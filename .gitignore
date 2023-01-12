@@ -1,0 +1,36 @@
+
+
+# ignore all compile_commands.json files recursively
+**/compile_commands.json
+
+# ignore all .DS_Store files recursively
+**/.DS_Store
+
+# ignore all .o files recursively
+**/*.o
+
+# ignore all .d files recursively
+**/*.d
+
+# ignore all .a files recursively
+**/*.a
+
+# ignore all .dylib files recursively
+**/*.dylib
+
+# ignore all _obj directories recursively
+**/_obj
+
+# ignore all _bin directories recursively
+**/_bin
+
+# ignore all _lib directories recursively
+**/_lib
+
+# ignore all _dep directories recursively
+**/_dep
+
+# ignore all _jsn directories recursively
+**/_jsn
+
+
