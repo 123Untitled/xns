@@ -3,6 +3,9 @@
 # ignore all compile_commands.json files recursively
 **/compile_commands.json
 
+# ignore all .cache files recursively
+**/.cache
+
 # ignore all .DS_Store files recursively
 **/.DS_Store
 
