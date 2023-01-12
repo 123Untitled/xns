@@ -7,7 +7,9 @@
 
 		#include <MacTypes.h>
 
-	#elif defined(__linux__)
+	#endif
+
+	//#elif defined(__linux__)
 
 		#include <cstdint>
 
@@ -36,7 +38,6 @@
 		using Double = double;
 		using Float = float;
 
-	#endif
 
 #endif
 
