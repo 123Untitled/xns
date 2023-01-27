@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <list>
 #include <csignal>
+#include <fcntl.h>
 
 #include "Types.hpp"
 #include "Macro.hpp"
