@@ -65,6 +65,8 @@ private:
 	// observers subscription
 	static void callObservers(void);
 
+	static int checkControlTerm(void);
+	static void getProcessInfos(void);
 
 
 public:
