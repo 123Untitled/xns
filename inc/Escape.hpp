@@ -2,11 +2,13 @@
 #define ESCAPE_HEADER
 
 #include <unistd.h>
-#include <string>
-typedef std::string String;
+#include <iostream>
+
 
 #include "Types.hpp"
 #include "Color.hpp"
+#include "Buffer.hpp"
+#include "Macro.hpp"
 
 #define ESC						"\x1b"
 
@@ -20,6 +22,9 @@ typedef std::string String;
 // ESC M	moves cursor one line up, scrolling if needed
 
 #define MOVE_HOME				ESC"[H"
+
+#define MOVE_LEFT				ESC"[1D"
+#define MOVE_RIGHT				ESC"[1C"
 
 
 ////////////////////////// ERASE FUNCTIONS
@@ -84,6 +89,9 @@ typedef std::string String;
 // save screen
 #define SAVE_SCREEN							ESC"[?47h"
 
+
+#define RESET_STYLE							ESC"[0m"
+
 //ESC[0m		reset all modes (styles and colors)
 //ESC[1m	ESC[22m	set bold mode.
 //ESC[2m	ESC[22m	set dim/faint mode.
@@ -93,9 +101,6 @@ typedef std::string String;
 //ESC[7m	ESC[27m	set inverse/reverse mode
 //ESC[8m	ESC[28m	set hidden/invisible mode
 //ESC[9m	ESC[29m	set strikethrough mode.
-/*enum {
-
-};*/
 
 
 
@@ -107,59 +112,84 @@ typedef std::string String;
 #define BACKGROUND				false
 
 
-class Esc {
-	private:
-	const UInt8*	_ptr;
-	UInt64			_size;
-	public:
-	Esc(void);
-	Esc(const Esc& copy);
-	Esc(const UInt8* ptr, const UInt64 size);
-	~Esc(void);
-	Esc& operator=(const Esc&);
-	const UInt8* ptr(void) const;
-	UInt64		size(void) const;
-};
+
+
+// -- E S C A P E  N A M E S P A C E ------------------------------------------
+
+namespace Escape {
+
+	// -- F U N C T I O N S ---------------------------------------------------
+
+	bool requestCursorPosition(UInt32& x, UInt32& y);
 
 
 
-class Escape {
+	// -- M O V E -------------------------------------------------------------
 
-private:
+	/* move position */
+	void move_position(UInt32 x, UInt32 y);
 
-	static const char*		_escapes[];
+	/* move left */
+	void move_left(void);
+
+	/* move right */
+	void move_right(void);
+
+	/* move home */
+	void move_home(void);
 
 
-	public:
+	// -- E R A S E -----------------------------------------------------------
 
-	static Esc			getEscapeSequence(void);
+	void eraseFromCursorToEOL(void);
 
-	static bool			requestCursorPosition(UInt32& x, UInt32& y);
+	/* erase line */
+	void erase_line(void);
 
-	/////////////////////////////////////////////
-	static SInt32		movePos(UInt32 x, UInt32 y);
-	static Esc			movePosEsc(UInt32 x, UInt32 y);
 
-	static SInt32		moveLeft(void);
-	static SInt32		moveRight(void);
-	static SInt32		moveHome(void);
-	static SInt32		eraseFromCursorToEOL(void);
-	// DRAW /////////////////////////
-	// SCREEN ////////////////////
-	static SInt32		enterScreen();
-	static SInt32		exitScreen();
-	static SInt32		clearScreen();
-	// COLOR /////////////////////
-	static Esc			set24bitColor(const UInt32 color, const bool fore);
-	//static SInt32		set24bitColor(const UInt32 color, const bool fore);
-	static SInt32		resetColor(void);
-	/////////////////////////////////
-	// CURSOR ///////////////
-	static SInt32		showCursor();
-	static SInt32		noCursor();
-	static SInt32		cursorBeam();
-	static SInt32		cursorUnderline();
-	static SInt32		cursorBlock();
+	// -- S C R E E N ---------------------------------------------------------
+
+	/* enter screen */
+	void enter_screen(void);
+
+	/* exit screen */
+	void exit_screen(void);
+
+	/* clear screen */
+	void clear_screen(void);
+
+
+	// -- C O L O R -----------------------------------------------------------
+
+	/* color rgb */
+	void color_rgb(const UInt32 color, const bool fore = true);
+
+	/* reset style */
+	void reset_style(void);
+
+
+	// -- C U R S O R ---------------------------------------------------------
+
+	/* show cursor */
+	void show_cursor(void);
+
+	/* hide cursor */
+	void hide_cursor(void);
+
+
+	// -- C U R S O R  S T Y L E ----------------------------------------------
+
+	/* cursor beam */
+	void cursor_beam(void);
+
+	/* cursor underline */
+	void cursor_underline(void);
+
+	/* cursor block */
+	void cursor_block(void);
+
+
+
 
 };
 
