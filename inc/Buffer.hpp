@@ -8,25 +8,45 @@
 #include <unistd.h>
 #include <iostream>
 
-class Buffer {
 
-public:
+// -- B U F F E R  C L A S S --------------------------------------------------
 
-	NON_INSTANCIABLE(Buffer);
+class Buffer final {
 
-	static void draw(const void* ptr, const UInt size);
-	static int render(const int fd = STDOUT_FILENO);
+	public:
 
-private:
+		// -- C O N S T R U C T O R S -----------------------------------------
 
-	static char* initBuffer(void);
-	static void staticDestructor(void);
-	static void extend(const UInt bytes);
+		/* non-instanciable class */
+		NON_INSTANCIABLE(Buffer);
 
 
-	static char*	_buff;
-	static UInt		_size;
-	static UInt		_pos;
+		// -- P U B L I C  M E T H O D S --------------------------------------
+
+		/* draw */
+		static void draw(const void* ptr, const UInt size);
+
+		/* render */
+		static int render(const int fd = STDOUT_FILENO);
+
+
+	private:
+
+		// -- P R I V A T E  M E T H O D S ------------------------------------
+
+		/* initialize buffer */
+		static char* initialize_buffer(void);
+
+		/* static destructor */
+		static void static_destructor(void);
+
+
+		static void extend(const UInt bytes);
+
+
+		static char*	_buff;
+		static UInt		_size;
+		static UInt		_pos;
 
 
 };

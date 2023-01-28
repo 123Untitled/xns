@@ -3,9 +3,9 @@
 
 #define DEFAULT_BUFFER_SIZE 1024
 
-char*	Buffer::_buff	= initBuffer();
-UInt	Buffer::_size	= DEFAULT_BUFFER_SIZE;
-UInt	Buffer::_pos	= 0;
+char* Buffer::_buff	= initialize_buffer();
+UInt  Buffer::_size	= DEFAULT_BUFFER_SIZE;
+UInt  Buffer::_pos	= 0;
 
 
 /* draw */
@@ -48,18 +48,21 @@ int Buffer::render(const int fd) {
 	return (writed);
 }
 
-/* initBuffer */
-char* Buffer::initBuffer(void) {
-	// record static method for end of program
-	std::atexit(&staticDestructor);
-	// return buffer default memory allocation
+/* initialize buffer */
+char* Buffer::initialize_buffer(void) {
+	// clean memory allocation at exit
+	std::atexit(&static_destructor);
+	// return new allocated memory
 	return (new char[DEFAULT_BUFFER_SIZE]());
 }
 
-/* staticDestructor */
-void Buffer::staticDestructor(void) {
-	// check pointer not null
-	if (_buff)
+/* static destructor */
+void Buffer::static_destructor(void) {
+	// check if buffer is allocated
+	if (_buff) {
 		// free memory
-		delete _buff;
+		delete[] _buff;
+		// reset buffer pointer
+		_buff = nullptr;
+	}
 }
