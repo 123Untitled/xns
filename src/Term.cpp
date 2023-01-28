@@ -98,7 +98,6 @@ void Term::callObservers(void) {
 	}
 }
 
-#include <iostream>
 
 TermSizeObserver::TermSizeObserver(void) {
 	Term::subscript(this);
@@ -141,7 +140,7 @@ std::list<TermSizeObserver*> Term::_observers;
 		std::cout << "stderr terminal control current process id: " << tcgid << std::endl;
 	}*/
 
-void Term::getProcessInfos(void) {
+void Term::get_process_info(void) {
 	// get the current process ID
 	const pid_t pid = getpid();
 	std::cout << "current process id: " << pid << std::endl;
@@ -180,7 +179,7 @@ void Term::getProcessInfos(void) {
 // thread ID
 
 
-int Term::checkControlTerm(void) {
+int Term::check_control_term(void) {
 
 	//char term[L_ctermid];
 	//char *ptr;
