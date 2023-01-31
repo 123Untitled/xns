@@ -27,7 +27,7 @@ public:
 
 	static void drawLine(const UInt x, const UInt y, const void *ptr, const UInt size);
 
-	static void drawStr(const UInt x, const UInt y, const Str& str);
+	static void drawStr(const UInt x, const UInt y, const String& str);
 
 	static void vertivalDraw(const UInt x, UInt y, const void *ptr, const UInt size, UInt line);
 
