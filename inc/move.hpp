@@ -12,13 +12,13 @@ namespace Xf {
 
 	/* move */
 	template <typename T>
-	inline constexpr typename remove_reference<T>::type&& move(T&& obj) noexcept {
+	inline constexpr typename Xf::remove_reference<T>::type&& move(T&& obj) noexcept {
 		// remove reference from T and return as rvalue reference
-		return static_cast<typename remove_reference<T>::type&&>(obj);
+		return static_cast<typename Xf::remove_reference<T>::type&&>(obj);
 	}
 
 
-}
+} // end of namespace Xf
 
 
 
