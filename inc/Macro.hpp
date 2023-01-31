@@ -1,7 +1,7 @@
 #ifndef MACRO_HEADER
 #define MACRO_HEADER
 
-#define LOOP(x,limit) for(UInt64 x = 0; x < UInt64(limit); x++)
+#define LOOP(x,limit) for(UInt64 x = 0; x < UInt64(limit); ++x)
 
 #define Loop(ite) for (uint x = 0; x < (ite); ++x)
 
