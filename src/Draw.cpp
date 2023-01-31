@@ -20,9 +20,9 @@ void Draw::drawLine(const UInt x, const UInt y, const void *ptr, const UInt size
 }
 
 /* drawStr */
-void Draw::drawStr(const UInt x, const UInt y, const Str& str) {
+void Draw::drawStr(const UInt x, const UInt y, const String& str) {
 	Escape::move_position(x, y);
-	Buffer::draw(str.getPointer(), str.getLen());
+	Buffer::draw(str.pointer(), str.length());
 }
 
 /* vertivalDraw */
