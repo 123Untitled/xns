@@ -86,9 +86,10 @@ STD := -std=c++20
 
 OPT := -O0
 
-CXXFLAGS :=	-Wall -Wextra -Werror -Wpedantic \
+CXXFLAGS :=	-Wall -Wextra -Werror \
 			-Wno-unused -Wno-unused-variable -Wno-unused-parameter \
 			-Winline
+#-Wpedantic \
 
 LDFLAGS ?=
 
@@ -146,7 +147,7 @@ all: ascii $(DYNAMIC_LIB) $(COMPILE_COMMANDS)
 
 # -- L I B R A R Y  T A R G E T S -----------------------------------------------
 
-$(DYNAMIC_LIB): obj | $(LIBDIR)
+$(DYNAMIC_LIB): obj
 	@echo $(COLOR)Dynamic-Link$(RESET) $@;
 	@$(CCX) $(OBJ) $(LDFLAGS) -dynamiclib -o $@;
 
