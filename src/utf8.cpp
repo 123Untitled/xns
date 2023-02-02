@@ -294,8 +294,8 @@ void parser(const char* str) {
 
 
 
+int test(void) {
 
-int main(void) {
 
 	const char* lc_type = std::getenv("LC_CTYPE");
 	if (!lc_type) {
