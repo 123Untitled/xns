@@ -1,77 +1,62 @@
-#include <Str.hpp>
+#include "Str.hpp"
 
-bool Strlst::_debug = false;
 
-void Strlst::debug(const char *message) const {
-	if (_debug) {
-		printf("%s::", typeid(*this).name());
-		//puts(message);
-		printf("%s -> ", message);
-		fflush(stdout);
-		printf("\n");
-	}
-}
+// -- C O N S T R U C T O R S -------------------------------------------------
 
-void Strlst::debugOn(void) {
-	_debug = true;
-}
-
-void Strlst::debugOff(void) {
-	_debug = false;
-}
-
-//////////////////////////////////////////////////////////////
-Strlst::Strlst()
+/* default constructor */
+LString::LString(void)
+// initializations
 : _head{nullptr}, _tail{nullptr}, _size{0}, _node{0} {
-	debug(DEFAULT_CONSTRUCTOR);
-	// default constructor
+	// nothing to do
 }
 
-
-/* DELETED COPY CONSTRUCTOR */
-Strlst::Strlst(const Strlst& copy)
-: Strlst{} {
-	debug(COPY_CONSTRUCTOR);
-	// Strlst copy constructor
-	STRNode* node = copy._head;
+/* copy constructor */ // !!! not implemented
+LString::LString(const LString& copy)
+: LString{} {
+	// LString copy constructor
+	Node* node = copy._head;
 	while (node) {
-		addBack(*node);
+		add_back(*node);
 		node = node->_nxt;
 	}
 }
 
-// destructor
-Strlst::~Strlst() {
-	// destructor
-	debug(DESTRUCTOR);
+/* move constructor */
+LString::LString(LString&& move) noexcept
+// initializations
+: _head{move._head}, _tail{move._tail}, _size{move._size}, _node{move._node} {
+	// initialize members
+	move.initialize_members();
+}
+
+/* destructor */
+LString::~LString() {
 	deleteList();
 }
 
-Strlst::Strlst(Strlst&& move) noexcept
-: _head{move._head}, _tail{move._tail}, _size{move._size}, _node{move._node} {
-	// Strlst move constructor
-	debug(MOVE_CONSTRUCTOR);
-	move.init();
-}
 
-void Strlst::operator=(Strlst&& move) {
-	debug(MOVE_OPERATOR);
+// -- O P E R A T O R S -------------------------------------------------------
+
+/* move operator */
+LString& LString::operator=(LString&& move) noexcept {
 	freeLst();
 	_head = move._head;
 	_tail = move._tail;
 	_size = move._size;
 	_node = move._node;
-	move.init();
+	move.initialize_members();
+	return *this;
 }
 
-void Strlst::operator=(Strlst& copy) {
-	debug(COPY_OPERATOR);
-	*this = Strlst{copy};
+/* assignment operator */
+LString& LString::operator=(const LString& copy) {
+	*this = LString{copy};
+	return *this;
 }
 
-Str* Strlst::operator[](const UInt32 index) const {
+String* LString::operator[](const UInt32 index) const {
 
-	STRNode* node = _head;
+	Node* node = _head;
 
 	for (UInt32 x = 0; node; x++) {
 		if (x == index)
@@ -81,23 +66,20 @@ Str* Strlst::operator[](const UInt32 index) const {
 }
 
 
-/*STRNode*	Strlst::getHead(void) {
-	return (_head);
-}*/
 
-
-void Strlst::init() {
+/* initialize members */
+void LString::initialize_members(void) {
 	_head = _tail = nullptr;
 	_size = _node = 0;
 }
 
-void Strlst::deleteList() {
+void LString::deleteList() {
 	freeLst();
-	init();
+	initialize_members();
 }
 
-void Strlst::freeLst() {
-	STRNode *del;
+void LString::freeLst() {
+	Node *del;
 	while (_head) {
 		del = _head;
 		_head = _head->_nxt;
@@ -106,8 +88,8 @@ void Strlst::freeLst() {
 }
 
 
-void Strlst::separator(Str&& sep) {
-	STRNode* node = _head;
+void LString::separator(String&& sep) {
+	Node* node = _head;
 	if (!node)
 		return;
 	//while (node->_nxt) {
@@ -118,18 +100,18 @@ void Strlst::separator(Str&& sep) {
 }
 
 
-void Strlst::print() const {
-	STRNode *node = _head;
+void LString::print() const {
+	Node *node = _head;
 
 	while (node) {
-		node->print();
+		node->print_string();
 		node = node->_nxt;
 	} printf("size::%u, node::%u\n\n", _size, _node);
 }
 
 
 
-void Strlst::deleteNode(STRNode *del) {
+void LString::deleteNode(Node *del) {
 
 	if (del->_nxt)
 		del->_nxt->_prv = del->_prv;
@@ -139,13 +121,13 @@ void Strlst::deleteNode(STRNode *del) {
 		del->_prv->_nxt = del->_nxt;
 	else _head = del->_nxt;
 	_node--;
-	_size -= del->getLen();
+	_size -= del->length();
 
 	delete (del);
 }
 
-void Strlst::deleteAt(const UInt32 index) {
-	STRNode *del = _head;
+void LString::deleteAt(const UInt32 index) {
+	Node *del = _head;
 	UInt32 x = 0;
 
 	while (del) {
@@ -155,87 +137,88 @@ void Strlst::deleteAt(const UInt32 index) {
 	}
 }
 
-void Strlst::frontLink(STRNode *add) {
+/* front link */
+void LString::front_link(Node* add) {
 
-	if (!_head)
-		_tail = add;
+	if (!_head) { _tail = add; }
 	else {
 		_head->_prv	= add;
 		add->_nxt	= _head;
 	} _head = add;
 }
 
-void Strlst::backLink(STRNode *add) {
+/* back link */
+void LString::back_link(Node* add) {
 
-	if (!_tail) {
-		_head = add;
-	} else {
+	if (!_tail) { _head = add; }
+	else {
 		_tail->_nxt	= add;
 		add->_prv	= _tail;
 	} _tail = add;
 }
 
-// ADD FRONT
-void Strlst::addFront(Str&& string) {
 
-	if (string.getLen()) {
-		// call string rvalue move STRNode constructor
-		STRNode *add = new STRNode{static_cast<Str &&>(string)};
+/* add front */
+void LString::add_front(String&& str) {
+
+	if (str.length()) {
+		// call string rvalue move Node constructor
+		Node *add = new Node{Xf::move(str)};
 		// make link
-		frontLink(add);
+		front_link(add);
 		// update class data
-		_size += add->getLen();
+		_size += add->length();
 		_node++;
 	}
 }
 
-void Strlst::addFront(const Str& string) {
+void LString::add_front(const String& str) {
 
-	if (string.getLen()) {
+	if (str.length()) {
 		// call string copy Node constructor
-		STRNode *add = new STRNode{string};
+		Node *add = new Node{str};
 		// make link
-		frontLink(add);
+		front_link(add);
 		// update class data
-		_size += add->getLen();
+		_size += add->length();
 		_node++;
 	}
 }
 
 
 // ADD BACK
-void Strlst::addBack(Str&& string) {
+void LString::add_back(String&& str) {
 
-	if (string.getLen()) {
+	if (str.length()) {
 		// call string rvalue move Node constructor
-		STRNode *add = new STRNode{static_cast<Str &&>(string)};
+		Node *add = new Node{Xf::move(str)};
 		// make link
-		backLink(add);
+		back_link(add);
 		// update class data
-		_size += add->getLen();
+		_size += add->length();
 		_node++;
 	}
 }
 
-void Strlst::addBack(const Str& string) {
+void LString::add_back(const String& str) {
 
-	if (string.getLen()) {
+	if (str.length()) {
 		// call string copy Node constructor
-		STRNode *add = new STRNode{string};
+		Node *add = new Node{str};
 		// make link
-		backLink(add);
+		back_link(add);
 		// update class data
-		_size += add->getLen();
+		_size += add->length();
 		_node++;
 	}
 }
 
 
-Str Strlst::release() {
+String LString::merge(void) {
 	// local variable to return
-	Str merged{_size};
+	String merged{_size};
 	// local node initialized with head list
-	STRNode *node = _head;
+	Node *node = _head;
 	// run over list and append string
 	while (node) {
 		merged.append(*node);
@@ -246,21 +229,29 @@ Str Strlst::release() {
 
 
 
-//////////////////////////////// STRNode class
+
+// -- N O D E  C L A S S ------------------------------------------------------
 
 
-Strlst::STRNode::STRNode(const Str& string)
-: Str{string._str, string._len}, _nxt{nullptr}, _prv{nullptr} {
-	// string copy constructor
+// -- C O N S T R U C T O R S -------------------------------------------------
+
+/* string copy constructor */
+LString::Node::Node(const String& str)
+// initializations
+: String{str._str, str._size}, _nxt{nullptr}, _prv{nullptr} {
+	// nothing to do
 }
 
-Strlst::STRNode::STRNode(Str &&string)
-: Str{static_cast<Str &&>(string)}, _nxt{nullptr}, _prv{nullptr} {
-	// string move constructor
+/* string move constructor */
+LString::Node::Node(String&& str)
+// initializations
+: String{Xf::move(str)}, _nxt{nullptr}, _prv{nullptr} {
+	// nothing to do
 }
 
-Strlst::STRNode::~STRNode(void) {
-	// destructor
+/* destructor */
+LString::Node::~Node(void) {
+	// nothing to do
 }
 
 
@@ -269,39 +260,39 @@ Strlst::STRNode::~STRNode(void) {
 
 
 ////////////////////////////// ITERATOR
-Strlst::Iterator::Iterator(Strlst& lst)
+LString::Iterator::Iterator(LString& lst)
 : _ptr{&(lst._head)} {
 }
 
-Strlst::Iterator::Iterator(STRNode** node)
+LString::Iterator::Iterator(Node** node)
 : _ptr{node} {
 }
 
-bool Strlst::Iterator::operator!(void) {
+bool LString::Iterator::operator!(void) {
 	return (!(*_ptr));
 }
 
-void Strlst::Iterator::start(Strlst& lst) {
+void LString::Iterator::start(LString& lst) {
 	_ptr = &lst._head;
 }
 
-void Strlst::Iterator::end(Strlst& lst) {
+void LString::Iterator::end(LString& lst) {
 	_ptr = &lst._tail;
 }
 
 // Prefix increment operator.
-Strlst::Iterator& Strlst::Iterator::operator++(void) {
+LString::Iterator& LString::Iterator::operator++(void) {
 	if (*_ptr)
 		_ptr = &(*_ptr)->_nxt;
 		//*_ptr = (*_ptr)->_nxt;
 	return (*this);
 }
-Strlst::Iterator::operator bool() {
+LString::Iterator::operator bool() {
 	return (*_ptr);
 }
 
 // Postfix increment operator.
-Strlst::Iterator Strlst::Iterator::operator++(int) {
+LString::Iterator LString::Iterator::operator++(int) {
 	Iterator tmp{_ptr};
 	if (*_ptr)
 		_ptr = &(*_ptr)->_nxt;
@@ -310,7 +301,7 @@ Strlst::Iterator Strlst::Iterator::operator++(int) {
 }
 
 // Postfix increment operator.
-Strlst::Iterator Strlst::Iterator::operator--(int) {
+LString::Iterator LString::Iterator::operator--(int) {
 	Iterator tmp{_ptr};
 	if (*_ptr)
 		_ptr = &(*_ptr)->_prv;
@@ -318,7 +309,7 @@ Strlst::Iterator Strlst::Iterator::operator--(int) {
 	return (tmp);
 }
 
-Str& Strlst::Iterator::operator*(void) {
+String& LString::Iterator::operator*(void) {
 	return (**_ptr);
 }
 
