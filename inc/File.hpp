@@ -1,33 +1,24 @@
 #ifndef _FILE_HEADER_
 #define _FILE_HEADER_
 
-#include <Str.hpp>
+
+#include "Str.hpp"
+#include "Draw.hpp"
+
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include <Draw.hpp>
-#include <Error.hpp>
 
-/*
-#ifndef NOERR
-#define NOERR 0
-#endif
 
-#ifndef ERROR
-#define ERROR 1
-#endif
-*/
-
-////////////
 class File {
 
 private:
 	typedef struct stat Stat;
 	#define FILE_BUFFER_SIZE 64
 
-	Str		_file;
-	Str		_path;
-	int		_fd;
+	String		_file;
+	String		_path;
+	int     _fd;
 	Stat	_data;
 
 	// deleted method
@@ -37,17 +28,18 @@ private:
 public:
 	// constructor and destructor
 	File(void);
-	File(const Str& name);
+	File(const String& name);
 	~File(void);
 
-	void	setFileName(Str&& name);
+	void	setFileName(String&& name);
 	int		openFile(void);
 	int		catchFile(void);
 	void	print(void);
 
 	// getter
-	const Str& getPath(void) const;
-}; ////////////////////////////////
+	const String& getPath(void) const;
+
+};
 
 
 /*
