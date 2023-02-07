@@ -20,7 +20,7 @@ bool Directory::isSlashTerminated(const String& path) {
 void Directory::makeAbsolute(String& path) {
 	static char buff[MAXPATHLEN];
 
-	if (isRelative(path) && getwd(buff) != nullptr)
+	if (isRelative(path) && getcwd(buff, MAXPATHLEN) != nullptr)
 		path = String{buff} + String{S_SLASH} + path;
 }
 
@@ -221,7 +221,7 @@ DirEntity::DirEntity(void) {
 
 DirEntity::DirEntity(const String& path, const Dirent* dirent)
 // initialize name and full path
-: _name{dirent->d_name, dirent->d_namlen}, _path{path + _name} {
+: _name{dirent->d_name, strlen(dirent->d_name)}, _path{path + _name} {
 	// memory copy 'Dirent' structure
 	std::memcpy(&_dirent, dirent, sizeof(Dirent));
 	// get stat data about entity
