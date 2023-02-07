@@ -19,10 +19,12 @@ void Draw::drawLine(const UInt x, const UInt y, const void *ptr, const UInt size
 	Buffer::draw(ptr, size);
 }
 
-/* drawStr */
-void Draw::drawStr(const UInt x, const UInt y, const String& str) {
+/* draw string */
+void Draw::draw_string(const UInt x, const UInt y, const std::string& str) {
+	// move to position
 	Escape::move_position(x, y);
-	Buffer::draw(str.pointer(), str.length());
+	// draw string
+	Buffer::draw(str.data(), str.size());
 }
 
 /* vertivalDraw */
