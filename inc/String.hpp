@@ -16,7 +16,6 @@
 // forward declarations
 class LString;
 
-
 // -- S T R I N G  C L A S S --------------------------------------------------
 
 class String {
@@ -231,9 +230,14 @@ class String {
 
 		// -- A L G O R I T H M S ---------------------------------------------
 
-		void pull_twin(void);
 
 		void pull_repeat(void);
+
+		/* forward remove duplicates */
+		void forward_remove_duplicates(void);
+
+		/* backward remove duplicates */
+		void backward_remove_duplicates(void);
 
 
 	private:
@@ -268,6 +272,11 @@ class String {
 		Char* allocation(const UInt size) const;
 
 
+		/* unsafe copy */
+		static void unsafe_copy(Char* dst, const Char* src, const Size size);
+
+		/* unsafe bzero */
+		static void unsafe_bzero(Char* dst, const Size size);
 
 
 
