@@ -1,4 +1,5 @@
 
+xfunc
 
 # ignore all compile_commands.json files recursively
 **/compile_commands.json
