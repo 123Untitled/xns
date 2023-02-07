@@ -2,7 +2,7 @@
 #define _FILE_HEADER_
 
 
-#include "Str.hpp"
+#include "String.hpp"
 #include "Draw.hpp"
 
 #include <fcntl.h>
