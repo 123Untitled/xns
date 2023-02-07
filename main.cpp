@@ -7,8 +7,10 @@
 #include "allocator.hpp"
 #include "vector.hpp"
 #include "array.hpp"
+
 #include <array>
 #include <vector>
+#include <iostream>
 
 
 void* print(void* instance) {
@@ -28,7 +30,7 @@ void* arrow(void* instance) {
 
 void* _return(void* instance) {
 	std::cout << "RETURN" << std::endl;
-	Xf::Input::stop_loop();
+	//Xf::Input::stop_loop();
 	return nullptr;
 }
 
@@ -76,25 +78,21 @@ std::ostream& operator<<(std::ostream& os, const Test& t) {
 
 int main(void) {
 
-	Xf::Event& instance = Xf::Event::instance();
+	using namespace Xf;
 
+	Evntmode normal = Event::instance().add_mode("NORMAL");
 
-	Xf::Event::Mode* mode1 = instance.add_mode("hello");
-	Xf::Event::Mode* mode2 = instance.add_mode("world");
-	Xf::Event::Mode* mode3 = instance.add_mode("!!!!!");
+	Evntmode insert = Event::instance().add_mode("world");
 
-	std::cout << "mode1: " << mode1->name() << std::endl;
-	std::cout << "mode2: " << mode2->name() << std::endl;
-	std::cout << "mode3: " << mode3->name() << std::endl;
+	if (!normal) {
+		std::cout << "NORMAL MODE" << std::endl;
+	}
 
-	mode1->subscribe(Xf::Evntype::ESCAPE, escape, nullptr);
+	int a = 42;
 
+	loop();
 
-
-	//instance.add_mode("hello");
-
-
-
+	normal.subscribe(Xf::Evntype::ESCAPE, escape, &a);
 
 	return 0;
 }
