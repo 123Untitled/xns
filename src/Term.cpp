@@ -7,8 +7,9 @@ constinit bool		Term::_isready	= false;
 
 
 void Term::staticDestructor(void) {
-	if (_israw)
+	if (_israw) {
 		Term::setOrigin();
+	}
 }
 
 const Term::Termios Term::setupTerm(void) {
