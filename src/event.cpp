@@ -5,17 +5,20 @@
 
 /* default constructor */
 Xf::Event::Event(void)
-: _modes{} {
+: _modes{}, _current{nullptr} {
+	// add default mode
+	add_mode("default");
+	// set default mode
+	set_mode("default");
 }
 
 /* destructor */
 Xf::Event::~Event(void) {
-	// clean up observer list
-	//clear();
+	// code here...
 }
 
 
-// -- S T A T I C  P U B L I C  M E T H O D S ---------------------------------
+// -- S T A T I C  M E T H O D S ----------------------------------------------
 
 /* get singleton instance */
 Xf::Event& Xf::Event::instance(void) {
@@ -27,30 +30,33 @@ Xf::Event& Xf::Event::instance(void) {
 // -- P U B L I C  M E T H O D S ----------------------------------------------
 
 /* add mode */
-Xf::Event::Mode* Xf::Event::add_mode(std::string&& name) {
-	std::cout << "----------------------\n\n" << std::endl;
+void Xf::Event::add_mode(std::string&& name) {
 	// check invalid name
-	if (name.empty()) { return nullptr; }
+	if (name.empty()) { return; }
 	// loop through all modes
 	for (Size x = 0; x < _modes.size(); ++x) {
 		// check mode already exists
 		if (_modes[x].name() == name) {
-			std::cout << "Mode already exists" << std::endl;
 			// exit method
-			return &_modes[x];
+			return;
 		} // add mode
-	}
-	_modes.push_back(Xf::move(name));
-	std::cout << "Mode added-> " << _modes.back().name() << std::endl;
+	} _modes.push_back(Xf::move(name));
 	// return new mode
-	return &_modes.back();
+	return;
 }
 
-/* set mode */
-void Xf::Event::set_mode(Mode* mode) {
-	// check invalid mode
-	if (!mode) { return; }
-	_current = mode;
+/* set mode by name */
+void Xf::Event::set_mode(const std::string& name) {
+	// loop through all modes
+	for (Size x = 0; x < _modes.size(); ++x) {
+		// check mode name
+		if (_modes[x].name() == name) {
+			// set new current mode
+			_current = &_modes[x];
+			// exit method
+			return;
+		}
+	}
 }
 
 
@@ -159,6 +165,10 @@ Xf::Event Xf::Event::_instance;
 
 /* observers list */
 //Xf::Event::Observer* Xf::Event::_observers[IDX(Evntype::EVNT_MAX)] = { nullptr };
+
+
+
+
 
 
 
