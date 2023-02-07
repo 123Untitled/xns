@@ -1,25 +1,21 @@
 #include "Input.hpp"
 
-SInt64							Input::_readed;
-char							Input::_buff[BUFFER_SIZE + 1];
-Input::String					Input::_input;
-Input::List<Input::Observer*>	Input::_observers[static_cast<UInt64>
-												(KeyEvent::EVNT_NBR)];
 
-SInt64 Input::readInput(void) {
-	// read bytes from stdin
-	_readed = read(STDIN_FILENO, _buff, BUFFER_SIZE);
-	// append null terminator
-	_buff[_readed] = '\0';
-	// return number of readed bytes
-	return (_readed);
-}
+// -- S T A T I C  P R I V A T E  M E M B E R S -------------------------------
 
-void Input::getEvent(void) {
+SInt64      Xf::Input::_readed                = 0;
+char        Xf::Input::_buff[BUFFER_SIZE + 1] = { 0 };
+std::string Xf::Input::_input                 = "";
+bool        Xf::Input::_is_running            = false;
+
+
+// -- S T A T I C  P U B L I C  M E T H O D S ---------------------------------
+
+void Xf::Input::get_event(void) {
 	// reset string
 	_input.clear();
 	// read stdin
-	if (readInput() > 0) {
+	if (read_stdin() > 0) {
 		// append buffer to the string
 		_input.append(_buff, _readed);
 		// buffer is full, loop over reading
@@ -27,91 +23,104 @@ void Input::getEvent(void) {
 			// set to non-blocking read
 			Term::setRaw(VFlag::NON_BLOCKING);
 			// read stdin again
-			while (readInput() > 0) {
+			while (read_stdin() > 0) {
 				// append buffer to the string
 				_input.append(_buff, _readed);
 			} // back to blocking read
 			Term::setRaw(VFlag::BLOCKING);
 		} // analyze readed bytes
-		processInput();
+		//processInput();
 	}
 }
 
-void Input::processArrow(void) {
-
-	switch (_input[2]) {
-		case 'A': // code for arrow up
-			callObservers(KeyEvent::KEY_UP);
-			break;
-		case 'B': // code for arrow down
-			callObservers(KeyEvent::KEY_DOWN);
-			break;
-		case 'C': // code for arrow right
-			callObservers(KeyEvent::KEY_RIGHT);
-			break;
-		case 'D': // code for arrow left
-			callObservers(KeyEvent::KEY_LEFT);
-			break;
-		default:
-			break;
+/* input loop */
+void Xf::Input::start_loop(void) {
+	// set running flag
+	_is_running = true;
+	// loop over reading
+	while (_is_running) {
+		// read stdin
+		get_event();
+		// analyze readed bytes
+		process_input();
 	}
 }
 
-void Input::processEscape(void) {
-	if (_input[1] == 0x5b)
-		processArrow();
+/* stop input loop */
+void Xf::Input::stop_loop(void) {
+	// unset running flag
+	_is_running = false;
 }
 
-void Input::processInput(void) {
+
+// -- S T A T I C  P R I V A T E  M E T H O D S -------------------------------
+
+/* read stdin */
+SInt64 Xf::Input::read_stdin(void) {
+	// read bytes from stdin
+	_readed = read(STDIN_FILENO, _buff, BUFFER_SIZE);
+	// append null terminator
+	_buff[_readed] = '\0';
+	// return number of readed bytes
+	return _readed;
+}
+
+
+
+
+
+void Xf::Input::process_input(void) {
+
+	// get event instance
+	Xf::Event& event = Xf::Event::instance();
+
 	if (_input.length() == 3) {
-		if (_input[0] == 0x1b)
-			processEscape();
+
+		// check escape sequence
+		if (_input[0] == 0x1b) {
+			// check ctrl sequence
+			if (_input[1] == 0x5b) {
+				// check arrow sequence
+				switch (_input[2]) {
+					case 'A': // code for arrow up
+						event.call(Xf::Evntype::UP);
+						break;
+					case 'B': // code for arrow down
+						event.call(Xf::Evntype::DOWN);
+						break;
+					case 'C': // code for arrow right
+						event.call(Xf::Evntype::RIGHT);
+						break;
+					case 'D': // code for arrow left
+						event.call(Xf::Evntype::LEFT);
+						break;
+					default:
+						break;
+				}
+			}
+		}
 	}
 	else if (_input.length() == 1) {
-		if (_input[0] == 0x1b)
-			callObservers(KeyEvent::KEY_ESCAPE);
+
+		switch (_input[0]) {
+			case 0x1b:
+				event.call(Xf::Evntype::ESCAPE);
+				break;
+			case 0x0a:
+				event.call(Xf::Evntype::ENTER);
+				break;
+			case 0x7f:
+				event.call(Xf::Evntype::BACKSPACE);
+				break;
+			case 0x09:
+				event.call(Xf::Evntype::TAB);
+				break;
+			case 0x0d:
+				event.call(Xf::Evntype::RETURN);
+				break;
+			default:
+				break;
+		}
 	}
 }
-
-
-void Input::subscript(Observer* obs, const KeyEvent key) {
-	// add new observer to indexed list by 'key'
-	_observers[static_cast<UInt64>(key)].push_back(obs);
-}
-
-void Input::callObservers(const KeyEvent key) {
-	// indexed list by 'key' iterator declaration
-	auto ite = _observers[static_cast<UInt64>(key)].begin();
-	// iterate over observer list
-	while (ite != _observers[static_cast<UInt64>(key)].end()) {
-		// call indexed inherited function by 'key'
-		((*ite)->*Observer::_keyfn[static_cast<UInt64>(key)])();
-		// move to next observer
-		ite++;
-	}
-}
-
-/////////////////////////////////////////////////// OBSERVER
-
-Input::Observer::Observer(void) {
-	// Observer constructor
-}
-
-Input::Observer::~Observer(void) {
-	// Observer destructor
-}
-
-const Input::Observer::Keyfn \
-Input::Observer::_keyfn[static_cast<UInt64>(KeyEvent::EVNT_NBR)] = {
-	// member functions static array initialization
-	&Input::Observer::onKeyUp,
-	&Input::Observer::onKeyDown,
-	&Input::Observer::onKeyLeft,
-	&Input::Observer::onKeyRight,
-	&Input::Observer::onKeyEscape,
-	&Input::Observer::onKeyEnter,
-};
-
-
-
 
