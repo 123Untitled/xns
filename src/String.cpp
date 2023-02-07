@@ -1,4 +1,4 @@
-#include "Str.hpp"
+#include "String.hpp"
 
 
 #define nullchar '\0'
@@ -10,30 +10,33 @@
 String::String(void)
 // initializations
 : _str{nullptr}, _size{0}, _capacity{0} {
-	// nothing to do
+	// code here...
 }
 
 /* capacity constructor */
 String::String(const Size capacity)
 // initializations
-: _str{capacity ? new char[capacity] : nullptr}, _size{0}, _capacity{capacity} {
-	// initialize memory
-	initialize_memory();
+: _str{allocation(capacity)}, _size{0}, _capacity{capacity} {
+	// code here...
 }
 
 /* null-terminated string constructor */
-String::String(const char* str)
+String::String(const Char* str)
 // initializations
-: _str{nullptr}, _size{0}, _capacity{0} {
+: String{ } {
 	// check if string is not empty
 	if ((_size = get_len(str)) != 0) {
 		// set capacity
 		_capacity = _size + 1;
 		// allocate memory
-		_str = new char[_capacity];
-		// loop through string
+		_str = allocation(_capacity);
+		// set nullchar
+		_str[_size] = '\0';
+		// copy string
+		unsafe_copy(_str, str, _size);
 	}
 }
+
 
 /* buffer constructor */
 String::String(const char* str, const Size size)
@@ -342,12 +345,18 @@ void String::deallocate(void) {
 }
 
 
-
 /* allocation */
-char* String::allocation(const UInt size) const {
-	char *tmp = new char[size + 1]();
-	tmp[size] = nullchar;
-	return (tmp);
+Char* String::allocation(const Size capacity) const {
+	// check capacity is not zero
+	if (capacity) {
+		// allocate new memory space
+		Char* str = new Char[capacity];
+		// initialize memory
+		unsafe_bzero(str, capacity);
+		// return new memory space
+		return str;
+	} // else return null
+	return nullptr;
 }
 
 void String::copy(Char *dest, const Char *src, UInt32 start) {
@@ -380,6 +389,24 @@ void String::fill(const Char character) {
 	}
 }
 
+/* unsafe copy */
+void String::unsafe_copy(Char* dst, const Char* src, const Size size) {
+	// loop through src
+	for (Size x = 0; x < size; ++x) {
+		// copy character to dst
+		dst[x] = src[x];
+	}
+}
+
+/* unsafe bzero */
+void String::unsafe_bzero(Char* dst, const Size size) {
+	// loop through dst
+	for (Size x = 0; x < size; ++x) {
+		// set each character to null
+		dst[x] = '\0';
+	}
+}
+
 
 
 
@@ -399,8 +426,8 @@ bool String::resize(const UInt32 len) {
 
 void String::pull_repeat(void) {
 
-	UInt32 x = 0;
-	UInt32 z = 0;
+	Size x = 0;
+	Size z = 0;
 
 	if (_str) {
 		while (z + x < _size) {
@@ -413,20 +440,54 @@ void String::pull_repeat(void) {
 	}
 }
 
-void String::pull_twin(void) {
 
-	if (!_str)
-		return;
-	for (UInt32 x = 0; _str[x + 1]; x++) {
-		for (UInt32 z = x + 1; _str[z]; z++) {
-			if (_str[x] != _str[z])
-				continue;
-			for (z = x; _str[z]; z++) {
-				_str[z] = _str[z + 1];
-			} _size--; x--;
-			break;
-		}
+/* forward remove duplicates */
+void String::forward_remove_duplicates(void) {
+
+	bool seen[UINT8_MAX] = { false };
+
+	if (!_str) { return; }
+
+	UInt8* ptr = reinterpret_cast<UInt8*>(_str);
+	// initialize new size
+	Size length = _size;
+
+	_size = 0;
+	// loop through string characters
+	for (Size z = 0, x = 0; x < length; ++x) {
+		// check if character has been seen
+		if (seen[ptr[x]]) { continue; }
+		// set character as seen
+		seen[ptr[x]] = true;
+		// copy character to new position
+		_str[_size++] = _str[x];
+	} // set null character
+	_str[_size] = 0;
+}
+
+/* backward remove duplicates */
+void String::backward_remove_duplicates(void) {
+
+	bool seen[UINT8_MAX] = { false };
+
+	if (!_str) { return; }
+
+	UInt8* ptr = reinterpret_cast<UInt8*>(_str);
+
+	Size x = _size;
+	Size z = x;
+
+	while (x--) {
+		if (seen[ptr[x]]) { continue; }
+		seen[ptr[x]] = true;
+		_str[--z] = _str[x];
 	}
+	_size = _size - z;
+
+	for (x = 0; x < _size; ++x) {
+		_str[x] = _str[x + z];
+	} _str[_size] = 0;
+
 }
 
 /* split */
@@ -489,6 +550,7 @@ LString String::split2(String&& sep) const {
 void String::print_string(void) const {
 	if (_str && _size) {
 		write(STDOUT_FILENO, _str, _size);
+		write(STDOUT_FILENO, "\n", 1);
 	}
 }
 
@@ -499,6 +561,7 @@ void String::debug_string(void) const {
 			std::cout << "String: "   << std::setw(10) << _str      << std::endl;
 			std::cout << "Size: "     << std::setw(10) << _size     << std::endl;
 			std::cout << "Capacity: " << std::setw(10) << _capacity << std::endl;
+			return;
 		}
 		write(STDOUT_FILENO, "(empty)", 7);
 		return;
@@ -512,7 +575,7 @@ void String::debug_string(void) const {
 
 
 
-String& String::append(const String &append) {
+String& String::append(const String& append) {
 
 	if (!append._str)
 		return *this;
