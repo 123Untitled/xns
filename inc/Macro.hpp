@@ -38,9 +38,13 @@
 	NON_COPYABLE(Obj)						\
 	NON_MOVABLE(Obj)
 
+#define NO_OPERATOR(OBJ, OP) \
+	OBJ& operator OP (const OBJ&) = delete; \
+	OBJ& operator OP (OBJ&&) = delete
 
 
-#define IDX(type) static_cast<uint>((type))
+
+#define IDX(type) static_cast<int>((type))
 
 #define CAST(type, var) static_cast<type>((var))
 
