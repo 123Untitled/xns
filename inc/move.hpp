@@ -7,7 +7,6 @@
 
 namespace Xf {
 
-
 	// -- M O V E -------------------------------------------------------------
 
 	/* move */
@@ -18,7 +17,7 @@ namespace Xf {
 	}
 
 
-} // end of namespace Xf
+}
 
 
 
