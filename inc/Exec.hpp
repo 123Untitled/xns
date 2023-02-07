@@ -5,6 +5,9 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <cstring>
 
 #include "Types.hpp"
 
