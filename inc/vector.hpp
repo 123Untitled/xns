@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Types.hpp"
 #include "allocator.hpp"
+#include "array.hpp"
 
 // -- N A M E S P A C E -------------------------------------------------------
 
@@ -50,20 +51,7 @@ namespace Xf {
 			// initializations
 			: _vector{nullptr}, _capacity{0}, _size{0} { }
 
-			/* initializer list constructor */
-			explicit Vector(std::initializer_list<Value> list)
-			// initializations
-			: Vector{} {
-				// reserve list size
-				reserve(list.size());
-				// loop through list
-				for (auto& value : list) {
-					// construct value by copy
-					Allocator::construct(_vector + _size, value);
-					// increment size
-					++_size;
-				}
-			}
+
 
 			/* copy constructor */
 			Vector(const Vector& other)
