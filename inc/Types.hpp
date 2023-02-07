@@ -5,13 +5,14 @@
 	// preprocessor check operating system
 	#if defined(__APPLE__) && defined(__MACH__)
 
-		#include <MacTypes.h>
+		//#include <MacTypes.h>
 
 	#endif
 
 	//#elif defined(__linux__)
 
 		#include <cstdint>
+		#include <cstddef>
 
 		using SInt = int;
 		using UInt = unsigned int;
@@ -37,6 +38,8 @@
 
 		using Double = double;
 		using Float = float;
+
+		using Size = size_t;
 
 
 #endif
