@@ -59,7 +59,14 @@ namespace Xf {
 			/* deallocate */
 			static void deallocate(Pointer pointer, const Size size) {
 				// deallocate memory
+				// linux
+#ifdef __linux__
+				delete(pointer);
+#endif
+				// macos
+#ifdef __APPLE__
 				::operator delete(pointer, size * sizeof(Value));
+#endif
 			}
 
 
