@@ -17,6 +17,9 @@
 
 namespace Xf {
 
+	/* forward declaration */
+	class Evntmode;
+
 	/* event */
 	enum class Evntype {
 		ESCAPE, ENTER, BACKSPACE, DELETE, TAB, RETURN,
@@ -68,11 +71,6 @@ namespace Xf {
 			class Observer;
 
 
-			// -- P R I V A T E  A L I A S E S --------------------------------
-
-			using Modelist = Xf::List<Mode>;
-
-
 		public:
 
 			// -- S T A T I C  M E T H O D S ----------------------------------
@@ -84,10 +82,10 @@ namespace Xf {
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* add mode */
-			Mode* add_mode(std::string&&);
+			void add_mode(std::string&&);
 
-			/* set mode */
-			void set_mode(Mode*);
+			/* set mode by name */
+			void set_mode(const std::string&);
 
 			/* subscribe to event */
 			void subscribe(const Evntype, Evntfunc, Object);
@@ -120,12 +118,16 @@ namespace Xf {
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
 			/* modes vector */
-			Modelist _modes;
+			Xf::Vector<Mode> _modes;
 
 			/* current mode */
 			Mode* _current;
 
+			using Obslist = Xf::Vector<Observer>[IDX(Evntype::EVNT_MAX)];
 
+			using Pair = Xf::Pair<std::string, Obslist>;
+
+			Xf::Vector<Pair> _observers;
 
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------
 
@@ -133,90 +135,78 @@ namespace Xf {
 			static Event _instance;
 
 
+
+
 	};
 
-
-	// -- E V N T M O D E  C L A S S ------------------------------------------
-
-	class Evntmode final {
-
-		Xf::Event::Mode* _mode;
-
-	};
 
 
 	// -- M O D E  P R I V A T E  N E S T E D  S T R U C T --------------------
 
-	class Event::Mode final {
-
-		public:
-
-			// -- C O N S T R U C T O R S -------------------------------------
-
-			/* deleted default constructor */
-			Mode(void) = delete;
-
-			/* copy name constructor */
-			Mode(const std::string&);
-
-			/* move name constructor */
-			Mode(std::string&&) noexcept;
-
-			/* copy constructor */
-			Mode(const Mode&);
-
-			/* move constructor */
-			Mode(Mode&&) noexcept;
-
-			/* destructor */
-			~Mode(void);
-
-
-			// -- O P E R A T O R S -------------------------------------------
-
-			/* copy operator */
-			Mode& operator=(const Mode&);
-
-			/* move operator */
-			Mode& operator=(Mode&&);
-
-
-			// -- A C C E S S O R S -------------------------------------------
-
-			/* get name */
-			const std::string& name(void) const;
-
-			/* subscribe */
-			void subscribe(const Evntype, Evntfunc, Object);
-
-			/* unsubscribe */
-			void unsubscribe(const Evntype, Evntfunc, Object);
-
-
-
-
-		private:
-
-			// -- P R I V A T E  A L I A S E S --------------------------------
-
-			/* observer list */
-			using Obslist = Xf::Vector<Observer>;
-
-			/* event list */
-			using Evntlist = Xf::Array<Obslist, IDX(Evntype::EVNT_MAX)>;
-
-
-			// -- P R I V A T E  M E M B E R S --------------------------------
-
-			/* mode name */
-			std::string _name;
-
-			Obslist _observers[IDX(Evntype::EVNT_MAX)];
-			/* event list */
-			Evntlist _events;
-
-
-	};
+//	class Event::Mode final {
+//
+//		public:
+//
+//			// -- C O N S T R U C T O R S -------------------------------------
+//
+//			/* deleted default constructor */
+//			Mode(void) = delete;
+//
+//			/* copy name constructor */
+//			Mode(const std::string&);
+//
+//			/* move name constructor */
+//			Mode(std::string&&) noexcept;
+//
+//			/* copy constructor */
+//			Mode(const Mode&);
+//
+//			/* move constructor */
+//			Mode(Mode&&) noexcept;
+//
+//			/* destructor */
+//			~Mode(void);
+//
+//
+//			// -- O P E R A T O R S -------------------------------------------
+//
+//			/* copy operator */
+//			Mode& operator=(const Mode&);
+//
+//			/* move operator */
+//			Mode& operator=(Mode&&);
+//
+//
+//			// -- A C C E S S O R S -------------------------------------------
+//
+//			/* get name */
+//			const std::string& name(void) const;
+//
+//			/* subscribe */
+//			void subscribe(const Evntype, Evntfunc, Object);
+//
+//			/* unsubscribe */
+//			void unsubscribe(const Evntype, Evntfunc, Object);
+//
+//
+//
+//
+//		private:
+//
+//			// -- P R I V A T E  A L I A S E S --------------------------------
+//
+//			/* observer list */
+//			using Obslist = Xf::Vector<Observer>;
+//
+//			// -- P R I V A T E  M E M B E R S --------------------------------
+//
+//			/* mode name */
+//			std::string _name;
+//
+//			Obslist _observers[IDX(Evntype::EVNT_MAX)];
+//
+//
+//	};
 
 
 	// -- O B S E R V E R  C L A S S ------------------------------------------
