@@ -88,7 +88,7 @@ OPT := -O0
 
 CXXFLAGS :=	-Wall -Wextra -Werror \
 			-Wno-unused -Wno-unused-variable -Wno-unused-parameter \
-			-Winline
+			-Winline -fno-exceptions -fno-rtti
 #-Wpedantic \
 
 LDFLAGS ?=
@@ -136,6 +136,9 @@ define resume
 	@$(EXA) $(1);
 endef
 
+# -- P H O N Y  T A R G E T S ---------------------------------------------------
+
+.PHONY: all clean fclean re ascii obj main
 
 
 # -- M A I N  T A R G E T S -----------------------------------------------------
@@ -144,6 +147,9 @@ all: ascii $(DYNAMIC_LIB) $(COMPILE_COMMANDS)
 	@echo $(COLOR)'[v]'$(RESET) "All targets are up to date !";
 	$(call resume, $(DYNAMIC_LIB))
 
+
+main: main.cpp $(DYNAMIC_LIB)
+	@$(CCX) $(STD) $(OPT) $(CXXFLAGS) $(INCLUDES) -L. -lxfunc $< -o exec
 
 # -- L I B R A R Y  T A R G E T S -----------------------------------------------
 
@@ -209,9 +215,6 @@ ascii:
 		$(RESET);
 
 
-# -- P H O N Y  T A R G E T S ---------------------------------------------------
-
-.PHONY: all clean fclean re ascii obj
 
 
 
