@@ -63,7 +63,7 @@ class Term {
 
 		static void subscript(TermSizeObserver* obs);
 
-		static void setRaw(const VFlag vmin);
+		static void setRaw(const VFlag vmin = VFlag::BLOCKING);
 		static void setOrigin(void);
 		static void flush(void);
 		static int getTermSize(UInt32* w, UInt32* h);
