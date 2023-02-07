@@ -3,10 +3,6 @@
 
 #include <unistd.h>
 
-#include <Str.hpp>
-
-
-
 // libxfunc
 #include "Escape.hpp"
 #include "Types.hpp"
@@ -14,20 +10,30 @@
 #include "Macro.hpp"
 #include "Buffer.hpp"
 
+/* standard includes */
+#include <string>
 
 #define PDELAY		40000
 
-class Draw {
 
-public:
+// -- D R A W  C L A S S ------------------------------------------------------
 
-	NON_INSTANCIABLE(Draw);
+class Draw final {
 
-	/* -------------------------------- */
+	public:
+
+		// -- C O N S T R U C T O R S -----------------------------------------
+
+		/* non-instanciable class */
+		NON_INSTANCIABLE(Draw);
+
+
+
 
 	static void drawLine(const UInt x, const UInt y, const void *ptr, const UInt size);
 
-	static void drawStr(const UInt x, const UInt y, const String& str);
+	/* draw string */
+	static void draw_string(const UInt x, const UInt y, const std::string& str);
 
 	static void vertivalDraw(const UInt x, UInt y, const void *ptr, const UInt size, UInt line);
 
