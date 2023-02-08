@@ -173,7 +173,7 @@ $(OBJDIR) $(DEPDIR) $(JSNDIR) $(LIBDIR):
 # -- C L E A N I N G ----------------------------------------------------------
 
 clean:
-	@$(RM) $(OBJ) $(OBJDIR) $(DEP) $(DEPDIR) $(JSNDIR)
+	@$(RM) $(OBJ) $(OBJDIR) $(DEP) $(DEPDIR) $(JSNDIR) $(PROJECT).dSYM
 
 fclean: clean
 	@$(RM) $(PROJECT) $(DYNAMIC_LIB) $(STATIC_LIB) $(COMPILE_COMMANDS) .cache
