@@ -1,6 +1,8 @@
 #ifndef TYPE_TRAITS_HEADER
 #define TYPE_TRAITS_HEADER
 
+#include "Types.hpp"
+
 // -- N A M E S P A C E -------------------------------------------------------
 
 namespace Xf {
@@ -98,6 +100,22 @@ namespace Xf {
 		static constexpr bool value = all_of<Bs...>::value;
 	};
 
+
+
+
+
+
+
+
+	template<std::size_t N, typename T, typename... types>
+	struct get_Nth_type {
+		using type = typename get_Nth_type<N - 1, types...>::type;
+	};
+
+	template<typename T, typename... types>
+	struct get_Nth_type<0, T, types...> {
+		using type = T;
+	};
 
 
 
