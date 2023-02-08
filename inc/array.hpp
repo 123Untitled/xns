@@ -4,10 +4,12 @@
 #include "Types.hpp"
 #include "move.hpp"
 #include "forward.hpp"
+#include <iostream>
 
 // -- N A M E S P A C E -------------------------------------------------------
 
 namespace Xf {
+
 
 	// -- A R R A Y  C L A S S ------------------------------------------------
 
@@ -40,10 +42,20 @@ namespace Xf {
 			using ConstPointer = const Value*;
 
 
-			// -- P U B L I C  M E M B E R S ----------------------------------
+			// -- C O N S T R U C T O R S -------------------------------------
 
-			/* array */
-			Value _array[N];
+			/* initializer list constructor */
+			template <typename... A>
+			Array(A&&... args)
+			: _array{Xf::forward<A>(args)...} {
+				// code here...
+			}
+
+			/* copy constructor */
+			// implicitly declared
+
+			/* move constructor */
+			// implicitly declared
 
 
 			// -- O P E R A T O R S -------------------------------------------
@@ -62,6 +74,20 @@ namespace Xf {
 
 
 			// -- E L E M E N T  A C C E S S ----------------------------------
+
+			/* idx */
+			template <typename I>
+			Reference idx(const I index) {
+				// return reference with static cast
+				return _array[static_cast<Size>(index)];
+			}
+
+			/* const idx */
+			template <typename I>
+			ConstReference idx(const I index) const {
+				// return const reference with static cast
+				return _array[static_cast<Size>(index)];
+			}
 
 			/* front */
 			Reference front(void) {
@@ -120,18 +146,39 @@ namespace Xf {
 			/* fill */
 			void fill(const Value& value) {
 				// fill array
-				for (Size i = 0; i < N; ++i) {
+				for (Size x = 0; x < N; ++x) {
 					// assign value
-					_array[i] = value;
+					_array[x] = value;
 				}
 			}
 
 
+		private:
+
+			/* array */
+			Value _array[N];
+
 	};
+
+	// deduction guide
+	template <class T, class... A>
+	Array(T, A...) -> Array<T, 1 + sizeof...(A)>;
+
+
+	// << operator
+	template <typename T, UInt64 N>
+	std::ostream& operator<<(std::ostream& os, const Array<T, N>& array) {
+		// print array
+		for (UInt64 x = 0; x < N; ++x) {
+			// print value
+			os << array[x] << " ";
+		}
+		// return stream
+		return os;
+	}
+
 
 };
 
 #endif
-
-
 
