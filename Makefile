@@ -73,7 +73,7 @@ ARFLAGS := -rcs
 
 STD := -std=c++20
 
-OPT := -O0
+OPT := -O0 -g3
 
 CXXFLAGS :=	-Wall -Wextra -Werror -Wpedantic \
 			-Wno-unused -Wno-unused-variable -Wno-unused-parameter \
