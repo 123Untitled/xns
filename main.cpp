@@ -13,30 +13,32 @@
 #include <iostream>
 
 
-void* print(void* instance) {
-	std::cout << *(int*)instance << std::endl;
+void* escape_normal(void* instance) {
+	std::cout << "escape_normal" << std::endl;
 	return nullptr;
 }
 
-void* escape(void* instance) {
-	std::cout << "ESCAPE" << std::endl;
+void* escape_insert(void* instance) {
+	std::cout << "escape_insert" << std::endl;
 	return nullptr;
 }
 
-void* arrow(void* instance) {
-	std::cout << "ARROW" << std::endl;
+void* enter_insert(void* instance) {
+	Xf::Event::instance().set_mode("INSERT");
+	std::cout << "enter_insert" << std::endl;
 	return nullptr;
 }
 
-void* _return(void* instance) {
-	std::cout << "RETURN" << std::endl;
-	//Xf::Input::stop_loop();
+void* exit_insert(void* instance) {
+	Xf::Event::instance().set_mode("NORMAL");
+	std::cout << "exit_insert" << std::endl;
 	return nullptr;
 }
 
-int _int(void) {
-	std::cout << "_INT" << std::endl;
-	return 42;
+void* exit_loop(void* instance) {
+	std::cout << "exit_loop" << std::endl;
+	Xf::Input::stop_loop();
+	return nullptr;
 }
 
 class Test {
@@ -47,14 +49,20 @@ class Test {
 
 		Test(float f) : _f(f) { std::cout << "FLOAT CONSTRUCTOR" << std::endl; }
 
-		Test(const Test& t) : _f(t._f) { std::cout << "COPY" << std::endl; }
+		Test(const Test& t) : _f(t._f) { std::cout << "COPY CONSTRUCTOR" << std::endl; }
 
 		~Test(void) noexcept { std::cout << "DESTRUCTOR" << std::endl; }
 
 		Test(Test&& t) noexcept : _f(t._f) { std::cout << "MOVE" << std::endl; }
 
 		Test& operator=(const Test& t) {
-			std::cout << "ASSIGNMENT" << std::endl;
+			std::cout << "COPY ASSIGNMENT" << std::endl;
+			_f = t._f;
+			return *this;
+		}
+
+		Test& operator=(Test&& t) noexcept {
+			std::cout << "MOVE ASSIGNMENT" << std::endl;
 			_f = t._f;
 			return *this;
 		}
@@ -75,24 +83,72 @@ std::ostream& operator<<(std::ostream& os, const Test& t) {
 	return os;
 }
 
+void print_array(const Xf::Array<int, 10>& a) {
+	for (Size x = 0; x < a.size(); ++x) {
+		std::cout << a[x] << " ";
+	}
+	std::cout << std::endl;
+}
+
+#include "initializer.hpp"
+#include "stack.hpp"
+
+enum class Ev {
+	ESCAPE        = 0,
+	ENTER         = 1,
+	BACKSPACE     = 2,
+};
+
+#define N 0
 
 int main(void) {
 
+
+
+	/*
+	Xf::Stack<int> s;
+
+	for (int x = 0; x < 10; ++x) {
+		s.push(x);
+	}
+	s.print();
+	for (int x = 0; x < 5; ++x) {
+		s.pop();
+	}
+	s.print();
+
+	s.clear();
+	s.print();
+	*/
+
+
+
+	/*
 	using namespace Xf;
 
-	Evntmode normal = Event::instance().add_mode("NORMAL");
+	Event& evnt = Event::instance();
 
-	Evntmode insert = Event::instance().add_mode("world");
+	evnt.add_mode("NORMAL");
+	evnt.add_mode("INSERT");
 
-	if (!normal) {
-		std::cout << "NORMAL MODE" << std::endl;
-	}
+	evnt.subscribe("NORMAL", Evntype::ESCAPE, escape_normal, nullptr);
 
-	int a = 42;
 
-	loop();
+	evnt.subscribe("NORMAL", Evntype::RETURN, enter_insert, nullptr);
+	evnt.subscribe("INSERT", Evntype::ESCAPE, escape_insert, nullptr);
+	evnt.subscribe("INSERT", Evntype::RETURN, exit_insert, nullptr);
+	evnt.subscribe("NORMAL", Evntype::TAB, exit_loop, nullptr);
 
-	normal.subscribe(Xf::Evntype::ESCAPE, escape, &a);
+	evnt.set_mode("NORMAL");
+
+	//evnt.call(Evntype::ESCAPE);
+	Term::setRaw();
+	Xf::Input::start_loop();
+
+	std::cout << __cplusplus << std::endl;
+	*/
+
+
 
 	return 0;
 }
