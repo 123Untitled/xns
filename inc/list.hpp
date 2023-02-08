@@ -6,6 +6,7 @@
 #include "forward.hpp"
 #include <iostream>
 #include "Macro.hpp"
+#include "allocator.hpp"
 
 
 // -- N A M E S P A C E -------------------------------------------------------
@@ -41,6 +42,9 @@ namespace Xf {
 
 			/* const pointer type */
 			using ConstPointer = const Value*;
+
+			/* allocator type */
+			using Allocator = Xf::Allocator<Value>;
 
 
 			// -- C O N S T R U C T O R S -------------------------------------
@@ -444,11 +448,11 @@ namespace Xf {
 			// initializations
 			: _value{Xf::move(value)}, _next{nullptr}, _prev{nullptr} { }
 
-			/* emplace constructor */
-			template <typename... Args>
-			Node(Args&&... args)
+			/* value emplace constructor */
+			template <typename... A>
+			Node(A&&... args)
 			// initializations
-			: _value{Xf::forward<Args>(args)...}, _next{nullptr}, _prev{nullptr} { }
+			: _value{Xf::forward<A>(args)...}, _next{nullptr}, _prev{nullptr} { }
 
 			/* destructor */
 			~Node(void) {
