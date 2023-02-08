@@ -17,9 +17,6 @@
 
 namespace Xf {
 
-	/* forward declaration */
-	class Evntmode;
-
 	/* event */
 	enum class Evntype {
 		ESCAPE, ENTER, BACKSPACE, DELETE, TAB, RETURN,
@@ -48,7 +45,7 @@ namespace Xf {
 			// -- F O R W A R D  D E C L A R A T I O N S ----------------------
 
 			/* mode forward declaration */
-			class Mode;
+			//class Mode;
 
 
 		private:
@@ -88,20 +85,28 @@ namespace Xf {
 			void set_mode(const std::string&);
 
 			/* subscribe to event */
-			void subscribe(const Evntype, Evntfunc, Object);
+			void subscribe(const std::string& mode, const Evntype, Evntfunc, Object);
 
 			/* unsubscribe to event */
-			void unsubscribe(const Evntype, Evntfunc, Object);
+			void unsubscribe(const std::string& mode, const Evntype, Evntfunc, Object);
 
 			/* call all observers */
 			void call(const Evntype);
 
-			/* clean up */
-			void clear(void);
-
 
 		private:
 
+			using Obslist = Xf::Array<Xf::Vector<Observer>, IDX(Evntype::EVNT_MAX)>;
+
+			using Pair = Xf::Pair<std::string, Obslist>;
+
+			// -- P R I V A T E  M E T H O D S --------------------------------
+
+			/* get mode */
+			Obslist* get_mode(const std::string& mode);
+
+			/* get observer list */
+			Xf::Vector<Observer>* get_observers(const std::string& mode, const Evntype type);
 
 			// -- S T A T I C  P R I V A T E  A C C E S S O R S ---------------
 
@@ -117,96 +122,18 @@ namespace Xf {
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
-			/* modes vector */
-			Xf::Vector<Mode> _modes;
 
-			/* current mode */
-			Mode* _current;
-
-			using Obslist = Xf::Vector<Observer>[IDX(Evntype::EVNT_MAX)];
-
-			using Pair = Xf::Pair<std::string, Obslist>;
 
 			Xf::Vector<Pair> _observers;
+
+			Obslist* _current;
 
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------
 
 			/* singleton instance */
 			static Event _instance;
 
-
-
-
 	};
-
-
-
-	// -- M O D E  P R I V A T E  N E S T E D  S T R U C T --------------------
-
-//	class Event::Mode final {
-//
-//		public:
-//
-//			// -- C O N S T R U C T O R S -------------------------------------
-//
-//			/* deleted default constructor */
-//			Mode(void) = delete;
-//
-//			/* copy name constructor */
-//			Mode(const std::string&);
-//
-//			/* move name constructor */
-//			Mode(std::string&&) noexcept;
-//
-//			/* copy constructor */
-//			Mode(const Mode&);
-//
-//			/* move constructor */
-//			Mode(Mode&&) noexcept;
-//
-//			/* destructor */
-//			~Mode(void);
-//
-//
-//			// -- O P E R A T O R S -------------------------------------------
-//
-//			/* copy operator */
-//			Mode& operator=(const Mode&);
-//
-//			/* move operator */
-//			Mode& operator=(Mode&&);
-//
-//
-//			// -- A C C E S S O R S -------------------------------------------
-//
-//			/* get name */
-//			const std::string& name(void) const;
-//
-//			/* subscribe */
-//			void subscribe(const Evntype, Evntfunc, Object);
-//
-//			/* unsubscribe */
-//			void unsubscribe(const Evntype, Evntfunc, Object);
-//
-//
-//
-//
-//		private:
-//
-//			// -- P R I V A T E  A L I A S E S --------------------------------
-//
-//			/* observer list */
-//			using Obslist = Xf::Vector<Observer>;
-//
-//			// -- P R I V A T E  M E M B E R S --------------------------------
-//
-//			/* mode name */
-//			std::string _name;
-//
-//			Obslist _observers[IDX(Evntype::EVNT_MAX)];
-//
-//
-//	};
 
 
 	// -- O B S E R V E R  C L A S S ------------------------------------------
@@ -223,20 +150,23 @@ namespace Xf {
 			/* initialize constructor */
 			Observer(Evntfunc, Object);
 
-			Observer(const Observer&) { }
+			/* copy constructor */
+			Observer(const Observer& other);
 
-			Observer(Observer&&) { }
-
-			Observer& operator=(const Observer&) { return *this; }
-
-			Observer& operator=(Observer&&) { return *this; }
-
+			/* move constructor */
+			Observer(Observer&& other) noexcept;
 
 			/* destructor */
 			~Observer(void);
 
 
 			// -- O P E R A T O R S -------------------------------------------
+
+			/* copy operator */
+			Observer& operator=(const Observer& other);
+
+			/* move operator */
+			Observer& operator=(Observer&& other) noexcept;
 
 			/* equality operator */
 			bool operator==(const Observer&) const;
