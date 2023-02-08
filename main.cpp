@@ -8,6 +8,7 @@
 #include "vector.hpp"
 #include "array.hpp"
 
+#include "stack.hpp"
 #include <array>
 #include <vector>
 #include <iostream>
@@ -90,8 +91,6 @@ void print_array(const Xf::Array<int, 10>& a) {
 	std::cout << std::endl;
 }
 
-#include "initializer.hpp"
-#include "stack.hpp"
 
 enum class Ev {
 	ESCAPE        = 0,
