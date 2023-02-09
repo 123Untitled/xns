@@ -6,6 +6,7 @@
 #include "Macro.hpp"
 #include "forward.hpp"
 #include "move.hpp"
+#include <cstdlib>
 
 // -- N A M E S P A C E -------------------------------------------------------
 
@@ -51,22 +52,15 @@ namespace Xf {
 			// -- A L L O C A T I O N -----------------------------------------
 
 			/* allocate */
-			static Pointer allocate(const Size size) {
+			static Pointer allocate(const Size size = 1) {
 				// allocate memory
-				return static_cast<Pointer>(::operator new(size * sizeof(Value)));
+				return static_cast<Pointer>(std::malloc(size * sizeof(Value)));
 			}
 
 			/* deallocate */
-			static void deallocate(Pointer pointer, const Size size) {
+			static void deallocate(Pointer pointer) {
 				// deallocate memory
-				// linux
-#ifdef __linux__
-				delete(pointer);
-#endif
-				// macos
-#ifdef __APPLE__
-				::operator delete(pointer, size * sizeof(Value));
-#endif
+				std::free(pointer);
 			}
 
 
@@ -96,20 +90,20 @@ namespace Xf {
 			/* copy construct */
 			static void construct(Pointer addrs, ConstReference value) {
 				// construct object by copy
-				::new(addrs) Value{value};
+				new(addrs) Value{value};
 			}
 
 			/* move construct */
 			static void construct(Pointer addrs, MoveReference value) {
 				// construct object by move
-				::new(addrs) Value{Xf::move(value)};
+				new(addrs) Value{Xf::move(value)};
 			}
 
 			/* forward construct */
 			template <typename... Args>
 			static void construct(Pointer addrs, Args&&... args) {
 				// construct object by forwarding
-				::new(addrs) Value{Xf::forward<Args>(args)...};
+				new(addrs) Value{Xf::forward<Args>(args)...};
 			}
 
 
