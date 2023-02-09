@@ -62,9 +62,30 @@ namespace Xf {
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* default constructor */
-			Stack(void)
-			: _top{nullptr}, _storage{nullptr}, _capacity{0}, _size{0} {
+			explicit Stack(void) noexcept
+			: _top{nullptr}, _storage{nullptr}, _size{0} {
 				// code here...
+			}
+
+			/* copy constructor */
+			Stack(const Stack& other)
+			: Stack{} {
+				// get other top
+				NodePointer node = other._top;
+				// loop through other
+				while (node) {
+					// push node value
+					push(node->_value);
+					// get next node
+					node = node->_next;
+				}
+			}
+
+			/* move constructor */
+			Stack(Stack&& other) noexcept
+			: _top{other._top}, _storage{other._storage}, _size{other._size} {
+				// invalidate other
+				other.initialize_members();
 			}
 
 			/* destructor */
@@ -81,8 +102,7 @@ namespace Xf {
 					Allocator::deallocate(node, 1);
 					// set node to next
 					node = next;
-				}
-				// get storage node
+				} // get storage node
 				node = _storage;
 				// loop through storage
 				while (node) {
@@ -96,16 +116,112 @@ namespace Xf {
 			}
 
 
+			// -- O P E R A T O R S -------------------------------------------
+
+			/* copy operator */
+			Stack& operator=(const Stack& other) {
+				// check self assignment
+				if (this != &other) {
+					// clear self (keep own storage)
+					clear();
+					// get other top
+					NodePointer node = other._top;
+					// loop through other stack
+					while (node) {
+						// push node value
+						push(node->_value);
+						// get next node
+						node = node->_next;
+					} // return self reference
+				} return *this;
+			}
+
+			/* move operator */ // WARNING: doesn't move storage
+			Stack& operator=(Stack&& other) noexcept {
+				// check self assignment
+				if (this != &other) {
+					// clear self (keep own storage)
+					clear();
+					// move only top
+					_top = other._top;
+					// assign size
+					_size = other._size;
+					// invalidate other top
+					other._top = nullptr;
+					// reset other size
+					other._size = 0;
+				} // return self reference
+				return *this;
+			}
+
+
+			// -- A C C E S S O R S -------------------------------------------
+
+			/* top */
+			Reference top(void) {
+				// return top value reference
+				return _top->_value;
+			}
+
+			/* const top */
+			ConstReference top(void) const {
+				// return top value const reference
+				return _top->_value;
+			}
+
+			/* size */
+			Size size(void) const {
+				// return size
+				return _size;
+			}
+
+			/* empty */
+			bool empty(void) const {
+				// return if size is zero
+				return _size == 0;
+			}
+
+
+
 			// -- M E T H O D S -----------------------------------------------
 
 			/* push */
 			void push(ConstReference value) {
-				// get new node
-				NodePointer node = make_node();
-				// check allocation
+				// node pointer
+				NodePointer node = new_node();
+				// check if pointer is valid
 				if (!node) { return; }
 				// construct node
 				Allocator::construct(node, value);
+				// link node
+				link(node);
+				// increment size
+				++_size;
+			}
+
+			/* move push */
+			void push(MoveReference value) {
+				// node pointer
+				NodePointer node = new_node();
+				// check if pointer is valid
+				if (!node) { return; }
+				// construct node
+				Allocator::construct(node, Xf::move(value));
+				// link node
+				link(node);
+				// increment size
+				++_size;
+			}
+
+			/* emplace */
+			template <typename... A>
+			void emplace(A&&... arguments) {
+				// node pointer
+				NodePointer node = new_node();
+				// check if pointer is valid
+				if (!node) { return; }
+				// construct node
+				Allocator::construct(node, Xf::forward<A>(arguments)...);
 				// link node
 				link(node);
 				// increment size
@@ -126,10 +242,16 @@ namespace Xf {
 				--_size;
 			}
 
-			/* top */
-			Reference top(void) {
-				// return top value reference
-				return _top->_value;
+
+			/* shrink */
+			void shrink(void) {
+				// node pointer
+				NodePointer node;
+				// loop through storage
+				while ((node = unlink_storage())) {
+					// deallocate node
+					Allocator::deallocate(node, 1);
+				}
 			}
 
 			/* clear */
@@ -142,15 +264,13 @@ namespace Xf {
 					Allocator::destroy(node);
 					// link node to storage
 					link_storage(node);
-					// decrement size
-					--_size;
-				}
+				} // reset size
+				_size = 0;
 			}
 
 			/* print stack */
 			void print(void) {
 				std::cout << "size: " << _size << std::endl;
-				std::cout << "capacity: " << _capacity << std::endl;
 				// get top node
 				NodePointer node = _top;
 				// loop through stack
@@ -165,6 +285,15 @@ namespace Xf {
 		private:
 
 			// -- P R I V A T E  M E T H O D S --------------------------------
+
+			/* new node */
+			NodePointer new_node(void) {
+				// check if free nodes are available
+				if (_storage) { return unlink_storage(); }
+				// else allocate new node
+				return Allocator::allocate(1);
+			}
+
 
 			void link(NodePointer node) {
 				// link node's next pointer to top node
@@ -198,18 +327,14 @@ namespace Xf {
 				return node;
 			}
 
-
-			NodePointer make_node(void) {
-				// check if free nodes are available
-				if (_storage) { return unlink_storage(); }
-				// allocate new node
-				NodePointer node = Allocator::allocate(1);
-				// check allocation
-				if (node) { ++_capacity; }
-				// return node
-				return node;
+			void initialize_members(void) {
+				// initialize top
+				_top = nullptr;
+				// initialize storage
+				_storage = nullptr;
+				// initialize size
+				_size = 0;
 			}
-
 
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
@@ -219,9 +344,6 @@ namespace Xf {
 
 			/* storage */
 			NodePointer _storage;
-
-			/* capacity */
-			Size _capacity;
 
 			/* size */
 			Size _size;
@@ -271,8 +393,8 @@ namespace Xf {
 
 			/* value emplace constructor */
 			template <typename... A>
-			Node(A&&... args)
-			: _value(Xf::forward<A>(args)...), _next(nullptr) {
+			Node(A&&... arguments)
+			: _value(Xf::forward<A>(arguments)...), _next(nullptr) {
 				// code here...
 			}
 
