@@ -42,47 +42,8 @@ void* exit_loop(void* instance) {
 	return nullptr;
 }
 
-class Test {
-
-	public:
-
-		Test(void) : _f{1} { std::cout << "CONSTRUCTOR" << std::endl; }
-
-		Test(float f) : _f(f) { std::cout << "FLOAT CONSTRUCTOR" << std::endl; }
-
-		Test(const Test& t) : _f(t._f) { std::cout << "COPY CONSTRUCTOR" << std::endl; }
-
-		~Test(void) noexcept { std::cout << "DESTRUCTOR" << std::endl; }
-
-		Test(Test&& t) noexcept : _f(t._f) { std::cout << "MOVE" << std::endl; }
-
-		Test& operator=(const Test& t) {
-			std::cout << "COPY ASSIGNMENT" << std::endl;
-			_f = t._f;
-			return *this;
-		}
-
-		Test& operator=(Test&& t) noexcept {
-			std::cout << "MOVE ASSIGNMENT" << std::endl;
-			_f = t._f;
-			return *this;
-		}
-
-		void print(float f) {
-			std::cout << "f: " << f << "\n_f: " << _f << std::endl;
-		}
 
 
-	float _f;
-
-};
-
-
-// overload <<
-std::ostream& operator<<(std::ostream& os, const Test& t) {
-	os << t._f;
-	return os;
-}
 
 void print_array(const Xf::Array<int, 10>& a) {
 	for (Size x = 0; x < a.size(); ++x) {
@@ -100,7 +61,63 @@ enum class Ev {
 
 #define N 0
 
-int main(void) {
+template <typename... A>
+class Base {
+	public:
+		virtual void print(A&&... a) = 0;
+		~Base() = default;
+};
+
+class Derived1 : public Base<int, bool> {
+	public:
+		void print(int&& i, bool&& b) override {
+			std::cout << "i: " << i << "\nb: " << b << std::endl;
+		}
+
+};
+
+class Derived2 : public Base<float, bool> {
+	public:
+		void print(float&& f, bool&& b) override {
+			std::cout << "f: " << f << "\nb: " << b << std::endl;
+		}
+};
+
+#include "testclass.hpp"
+
+#include <stack>
+
+#define NB 100000
+
+#include "unique.hpp"
+
+class Int {
+
+	public:
+		Int(Int* i) { }
+		~Int() { }
+
+	private:
+		int _i;
+
+};
+#include "allocator.hpp"
+
+int main(int ac, char** av) {
+
+
+	//Xf::UniquePtr<Test<int>> u{2};
+
+
+
+
+
+
+
+
+	//Xf::Vector<Xf::MethodPointer<void, Derived1>> v;
+
+
 
 
 
