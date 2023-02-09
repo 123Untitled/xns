@@ -82,7 +82,7 @@ namespace Xf {
 					// clear vector
 					clear();
 					// deallocate memory
-					Allocator::deallocate(_vector, _capacity);
+					Allocator::deallocate(_vector);
 				}
 			}
 
@@ -165,7 +165,6 @@ namespace Xf {
 
 			/* back */
 			Reference back(void) {
-				print();
 				// return reference
 				return *(_vector + (_size - 1));
 			}
@@ -228,7 +227,7 @@ namespace Xf {
 							// move elements
 							tmp[x] = Xf::move(_vector[x]);
 						} // deallocate memory
-						Allocator::deallocate(_vector, _capacity);
+						Allocator::deallocate(_vector);
 					} // assign capacity
 					_capacity = capacity;
 					// assign pointer
