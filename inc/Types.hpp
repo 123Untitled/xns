@@ -14,6 +14,8 @@
 		#include <cstdint>
 		#include <cstddef>
 
+		using Nullptr = decltype(nullptr);
+
 		using SInt = int;
 		using UInt = unsigned int;
 		using Char = char;
