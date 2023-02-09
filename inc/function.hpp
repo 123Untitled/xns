@@ -3,6 +3,7 @@
 
 #include "type_traits.hpp"
 #include "event.hpp"
+#include "forward.hpp"
 
 
 // -- N A M E S P A C E -------------------------------------------------------
@@ -27,7 +28,8 @@ namespace Xf {
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* deleted default constructor */
-			Function(void) = delete;
+			//Function(void) = delete;
+			Function() { }
 
 			/* function pointer constructor */
 			Function(Prototype function)
@@ -40,13 +42,7 @@ namespace Xf {
 
 			// -- O P E R A T O R S -------------------------------------------
 
-			/* function call operator */
-			Return operator()(A... args) const {
-				// call function
-				return _function(args...);
-			}
-
-			/* assignment operator */
+			/* copy operator */
 			Function& operator=(const Function& other) {
 				// copy function pointer
 				_function = other._function;
@@ -54,12 +50,19 @@ namespace Xf {
 				return *this;
 			}
 
+			/* function call operator */
+			Return operator()(A&&... arguments) {
+				// call function
+				return _function(Xf::forward<A>(arguments)...);
+			}
+
+
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* call method */
-			Return call(A... args) const {
+			Return call(A&&... arguments) const {
 				// call function
-				return _function(args...);
+				return _function(Xf::forward<A>(arguments)...);
 			}
 
 		private:
@@ -119,32 +122,30 @@ namespace Xf {
 
 			// -- O P E R A T O R S -------------------------------------------
 
-			/* assignment operator */
+			/* copy operator */
 			Method& operator=(const Method& other) {
-				// check for self assignment
-				if (this != &other) {
-					// copy method pointer
-					_method = other._method;
-					// copy instance reference
-					_instance = other._instance;
-				} // return self reference
+				// copy method pointer
+				_method = other._method;
+				// copy instance reference
+				_instance = other._instance;
+				// return self reference
 				return *this;
 			}
 
 
 			/* function call operator */
-			Return operator()(A... args) const {
+			Return operator()(A&&... arguments) const {
 				// call method
-				return (_instance->*_method)(args...);
+				return (_instance->*_method)(Xf::forward<A>(arguments)...);
 			}
 
 
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* call method */
-			Return call(A... args) const {
+			Return call(A&&... arguments) const {
 				// call method
-				return (_instance->*_method)(args...);
+				return (_instance->*_method)(Xf::forward<A>(arguments)...);
 			}
 
 
@@ -159,6 +160,10 @@ namespace Xf {
 			Pointer   _instance;
 
 	};
+
+	/* template method pointer type */
+	template <typename R, typename C, typename... A>
+	using MethodPointer = Method<R, C, A...>*;
 
 };
 
