@@ -83,16 +83,16 @@ void Xf::Input::process_input(void) {
 				// check arrow sequence
 				switch (_input[2]) {
 					case 'A': // code for arrow up
-						event.call(Xf::Evntype::UP);
+						event.call(Xf::Evntype::UP, _input);
 						break;
 					case 'B': // code for arrow down
-						event.call(Xf::Evntype::DOWN);
+						event.call(Xf::Evntype::DOWN, _input);
 						break;
 					case 'C': // code for arrow right
-						event.call(Xf::Evntype::RIGHT);
+						event.call(Xf::Evntype::RIGHT, _input);
 						break;
 					case 'D': // code for arrow left
-						event.call(Xf::Evntype::LEFT);
+						event.call(Xf::Evntype::LEFT, _input);
 						break;
 					default:
 						break;
@@ -104,19 +104,19 @@ void Xf::Input::process_input(void) {
 
 		switch (_input[0]) {
 			case 0x1b:
-				event.call(Xf::Evntype::ESCAPE);
+				event.call(Xf::Evntype::ESCAPE, _input);
 				break;
 			case 0x0a:
-				event.call(Xf::Evntype::ENTER);
+				event.call(Xf::Evntype::ENTER, _input);
 				break;
 			case 0x7f:
-				event.call(Xf::Evntype::BACKSPACE);
+				event.call(Xf::Evntype::BACKSPACE, _input);
 				break;
 			case 0x09:
-				event.call(Xf::Evntype::TAB);
+				event.call(Xf::Evntype::TAB, _input);
 				break;
 			case 0x0d:
-				event.call(Xf::Evntype::RETURN);
+				event.call(Xf::Evntype::RETURN, _input);
 				break;
 			default:
 				break;
