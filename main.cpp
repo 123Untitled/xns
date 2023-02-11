@@ -7,11 +7,15 @@
 #include "allocator.hpp"
 #include "vector.hpp"
 #include "array.hpp"
-
+#include "testclass.hpp"
 #include "stack.hpp"
+#include "unique.hpp"
+
 #include <array>
 #include <vector>
 #include <iostream>
+#include <stack>
+#include <any>
 
 
 void* escape_normal(void* instance) {
@@ -61,54 +65,80 @@ enum class Ev {
 
 #define N 0
 
-template <typename... A>
-class Base {
-	public:
-		virtual void print(A&&... a) = 0;
-		~Base() = default;
-};
 
-class Derived1 : public Base<int, bool> {
-	public:
-		void print(int&& i, bool&& b) override {
-			std::cout << "i: " << i << "\nb: " << b << std::endl;
-		}
 
-};
-
-class Derived2 : public Base<float, bool> {
-	public:
-		void print(float&& f, bool&& b) override {
-			std::cout << "f: " << f << "\nb: " << b << std::endl;
-		}
-};
-
-#include "testclass.hpp"
-
-#include <stack>
 
 #define NB 100000
 
-#include "unique.hpp"
-
-class Int {
-
+class Toto {
 	public:
-		Int(Int* i) { }
-		~Int() { }
+		Toto() = default;
+		~Toto() = default;
 
-	private:
-		int _i;
-
+		bool print(int x, bool b) {
+			std::cout << "Toto::print(" << x << ", " << b << ")" << std::endl;
+			return true;
+		}
 };
-#include "allocator.hpp"
+
+class Tutu {
+	public:
+		Tutu() = default;
+		~Tutu() = default;
+
+		bool print(int x, bool b) {
+			std::cout << "Tutu::print(" << x << ", " << b << ")" << std::endl;
+			return true;
+		}
+};
+
+
+
+
+
 
 int main(int ac, char** av) {
+
+	Toto t;
+	Tutu u;
+
+	Xf::Vector<Xf::PolyMethod<bool, int, bool>> v;
+
+	v.push_back(Xf::PolyMethod{&Toto::print, &t});
+
+	v.push_back(Xf::PolyMethod{&Tutu::print, &u});
+
+	/*for (unsigned int x = 0; x < v.size(); ++x) {
+		v[x].call(2, true);
+	}*/
+
+	Xf::PolyMethod m{&Toto::print, &t};
+	Xf::PolyMethod n{&Tutu::print, &u};
+
+	m.call(2, true);
+	n.call(2, true);
+
+	Xf::PolyMethod o{m};
+	o.call(2, true);
+	o = n;
+	o.call(2, true);
+
 
 
 	//Xf::UniquePtr<Test<int>> u{2};
 
+	//Base* b = new Derived1<int>{};
 
+	//Xf::Vector<Base<int>*> v;
+
+	//v.push_back(new Derived1<void, Toto, int>{});
+
+
+	//Xf::Method m{&Derived1::print, d1};
+
+
+
+	//m.call(2, true);
 
 
 
