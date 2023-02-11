@@ -2,7 +2,6 @@
 #define FUNCTION_HEADER
 
 #include "type_traits.hpp"
-#include "event.hpp"
 #include "forward.hpp"
 
 
