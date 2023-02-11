@@ -66,18 +66,19 @@ RM := rm -rvf
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 CCX := $(shell which clang++)
+#CCX := /opt/homebrew/Cellar/llvm/15.0.7_1/bin/clang++
 
 AR := $(shell which ar)
 
 ARFLAGS := -rcs
 
-STD := -std=c++20
+STD := -std=c++2b
 
 OPT := -O0 -g3
 
 CXXFLAGS :=	-Wall -Wextra -Werror -Wpedantic \
 			-Wno-unused -Wno-unused-variable -Wno-unused-parameter \
-			-Winline -fno-exceptions -fno-rtti
+			-Winline -fno-exceptions -Weffc++
 
 LDFLAGS ?=
 
