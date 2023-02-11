@@ -1,17 +1,18 @@
 #ifndef EVENT_HEADER
 #define EVENT_HEADER
 
-#include <iostream>
 #include "Macro.hpp"
 #include "move.hpp"
 #include "forward.hpp"
 #include "Types.hpp"
 #include "list.hpp"
 #include "vector.hpp"
-#include <string>
 #include "pair.hpp"
 #include "array.hpp"
+#include "function.hpp"
 
+#include <iostream>
+#include <string>
 
 // -- N A M E S P A C E -------------------------------------------------------
 
@@ -27,28 +28,22 @@ namespace Xf {
 	};
 
 
-	// -- A L I A S E S -------------------------------------------------------
-
-	/* function pointer */
-	using Evntfunc = void*(*)(void*);
-
-	/* object pointer */
-	using Object = void*;
-
-
 	// -- E V E N T  C L A S S ------------------------------------------------
 
 	class Event final {
 
-		public:
-
-			// -- F O R W A R D  D E C L A R A T I O N S ----------------------
-
-			/* mode forward declaration */
-			//class Mode;
-
-
 		private:
+
+			// -- P R I V A T E  A L I A S E S --------------------------------
+
+			/* object pointer */
+			template <typename C>
+			using Pointer = C*;
+
+			/* prototype */
+			template <typename C>
+			using Prototype = void(C::*)(const std::string&);
+
 
 			// -- P R I V A T E  C O N S T R U C T O R S ----------------------
 
@@ -60,12 +55,6 @@ namespace Xf {
 
 			/* destructor */
 			~Event(void);
-
-
-			// -- P R I V A T E  F O R W A R D  D E C L A R A T I O N S -------
-
-			/* observer forward declaration */
-			class Observer;
 
 
 		public:
@@ -85,20 +74,47 @@ namespace Xf {
 			void set_mode(const std::string&);
 
 			/* subscribe to event */
-			void subscribe(const std::string& mode, const Evntype, Evntfunc, Object);
+			template <typename C>
+			void subscribe(const std::string& mode, const Evntype type, Prototype<C> method, Pointer<C> instance) {
+				// check invalid type and method pointer
+				if (type >= Evntype::EVNT_MAX || !method || !instance) { return; }
+				// check invalid method
+				if (!method) { return; }
+				// get observer list
+				PolyVector* obs = get_observers(mode, type);
+				// check observer list
+				if (!obs) { return; }
+				// create new observer
+				obs->emplace_back(method, instance);
+			}
 
 			/* unsubscribe to event */
-			void unsubscribe(const std::string& mode, const Evntype, Evntfunc, Object);
+			template <typename C>
+			void unsubscribe(const std::string& mode, const Evntype type, Prototype<C> method, Pointer<C> instance) {
+				// check invalid type
+				if (type >= Evntype::EVNT_MAX) { return; }
+				// get observer list
+				PolyVector* obs = get_observers(mode, type);
+				// check observer list
+				if (!obs) { return; }
+				// loop through all observers
+				for (Size x = 0; x < obs->size(); ++x) { }
+			}
 
 			/* call all observers */
-			void call(const Evntype);
+			void call(const Evntype, const std::string&);
 
 
 		private:
 
-			using Obslist = Xf::Array<Xf::Vector<Observer>, IDX(Evntype::EVNT_MAX)>;
+			using LocalMethod = Xf::PolyMethod<void, const std::string&>;
+
+			using PolyVector = Xf::Vector<LocalMethod>;
+
+			using Obslist = Xf::Array<PolyVector, IDX(Evntype::EVNT_MAX)>;
 
 			using Pair = Xf::Pair<std::string, Obslist>;
+
 
 			// -- P R I V A T E  M E T H O D S --------------------------------
 
@@ -106,23 +122,11 @@ namespace Xf {
 			Obslist* get_mode(const std::string& mode);
 
 			/* get observer list */
-			Xf::Vector<Observer>* get_observers(const std::string& mode, const Evntype type);
+			PolyVector* get_observers(const std::string& mode, const Evntype type);
 
-			// -- S T A T I C  P R I V A T E  A C C E S S O R S ---------------
-
-			/* get head observer */
-			//static Observer* head(const Evntype);
-
-
-			// -- S T A T I C  P R I V A T E  M U T A T O R S -----------------
-
-			/* set head observer */
-			//static void head(const Evntype, Observer*);
 
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
-
-
 
 			Xf::Vector<Pair> _observers;
 
@@ -135,71 +139,6 @@ namespace Xf {
 
 	};
 
-
-	// -- O B S E R V E R  C L A S S ------------------------------------------
-
-	class Event::Observer final {
-
-		public:
-
-			// -- C O N S T R U C T O R S -------------------------------------
-
-			/* deleted default constructor */
-			Observer(void) = delete;
-
-			/* initialize constructor */
-			Observer(Evntfunc, Object);
-
-			/* copy constructor */
-			Observer(const Observer& other);
-
-			/* move constructor */
-			Observer(Observer&& other) noexcept;
-
-			/* destructor */
-			~Observer(void);
-
-
-			// -- O P E R A T O R S -------------------------------------------
-
-			/* copy operator */
-			Observer& operator=(const Observer& other);
-
-			/* move operator */
-			Observer& operator=(Observer&& other) noexcept;
-
-			/* equality operator */
-			bool operator==(const Observer&) const;
-
-
-			// -- P U B L I C  M E T H O D S ----------------------------------
-
-			/* call method on instance */
-			void call(void);
-
-
-			// -- A C C E S S O R S -------------------------------------------
-
-
-			/* get method */
-			Evntfunc method(void) const;
-
-			/* get instance */
-			const Object& instance(void) const;
-
-
-		private:
-
-			// -- P R I V A T E  M E M B E R S --------------------------------
-
-			/* method to call */
-			Evntfunc  _method;
-
-			/* object to call method on */
-			Object    _instance;
-
-
-	};
 
 };
 
