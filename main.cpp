@@ -75,9 +75,8 @@ class Toto {
 		Toto() = default;
 		~Toto() = default;
 
-		bool print(int x, bool b) {
-			std::cout << "Toto::print(" << x << ", " << b << ")" << std::endl;
-			return true;
+		void print1(const std::string& input) {
+			std::cout << "TOTO METHOD: " << input << std::endl;
 		}
 };
 
@@ -86,9 +85,8 @@ class Tutu {
 		Tutu() = default;
 		~Tutu() = default;
 
-		bool print(int x, bool b) {
-			std::cout << "Tutu::print(" << x << ", " << b << ")" << std::endl;
-			return true;
+		void print2(const std::string& input) {
+			std::cout << "TUTU METHOD: " << input << std::endl;
 		}
 };
 
@@ -102,26 +100,23 @@ int main(int ac, char** av) {
 	Toto t;
 	Tutu u;
 
-	Xf::Vector<Xf::PolyMethod<bool, int, bool>> v;
+	auto& evnt = Xf::Event::instance();
 
-	v.push_back(Xf::PolyMethod{&Toto::print, &t});
+	evnt.add_mode("NORMAL");
 
-	v.push_back(Xf::PolyMethod{&Tutu::print, &u});
+	evnt.set_mode("NORMAL");
 
-	/*for (unsigned int x = 0; x < v.size(); ++x) {
-		v[x].call(2, true);
-	}*/
+	using Ev = Xf::Evntype;
 
-	Xf::PolyMethod m{&Toto::print, &t};
-	Xf::PolyMethod n{&Tutu::print, &u};
+	evnt.subscribe("NORMAL", Ev::ESCAPE, &Toto::print1, &t);
+	evnt.subscribe("NORMAL", Ev::ESCAPE, &Tutu::print2, &u);
 
-	m.call(2, true);
-	n.call(2, true);
 
-	Xf::PolyMethod o{m};
-	o.call(2, true);
-	o = n;
-	o.call(2, true);
+	evnt.call(Xf::Evntype::ESCAPE, "\\x1b[32m");
+
+	evnt.call(Xf::Evntype::ESCAPE, "yolo!!!");
+
+
 
 
 
