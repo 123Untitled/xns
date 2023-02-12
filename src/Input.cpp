@@ -72,7 +72,9 @@ SInt64 Xf::Input::read_stdin(void) {
 void Xf::Input::process_input(void) {
 
 	// get event instance
-	Xf::Event& event = Xf::Event::instance();
+	Xf::Event& evnt = Xf::Event::instance();
+
+	using Ev = Xf::Evntype;
 
 	if (_input.length() == 3) {
 
@@ -83,42 +85,44 @@ void Xf::Input::process_input(void) {
 				// check arrow sequence
 				switch (_input[2]) {
 					case 'A': // code for arrow up
-						event.call(Xf::Evntype::UP, _input);
+						evnt.call_event(Ev::UP);
 						break;
 					case 'B': // code for arrow down
-						event.call(Xf::Evntype::DOWN, _input);
+						evnt.call_event(Ev::DOWN);
 						break;
 					case 'C': // code for arrow right
-						event.call(Xf::Evntype::RIGHT, _input);
+						evnt.call_event(Ev::RIGHT);
 						break;
 					case 'D': // code for arrow left
-						event.call(Xf::Evntype::LEFT, _input);
+						evnt.call_event(Ev::LEFT);
 						break;
 					default:
 						break;
 				}
 			}
 		}
+
 	}
 	else if (_input.length() == 1) {
 
 		switch (_input[0]) {
 			case 0x1b:
-				event.call(Xf::Evntype::ESCAPE, _input);
+				evnt.call_event(Ev::ESCAPE);
 				break;
 			case 0x0a:
-				event.call(Xf::Evntype::ENTER, _input);
+				evnt.call_event(Ev::ENTER);
 				break;
 			case 0x7f:
-				event.call(Xf::Evntype::BACKSPACE, _input);
+				evnt.call_event(Ev::BACKSPACE);
 				break;
 			case 0x09:
-				event.call(Xf::Evntype::TAB, _input);
+				evnt.call_event(Ev::TAB);
 				break;
 			case 0x0d:
-				event.call(Xf::Evntype::RETURN, _input);
+				evnt.call_event(Ev::RETURN);
 				break;
 			default:
+				evnt.call_input(_input);
 				break;
 		}
 	}
