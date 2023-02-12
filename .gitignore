@@ -1,5 +1,9 @@
 
+# ignore executables
 xfunc
+
+# ignore all .dSYM directories recursively
+xfunc.dSYM/
 
 # ignore all compile_commands.json files recursively
 **/compile_commands.json
