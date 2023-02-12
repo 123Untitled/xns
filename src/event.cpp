@@ -5,7 +5,7 @@
 
 /* default constructor */
 Xf::Event::Event(void)
-: _observers{}, _current{nullptr} {
+: _modes{ }, _current{nullptr} {
 	// code here...
 }
 
@@ -27,7 +27,7 @@ Xf::Event& Xf::Event::instance(void) {
 // -- P U B L I C  M E T H O D S ----------------------------------------------
 
 /* add mode */
-void Xf::Event::add_mode(std::string&& name) {
+void Xf::Event::add_mode(String&& name) {
 	// check invalid name
 	if (name.empty()) { return; }
 
@@ -39,26 +39,22 @@ void Xf::Event::add_mode(std::string&& name) {
 	// find index of current mode
 	if (_current) { idx = get_current_idx(); }
 
-	_observers.emplace_back(Xf::move(Pair{
-				Xf::move(name), Xf::move(Obslist{})
-			}
-		)
-	);
+	_modes.emplace_back(Pair{Xf::move(name), Mode{}});
 
 	// set new current mode
 	if (_current) {
 		// INFO: reason of this is when vector is resized,
 		// all pointers are invalidated
-		_current = &_observers[idx]._second;
+		_current = &_modes[idx]._second;
 	}
 }
 
 /* [PRIVATE] mode exists */
 bool Xf::Event::mode_exists(const std::string& mode) const {
 	// loop through all modes
-	for (Size x = 0; x < _observers.size(); ++x) {
+	for (Size x = 0; x < _modes.size(); ++x) {
 		// compare mode name
-		if (_observers[x]._first == mode) {
+		if (_modes[x]._first == mode) {
 			// exit method
 			return true; }
 	} // mode not found
@@ -68,9 +64,9 @@ bool Xf::Event::mode_exists(const std::string& mode) const {
 /* [PRIVATE] get current mode index */
 Size Xf::Event::get_current_idx(void) const {
 	// loop through all modes
-	for (Size x = 0; x < _observers.size(); ++x) {
+	for (Size x = 0; x < _modes.size(); ++x) {
 		// check mode name
-		if (&_observers[x]._second == _current) {
+		if (&_modes[x]._second == _current) {
 			// exit method
 			return x; }
 	} // else return 0
@@ -78,31 +74,47 @@ Size Xf::Event::get_current_idx(void) const {
 }
 
 /* set mode by name */
-void Xf::Event::set_mode(const std::string& name) {
+bool Xf::Event::set_mode(const String& name) {
 	// loop through all modes
-	for (Size x = 0; x < _observers.size(); ++x) {
+	for (Size x = 0; x < _modes.size(); ++x) {
 		// check mode name
-		if (_observers[x]._first == name) {
+		if (_modes[x]._first == name) {
 			// set new current mode
-			_current = &_observers[x]._second;
+			_current = &_modes[x]._second;
 			// exit method
-			return;
+			return true;
+		} // mode not found
+	} return false;
+}
+
+/* call all event subscribers */
+void Xf::Event::call_event(const Evntype type) {
+	// exit if no current mode
+	if (!_current) { return; }
+	// check event type
+	if (type < Evntype::EVNT_MAX) {
+		// get subscribers index by event type
+		EventVector& subscribers = _current->_second[IDX(type)];
+		// loop through all observers
+		for (Size x = 0; x < subscribers.size(); ++x) {
+
+			// INFO: need to overload call for PolyMethod instance with no arguments (void)
+			// call subscriber
+			subscribers[x].call();
 		}
 	}
 }
 
-/* call all observers */
-void Xf::Event::call(const Evntype type, const std::string& data) {
-	// check current mode
+/* call all input subscribers */
+void Xf::Event::call_input(const String& input) {
+	// exit if no current mode
 	if (!_current) { return; }
-	// check invalid type
-	if (type >= Evntype::EVNT_MAX) { return; }
-	// get observers indexed by type
-	PolyVector& evntobs = (*_current)[(IDX(type))];
+	// get subscribers
+	InputVector& subscribers = _current->_first;
 	// loop through all observers
-	for (Size x = 0; x < evntobs.size(); ++x) {
-		// call observer
-		evntobs[x].call(data);
+	for (Size x = 0; x < subscribers.size(); ++x) {
+		// call subscriber
+		subscribers[x].call(input);
 	}
 }
 
@@ -110,27 +122,38 @@ void Xf::Event::call(const Evntype type, const std::string& data) {
 // -- P R I V A T E  M E T H O D S --------------------------------------------
 
 /* get mode */
-Xf::Event::Obslist* Xf::Event::get_mode(const std::string& name) {
+Xf::Event::Mode* Xf::Event::get_mode(const String& name) {
 	// loop through all modes
-	for (Size x = 0; x < _observers.size(); ++x) {
+	for (Size x = 0; x < _modes.size(); ++x) {
 		// check mode name
-		if (_observers[x]._first == name) {
+		if (_modes[x]._first == name) {
 			// return mode
-			return &_observers[x]._second;
-		} // return null
+			return &_modes[x]._second;
+		}
 	} return nullptr;
 }
 
-/* get observer list */
-Xf::Event::PolyVector* Xf::Event::get_observers(const std::string& mode, const Evntype type) {
-	// check invalid type
-	if (type >= Evntype::EVNT_MAX) { return nullptr; }
+/* get event subscribers */
+Xf::Event::EventVector* Xf::Event::get_event_subscribers(const String& mode, const Evntype type) {
 	// get mode
-	Obslist* obslist = get_mode(mode);
+	Mode* m = get_mode(mode);
 	// check mode
-	if (!obslist) { return nullptr; }
-	// return observers
-	return &obslist->idx(type);
+	if (!m) { return nullptr; }
+	// check event type
+	if (type < Evntype::EVNT_MAX) {
+		// return subscribers
+		return &m->_second[IDX(type)];
+	} return nullptr;
+}
+
+/* get input subscribers */
+Xf::Event::InputVector* Xf::Event::get_input_subscribers(const String& mode) {
+	// get mode
+	Mode* m = get_mode(mode);
+	// check mode
+	if (!m) { return nullptr; }
+	// return subscribers
+	return &m->_first;
 }
 
 

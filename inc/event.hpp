@@ -27,6 +27,9 @@ namespace Xf {
 		EVNT_MAX
 	};
 
+	/* method type */
+	enum class MethodType { INPUT, EVENT, METHOD_TYPE_MAX };
+
 
 	// -- E V E N T  C L A S S ------------------------------------------------
 
@@ -36,13 +39,21 @@ namespace Xf {
 
 			// -- P R I V A T E  A L I A S E S --------------------------------
 
+			/* string type */
+			using String = std::string;
+
 			/* object pointer */
 			template <typename C>
 			using Pointer = C*;
 
-			/* prototype */
+			/* event prototype */
 			template <typename C>
-			using Prototype = void(C::*)(const std::string&);
+			using EventPrototype = void(C::*)(void);
+
+			/* input prototype */
+			template <typename C>
+			using InputPrototype = void(C::*)(const String&);
+
 
 
 			// -- P R I V A T E  C O N S T R U C T O R S ----------------------
@@ -68,61 +79,105 @@ namespace Xf {
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* add mode */
-			void add_mode(std::string&&);
+			void add_mode(String&&);
 
 			/* set mode by name */
-			void set_mode(const std::string&);
+			bool set_mode(const String&);
 
 			/* subscribe to event */
 			template <typename C>
-			void subscribe(const std::string& mode, const Evntype type, Prototype<C> method, Pointer<C> instance) {
-				// check invalid type and method pointer
-				if (type >= Evntype::EVNT_MAX || !method || !instance) { return; }
-				// check invalid method
-				if (!method) { return; }
-				// get observer list
-				PolyVector* obs = get_observers(mode, type);
-				// check observer list
-				if (!obs) { return; }
-				// create new observer
-				obs->emplace_back(method, instance);
+			void subscribe_event(const String& mode, const Evntype type, EventPrototype<C> method, Pointer<C> instance) {
+				// check invalid pointers
+				if (!method || !instance) { return; }
+				// check event type
+				if (type < Evntype::EVNT_MAX) {
+					// get event subscriber vector
+					EventVector* subscribers = get_event_subscribers(mode, type);
+					// check pointer
+					if (!subscribers) { return; }
+					// add new subscriber
+					subscribers->emplace_back(method, instance);
+				}
+			}
+
+			/* subscribe to input */
+			template <typename C>
+			void subscribe_input(const String& mode, InputPrototype<C> method, Pointer<C> instance) {
+				// check invalid pointers
+				if (!method || !instance) { return; }
+				// get input subscriber vector
+				InputVector* subscribers = get_input_subscribers(mode);
+				// check pointer
+				if (!subscribers) { return; }
+				// add new subscriber
+				subscribers->emplace_back(method, instance);
 			}
 
 			/* unsubscribe to event */
 			template <typename C>
-			void unsubscribe(const std::string& mode, const Evntype type, Prototype<C> method, Pointer<C> instance) {
-				// check invalid type
-				if (type >= Evntype::EVNT_MAX) { return; }
-				// get observer list
-				PolyVector* obs = get_observers(mode, type);
-				// check observer list
-				if (!obs) { return; }
-				// loop through all observers
-				for (Size x = 0; x < obs->size(); ++x) { }
+			void unsubscribe_event(const String& mode, const Evntype type, EventPrototype<C> method, Pointer<C> instance) {
+
+				/* -> */ return; // INFO: this method is not implemented yet
+
+				//// check invalid type
+				//if (type >= Evntype::EVNT_MAX) { return; }
+				//// get subscriber vector
+				//EventVector* subscribers = get_event_subscribers(mode, type);
+				//// check pointer
+				//if (!subscribers) { return; }
+				//// loop through all observers
+				//for (Size x = 0; x < subscribers->size(); ++x) { }
 			}
 
-			/* call all observers */
-			void call(const Evntype, const std::string&);
+			/* call all event subscribers */
+			void call_event(const Evntype);
+
+			/* call all input subscribers */
+			void call_input(const String&);
+
 
 
 		private:
 
-			using LocalMethod = Xf::PolyMethod<void, const std::string&>;
+			// -- P R I V A T E  A L I A S E S --------------------------------
 
-			using PolyVector = Xf::Vector<LocalMethod>;
+			/* input method type */
+			using InputMethod = Xf::PolyMethod<void(const std::string&)>;
 
-			using Obslist = Xf::Array<PolyVector, IDX(Evntype::EVNT_MAX)>;
+			/* input vector type */
+			using InputVector = Xf::Vector<InputMethod>;
 
-			using Pair = Xf::Pair<std::string, Obslist>;
+
+			/* event method type */
+			using EventMethod = Xf::PolyMethod<void(void)>;
+
+			/* event vector type */
+			using EventVector = Xf::Vector<EventMethod>;
+
+			/* event array type */
+			using EventArray = Xf::Array<EventVector, IDX(Evntype::EVNT_MAX)>;
+
+
+			/* mode type */
+			using Mode = Xf::Pair<InputVector, EventArray>;
+
+			/* mode pair type */
+			using Modepair = Xf::Pair<std::string, Mode>;
+
+			/* mode list type */
+			using Modelist = Xf::Vector<Modepair>;
 
 
 			// -- P R I V A T E  M E T H O D S --------------------------------
 
 			/* get mode */
-			Obslist* get_mode(const std::string& mode);
+			Mode* get_mode(const std::string& mode);
 
-			/* get observer list */
-			PolyVector* get_observers(const std::string& mode, const Evntype type);
+			/* get event subscribers */
+			EventVector* get_event_subscribers(const String& mode, const Evntype type);
+
+			/* get input subscribers */
+			InputVector* get_input_subscribers(const String& mode);
 
 			/* mode exists */
 			bool mode_exists(const std::string& mode) const;
@@ -134,9 +189,12 @@ namespace Xf {
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
-			Xf::Vector<Pair> _observers;
+			/* mode list */
+			Modelist _modes;
 
-			Obslist* _current;
+			/* current mode */
+			Mode* _current;
+
 
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------
 
