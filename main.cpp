@@ -29,13 +29,13 @@ void* escape_insert(void* instance) {
 }
 
 void* enter_insert(void* instance) {
-	Xf::Event::instance().set_mode("INSERT");
+	//Xf::Event::instance().set_mode("INSERT");
 	std::cout << "enter_insert" << std::endl;
 	return nullptr;
 }
 
 void* exit_insert(void* instance) {
-	Xf::Event::instance().set_mode("NORMAL");
+	//Xf::Event::instance().set_mode("NORMAL");
 	std::cout << "exit_insert" << std::endl;
 	return nullptr;
 }
@@ -75,8 +75,8 @@ class Toto {
 		Toto() = default;
 		~Toto() = default;
 
-		void print1(const std::string& input) {
-			std::cout << "TOTO METHOD: " << input << std::endl;
+		void print1(void) {
+			std::cout << "TOTO METHOD: " << std::endl;
 		}
 };
 
@@ -88,14 +88,40 @@ class Tutu {
 		void print2(const std::string& input) {
 			std::cout << "TUTU METHOD: " << input << std::endl;
 		}
+
+		void exit() {
+			Xf::Input::stop_loop();
+		}
 };
 
 
 
+#include "Buffer.hpp"
 
+void yolo(void) {
+	std::cout << "YOLO: " << std::endl;
+}
 
 
 int main(int ac, char** av) {
+	Tutu tu;
+
+	Xf::PolyMethod<void()> m1{yolo};
+
+	m1 = nullptr;
+
+	m1.call();
+	return 0;
+
+	Xf::PolyMethod<void()> m2{&Tutu::exit, &tu};
+
+	m1 = m2;
+
+	return 0;
+
+	//Xf::PolyMethod<void(void)> m2{yolo};
+
+
 
 	Toto t;
 	Tutu u;
@@ -112,8 +138,9 @@ int main(int ac, char** av) {
 
 	using Ev = Xf::Evntype;
 
-	evnt.subscribe("NORMAL", Ev::ESCAPE, &Toto::print1, &t);
-	evnt.subscribe("NORMAL", Ev::ESCAPE, &Tutu::print2, &u);
+	evnt.subscribe_event("NORMAL", Ev::ESCAPE, &Toto::print1, &t);
+	evnt.subscribe_input("NORMAL", &Tutu::print2, &u);
+	evnt.subscribe_event("NORMAL", Ev::RETURN, &Tutu::exit, &u);
 
 	Xf::Input::start_loop();
 
