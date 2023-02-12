@@ -1,68 +1,63 @@
 #include "Buffer.hpp"
 
 
-#define DEFAULT_BUFFER_SIZE 1024
-
-char* Buffer::_buff	= initialize_buffer();
-UInt  Buffer::_size	= DEFAULT_BUFFER_SIZE;
-UInt  Buffer::_pos	= 0;
-
-
-/* draw */
-void Buffer::draw(const void* ptr, const UInt size) {
-	if (_buff) {
-		if (_pos + size >= _size)
-			extend(size);
-		for (UInt x = 0; x < size; ++x) {
-			_buff[x + _pos] = ((unsigned char*)ptr)[x];
-		}
-		_pos += size;
-	}
+/* [PRIVATE] default constructor */
+Buffer::Buffer(void)
+:	_buff{Allocator::allocate(DEFAULT_BUFFER_SIZE)},
+	_size{DEFAULT_BUFFER_SIZE},
+	_pos{0} {
+	// code here...
 }
 
-/* extend */
-void Buffer::extend(const UInt size) {
-	// doubles the size until the buffer is large enough
-	while ((_pos + size) >= _size) {
-		// extend size
-		_size *= 2;
-	} // new size memory allocation
-	char* tmp = new char[_size];
-	// iterate over previous allocation content
-	for (UInt x = 0; x < _pos; ++x) {
-		// copy each bytes to new allocated pointer
-		tmp[x] = _buff[x];
-	} // free previous allocation memory
-	delete _buff;
-	// assign new allocation
-	_buff = tmp;
+/* [PUBLIC] destructor */
+Buffer::~Buffer(void) {
+	// free memory
+	if (_buff) { Allocator::deallocate(_buff); }
+}
+
+/* [PUBLIC] draw */
+void Buffer::draw(const void* ptr, const Size count) {
+	// get instance
+	static Buffer& buffer = get_instance();
+
+	// exit if pointer is null
+	if (!buffer._buff) { return; }
+
+	if (buffer._pos + count >= buffer._size) {
+		// INFO: need replace this by std::realloc
+		Pointer new_buff = Allocator::realloc(buffer._buff, count);
+
+		// exit, realloc failed
+		if (!new_buff) { return; }
+
+		buffer._buff = new_buff;
+		buffer._size += count;
+	}
+
+	// copy data into buffer
+	for (Size x = 0, z = buffer._pos; x < count; ++x, ++z) {
+		buffer._buff[z] = ((Pointer)ptr)[x];
+	}
+	// update position
+	buffer._pos += count;
+}
+
+/* get instance */
+Buffer& Buffer::get_instance(void) {
+	return _instance;
 }
 
 /* render */
 int Buffer::render(const int fd) {
+	// get instance
+	static Buffer& buffer = get_instance();
 
-	int writed = write(fd, _buff, _pos);
+	int writed = write(fd, buffer._buff, buffer._pos);
 
-	_pos = 0;
+	buffer._pos = 0;
 
-	return (writed);
+	return writed;
 }
 
-/* initialize buffer */
-char* Buffer::initialize_buffer(void) {
-	// clean memory allocation at exit
-	std::atexit(&static_destructor);
-	// return new allocated memory
-	return (new char[DEFAULT_BUFFER_SIZE]());
-}
+Buffer Buffer::_instance{};
 
-/* static destructor */
-void Buffer::static_destructor(void) {
-	// check if buffer is allocated
-	if (_buff) {
-		// free memory
-		delete[] _buff;
-		// reset buffer pointer
-		_buff = nullptr;
-	}
-}

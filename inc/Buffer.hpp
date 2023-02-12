@@ -3,6 +3,7 @@
 
 #include "Macro.hpp"
 #include "Types.hpp"
+#include "allocator.hpp"
 
 #include <cstdlib>
 #include <unistd.h>
@@ -13,20 +14,52 @@
 
 class Buffer final {
 
+	private:
+
+		// -- P R I V A T E  A L I A S E S ------------------------------------
+
+		/* char type */
+		using Char = char;
+
+		/* reference type */
+		using Reference = Char&;
+
+		/* pointer type */
+		using Pointer = Char*;
+
+		/* size type */
+		using Size = UInt64;
+
+		/* allocator type */
+		using Allocator = Xf::Allocator<Char>;
+
+
+		// -- P R I V A T E  C O N S T R U C T O R S --------------------------
+
+		/* [PRIVATE] default constructor */
+		Buffer(void);
+
+		/* deleted copy constructor */
+		Buffer(const Buffer&) = delete;
+
+		/* deleted move constructor */
+		Buffer(Buffer&&) = delete;
+
+
 	public:
 
-		// -- C O N S T R U C T O R S -----------------------------------------
+		// -- D E S T R U C T O R ---------------------------------------------
 
-		/* non-instanciable class */
-		NON_INSTANCIABLE(Buffer);
+		/* [PUBLIC] destructor */
+		~Buffer(void);
 
 
-		// -- P U B L I C  M E T H O D S --------------------------------------
+		// -- S T A T I C  M E T H O D S --------------------------------------
 
-		/* draw */
-		static void draw(const void* ptr, const UInt size);
+		/* [PUBLIC] draw */
+		static void draw(const void* ptr, const Size size);
 
-		/* render */
+		/* [PUBLIC] render */
 		static int render(const int fd = STDOUT_FILENO);
 
 
@@ -34,19 +67,31 @@ class Buffer final {
 
 		// -- P R I V A T E  M E T H O D S ------------------------------------
 
-		/* initialize buffer */
-		static char* initialize_buffer(void);
+		/* get instance */
+		static Buffer& get_instance(void);
 
-		/* static destructor */
-		static void static_destructor(void);
 
 
 		static void extend(const UInt bytes);
 
 
-		static char*	_buff;
-		static UInt		_size;
-		static UInt		_pos;
+		// -- P R I V A T E  E N U M S ----------------------------------------
+
+		/* buffer size */
+		enum : Size { DEFAULT_BUFFER_SIZE = 1024 };
+
+
+		// -- P R I V A T E  S T A T I C  M E M B E R S -----------------------
+
+		/* singleton instance */
+		static Buffer _instance;
+
+
+		// -- P R I V A T E  M E M B E R S ------------------------------------
+
+		Pointer _buff;
+		Size    _size;
+		Size    _pos;
 
 
 };
