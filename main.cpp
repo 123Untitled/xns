@@ -100,21 +100,22 @@ int main(int ac, char** av) {
 	Toto t;
 	Tutu u;
 
+	Term::setRaw();
+
 	auto& evnt = Xf::Event::instance();
 
 	evnt.add_mode("NORMAL");
 
 	evnt.set_mode("NORMAL");
 
+	evnt.add_mode("INSERT");
+
 	using Ev = Xf::Evntype;
 
 	evnt.subscribe("NORMAL", Ev::ESCAPE, &Toto::print1, &t);
 	evnt.subscribe("NORMAL", Ev::ESCAPE, &Tutu::print2, &u);
 
-
-	evnt.call(Xf::Evntype::ESCAPE, "\\x1b[32m");
-
-	evnt.call(Xf::Evntype::ESCAPE, "yolo!!!");
+	Xf::Input::start_loop();
 
 
 
