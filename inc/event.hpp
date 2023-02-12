@@ -124,6 +124,12 @@ namespace Xf {
 			/* get observer list */
 			PolyVector* get_observers(const std::string& mode, const Evntype type);
 
+			/* mode exists */
+			bool mode_exists(const std::string& mode) const;
+
+			/* get current mode index */
+			Size get_current_idx(void) const;
+
 
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
