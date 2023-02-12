@@ -57,6 +57,12 @@ namespace Xf {
 				return static_cast<Pointer>(std::malloc(size * sizeof(Value)));
 			}
 
+			/* realloc */
+			static Pointer realloc(Pointer addrs, const Size size = 1) {
+				// reallocate memory
+				return static_cast<Pointer>(std::realloc(addrs, size * sizeof(Value)));
+			}
+
 			/* deallocate */
 			static void deallocate(Pointer pointer) {
 				// deallocate memory
