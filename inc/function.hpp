@@ -3,174 +3,185 @@
 
 #include "type_traits.hpp"
 #include "forward.hpp"
+#include "Macro.hpp"
+#include <iostream>
 
 
 // -- N A M E S P A C E -------------------------------------------------------
 
 namespace Xf {
 
-	// -- F U N C T I O N  C L A S S --------------------------------------------
+	//// -- F U N C T I O N  C L A S S --------------------------------------------
 
-	template <typename R, typename... A>
-	class Function final {
+	//template <typename R, typename... A>
+	//class Function final {
 
-		public:
+	//	public:
 
-			// -- A L I A S E S -----------------------------------------------
+	//		// -- A L I A S E S -----------------------------------------------
 
-			/* function pointer type */
-			using Prototype = R(*)(A...);
+	//		/* function pointer type */
+	//		using Prototype = R(*)(A...);
 
-			/* return type */
-			using Return = R;
+	//		/* return type */
+	//		using Return = R;
 
-			// -- C O N S T R U C T O R S -------------------------------------
+	//		// -- C O N S T R U C T O R S -------------------------------------
 
-			/* deleted default constructor */
-			//Function(void) = delete;
-			Function() { }
+	//		/* deleted default constructor */
+	//		//Function(void) = delete;
+	//		Function() { }
 
-			/* function pointer constructor */
-			Function(Prototype function)
-			// initializations
-			: _function{function} { }
+	//		/* function pointer constructor */
+	//		Function(Prototype function)
+	//		// initializations
+	//		: _function{function} { }
 
-			/* destructor */
-			~Function(void) { /* nothing to do */ }
-
-
-			// -- O P E R A T O R S -------------------------------------------
-
-			/* copy operator */
-			Function& operator=(const Function& other) {
-				// copy function pointer
-				_function = other._function;
-				// return self reference
-				return *this;
-			}
-
-			/* function call operator */
-			Return operator()(A&&... arguments) {
-				// call function
-				return _function(Xf::forward<A>(arguments)...);
-			}
+	//		/* destructor */
+	//		~Function(void) { /* nothing to do */ }
 
 
-			// -- P U B L I C  M E T H O D S ----------------------------------
+	//		// -- O P E R A T O R S -------------------------------------------
 
-			/* call method */
-			Return call(A&&... arguments) const {
-				// call function
-				return _function(Xf::forward<A>(arguments)...);
-			}
+	//		/* copy operator */
+	//		Function& operator=(const Function& other) {
+	//			// copy function pointer
+	//			_function = other._function;
+	//			// return self reference
+	//			return *this;
+	//		}
 
-		private:
-
-			// -- P R I V A T E  M E M B E R S ----------------------------
-
-			/* function to call */
-			Prototype _function;
-
-	};
+	//		/* function call operator */
+	//		Return operator()(A&&... arguments) {
+	//			// call function
+	//			return _function(Xf::forward<A>(arguments)...);
+	//		}
 
 
+	//		// -- P U B L I C  M E T H O D S ----------------------------------
+
+	//		/* call method */
+	//		Return call(A&&... arguments) const {
+	//			// call function
+	//			return _function(Xf::forward<A>(arguments)...);
+	//		}
+
+	//	private:
+
+	//		// -- P R I V A T E  M E M B E R S ----------------------------
+
+	//		/* function to call */
+	//		Prototype _function;
+
+	//};
 
 
 
 
-	// -- M E T H O D  C L A S S ----------------------------------------------
-
-	template <typename R, typename C, typename... A>
-	class Method final {
-
-		public:
-
-			// -- A L I A S E S -----------------------------------------------
-
-			/* method pointer type */
-			using Prototype = R(C::*)(A...);
-
-			/* instance reference type */
-			using Reference = C&;
-
-			/* instance pointer type */
-			using Pointer = C*;
-
-			/* return type */
-			using Return = R;
 
 
-			// -- C O N S T R U C T O R S -------------------------------------
+	//// -- M E T H O D  C L A S S ----------------------------------------------
 
-			/* deleted default constructor */
-			//Method(void) = delete;
-			Method() { }
+	//template <typename R, typename C, typename... A>
+	//class Method final {
 
-			/* method pointer constructor */
-			Method(Prototype method, Reference instance)
-			// initializations
-			: _method{method}, _instance{&instance} { }
+	//	public:
 
-			Method(Prototype method, Pointer instance)
-			// initializations
-			: _method{method}, _instance{instance} { }
+	//		// -- A L I A S E S -----------------------------------------------
 
-			/* copy constructor */
-			Method(const Method& other)
-			// initializations
-			: _method{other._method}, _instance{other._instance} { }
+	//		/* method pointer type */
+	//		using Prototype = R(C::*)(A...);
 
-			/* destructor */
-			~Method(void) { }
+	//		/* instance reference type */
+	//		using Reference = C&;
+
+	//		/* instance pointer type */
+	//		using Pointer = C*;
+
+	//		/* return type */
+	//		using Return = R;
 
 
-			// -- O P E R A T O R S -------------------------------------------
+	//		// -- C O N S T R U C T O R S -------------------------------------
 
-			/* copy operator */
-			Method& operator=(const Method& other) {
-				// copy method pointer
-				_method = other._method;
-				// copy instance reference
-				_instance = other._instance;
-				// return self reference
-				return *this;
-			}
+	//		/* deleted default constructor */
+	//		//Method(void) = delete;
+	//		Method() { }
 
+	//		/* method pointer constructor */
+	//		Method(Prototype method, Reference instance)
+	//		// initializations
+	//		: _method{method}, _instance{&instance} { }
 
-			/* function call operator */
-			Return operator()(A&&... arguments) const {
-				// call method
-				return (_instance->*_method)(Xf::forward<A>(arguments)...);
-			}
+	//		Method(Prototype method, Pointer instance)
+	//		// initializations
+	//		: _method{method}, _instance{instance} { }
 
+	//		/* copy constructor */
+	//		Method(const Method& other)
+	//		// initializations
+	//		: _method{other._method}, _instance{other._instance} { }
 
-			// -- P U B L I C  M E T H O D S ----------------------------------
-
-			/* call method */
-			Return call(A&&... arguments) const {
-				// call method
-				return (_instance->*_method)(Xf::forward<A>(arguments)...);
-			}
+	//		/* destructor */
+	//		~Method(void) { }
 
 
-		private:
+	//		// -- O P E R A T O R S -------------------------------------------
 
-			// -- P R I V A T E  M E M B E R S --------------------------------
+	//		/* copy operator */
+	//		Method& operator=(const Method& other) {
+	//			// copy method pointer
+	//			_method = other._method;
+	//			// copy instance reference
+	//			_instance = other._instance;
+	//			// return self reference
+	//			return *this;
+	//		}
 
-			/* method to call */
-			Prototype _method;
 
-			/* instance to call method on */
-			Pointer   _instance;
+	//		/* function call operator */
+	//		Return operator()(A&&... arguments) const {
+	//			// call method
+	//			return (_instance->*_method)(Xf::forward<A>(arguments)...);
+	//		}
 
-	};
+
+	//		// -- P U B L I C  M E T H O D S ----------------------------------
+
+	//		/* call method */
+	//		Return call(A&&... arguments) const {
+	//			// call method
+	//			return (_instance->*_method)(Xf::forward<A>(arguments)...);
+	//		}
+
+
+	//	private:
+
+	//		// -- P R I V A T E  M E M B E R S --------------------------------
+
+	//		/* method to call */
+	//		Prototype _method;
+
+	//		/* instance to call method on */
+	//		Pointer   _instance;
+
+	//};
 
 
 
 	// -- P O L Y  M E T H O D  C L A S S -------------------------------------
 
+	// empty definition
+	template <typename>
+	class PolyMethod;
+
+	// INFO: empty definition is needed to do next partial specialisation
+	// used to instanciate like PolyMethod<int(void)>
+
+	// BONUS: let also instanciate template with void as arguments
+
 	template <typename R, typename... A>
-	class PolyMethod final {
+	class PolyMethod<R(A...)> final {
 
 		public:
 
@@ -178,7 +189,13 @@ namespace Xf {
 
 			/* method pointer type */
 			template <typename C>
-			using Prototype = R(C::*)(A...);
+			using MethodPrototype = R(C::*)(A...);
+
+			/* function pointer type */
+			using FunctionPrototype = R(*)(A...);
+
+			/* return type */
+			using Return = R;
 
 			/* instance reference type */
 			template <typename C>
@@ -188,29 +205,33 @@ namespace Xf {
 			template <typename C>
 			using Pointer = C*;
 
-			/* return type */
-			using Return = R;
 
 
 			// -- C O N S T R U C T O R S -------------------------------------
 
-			/* [default constructor] */
+			/* default constructor */
 			PolyMethod(void)
 			: _base{nullptr} {
 				// code here...
 			}
 
-			/* [prototype reference constructor] */
+			/* method reference constructor */
 			template <typename C>
-			explicit PolyMethod(Prototype<C> method, Reference<C> instance)
-			: _base{new Derived<C>{method, instance}} {
+			explicit PolyMethod(MethodPrototype<C> method, Reference<C> instance)
+			: _base{new Method<C>{method, instance}} {
 				// code here...
 			}
 
-			/* [prototype pointer constructor] */
+			/* method pointer constructor */
 			template <typename C>
-			explicit PolyMethod(Prototype<C> method, Pointer<C> instance)
-			: _base{new Derived<C>{method, instance}} {
+			explicit PolyMethod(MethodPrototype<C> method, Pointer<C> instance)
+			: _base{new Method<C>{method, instance}} {
+				// code here...
+			}
+
+			/* function pointer constructor */
+			explicit PolyMethod(FunctionPrototype function)
+			: _base{new Function{function}} {
 				// code here...
 			}
 
@@ -262,6 +283,16 @@ namespace Xf {
 				return *this;
 			}
 
+			/* nullptr assignment operator */
+			PolyMethod& operator=(Nullptr) noexcept {
+				// deallocate base
+				if (_base) { delete _base; }
+				// invalidate base pointer
+				_base = nullptr;
+				// return self reference
+				return *this;
+			}
+
 			/* [function call operator] */
 			Return operator()(A&&... arguments) const {
 				// call base method
@@ -284,21 +315,29 @@ namespace Xf {
 
 			struct Base {
 
-					Base(void) = default;
+				/* default constructor */
+				Base(void) = default;
 
-					virtual ~Base(void) = default;
+				/* non-assignable struct */
+				NON_ASSIGNABLE(Base);
 
-					virtual R call(A&&...) const = 0;
+				/* default destructor */
+				virtual ~Base(void) = default;
 
-					virtual R operator()(A&&...) const = 0;
+				/* virtual operator() method */
+				virtual R operator()(A&&...) const = 0;
 
-					virtual Base* clone(void) const = 0;
+				/* virtual call method */
+				virtual R call(A&&...) const = 0;
+
+				/* virtual clone method */
+				virtual Base* clone(void) const = 0;
 
 			};
 
 
 			template <typename C>
-			struct Derived final : public Base {
+			struct Method final : public Base {
 
 				// -- A L I A S E S -------------------------------------------
 
@@ -306,55 +345,55 @@ namespace Xf {
 				using Value = C;
 
 				/* method pointer type */
-				using Prototype = R(C::*)(A...);
+				using Prototype = PolyMethod::MethodPrototype<C>;
 
 				/* instance reference type */
-				using Reference = Reference<C>;
+				using Reference = PolyMethod::Reference<C>;
 
 				/* instance pointer type */
-				using Pointer = Pointer<C>;
+				using Pointer = PolyMethod::Pointer<C>;
 
 
 				// -- C O N S T R U C T O R S ---------------------------------
 
 				/* [default constructor] */
-				Derived(void)
+				Method(void)
 				: _method{nullptr}, _instance{nullptr} {
 					// code here...
 				}
 
 				/* [prototype reference constructor] */
-				Derived(Prototype method, Reference instance)
+				Method(Prototype method, Reference instance)
 				: _method{method}, _instance{&instance} {
 					// code here...
 				}
 
 				/* [prototype pointer constructor] */
-				Derived(Prototype method, Pointer instance)
+				Method(Prototype method, Pointer instance)
 				: _method{method}, _instance{instance} {
 					// code here...
 				}
 
 				/* [copy constructor] */
-				Derived(const Derived& other)
+				Method(const Method& other)
 				: _method{other._method}, _instance{other._instance} {
 					// code here...
 				}
 
 				/* [move constructor] */
-				Derived(Derived&& other)
-				: Derived{other} {
+				Method(Method&& other)
+				: Method{other} {
 					// code here...
 				}
 
 				/* [destructor] */
-				~Derived(void) override = default;
+				~Method(void) override = default;
 
 
 				// -- O P E R A T O R S ---------------------------------------
 
 				/* [copy assignment operator] */
-				Derived& operator=(const Derived& other) {
+				Method& operator=(const Method& other) {
 					// copy method pointer
 					_method = other._method;
 					// copy instance pointer
@@ -364,9 +403,9 @@ namespace Xf {
 				}
 
 				/* [move assignment operator] */
-				Derived& operator=(Derived&& other) {
+				Method& operator=(Method&& other) {
 					// call copy assignment operator
-					return Derived::operator=(other);
+					return Method::operator=(other);
 				}
 
 				/* [function call operator] */
@@ -387,7 +426,7 @@ namespace Xf {
 				/* [clone method] */
 				Base* clone(void) const override {
 					// return new dynamic copy of self
-					return new Derived(*this);
+					return new Method(*this);
 				}
 
 
@@ -402,15 +441,95 @@ namespace Xf {
 			};
 
 
+			struct Function final : public Base {
+
+				// -- A L I A S E S -------------------------------------------
+
+				/* function pointer type */
+				using Prototype = PolyMethod::FunctionPrototype;
+
+
+				// -- C O N S T R U C T O R S ---------------------------------
+
+				/* default constructor */
+				Function(void)
+				: _function{nullptr} {
+					// code here...
+				}
+
+				/* function pointer constructor */
+				Function(Prototype function)
+				: _function{function} {
+					// code here...
+				}
+
+				/* copy constructor */
+				Function(const Function& other)
+				: _function{other._function} {
+					// code here...
+				}
+
+				/* move constructor */
+				Function(Function&& other)
+				: Function{other} {
+					// code here...
+				}
+
+				/* destructor */
+				~Function(void) override = default;
+
+
+				// -- O P E R A T O R S ---------------------------------------
+
+				/* copy assignment operator */
+				Function& operator=(const Function& other) {
+					// copy function pointer
+					_function = other._function;
+					// return self reference
+					return *this;
+				}
+
+				/* move assignment operator */
+				Function& operator=(Function&& other) {
+					// call copy assignment operator
+					return Function::operator=(other);
+				}
+
+				/* function call operator */
+				Return operator()(A&&... arguments) const override {
+					// call function
+					return _function(Xf::forward<A>(arguments)...);
+				}
+
+
+				// -- M E T H O D S -------------------------------------------
+
+				/* call function */
+				Return call(A&&... arguments) const override {
+					// call function
+					return _function(Xf::forward<A>(arguments)...);
+				}
+
+				/* clone function */
+				Base* clone(void) const override {
+					// return new dynamic copy of self
+					return new Function(*this);
+				}
+
+
+				// -- M E M B E R S -------------------------------------------
+
+				/* function pointer */
+				Prototype _function;
+
+			};
+
+
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
 			Base* _base;
 
 	};
-
-
-
-
 
 
 
