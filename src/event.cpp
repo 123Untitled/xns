@@ -30,21 +30,51 @@ Xf::Event& Xf::Event::instance(void) {
 void Xf::Event::add_mode(std::string&& name) {
 	// check invalid name
 	if (name.empty()) { return; }
-	// loop through all modes
-	for (Size x = 0; x < _observers.size(); ++x) {
-		// check mode already exists
-		if (_observers[x]._first == name) {
-			// exit method
-			return;
-		} // add mode
-	}
+
+	// check if mode already exists
+	if (mode_exists(name)) { return; }
+
+
+	Size idx = 0;
+	// find index of current mode
+	if (_current) { idx = get_current_idx(); }
+
 	_observers.emplace_back(Xf::move(Pair{
 				Xf::move(name), Xf::move(Obslist{})
 			}
 		)
 	);
-	// return new mode
-	return;
+
+	// set new current mode
+	if (_current) {
+		// INFO: reason of this is when vector is resized,
+		// all pointers are invalidated
+		_current = &_observers[idx]._second;
+	}
+}
+
+/* [PRIVATE] mode exists */
+bool Xf::Event::mode_exists(const std::string& mode) const {
+	// loop through all modes
+	for (Size x = 0; x < _observers.size(); ++x) {
+		// compare mode name
+		if (_observers[x]._first == mode) {
+			// exit method
+			return true; }
+	} // mode not found
+	return false;
+}
+
+/* [PRIVATE] get current mode index */
+Size Xf::Event::get_current_idx(void) const {
+	// loop through all modes
+	for (Size x = 0; x < _observers.size(); ++x) {
+		// check mode name
+		if (&_observers[x]._second == _current) {
+			// exit method
+			return x; }
+	} // else return 0
+	return 0;
 }
 
 /* set mode by name */
