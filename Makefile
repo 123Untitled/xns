@@ -5,15 +5,18 @@
 #        ▁▁▁▁▁▁▁▁  ▁▁▁▁▁▁▁▁  ▁▁▁▁ ▁▁▁  ▁▁▁▁▁▁▁▁                               #
 #       ╱        ╲╱        ╲╱    ╱   ╲╱        ╲    language: makefile        #
 #      ╱         ╱         ╱         ╱         ╱    author:   @tutur          #
-#     ╱         ╱         ╱        ▁╱       ▁▁╱     created: 2020-05-01       #
-#     ╲▁▁╱▁▁╱▁▁╱╲▁▁▁╱▁▁▁▁╱╲▁▁▁▁╱▁▁▁╱╲▁▁▁▁▁▁▁▁╱      updated: 2020-05-01       #
+#     ╱         ╱         ╱        ▁╱       ▁▁╱     created:  2020-05-01      #
+#     ╲▁▁╱▁▁╱▁▁╱╲▁▁▁╱▁▁▁▁╱╲▁▁▁▁╱▁▁▁╱╲▁▁▁▁▁▁▁▁╱      updated:  2020-05-01      #
 #                                                                             #
 ###############################################################################
 
 
 # -- V E R S I O N  C H E C K -------------------------------------------------
 
+# minimal version required
 MINIMAL_VERSION := 4.2
+
+# compare version
 ifneq ($(MINIMAL_VERSION), $(firstword $(sort $(MAKE_VERSION) $(MINIMAL_VERSION))))
  $(error $(shell echo "Please use \033[1;32mGNU Make 4.2\033[0m or later"))
 endif
@@ -21,27 +24,44 @@ endif
 
 # -- S E T T I N G S ----------------------------------------------------------
 
+# set default target
 .DEFAULT_GOAL := all
+
+# use one shell for all commands
 .ONESHELL:
+
+# delete intermediate files on error
 .DELETE_ON_ERROR:
 
+# silent mode
+.SILENT:
+
+# set shell program
 override SHELL := $(shell which zsh)
+
+# set shell flags
+.SHELLFLAGS := -d -f -c -e -o pipefail -u
+
+# set make flags
 override MAKEFLAGS += --warn-undefined-variables --no-builtin-rules
 
 
-# -- O S   D E T E C T I O N --------------------------------------------------
+# -- O P E R A T I N G  S Y S T E M -------------------------------------------
 
-# Detect OPERATING SYSTEM
+# Detect operating system
 override OS := $(shell uname -s)
 
+# exit if OS is not supported
 ifeq ($(OS), Darwin)
  override PLATFORM := macosx
  override DLIB := -dynamiclib
  override THREAD := $(shell sysctl -n hw.ncpu)
+ override DLIB_EXT := dylib
 else ifeq ($(OS), Linux)
  override PLATFORM := linux
  override DLIB := -shared
  override THREAD := $(shell nproc)
+ override DLIB_EXT := so
 else
  $(error $(shell echo "Unsupported OS: \033[1;32m$(OS)\033[0m"))
 endif
@@ -49,92 +69,140 @@ endif
 
 # -- D I R E C T O R I E S ----------------------------------------------------
 
+# source directory
 override SRCDIR := src
+
+# include directory
 override INCDIR := inc
-override OBJDIR := _obj
-override DEPDIR := _dep
-override JSNDIR := _jsn
-override LIBDIR := _lib
+
+# library directory
+override LIBDIR := lib
+
+# build directory
+override BLDDIR := _bld
+
+# object directory
+override OBJDIR := $(BLDDIR)/_obj
+
+# dependency directory
+override DEPDIR := $(BLDDIR)/_dep
+
+# json directory
+override JSNDIR := $(BLDDIR)/_json
 
 
 # -- P R O G R A M  U T I L I T I E S -----------------------------------------
 
+# make directory if not exists
 MKDIR := mkdir -p
-RM := rm -rvf
 
-
-# -- C O M P I L E R  S E T T I N G S -----------------------------------------
-
-CCX := $(shell which clang++)
-#CCX := /opt/homebrew/Cellar/llvm/15.0.7_1/bin/clang++
-
-AR := $(shell which ar)
-
-ARFLAGS := -rcs
-
-STD := -std=c++2b
-
-OPT := -O0 -g3
-
-CXXFLAGS :=	-Wall -Wextra -Werror -Wpedantic \
-			-Wno-unused -Wno-unused-variable -Wno-unused-parameter \
-			-Winline -fno-exceptions -Weffc++
-
-LDFLAGS ?=
-
-DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
-
-CMPFLAGS = -MJ $(JSNDIR)/$*.json
-
-INCLUDES := -I$(INCDIR)
+# remove recursively force
+RM := rm -rf
 
 
 # -- T A R G E T S ------------------------------------------------------------
 
-PROJECT				= xfunc
-DYNAMIC_LIB			= libxfunc.dylib
-STATIC_LIB			= libxfunc.a
-COMPILE_COMMANDS	= compile_commands.json
+# project name
+PROJECT = xfunc
+
+# main executable
+EXEC = $(PROJECT)
+
+# dynamic library
+DYNAMIC_LIB = lib$(PROJECT).$(DLIB_EXT)
+
+# static library
+STATIC_LIB = lib$(PROJECT).a
+
+# compile commands for clangd
+COMPILE_COMMANDS = compile_commands.json
+
+
+# -- C O M P I L E R  S E T T I N G S -----------------------------------------
+
+# compiler
+CCX := $(shell which clang++)
+
+# archiver
+AR := $(shell which ar)
+
+# archiver flags
+ARFLAGS := -rcs
+
+# compiler standard
+STD := -std=c++2b
+
+# compiler optimization
+OPT := -O0 -g3
+
+# compiler flags
+CXXFLAGS :=	-Wall -Wextra -Werror -Wpedantic \
+			-Wno-unused -Wno-unused-variable -Wno-unused-parameter \
+			-Winline -fno-exceptions -Weffc++
+
+# linker flags
+LDFLAGS ?=
+
+# dependency flags
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
+
+# compile commands flags
+CMPFLAGS = -MJ $(JSNDIR)/$*.json
+
+# include flags
+INCLUDES := -I$(INCDIR)
 
 
 # -- S O U R C E S ------------------------------------------------------------
 
+# get all source files
 override SRC := $(shell find $(SRCDIR) -type f -name '*.cpp')
 
-override FILES := $(notdir $(SRC))
+# pattern substitution for object files
+override OBJ := $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o,    $(SRC))
 
-override SUB := $(dir $(SRC))
+# pattern substitution for dependency files
+override DEP := $(patsubst $(OBJDIR)/%.o,   $(DEPDIR)/%.d,    $(OBJ))
 
-override OBJ := $(addprefix $(OBJDIR)/, $(FILES:%.cpp=%.o))
+# pattern substitution for compile commands
+override JSN := $(patsubst $(SRCDIR)/%.cpp, $(JSNDIR)/%.json, $(SRC))
 
-override DEP := $(addprefix $(DEPDIR)/, $(FILES:%.cpp=%.d))
-
-override JSN := $(addprefix $(JSNDIR)/, $(FILES:%.cpp=%.json))
+#
+override HIR := $(sort $(dir $(SRC)))
+override OBJHIR := $(HIR:$(SRCDIR)/%=$(OBJDIR)/%)
+override DEPHIR := $(HIR:$(SRCDIR)/%=$(DEPDIR)/%)
+override JSNHIR := $(HIR:$(SRCDIR)/%=$(JSNDIR)/%)
 
 
 # -- F O R M A T T I N G ------------------------------------------------------
 
-override RESET := "\x1b[0m"
+# formatting (erase line, move cursor up, set color)
 override COLOR := "\x1b[1F\x1b[0J\x1b[3;31m"
+
+# reset formatting
+override RESET := "\x1b[0m"
 
 
 # -- P H O N Y  T A R G E T S -------------------------------------------------
 
-.PHONY: all clean fclean re ascii obj lib
+# phony targets
+.PHONY: all clean fclean re ascii obj lib directories test
 
 
 # -- M A I N  T A R G E T S ---------------------------------------------------
 
-all: main.cpp lib
-	$(CCX) $(STD) $(OPT) $(CXXFLAGS) $< $(INCLUDES) -L. -lxfunc -o $(PROJECT)
+all: lib test
 
-
-lib: ascii $(STATIC_LIB) $(COMPILE_COMMANDS)
-	@echo $(COLOR)'[v]'$(RESET) "All targets are up to date !";
-	file $(STATIC_LIB)
+test: main.cpp
+	$(CCX) $(STD) $(OPT) $(CXXFLAGS) $< $(INCLUDES) -L. -lxfunc -o $(EXEC)
+	file $(EXEC)
 
 
 # -- L I B R A R Y  T A R G E T S ---------------------------------------------
+
+lib: $(DYNAMIC_LIB) $(STATIC_LIB) $(COMPILE_COMMANDS)
+	@echo $(COLOR)'[v]'$(RESET) "All targets are up to date !";
+	file $(STATIC_LIB) $(DYNAMIC_LIB)
 
 $(DYNAMIC_LIB): obj
 	@echo $(COLOR)Dynamic-Link$(RESET) $@;
@@ -147,13 +215,12 @@ $(STATIC_LIB): obj
 
 # -- C O M P I L A T I O N ----------------------------------------------------
 
-# call self with threads
 obj:
 	@$(MAKE) -s -j$(THREAD) $(OBJ)
 
 -include $(DEP)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp Makefile | $(OBJDIR) $(DEPDIR) $(JSNDIR)
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp Makefile | directories
 	@echo $(COLOR)Compilation$(RESET) $<;
 	@$(CCX) $(STD) $(OPT) $(CXXFLAGS) $(CMPFLAGS) $(DEPFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -167,17 +234,19 @@ $(COMPILE_COMMANDS): obj
 
 # -- D I R E C T O R I E S  C R E A T I O N -----------------------------------
 
-$(OBJDIR) $(DEPDIR) $(JSNDIR) $(LIBDIR):
-	@$(MKDIR) $@
+directories:
+	@$(MKDIR) $(OBJHIR) $(DEPHIR) $(JSNHIR)
 
 
 # -- C L E A N I N G ----------------------------------------------------------
 
 clean:
-	@$(RM) $(OBJ) $(OBJDIR) $(DEP) $(DEPDIR) $(JSNDIR) $(PROJECT).dSYM
+	@echo $(COLOR)'[x]'$(RESET) "Cleaned";
+	@$(RM) $(BLDDIR) $(PROJECT).dSYM
 
 fclean: clean
-	@$(RM) $(PROJECT) $(DYNAMIC_LIB) $(STATIC_LIB) $(COMPILE_COMMANDS) .cache
+	@echo $(COLOR)'[x]'$(RESET) "Full cleaned";
+	@$(RM) $(EXEC) $(DYNAMIC_LIB) $(STATIC_LIB) $(COMPILE_COMMANDS) .cache
 
 
 # -- R E C O M P I L E --------------------------------------------------------
@@ -196,8 +265,4 @@ ascii:
 		"╱         ╱         ╱        ▁╱       ▁▁╱	\n" \
 		"╲▁▁╱▁▁╱▁▁╱╲▁▁▁╱▁▁▁▁╱╲▁▁▁▁╱▁▁▁╱╲▁▁▁▁▁▁▁▁╱	\n\n" \
 		$(RESET);
-
-
-
-
 
