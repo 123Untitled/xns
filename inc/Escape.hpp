@@ -9,6 +9,7 @@
 #include "Color.hpp"
 #include "Buffer.hpp"
 #include "Macro.hpp"
+#include "array.hpp"
 
 
 // -- E S C A P E  N A M E S P A C E ------------------------------------------
@@ -85,9 +86,57 @@ namespace Escape {
 	/* cursor block */
 	void cursor_block(void);
 
+};
+
+// -- N A M E S P A C E -------------------------------------------------------
+
+namespace Xf {
+
+	// -- E S C A P E  C L A S S ----------------------------------------------
+
+	class Escape final {
 
 
+
+
+		public:
+
+			// -- A L I A S E S -----------------------------------------------
+
+			/* character type */
+			using Char = char;
+
+			// -- C O N S T R U C T O R S -------------------------------------
+
+			/* non-instantiable class */
+			NON_INSTANCIABLE(Escape);
+
+		private:
+
+
+			// -- M E M B E R S -----------------------------------------------
+
+			/* move home \e[H */
+			constexpr static const Xf::Array move_home{"\x1b[H"};
+
+			/* move left \e[D */
+			constexpr static const Xf::Array move_left{"\x1b[D"};
+
+			/* move right \e[C */
+			constexpr static const Xf::Array move_right = { '\x1b', '[', 'C' };
+
+			/* move up \e[A */
+			constexpr static const Xf::Array move_up = { '\x1b', '[', 'A' };
+
+			/* move down \e[B */
+			constexpr static const Xf::Array move_down = { '\x1b', '[', 'B' };
+
+
+
+	};
 
 };
+
+
 
 #endif
