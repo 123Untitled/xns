@@ -89,9 +89,6 @@ class Tutu {
 			std::cout << "TUTU METHOD: " << input << std::endl;
 		}
 
-		void exit() {
-			Xf::Input::stop_loop();
-		}
 };
 
 
@@ -99,27 +96,16 @@ class Tutu {
 #include "Buffer.hpp"
 
 void yolo(void) {
-	std::cout << "YOLO: " << std::endl;
+	std::cout << "RECEIVED YOLO" << std::endl;
+}
+
+void exit(void) {
+	Xf::Input::stop_loop();
 }
 
 
+
 int main(int ac, char** av) {
-	Tutu tu;
-
-	Xf::PolyMethod<void()> m1{yolo};
-
-	m1 = nullptr;
-
-	m1.call();
-	return 0;
-
-	Xf::PolyMethod<void()> m2{&Tutu::exit, &tu};
-
-	m1 = m2;
-
-	return 0;
-
-	//Xf::PolyMethod<void(void)> m2{yolo};
 
 
 
@@ -138,9 +124,10 @@ int main(int ac, char** av) {
 
 	using Ev = Xf::Evntype;
 
-	evnt.subscribe_event("NORMAL", Ev::ESCAPE, &Toto::print1, &t);
+	evnt.subscribe_event("NORMAL", Ev::ESC, &Toto::print1, &t);
 	evnt.subscribe_input("NORMAL", &Tutu::print2, &u);
-	evnt.subscribe_event("NORMAL", Ev::RETURN, &Tutu::exit, &u);
+	evnt.subscribe_event("NORMAL", Ev::MAJ_R, yolo);
+	evnt.subscribe_event("NORMAL", Ev::ETX, exit);
 
 	Xf::Input::start_loop();
 
