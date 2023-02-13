@@ -67,6 +67,12 @@ class Buffer final {
 
 		// -- P R I V A T E  M E T H O D S ------------------------------------
 
+		/* [PRIVATE] draw */
+		void _draw(const void* ptr, const Size size);
+
+		/* [PRIVATE] render */
+		int _render(const int fd = STDOUT_FILENO);
+
 		/* get instance */
 		static Buffer& get_instance(void);
 
@@ -90,8 +96,8 @@ class Buffer final {
 		// -- P R I V A T E  M E M B E R S ------------------------------------
 
 		Pointer _buff;
+		Size    _capacity;
 		Size    _size;
-		Size    _pos;
 
 
 };
