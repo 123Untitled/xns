@@ -16,8 +16,16 @@ String::String(void)
 /* capacity constructor */
 String::String(const Size capacity)
 // initializations
-: _str{allocation(capacity)}, _size{0}, _capacity{capacity} {
-	// code here...
+: String{ } {
+	// check if capacity is not zero
+	if (capacity != 0) {
+		// set capacity
+		_capacity = capacity;
+		// allocate memory
+		_str = Allocator::allocate(_capacity);
+		// set nullchar
+		_str[0] = '\0';
+	}
 }
 
 /* null-terminated string constructor */
@@ -415,7 +423,7 @@ void String::unsafe_bzero(Char* dst, const Size size) {
 
 
 
-bool String::resize(const UInt32 len) {
+bool String::resize(const Size len) {
 	if (_str && len < _size) {
 		_str[len] = nullchar;
 		_size = len;
@@ -893,13 +901,13 @@ bool String::is_graphical(const char character) {
 /* is control */
 bool String::is_control(const char character) {
 	// return true if character is control
-	return (character < 0x20 || character == 0x7f);
+	return character < 0x20 || character == 0x7f;
 }
 
 /* is multi-byte */
 bool String::is_multibyte(const char character) {
 	// return true if character is multi-byte
-	return (character > 0x7f);
+	return character & 0x80;
 }
 
 
