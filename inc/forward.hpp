@@ -28,28 +28,28 @@ namespace Xf {
 
 	// forward lvalues as rvalues
 	template <typename T>
-	inline typename Xf::enable_if<!Xf::is_lvalue_reference<T>::value, T&&>::type
+	inline constexpr typename Xf::enable_if<!Xf::is_lvalue_reference<T>::value, T&&>::type
 	forward(typename Xf::identity<T>::type& obj) {
 		return static_cast<T&&>(obj);
 	}
 
 	// forward rvalues as rvalues
 	template <typename T>
-	inline typename Xf::enable_if<!Xf::is_lvalue_reference<T>::value, T&&>::type
+	inline constexpr typename Xf::enable_if<!Xf::is_lvalue_reference<T>::value, T&&>::type
 	forward(typename Xf::identity<T>::type&& obj) {
 		return static_cast<T&&>(obj);
 	}
 
 	// forward lvalues as lvalues.
 	template <typename T>
-	inline typename Xf::enable_if<Xf::is_lvalue_reference<T>::value, T>::type
+	inline constexpr typename Xf::enable_if<Xf::is_lvalue_reference<T>::value, T>::type
 	forward(typename Xf::identity<T>::type obj) {
 		return obj;
 	}
 
 	// prevent forwarding rvalues as const lvalues
 	template <typename T>
-	inline typename Xf::enable_if<Xf::is_lvalue_reference<T>::value, T>::type
+	inline constexpr typename Xf::enable_if<Xf::is_lvalue_reference<T>::value, T>::type
 	forward(typename Xf::remove_reference<T>::type&& obj) = delete;
 
 
