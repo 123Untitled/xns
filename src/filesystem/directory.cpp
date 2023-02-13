@@ -1,4 +1,4 @@
-#include "Directory.hpp"
+#include "directory.hpp"
 
 Directory::Directory(void)
 : _absolute{}, _directory{nullptr} {
