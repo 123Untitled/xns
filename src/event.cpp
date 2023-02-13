@@ -118,6 +118,20 @@ void Xf::Event::call_input(const String& input) {
 	}
 }
 
+/* subscribe to event [function] */
+void Xf::Event::subscribe_event(const String& mode, const Evntype type, EventFunction method) {
+	// check invalid pointers
+	if (!method) { return; }
+	// check event type
+	if (type < Evntype::EVNT_MAX) {
+		// get event subscriber vector
+		EventVector* subscribers = get_event_subscribers(mode, type);
+		// check pointer
+		if (!subscribers) { return; }
+		// add new subscriber
+		subscribers->emplace_back(method);
+	}
+}
 
 // -- P R I V A T E  M E T H O D S --------------------------------------------
 
