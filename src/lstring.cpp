@@ -1,4 +1,4 @@
-#include "String.hpp"
+#include "string.hpp"
 
 
 // -- C O N S T R U C T O R S -------------------------------------------------

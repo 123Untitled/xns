@@ -1,4 +1,4 @@
-#include "String.hpp"
+#include "string.hpp"
 
 
 #define nullchar '\0'
