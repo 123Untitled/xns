@@ -1,4 +1,4 @@
-#include "Exec.hpp"
+#include "exec.hpp"
 
 Exec::Exec(const char* exec)
 : _execPath{nullptr} {

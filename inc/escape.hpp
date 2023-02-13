@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-#include "Types.hpp"
+#include "types.hpp"
 #include "Color.hpp"
 #include "Buffer.hpp"
 #include "Macro.hpp"

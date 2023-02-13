@@ -1,4 +1,4 @@
-#include "Escape.hpp"
+#include "escape.hpp"
 
 #define ESC						"\x1b"
 

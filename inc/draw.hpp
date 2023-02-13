@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 // libxfunc
-#include "Escape.hpp"
+#include "escape.hpp"
 #include "Types.hpp"
 #include "Ascii.hpp"
 #include "Macro.hpp"

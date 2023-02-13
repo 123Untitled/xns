@@ -12,7 +12,7 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 
-#include "Types.hpp"
+#include "types.hpp"
 
 
 

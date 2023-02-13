@@ -1,4 +1,4 @@
-#include "Draw.hpp"
+#include "draw.hpp"
 
 void Draw::clearLine(UInt32 posX, UInt32 posY, UInt32 size) {
 	UInt8	*clear = new UInt8[size];

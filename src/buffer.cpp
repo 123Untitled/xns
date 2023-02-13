@@ -1,4 +1,4 @@
-#include "Buffer.hpp"
+#include "buffer.hpp"
 
 
 /* [PRIVATE] default constructor */
