@@ -4,6 +4,8 @@
 #include "Types.hpp"
 #include "allocator.hpp"
 
+#include <fcntl.h>
+#include <unistd.h>
 #include <iostream>
 
 // -- N A M E S P A C E -------------------------------------------------------
@@ -133,6 +135,80 @@ namespace Xf {
 
 
 	};
+
+
+	// -- U N I Q U E  F D  C L A S S ---------------------------------------
+
+	class UniqueFd final {
+
+		public:
+
+			// -- A L I A S E S -----------------------------------------------
+
+			/* file descriptor type */
+			using Fd = pid_t;
+
+
+			// -- C O N S T R U C T O R S -------------------------------------
+
+			/* default constructor */
+			UniqueFd(void);
+
+			/* file descriptor constructor */
+			UniqueFd(Fd fd);
+
+			/* deleted copy constructor */
+			UniqueFd(const UniqueFd&) = delete;
+
+			/* move constructor */
+			UniqueFd(UniqueFd&& other) noexcept;
+
+			/* destructor */
+			~UniqueFd(void);
+
+
+			// -- O P E R A T O R S -------------------------------------------
+
+			/* deleted copy operator */
+			UniqueFd& operator=(const UniqueFd&) = delete;
+
+			/* move operator */
+			UniqueFd& operator=(UniqueFd&& other) noexcept;
+
+			/* bool operator */
+			explicit operator bool(void) const;
+
+			/* bool not operator */
+			bool operator!(void) const;
+
+
+			// -- M E T H O D S -----------------------------------------------
+
+			/* get file descriptor */
+			Fd get(void) const;
+
+			/* duplicate */
+			UniqueFd duplicate(void) const;
+
+			/* duplicate 2 */
+			void duplicate(UniqueFd& other) const;
+
+
+		private:
+
+			// -- E N U M S --------------------------------------------------
+
+			/* invalid file descriptor */
+			enum : int  { NULLFD = -1 };
+
+			// -- M E M B E R S -----------------------------------------------
+
+			/* file descriptor */
+			Fd _fd;
+
+	};
+
+
 
 };
 
