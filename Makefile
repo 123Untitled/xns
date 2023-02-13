@@ -91,6 +91,18 @@ override DEPDIR := $(BLDDIR)/_dep
 override JSNDIR := $(BLDDIR)/_json
 
 
+# -- S O U R C E S ------------------------------------------------------------
+
+# get all source files
+override SRC := $(shell find $(SRCDIR) -type f -name '*.cpp')
+
+# get all header files
+override HDR := $(shell find $(INCDIR) -type f -name '*.hpp')
+
+# get all header directories
+override HDRDIR := $(sort $(dir $(HDR)))
+
+
 # -- P R O G R A M  U T I L I T I E S -----------------------------------------
 
 # make directory if not exists
@@ -150,13 +162,9 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 CMPFLAGS = -MJ $(JSNDIR)/$*.json
 
 # include flags
-INCLUDES := -I$(INCDIR)
+INCLUDES := $(addprefix -I,$(HDRDIR))
 
 
-# -- S O U R C E S ------------------------------------------------------------
-
-# get all source files
-override SRC := $(shell find $(SRCDIR) -type f -name '*.cpp')
 
 # pattern substitution for object files
 override OBJ := $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o,    $(SRC))
@@ -190,6 +198,8 @@ override RESET := "\x1b[0m"
 
 
 # -- M A I N  T A R G E T S ---------------------------------------------------
+
+#all: $(OBJ)
 
 all: lib test
 
