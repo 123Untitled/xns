@@ -106,7 +106,8 @@ void LString::print() const {
 	while (node) {
 		node->print_string();
 		node = node->_nxt;
-	} printf("size::%u, node::%u\n\n", _size, _node);
+	}
+	printf("size::%llu, node::%llu\n\n", _size, _node);
 }
 
 
