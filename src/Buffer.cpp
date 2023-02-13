@@ -4,8 +4,8 @@
 /* [PRIVATE] default constructor */
 Buffer::Buffer(void)
 :	_buff{Allocator::allocate(DEFAULT_BUFFER_SIZE)},
-	_size{DEFAULT_BUFFER_SIZE},
-	_pos{0} {
+	_capacity{DEFAULT_BUFFER_SIZE},
+	_size{0} {
 	// code here...
 }
 
@@ -18,28 +18,37 @@ Buffer::~Buffer(void) {
 /* [PUBLIC] draw */
 void Buffer::draw(const void* ptr, const Size count) {
 	// get instance
-	static Buffer& buffer = get_instance();
+	Buffer& buffer = get_instance();
+
+	buffer._draw(ptr, count);
+}
+
+/* [PRIVATE] draw */
+void Buffer::_draw(const void* ptr, const Size count) {
 
 	// exit if pointer is null
-	if (!buffer._buff) { return; }
+	if (!_buff) { return; }
 
-	if (buffer._pos + count >= buffer._size) {
-		// INFO: need replace this by std::realloc
-		Pointer new_buff = Allocator::realloc(buffer._buff, count);
+	const Size required = _size + count;
+
+	// extend buffer if required
+	if (required > _capacity) {
+
+		Pointer new_buff = Allocator::realloc(_buff, required);
 
 		// exit, realloc failed
 		if (!new_buff) { return; }
 
-		buffer._buff = new_buff;
-		buffer._size += count;
+		_buff = new_buff;
+		_capacity = required;
 	}
 
 	// copy data into buffer
-	for (Size x = 0, z = buffer._pos; x < count; ++x, ++z) {
-		buffer._buff[z] = ((Pointer)ptr)[x];
+	for (Size x = 0, z = _size; x < count; ++x, ++z) {
+		_buff[z] = ((Pointer)ptr)[x];
 	}
 	// update position
-	buffer._pos += count;
+	_size += count;
 }
 
 /* get instance */
@@ -50,12 +59,15 @@ Buffer& Buffer::get_instance(void) {
 /* render */
 int Buffer::render(const int fd) {
 	// get instance
-	static Buffer& buffer = get_instance();
+	Buffer& buffer = get_instance();
 
-	int writed = write(fd, buffer._buff, buffer._pos);
+	return buffer._render(fd);
+}
 
-	buffer._pos = 0;
-
+/* [PRIVATE] render */
+int Buffer::_render(const int fd) {
+	int writed = write(fd, _buff, _size);
+	_size = 0;
 	return writed;
 }
 
