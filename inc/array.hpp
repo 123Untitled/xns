@@ -24,7 +24,7 @@ namespace Xf {
 			using Value = T;
 
 			/* size type */
-			using Size = UInt64;
+			using Size = decltype(N);
 
 			/* reference type */
 			using Reference = Value&;
@@ -46,7 +46,7 @@ namespace Xf {
 
 			/* initializer list constructor */
 			template <typename... A>
-			Array(A&&... args)
+			constexpr Array(A&&... args)
 			: _array{Xf::forward<A>(args)...} {
 				// code here...
 			}
