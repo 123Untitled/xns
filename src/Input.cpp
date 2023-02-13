@@ -17,6 +17,8 @@ void Xf::Input::start_loop(void) {
 	_is_running = true;
 	// loop over reading
 	while (_is_running) {
+
+		Xf::Event::instance().apply_mode();
 		// read stdin
 		read_input();
 		// filter input
@@ -50,13 +52,15 @@ void Xf::Input::read_input(void) {
 		// buffer is full, loop over reading
 		if (_readed == BUFFER_SIZE) {
 			// set to non-blocking read
-			Term::setRaw(VFlag::NON_BLOCKING);
+			Xf::Term::instance().raw_terminal(VFlag::NON_BLOCKING);
 			// read stdin again
 			while (read_stdin() > 0) {
 				// append buffer to the string
 				_input.append(_buff, _readed);
-			} // back to blocking read
-			Term::setRaw(VFlag::BLOCKING);
+			}
+
+			// back to blocking read
+			Xf::Term::instance().raw_terminal(VFlag::BLOCKING);
 		}
 
 	}
