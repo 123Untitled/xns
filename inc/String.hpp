@@ -10,11 +10,12 @@
 #include "Types.hpp"
 #include "move.hpp"
 #include "type_traits.hpp"
-
+#include "allocator.hpp"
 
 
 // forward declarations
 class LString;
+
 
 // -- S T R I N G  C L A S S --------------------------------------------------
 
@@ -24,18 +25,26 @@ class String {
 
 		// -- A L I A S E S ---------------------------------------------------
 
-		using Char         = char;
+		/* character type */
+		using Char = char;
 
-		using Size         = UInt32;
+		/* size type */
+		using Size = UInt64;
 
-		using Pointer      = Char*;
+		/* pointer type */
+		using Pointer = Char*;
 
+		/* const pointer type */
 		using ConstPointer = const Char*;
 
-		using Reference    = Char&;
+		/* reference type */
+		using Reference = Char&;
 
-		using ConstRef     = const Char&;
+		/* const reference type */
+		using ConstRef = const Char&;
 
+		/* allocator type */
+		using Allocator = Xf::Allocator<Char>;
 
 
 		// -- C O N S T R U C T O R S -----------------------------------------
@@ -269,7 +278,7 @@ class String {
 		void reallocate(const Size capacity);
 
 		// new memory allocation
-		Char* allocation(const UInt size) const;
+		Char* allocation(const Size size) const;
 
 
 		/* unsafe copy */
