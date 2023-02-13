@@ -156,6 +156,9 @@ namespace Xf {
 		LEFT,         // \x1b[D
 		RIGHT,        // \x1b[C
 
+		// special events
+		TERMINAL_RESIZE, // terminal resize
+
 		EVNT_MAX
 	};
 
@@ -218,6 +221,9 @@ namespace Xf {
 
 			/* set mode by name */
 			bool set_mode(const String&);
+
+			/* apply mode */
+			void apply_mode(void);
 
 			/* subscribe to event [method] */
 			template <typename C>
@@ -325,6 +331,9 @@ namespace Xf {
 
 			/* current mode */
 			Mode* _current;
+
+			/* mode to apply */
+			Mode* _apply;
 
 
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------

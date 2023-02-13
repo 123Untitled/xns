@@ -5,7 +5,7 @@
 
 /* default constructor */
 Xf::Event::Event(void)
-: _modes{ }, _current{nullptr} {
+: _modes{ }, _current{nullptr}, _apply{nullptr} {
 	// code here...
 }
 
@@ -34,7 +34,6 @@ void Xf::Event::add_mode(String&& name) {
 	// check if mode already exists
 	if (mode_exists(name)) { return; }
 
-
 	Size idx = 0;
 	// find index of current mode
 	if (_current) { idx = get_current_idx(); }
@@ -47,6 +46,39 @@ void Xf::Event::add_mode(String&& name) {
 		// all pointers are invalidated
 		_current = &_modes[idx]._second;
 	}
+}
+
+/* apply mode */
+void Xf::Event::apply_mode(void) {
+
+	// check if there is a mode query
+	if (!_apply) { return; }
+
+	// set current mode
+	_current = _apply;
+
+	// reset apply mode
+	_apply = nullptr;
+}
+
+
+/* set mode by name */
+bool Xf::Event::set_mode(const String& name) {
+
+	// loop through all modes
+	for (Size x = 0; x < _modes.size(); ++x) {
+
+		// check mode name
+		if (_modes[x]._first == name) {
+			// set apply mode
+			_apply = &_modes[x]._second;
+			// exit method
+			return true;
+		}
+	}
+
+	// mode not found
+	return false;
 }
 
 /* [PRIVATE] mode exists */
@@ -73,19 +105,6 @@ Size Xf::Event::get_current_idx(void) const {
 	return 0;
 }
 
-/* set mode by name */
-bool Xf::Event::set_mode(const String& name) {
-	// loop through all modes
-	for (Size x = 0; x < _modes.size(); ++x) {
-		// check mode name
-		if (_modes[x]._first == name) {
-			// set new current mode
-			_current = &_modes[x]._second;
-			// exit method
-			return true;
-		} // mode not found
-	} return false;
-}
 
 /* call all event subscribers */
 void Xf::Event::call_event(const Evntype type) {
