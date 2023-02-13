@@ -103,6 +103,11 @@ void exit(void) {
 	Xf::Input::stop_loop();
 }
 
+void resize(void) {
+	Xf::Term::Wsize width, height;
+	Xf::Term::instance().get_terminal_size(width, height);
+	std::cout << "RESIZE: " << width << "x" << height << std::endl;
+}
 
 
 int main(int ac, char** av) {
@@ -112,7 +117,7 @@ int main(int ac, char** av) {
 	Toto t;
 	Tutu u;
 
-	Term::setRaw();
+	Xf::Term::instance().raw_terminal();
 
 	auto& evnt = Xf::Event::instance();
 
@@ -128,6 +133,7 @@ int main(int ac, char** av) {
 	evnt.subscribe_input("NORMAL", &Tutu::print2, &u);
 	evnt.subscribe_event("NORMAL", Ev::MAJ_R, yolo);
 	evnt.subscribe_event("NORMAL", Ev::ETX, exit);
+	evnt.subscribe_event("NORMAL", Ev::TERMINAL_RESIZE, resize);
 
 	Xf::Input::start_loop();
 
