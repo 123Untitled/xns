@@ -14,7 +14,7 @@ namespace Xf {
 	// -- A R R A Y  C L A S S ------------------------------------------------
 
 	template <typename T, UInt64 N>
-	class Array final {
+	struct Array final {
 
 		public:
 
@@ -44,12 +44,15 @@ namespace Xf {
 
 			// -- C O N S T R U C T O R S -------------------------------------
 
+			/* default constructor */
+			//constexpr Array(void) = default;
+
 			/* initializer list constructor */
-			template <typename... A>
-			constexpr Array(A&&... args)
-			: _array{Xf::forward<A>(args)...} {
-				// code here...
-			}
+			//template <typename... A>
+			//constexpr Array(A&&... args)
+			//: _array{Xf::forward<A>(args)...} {
+			//	// code here...
+			//}
 
 			/* copy constructor */
 			// implicitly declared
@@ -153,7 +156,7 @@ namespace Xf {
 			}
 
 
-		private:
+		//private:
 
 			/* array */
 			Value _array[N];
@@ -163,6 +166,11 @@ namespace Xf {
 	// deduction guide
 	template <class T, class... A>
 	Array(T, A...) -> Array<T, 1 + sizeof...(A)>;
+
+	// deduction guide for const char*
+	template <UInt64 N>
+	Array(const char(&)[N]) -> Array<char, N>;
+
 
 
 	// << operator
