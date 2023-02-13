@@ -4,6 +4,8 @@
 #include "Term.hpp"
 #include "Types.hpp"
 #include "event.hpp"
+#include "array.hpp"
+#include "String.hpp"
 
 #include <unistd.h>
 #include <string>
@@ -34,22 +36,40 @@ namespace Xf {
 			static void stop_loop(void);
 
 
-			static void get_event(void);
-
-
-
-
 		private:
+
+			// -- A L I A S E S -----------------------------------------------
+
+			/* string type */
+			using String = std::string;
+
+			/* character type */
+			using Char = String::value_type;
+
+			/* readed bytes type */
+			using Readed = SInt64;
+
+			/* size type */
+			using Size = String::size_type;
+
 
 			// -- S T A T I C  P R I V A T E  M E T H O D S -------------------
 
+			/* read input while available */
+			static void read_input(void);
+
 			/* read input from stdin */
-			static SInt64 read_stdin(void);
+			static Readed read_stdin(void);
 
-			static void process_input(void);
+			/* dispatch to subscribers */
+			static void dispatch(void);
 
-			static void processEscape(void);
-			static void processArrow(void);
+
+			/* filter extended ascii codes */
+			static void filter_extended(void);
+
+			/* filter control characters */
+			static void filter_control(void);
 
 
 			// -- P R I V A T E  E N U M S ------------------------------------
@@ -59,9 +79,9 @@ namespace Xf {
 
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------
 
-			static std::string _input;
-			static char        _buff[BUFFER_SIZE + 1];
-			static SInt64      _readed;
+			static String      _input;
+			static Char        _buff[BUFFER_SIZE + 1];
+			static Readed      _readed;
 			static bool        _is_running;
 
 	};
