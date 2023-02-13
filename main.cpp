@@ -112,6 +112,27 @@ void resize(void) {
 
 int main(int ac, char** av) {
 
+    Xf::Array b{ "hello" };
+
+	Buffer::draw(b.data(), b.size());
+
+	Buffer::render();
+
+	std::array<char, 6> a{"hello"};
+
+	// what is the name of the std::array member variable that stores the buffer?
+	// this variable is public, so we can access it directly
+
+
+	return 0;
+
+	//std::array<char, 6> a{"hello"};
+
+	for (unsigned int x = 0; x < b.size(); ++x) {
+		std::cout << "x: " << b[x] << std::endl;
+	}
+	return 0;
+
 
 
 	Toto t;
