@@ -1,8 +1,8 @@
 #ifndef BUFFER_HEADER
 #define BUFFER_HEADER
 
-#include "Macro.hpp"
-#include "Types.hpp"
+#include "macro.hpp"
+#include "types.hpp"
 #include "allocator.hpp"
 
 #include <cstdlib>

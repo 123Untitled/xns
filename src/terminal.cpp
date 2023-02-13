@@ -1,4 +1,4 @@
-#include "Term.hpp"
+#include "terminal.hpp"
 
 // TCSANOW
 // The change occurs immediately.

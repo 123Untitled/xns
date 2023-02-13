@@ -1,11 +1,11 @@
 #ifndef INPUT_HEADER
 #define INPUT_HEADER
 
-#include "Term.hpp"
-#include "Types.hpp"
+#include "terminal.hpp"
+#include "types.hpp"
 #include "event.hpp"
 #include "array.hpp"
-#include "String.hpp"
+#include "string.hpp"
 
 #include <unistd.h>
 #include <string>

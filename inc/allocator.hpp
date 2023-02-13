@@ -2,8 +2,8 @@
 #define ALLOCATOR_HEADER
 
 #include <limits>
-#include "Types.hpp"
-#include "Macro.hpp"
+#include "types.hpp"
+#include "macro.hpp"
 #include "forward.hpp"
 #include "move.hpp"
 #include <cstdlib>

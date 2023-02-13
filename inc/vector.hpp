@@ -2,7 +2,7 @@
 #define VECTOR_HEADER
 
 #include <iostream>
-#include "Types.hpp"
+#include "types.hpp"
 #include "allocator.hpp"
 #include "array.hpp"
 

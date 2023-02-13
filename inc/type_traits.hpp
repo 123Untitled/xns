@@ -1,7 +1,7 @@
 #ifndef TYPE_TRAITS_HEADER
 #define TYPE_TRAITS_HEADER
 
-#include "Types.hpp"
+#include "types.hpp"
 
 // -- N A M E S P A C E -------------------------------------------------------
 

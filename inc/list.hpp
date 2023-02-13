@@ -1,11 +1,11 @@
 #ifndef LIST_HEADER
 #define LIST_HEADER
 
-#include "Types.hpp"
+#include "types.hpp"
 #include "move.hpp"
 #include "forward.hpp"
 #include <iostream>
-#include "Macro.hpp"
+#include "macro.hpp"
 #include "allocator.hpp"
 
 

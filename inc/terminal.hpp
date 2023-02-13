@@ -14,8 +14,8 @@
 #include <fcntl.h>
 
 // xf headers
-#include "Types.hpp"
-#include "Macro.hpp"
+#include "types.hpp"
+#include "macro.hpp"
 #include "event.hpp"
 
 

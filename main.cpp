@@ -1,6 +1,6 @@
-#include "Term.hpp"
-#include "String.hpp"
-#include "Input.hpp"
+#include "terminal.hpp"
+#include "string.hpp"
+#include "input.hpp"
 #include "event.hpp"
 #include "function.hpp"
 #include "list.hpp"
@@ -10,6 +10,7 @@
 #include "testclass.hpp"
 #include "stack.hpp"
 #include "unique.hpp"
+#include "buffer.hpp"
 
 #include <array>
 #include <vector>
@@ -93,7 +94,6 @@ class Tutu {
 
 
 
-#include "Buffer.hpp"
 
 void yolo(void) {
 	std::cout << "RECEIVED YOLO" << std::endl;

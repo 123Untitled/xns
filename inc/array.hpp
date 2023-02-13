@@ -1,7 +1,7 @@
 #ifndef ARRAY_HEADER
 #define ARRAY_HEADER
 
-#include "Types.hpp"
+#include "types.hpp"
 #include "move.hpp"
 #include "forward.hpp"
 #include <iostream>
