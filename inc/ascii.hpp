@@ -1,10 +1,11 @@
 #ifndef ASCII_HEADER
 #define ASCII_HEADER
 
-#include "Types.hpp"
-#include <string>
-#include "Macro.hpp"
+#include "types.hpp"
+#include "macro.hpp"
 #include "array.hpp"
+
+#include <string>
 #include <climits>
 
 #define ZERO_ASCII		48

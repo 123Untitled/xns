@@ -9,7 +9,7 @@
 #include <sys/types.h>
 #include <cstring>
 
-#include "Types.hpp"
+#include "types.hpp"
 
 class Exec {
 	private:

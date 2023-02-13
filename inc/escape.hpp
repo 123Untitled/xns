@@ -6,9 +6,9 @@
 
 
 #include "types.hpp"
-#include "Color.hpp"
-#include "Buffer.hpp"
-#include "Macro.hpp"
+#include "color.hpp"
+#include "buffer.hpp"
+#include "macro.hpp"
 #include "array.hpp"
 
 

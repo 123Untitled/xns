@@ -5,10 +5,10 @@
 
 // libxfunc
 #include "escape.hpp"
-#include "Types.hpp"
-#include "Ascii.hpp"
-#include "Macro.hpp"
-#include "Buffer.hpp"
+#include "types.hpp"
+#include "ascii.hpp"
+#include "macro.hpp"
+#include "buffer.hpp"
 
 /* standard includes */
 #include <string>
