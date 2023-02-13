@@ -1,35 +1,82 @@
 #include "Term.hpp"
 
-Term::Termios		Term::_raw;
-const Term::Termios Term::_origin	= Term::setupTerm();
-constinit bool		Term::_israw	= false;
-constinit bool		Term::_isready	= false;
+// TCSANOW
+// The change occurs immediately.
+
+// TCSADRAIN
+// The change occurs after all output written to fildes has been transmitted to the terminal.
+// This value of optional_actions should be used when changing parameters that affect output.
+
+// TCSAFLUSH
+// The change occurs after all output written to fildes has been transmitted to the terminal.
+// Additionally, any input that has been received but not read is discarded.
+
+// TCSASOFT
+// If this value is or'ed into the optional_actions value,
+// the values of the c_cflag, c_ispeed, and c_ospeed fields are ignored.
 
 
-void Term::staticDestructor(void) {
-	if (_israw) {
-		Term::setOrigin();
+// -- S I N G L E T O N  I N S T A N C E --------------------------------------
+
+/* singleton instance */
+Xf::Term Xf::Term::_instance{};
+
+
+// -- C O N S T R U C T O R S -------------------------------------------------
+
+/* private default constructor */
+Xf::Term::Term(void)
+:	_is_raw{false}, _is_origin{false}, _is_setup{false},
+	_origin{setup_terminal()}, _raw{} {
+
+	// check if original terminal settings are available
+	if (_is_origin) {
+		// copy original terminal settings
+		_raw = _origin;
+		// setup raw terminal settings
+		setup_raw();
+		// set setup flag
+		_is_setup = true;
 	}
+
+	// set resize signal handler
+	std::signal(SIGWINCH, &Term::terminal_resize_handler);
 }
 
-const Term::Termios Term::setupTerm(void) {
-	// termios struct declaration
+/* destructor */
+Xf::Term::~Term(void) {
+	// restore terminal settings if raw
+	if (_is_raw) { restore_terminal(); }
+}
+
+
+// -- M E T H O D S -----------------------------------------------------------
+
+/* get singleton instance */
+Xf::Term& Xf::Term::instance(void) {
+	// return singleton instance
+	return _instance;
+}
+
+/* get terminal settings */
+const Xf::Term::Termios Xf::Term::setup_terminal(void) {
+
+	// termios structure
 	Termios origin;
-	// get current terminal setup
+
+	// get current terminal settings
 	if (!tcgetattr(STDIN_FILENO, &origin)) {
 		// if no error, set bool flag
-		_isready = true;
-		// setup raw terminal settings
-		setupRaw(origin);
-	} // assign function to execute when program exit
-	std::atexit(&staticDestructor);
-	std::signal(SIGWINCH, &Term::signalHandlerTermSize);
+		_is_origin = true;
+	}
+
 	// return by value original terminal setup
-	return (origin);
+	return origin;
 }
 
-void Term::setupRaw(const Termios& origin) {
-	_raw = origin;
+/* setup raw terminal */
+void Xf::Term::setup_raw(void) {
+
 	// setup new terminal structure
 	_raw.c_iflag &= ~(	IXON		// disable Ctrl-S and Ctrl-Q
 					|	ICRNL);		// disable Ctrl-M
@@ -38,76 +85,62 @@ void Term::setupRaw(const Termios& origin) {
 					|	ISIG		// disable Ctrl-C and Ctrl-Z
 					|	IEXTEN);	// disable Ctrl-V and Ctrl-O
 	_raw.c_cc[VTIME] = 0;
-
 }
 
 
-void Term::flush(void) {
-	//	TCIFLUSH flushes data received but not read.
+/* flush stdin buffer */
+void Xf::Term::flush(void) {
+	// [TCIFLUSH] flushes data received but not read.
 	tcflush(STDIN_FILENO, TCIFLUSH);
 }
 
-void Term::setRaw(const VFlag vmin) {
-	// VMIN -> Minimum number of characters to read
+void Xf::Term::raw_terminal(const VFlag vmin) {
+
+	// check if terminal is setup
+	if (!_is_setup) { return; }
+
+	// VMIN = Minimum number of characters to read
 	_raw.c_cc[VMIN] = static_cast<UInt8>(vmin);
+
 	// set non-canonical mode
-	if (!tcsetattr(STDIN_FILENO, TCSANOW, &_raw))
-		_israw = true;
+	if (!tcsetattr(STDIN_FILENO, TCSANOW, &_raw)) {
+		_is_raw = true;
+	}
 }
 
-void Term::setOrigin(void) {
+void Xf::Term::restore_terminal(void) {
+
+	// check if terminal is setup
+	if (!_is_setup) { return; }
+
 	// reset orignal terminal settings
-	if (!tcsetattr(STDIN_FILENO, TCSAFLUSH, &_origin))
-		_israw = false;
-}
-
-
-int Term::getTermSize(UInt32* w, UInt32* h) {
-	// declare Winsize structure
-	Winsize win;
-	// query terminal dimensions
-	int err = ioctl(STDOUT_FILENO, TIOCGWINSZ, &win);
-	// assign result to size pointers
-	if (w) *w = win.ws_col;
-	if (h) *h = win.ws_row;
-	// error return
-	return (err);
-}
-
-void Term::signalHandlerTermSize(int signum) {
-	callObservers();
-}
-
-
-void Term::subscript(TermSizeObserver* obs) {
-	// add new observer to the list
-	_observers.push_back(obs);
-}
-
-void Term::callObservers(void) {
-	UInt32 width = 0, height = 0;
-
-	getTermSize(&width, &height);
-	// indexed list by 'key' iterator declaration
-	auto ite = _observers.begin();
-	// iterate over observer list
-	while (ite != _observers.end()) {
-		// call indexed inherited function by 'key'
-		(*ite)->updateTermSize(width, height);
-		// move to next observer
-		ite++;
+	if (!tcsetattr(STDIN_FILENO, TCSAFLUSH, &_origin)) {
+		_is_raw = false;
 	}
 }
 
 
-TermSizeObserver::TermSizeObserver(void) {
-	Term::subscript(this);
-	std::cout << "call constructor TermSizeObserver" << std::endl;
+int Xf::Term::get_terminal_size(Wsize& width, Wsize& height) {
+
+	// winsize structure
+	Winsize win;
+
+	// query terminal dimensions
+	int err = ioctl(STDOUT_FILENO, TIOCGWINSZ, &win);
+
+	// assign result to reference parameters
+	width = win.ws_col;
+	height = win.ws_row;
+
+	// error return
+	return err;
 }
 
-TermSizeObserver::~TermSizeObserver(void) { }
-
-std::list<TermSizeObserver*> Term::_observers;
+void Xf::Term::terminal_resize_handler(int signum) {
+	static_cast<void>(signum);
+	// call resize event subscribers
+	Xf::Event::instance().call_event(Xf::Evntype::TERMINAL_RESIZE);
+}
 
 
 
@@ -141,7 +174,7 @@ std::list<TermSizeObserver*> Term::_observers;
 		std::cout << "stderr terminal control current process id: " << tcgid << std::endl;
 	}*/
 
-void Term::get_process_info(void) {
+void Xf::Term::get_process_info(void) {
 	// get the current process ID
 	const pid_t pid = getpid();
 	std::cout << "current process id: " << pid << std::endl;
@@ -174,13 +207,9 @@ void Term::get_process_info(void) {
 	const pid_t cgid = getpgrp();
 	std::cout << "current PGID: " << cgid << std::endl;
 }
-// session ID
-// group ID
-// process ID
-// thread ID
 
 
-int Term::check_control_term(void) {
+int Xf::Term::check_control_term(void) {
 
 	//char term[L_ctermid];
 	//char *ptr;
