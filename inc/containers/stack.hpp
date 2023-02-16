@@ -99,7 +99,7 @@ namespace Xf {
 					// destroy node
 					Allocator::destroy(node);
 					// deallocate node
-					Allocator::deallocate(node, 1);
+					Allocator::deallocate(node);
 					// set node to next
 					node = next;
 				} // get storage node
@@ -109,7 +109,7 @@ namespace Xf {
 					// get next node
 					NodePointer next = node->_next;
 					// deallocate node
-					Allocator::deallocate(node, 1);
+					Allocator::deallocate(node);
 					// set node to next
 					node = next;
 				}
@@ -250,7 +250,7 @@ namespace Xf {
 				// loop through storage
 				while ((node = unlink_storage())) {
 					// deallocate node
-					Allocator::deallocate(node, 1);
+					Allocator::deallocate(node);
 				}
 			}
 
@@ -291,7 +291,7 @@ namespace Xf {
 				// check if free nodes are available
 				if (_storage) { return unlink_storage(); }
 				// else allocate new node
-				return Allocator::allocate(1);
+				return Allocator::allocate();
 			}
 
 
