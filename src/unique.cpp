@@ -35,6 +35,7 @@ Xf::UniqueFd::~UniqueFd(void) {
 	// check if fd is not null
 	if (_fd != NULLFD) {
 		// close file descriptor
+		std::cout << "CLOSING FD" << std::endl;
 		close(_fd);
 	}
 }
@@ -99,6 +100,11 @@ void Xf::UniqueFd::duplicate(UniqueFd& other) const {
 		dup2(_fd, other._fd);
 	}
 
+}
+
+/* make fd */
+Xf::UniqueFd Xf::UniqueFd::make_fd(const Fd fd) {
+	return Xf::UniqueFd{fd};
 }
 
 
