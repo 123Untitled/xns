@@ -5,161 +5,36 @@
 #include "move.hpp"
 #include "forward.hpp"
 #include "types.hpp"
-#include "list.hpp"
 #include "vector.hpp"
 #include "pair.hpp"
 #include "array.hpp"
 #include "function.hpp"
+#include "string.hpp"
+#include "evntype.hpp"
+#include "unique.hpp"
+#include "stack.hpp"
+
 
 #include <iostream>
-#include <string>
 
 
 // -- N A M E S P A C E -------------------------------------------------------
 
 namespace Xf {
 
-	/* event */
-	enum class Evntype : UInt8 {
-		NUL,          // null character (ctrl+space)
-		SOH,          // start of heading (ctrl+a)
-		STX,          // start of text (ctrl+b)
-		ETX,          // end of text (ctrl+c)
-		EOT,          // end of transmission (ctrl+d)
-		ENQ,          // enquiry (ctrl+e)
-		ACK,          // acknowledge (ctrl+f)
-		BEL,          // bell (ctrl+g)
-		BS,           // backspace
-		HT,           // horizontal tab
-		LF,           // line feed
-		VT,           // vertical tab
-		FF,           // form feed
-		CR,           // carriage return
-		SO,           // shift out
-		SI,           // shift in
-		DLE,          // data link escape
-		DC1,          // device control 1
-		DC2,          // device control 2
-		DC3,          // device control 3
-		DC4,          // device control 4
-		NAK,          // negative acknowledge
-		SYN,          // synchronous idle
-		ETB,          // end of transmission block
-		CAN,          // cancel
-		EM,           // end of medium
-		SUB,          // substitute
-		ESC,          // escape
-		FS,           // file separator
-		GS,           // group separator
-		RS,           // record separator
-		US,           // unit separator
-		SPACE,        // space
-		EXCLAMATION,  // !
-		DOUBLE_QUOTE, // "
-		HASH,         // #
-		DOLLAR,       // $
-		PERCENT,      // %
-		AMPERSAND,    // &
-		SINGLE_QUOTE, // '
-		LEFT_PAREN,   // (
-		RIGHT_PAREN,  // )
-		ASTERISK,     // *
-		PLUS,         // +
-		COMMA,        // ,
-		MINUS,        // -
-		PERIOD,       // .
-		SLASH,        // /
-		ZERO,         // 0
-		ONE,          // 1
-		TWO,          // 2
-		THREE,        // 3
-		FOUR,         // 4
-		FIVE,         // 5
-		SIX,          // 6
-		SEVEN,        // 7
-		EIGHT,        // 8
-		NINE,         // 9
-		COLON,        // :
-		SEMICOLON,    // ;
-		LESS_THAN,    // <
-		EQUAL,        // =
-		GREATER_THAN, // >
-		QUESTION,     // ?
-		AT,           // @
-		MAJ_A,        // A
-		MAJ_B,        // B
-		MAJ_C,        // C
-		MAJ_D,        // D
-		MAJ_E,        // E
-		MAJ_F,        // F
-		MAJ_G,        // G
-		MAJ_H,        // H
-		MAJ_I,        // I
-		MAJ_J,        // J
-		MAJ_K,        // K
-		MAJ_L,        // L
-		MAJ_M,        // M
-		MAJ_N,        // N
-		MAJ_O,        // O
-		MAJ_P,        // P
-		MAJ_Q,        // Q
-		MAJ_R,        // R
-		MAJ_S,        // S
-		MAJ_T,        // T
-		MAJ_U,        // U
-		MAJ_V,        // V
-		MAJ_W,        // W
-		MAJ_X,        // X
-		MAJ_Y,        // Y
-		MAJ_Z,        // Z
-		LEFT_BRACKET, // [
-		BACKSLASH,    //
-		RIGHT_BRACKET,// ]
-		CARET,        // ^
-		UNDERSCORE,   // _
-		BACKQUOTE,    // `
-		MIN_A,        // a
-		MIN_B,        // b
-		MIN_C,        // c
-		MIN_D,        // d
-		MIN_E,        // e
-		MIN_F,        // f
-		MIN_G,        // g
-		MIN_H,        // h
-		MIN_I,        // i
-		MIN_J,        // j
-		MIN_K,        // k
-		MIN_L,        // l
-		MIN_M,        // m
-		MIN_N,        // n
-		MIN_O,        // o
-		MIN_P,        // p
-		MIN_Q,        // q
-		MIN_R,        // r
-		MIN_S,        // s
-		MIN_T,        // t
-		MIN_U,        // u
-		MIN_V,        // v
-		MIN_W,        // w
-		MIN_X,        // x
-		MIN_Y,        // y
-		MIN_Z,        // z
-		LEFT_BRACE,   // {
-		PIPE,         // |
-		RIGHT_BRACE,  // }
-		TILDE,        // ~
-		DEL,          // delete
+	/* forward declaration */
+	class Evntmode;
 
-		// escape sequences
-		UP,           // \x1b[A
-		DOWN,         // \x1b[B
-		LEFT,         // \x1b[D
-		RIGHT,        // \x1b[C
-
-		// special events
-		TERMINAL_RESIZE, // terminal resize
-
-		EVNT_MAX
+	/* event options enum */
+	enum class Evntopt : unsigned int {
+		/* force mode change */
+		FORCE = 0x01,
+		/* wait next loop */
+		WAIT = 0x02,
+		/* ignore mode change until next loop */
+		IGNORE = 0x04,
+		/* remove subscriber after event */
+		ONE_SHOT = 0x08,
 	};
 
 
@@ -170,9 +45,6 @@ namespace Xf {
 		private:
 
 			// -- P R I V A T E  A L I A S E S --------------------------------
-
-			/* string type */
-			using String = std::string;
 
 			/* object pointer */
 			template <typename C>
@@ -187,10 +59,10 @@ namespace Xf {
 
 			/* input prototype */
 			template <typename C>
-			using InputMethod = void(C::*)(const String&);
+			using InputMethod = void(C::*)(const Xf::String<char>&);
 
 			/* input function prototype */
-			using InputFunction = void(*)(const String&);
+			using InputFunction = void(*)(const Xf::String<char>&);
 
 
 
@@ -205,6 +77,9 @@ namespace Xf {
 			/* destructor */
 			~Event(void);
 
+			/* friend class */
+			friend class Evntmode;
+
 
 		public:
 
@@ -217,67 +92,40 @@ namespace Xf {
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* add mode */
-			void add_mode(String&&);
+			Evntmode new_mode(void);
+
+			/* remove mode */
+			void remove_mode(Evntmode&);
 
 			/* set mode by name */
-			bool set_mode(const String&);
+			void set_mode(const Evntmode&, const Evntopt = Evntopt::WAIT);
 
 			/* apply mode */
-			void apply_mode(void);
+			void next_mode(void);
 
-			/* subscribe to event [method] */
-			template <typename C>
-			void subscribe_event(const String& mode, const Evntype type, EventMethod<C> method, Pointer<C> instance) {
-				// check invalid pointers
-				if (!method || !instance) { return; }
-				// check event type
-				if (type < Evntype::EVNT_MAX) {
-					// get event subscriber vector
-					EventVector* subscribers = get_event_subscribers(mode, type);
-					// check pointer
-					if (!subscribers) { return; }
-					// add new subscriber
-					subscribers->emplace_back(method, instance);
-				}
-			}
+			/* is mode active */
+			bool is_mode(void) const;
 
-			void subscribe_event(const String& mode, const Evntype type, EventFunction method);
+			/* is mode active */
+			bool is_mode(const Evntmode&) const;
 
-			/* subscribe to input */
-			template <typename C>
-			void subscribe_input(const String& mode, InputMethod<C> method, Pointer<C> instance) {
-				// check invalid pointers
-				if (!method || !instance) { return; }
-				// get input subscriber vector
-				InputVector* subscribers = get_input_subscribers(mode);
-				// check pointer
-				if (!subscribers) { return; }
-				// add new subscriber
-				subscribers->emplace_back(method, instance);
-			}
+			/* stack current mode */
+			void stack_mode(void);
 
-			/* unsubscribe to event */
-			template <typename C>
-			void unsubscribe_event(const String& mode, const Evntype type, EventMethod<C> method, Pointer<C> instance) {
+			/* stack mode */
+			void stack_mode(const Evntmode&, const Evntopt = Evntopt::WAIT);
 
-				/* -> */ return; // INFO: this method is not implemented yet
+			/* unstack mode */
+			void unstack_mode(void);
 
-				//// check invalid type
-				//if (type >= Evntype::EVNT_MAX) { return; }
-				//// get subscriber vector
-				//EventVector* subscribers = get_event_subscribers(mode, type);
-				//// check pointer
-				//if (!subscribers) { return; }
-				//// loop through all observers
-				//for (Size x = 0; x < subscribers->size(); ++x) { }
-			}
+
+
 
 			/* call all event subscribers */
 			void call_event(const Evntype);
 
 			/* call all input subscribers */
-			void call_input(const String&);
-
+			void call_input(const Xf::String<char>&);
 
 
 		private:
@@ -285,43 +133,41 @@ namespace Xf {
 			// -- P R I V A T E  A L I A S E S --------------------------------
 
 			/* input vector type */
-			using InputVector = Xf::Vector<Xf::PolyMethod<void(const std::string&)>>;
-
+			using InputVector = Vector<PolyMethod<void(const Xf::String<char>&)>>;
 
 			/* event vector type */
-			using EventVector = Xf::Vector<Xf::PolyMethod<void(void)>>;
+			using EventVector = Vector<PolyMethod<void(void)>>;
 
 			/* event array type */
-			using EventArray = Xf::Array<EventVector, IDX(Evntype::EVNT_MAX)>;
+			using EventArray = Array<EventVector, IDX(Evntype::EVNT_MAX)>;
 
 
 			/* mode type */
-			using Mode = Xf::Pair<InputVector, EventArray>;
-
-			/* mode pair type */
-			using Modepair = Xf::Pair<std::string, Mode>;
+			using Mode = Pair<InputVector, EventArray>;
 
 			/* mode list type */
-			using Modelist = Xf::Vector<Modepair>;
+			using Modelist = Vector<Mode>;
+
+
+			/* optional type */
+			using Optional = Xf::UniquePtr<Size>;
 
 
 			// -- P R I V A T E  M E T H O D S --------------------------------
 
-			/* get mode */
-			Mode* get_mode(const std::string& mode);
+			/* subscribe function to event */
+			void _subscribe(const Evntmode&, const Evntype, EventFunction);
 
-			/* get event subscribers */
-			EventVector* get_event_subscribers(const String& mode, const Evntype type);
+			/* subscribe function to input */
+			void _subscribe(const Evntmode&, InputFunction);
 
-			/* get input subscribers */
-			InputVector* get_input_subscribers(const String& mode);
+			/* subscribe method to event */
+			template <typename C>
+			void _subscribe(const Evntmode&, const Evntype, EventMethod<C>, Pointer<C>);
 
-			/* mode exists */
-			bool mode_exists(const std::string& mode) const;
-
-			/* get current mode index */
-			Size get_current_idx(void) const;
-
+			/* subscribe method to input */
+			template <typename C>
+			void _subscribe(const Evntmode&, InputMethod<C>, Pointer<C>);
 
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
@@ -329,20 +175,141 @@ namespace Xf {
 			/* mode list */
 			Modelist _modes;
 
-			/* current mode */
-			Mode* _current;
+			/* current mode index */
+			Optional _current;
 
-			/* mode to apply */
-			Mode* _apply;
+			/* mode to apply next loop */
+			Optional _next;
 
+			/* mode index stack */
+			Xf::Stack<Optional> _stack;
 
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------
 
 			/* singleton instance */
 			static Event _instance;
 
+
 	};
 
+
+
+	// -- E V N T M O D E  C L A S S ------------------------------------------
+
+	// this class purpose to be the interface for the user to add events in a mode
+	// add event with string name is deprecated
+	// this class will store an index to the vector of modes in the event class
+	// this class cannot be instantiated outside the event class
+
+	class Evntmode {
+
+		private:
+
+			// -- P R I V A T E  C O N S T R U C T O R S ----------------------
+
+			/* deleted default constructor */
+			Evntmode(void) = delete;
+
+			/* index constructor */
+			Evntmode(const Size idx);
+
+			/* non-copyable */
+			NON_COPYABLE(Evntmode);
+
+			/* friend class */
+			friend class Event;
+
+
+			// -- P R I V A T E  M E M B E R S --------------------------------
+
+			/* mode index */
+			Size _idx;
+
+			/* state */
+			bool _state;
+
+
+		public:
+
+			// -- P U B L I C  C O N S T R U C T O R S ------------------------
+
+			/* move constructor */
+			Evntmode(Evntmode&&) noexcept;
+
+			/* destructor */
+			~Evntmode(void);
+
+
+			// -- P U B L I C  O P E R A T O R S ------------------------------
+
+			/* move assignment operator */
+			Evntmode& operator=(Evntmode&&) noexcept;
+
+
+			// -- A C C E S S O R S -------------------------------------------
+
+			/* get mode index */
+			inline Size idx(void) const { return _idx; }
+
+
+			// -- P U B L I C  M E T H O D S ----------------------------------
+
+			/* subscribe function to event */
+			void subscribe(const Evntype, Event::EventFunction);
+
+			/* subscribe function to input */
+			void subscribe(Event::InputFunction);
+
+			/* subscribe method to event */
+			template <typename C>
+			void subscribe(const Evntype, Event::EventMethod<C>, Event::Pointer<C>);
+
+			/* subscribe method to input */
+			template <typename C>
+			void subscribe(Event::EventMethod<C>, Event::Pointer<C>);
+
+	};
+
+
+	/* subscribe method to event */
+	template <typename C>
+	void Xf::Evntmode::subscribe(const Evntype type, Event::EventMethod<C> method, Event::Pointer<C> instance) {
+		// exit if not in a valid mode
+		if (!_state) { return; }
+		// call event class method
+		Event::instance()._subscribe(*this, type, method, instance);
+	}
+
+	/* subscribe method to input */
+	template <typename C>
+	void Xf::Evntmode::subscribe(Event::EventMethod<C> method, Event::Pointer<C> instance) {
+		// exit if not in a valid mode
+		if (!_state) { return; }
+		// call event class method
+		Event::instance()._subscribe(*this, method, instance);
+	}
+
+	/* subscribe method to event */
+	template <typename C>
+	void Xf::Event::_subscribe(const Evntmode& mode, const Evntype type, EventMethod<C> method, Pointer<C> instance) {
+		// check invalid pointers and event type
+		if (!method || !instance || type >= Evntype::EVNT_MAX) { return; }
+		// get event subscriber vector
+		EventVector& subscribers = _modes[mode._idx]._second[IDX(type)];
+		// add new subscriber
+		subscribers.emplace_back(method, instance);
+	}
+
+	/* subscribe method to input */
+	template <typename C>
+	void Xf::Event::_subscribe(const Evntmode& mode, InputMethod<C> method, Pointer<C> instance) {
+		// check invalid pointers
+		if (!method || !instance) { return; }
+		// get input subscriber vector
+		InputVector& subscribers = _modes[mode._idx]._first;
+		// add new subscriber
+		subscribers.emplace_back(method, instance);
+	}
 
 };
 
