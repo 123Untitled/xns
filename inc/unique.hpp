@@ -51,8 +51,17 @@ namespace Xf {
 			/* default constructor */
 			UniquePtr(void)
 			: _pointer{nullptr} {
-				std::cout << "default constructor" << std::endl;
 				// code here...
+			}
+
+			/* forward constructor */
+			template <typename... A>
+			UniquePtr(A&&... arguments)
+			: _pointer{Allocator::allocate()} {
+				// construct pointer
+				if (_pointer != nullptr) {
+					Allocator::construct(_pointer, Xf::forward<A>(arguments)...);
+				}
 			}
 
 			/* deleted copy constructor */
@@ -61,8 +70,7 @@ namespace Xf {
 			/* move constructor */
 			UniquePtr(UniquePtr&& other) noexcept
 			: _pointer{other._pointer} {
-				std::cout << "move constructor" << std::endl;
-				// code here...
+				// invalidate other pointer
 				other._pointer = nullptr;
 			}
 
@@ -77,13 +85,6 @@ namespace Xf {
 				}
 			}
 
-			template <typename... A>
-			UniquePtr(A&&... arguments)
-			: _pointer{Allocator::allocate()} {
-				std::cout << "template constructor" << std::endl;
-				// construct pointer
-				Allocator::construct(_pointer, arguments...);
-			}
 
 			// -- O P E R A T O R S -------------------------------------------
 
@@ -95,7 +96,7 @@ namespace Xf {
 				// check self assignment
 				if (this != &other) {
 					// clear this
-				    this->~UniquePtr();
+					this->~UniquePtr();
 					// move pointer
 					_pointer = other._pointer;
 					// set other pointer to null
@@ -124,6 +125,50 @@ namespace Xf {
 				return *_pointer;
 			}
 
+			/* pointer operator */
+			Pointer operator->(void) {
+				return _pointer;
+			}
+
+			/* const pointer operator */
+			ConstPointer operator->(void) const {
+				return _pointer;
+			}
+
+			/* bool operator */
+			explicit operator bool(void) const {
+				return _pointer != nullptr;
+			}
+
+			/* bool not operator */
+			bool operator!(void) const {
+				return _pointer == nullptr;
+			}
+
+
+			// -- P U B L I C  M E T H O D S ----------------------------------
+
+			/* make unique */
+			template <typename... A>
+			void make(A&&... arguments) {
+				// call destructor
+				this->~UniquePtr();
+				// allocate pointer
+				_pointer = Allocator::allocate();
+				// construct pointer
+				if (_pointer != nullptr) {
+					Allocator::construct(_pointer, Xf::forward<A>(arguments)...);
+				}
+			}
+
+			/* clear */
+			void clear(void) {
+				// call destructor
+				this->~UniquePtr();
+				// initialize pointer
+				_pointer = nullptr;
+			}
+
 
 		private:
 
@@ -131,8 +176,6 @@ namespace Xf {
 
 			/* pointer */
 			Pointer _pointer;
-
-
 
 	};
 
