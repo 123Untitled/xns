@@ -7,7 +7,7 @@ void Draw::clearLine(UInt32 posX, UInt32 posY, UInt32 size) {
 		clear[i] = ' ';
 		i++;
 	}
-	Escape::move_position(posX, posY);
+	//Escape::move_position(posX, posY);
 	write(STDOUT_FILENO, clear, size);
 	delete[] clear;
 }
@@ -15,14 +15,14 @@ void Draw::clearLine(UInt32 posX, UInt32 posY, UInt32 size) {
 
 /* drawLine */
 void Draw::drawLine(const UInt x, const UInt y, const void *ptr, const UInt size) {
-	Escape::move_position(x, y);
+	//Escape::move_position(x, y);
 	Buffer::draw(ptr, size);
 }
 
 /* draw string */
 void Draw::draw_string(const UInt x, const UInt y, const std::string& str) {
 	// move to position
-	Escape::move_position(x, y);
+	//Escape::move_position(x, y);
 	// draw string
 	Buffer::draw(str.data(), str.size());
 }
@@ -30,7 +30,7 @@ void Draw::draw_string(const UInt x, const UInt y, const std::string& str) {
 /* vertivalDraw */
 void Draw::vertivalDraw(const UInt x, UInt y, const void *ptr, const UInt size, UInt line) {
 	while (line) {
-		Escape::move_position(x, y);
+		//Escape::move_position(x, y);
 		Buffer::draw(ptr, size);
 		--line;
 		++y;
