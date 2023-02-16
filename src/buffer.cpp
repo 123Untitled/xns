@@ -12,7 +12,9 @@ Buffer::Buffer(void)
 /* [PUBLIC] destructor */
 Buffer::~Buffer(void) {
 	// free memory
-	if (_buff) { Allocator::deallocate(_buff); }
+	if (_buff) {
+		_render();
+		Allocator::deallocate(_buff); }
 }
 
 /* [PUBLIC] draw */
