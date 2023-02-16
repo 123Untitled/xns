@@ -1,20 +1,66 @@
 #include "escape.hpp"
 
-#define ESC						"\x1b"
+#define ESC "\x1b"
+
+const Xf::Array<Xf::String<char>,
+				Xf::Escape::_max_esc>
+				Xf::Escape::_escapes = {
+	/* move home */
+	ESC"[H",
+	/* move left */
+	ESC"[1D",
+	/* move right */
+	ESC"[1C",
+
+	/* erase screen */
+	ESC"[2J",
+	/* erase line */
+	ESC"[2K",
+	/* erase to end of line */
+	ESC"[0K",
+	/* erase start of line to cursor */
+	//ESC"[1K",
+
+	/* enter screen */
+	ESC"[?1049h",
+	/* exit screen */
+	ESC"[?1049l",
+	/* save screen */
+	ESC"[?47h",
+	/* restore screen */
+	ESC"[?47l",
+
+	/* reset style */
+	ESC"[0m",
+
+	/* show cursor */
+	ESC"[?25h",
+	/* hide cursor */
+	ESC"[?25l",
+	/* request position */
+	ESC"[6n",
+
+	/* cursor beam */
+	ESC"[5 q",
+	/* cursor underline */
+	ESC"[3 q",
+	/* cursor block */
+	ESC"[1 q"
+};
+
+#undef ESC
+
+
 
 // ESC[#A	moves cursor up # lines
 // ESC[#B	moves cursor down # lines
-// ESC[#C	moves cursor right # columns
-// ESC[#D	moves cursor left # columns
+
 // ESC[#E	moves cursor to beginning of next line, # lines down
 // ESC[#F	moves cursor to beginning of previous line, # lines up
+
 // ESC[#G	moves cursor to column #
 // ESC M	moves cursor one line up, scrolling if needed
 
-#define MOVE_HOME				ESC"[H"
-
-#define MOVE_LEFT				ESC"[1D"
-#define MOVE_RIGHT				ESC"[1C"
 
 
 ////////////////////////// ERASE FUNCTIONS
@@ -33,33 +79,6 @@
 #define CCC									ESC"[3J"
 
 
-// erase from cursor to end of line
-#define ERASE_FROM_CURSOR_TO_EOL			ESC"[0K"
-// erase start of line to the cursor
-#define ERASE_START_OF_LINE_TO_CURSOR		ESC"[1K"
-// erase the entire line
-#define ERASE_LINE							ESC"[2K"
-// erase entire screen
-#define ERASE_SCREEN						ESC"[2J"
-
-
-
-// request cursor position (format ESC[#;#R)
-#define REQUEST_CURSOR_POSITION				ESC"[6n"
-
-#define CURSOR_BEAM							ESC"[5 q"
-
-#define CURSOR_UNDERLINE					ESC"[3 q"
-
-#define CURSOR_BLOCK						ESC"[1 q"
-
-
-// make cursor visible
-#define SHOW_CURSOR							ESC"[?25h"
-// make cursor invisible
-#define NO_CURSOR							ESC"[?25l"
-
-
 /////////////////////// COMMON PRIVATE MODES
 // These are some examples of private modes,
 // which are not defined by the specification,
@@ -70,17 +89,6 @@
 // some may not work in multiplexers like tmux.
 ///////////////////////////////////////////////
 
-// enables the alternative buffer
-#define ENTER_SCREEN						ESC"[?1049h"
-// disables the alternative buffer
-#define EXIT_SCREEN							ESC"[?1049l"
-// restore screen
-#define RESTORE_SCREEN						ESC"[?47l"
-// save screen
-#define SAVE_SCREEN							ESC"[?47h"
-
-
-#define RESET_STYLE							ESC"[0m"
 
 //ESC[0m		reset all modes (styles and colors)
 //ESC[1m	ESC[22m	set bold mode.
@@ -102,14 +110,15 @@
 #define BACKGROUND				false
 
 
-bool Escape::requestCursorPosition(UInt32& x, UInt32& y) {
+bool Xf::Escape::request_position(UInt32& x, UInt32& y) {
 
 	UInt32*	num		= &y;
 	bool	bracket	= false;
 	char	c		= 0;
 
-	write(STDOUT_FILENO, REQUEST_CURSOR_POSITION,
-		sizeof(REQUEST_CURSOR_POSITION));
+	const String<char>& esc = _escapes[IDX(Esctype::REQUEST_POSITION)];
+
+	write(STDOUT_FILENO, esc.pointer(), esc.size());
 	x = y = 0;
 	// iterate while input available
 	while (0 < read(STDIN_FILENO, &c, 1) && c != 'R') {
@@ -135,9 +144,14 @@ bool Escape::requestCursorPosition(UInt32& x, UInt32& y) {
 // -- M O V E -----------------------------------------------------------------
 
 /* move position */
-void Escape::move_position(UInt32 x, UInt32 y) {
+Xf::String<char> Xf::Escape::_move_position(UInt32 x, UInt32 y) {
 	UInt8		escape[ESCAPE_BUFFER_SIZE];
 	UInt32		ite;
+
+	constexpr const UInt32 max = Xf::max<UInt32>();
+	x += (x != max);
+	y += (y != max);
+
 	// init iterator
 	ite = ESCAPE_BUFFER_SIZE - 1;
 	// last char
@@ -158,68 +172,30 @@ void Escape::move_position(UInt32 x, UInt32 y) {
 	escape[--ite] = '\x1b';
 
 	// append escape sequence to buffer
-	Buffer::draw((char*)&escape[ite], ESCAPE_BUFFER_SIZE - ite);
+	//Buffer::draw((char*)&escape[ite], ESCAPE_BUFFER_SIZE - ite);
+	return Xf::String<char>((char*)&escape[ite], ESCAPE_BUFFER_SIZE - ite);
 }
 
-/* move left */
-void Escape::move_left(void) {
-	// append escape sequence to buffer
-	Buffer::draw(MOVE_LEFT, sizeof(MOVE_LEFT));
-}
-
-/* move right */
-void Escape::move_right(void) {
-	// append escape sequence to buffer
-	Buffer::draw(MOVE_RIGHT, sizeof(MOVE_RIGHT));
-}
-
-/* move home */
-void Escape::move_home(void) {
-	// append escape sequence to buffer
-	Buffer::draw(MOVE_HOME, sizeof(MOVE_HOME));
-}
-
-
-// -- E R A S E ---------------------------------------------------------------
-
-//SInt32 Escape::eraseFromCursorToEOL(void) {
-void Escape::eraseFromCursorToEOL(void) {
-	Buffer::draw(ERASE_FROM_CURSOR_TO_EOL, sizeof(ERASE_FROM_CURSOR_TO_EOL));
-	//return (write(STDOUT_FILENO, ERASE_FROM_CURSOR_TO_EOL, sizeof(ERASE_FROM_CURSOR_TO_EOL)));
-}
-
-/* erase line */
-void Escape::erase_line(void) {
-	// append escape sequence to buffer
-	Buffer::draw(ERASE_LINE, sizeof(ERASE_LINE));
-}
-
-
-// -- S C R E E N -------------------------------------------------------------
-
-/* enter screen */
-void Escape::enter_screen(void) {
-	// append escape sequence to buffer
-	Buffer::draw(ENTER_SCREEN, sizeof(ENTER_SCREEN));
-}
-
-/* exit screen */
-void Escape::exit_screen(void) {
-	// append escape sequence to buffer
-	Buffer::draw(EXIT_SCREEN, sizeof(EXIT_SCREEN));
-}
-
-/* clear screen */
-void Escape::clear_screen(void) {
-	// append escape sequence to buffer
-	Buffer::draw(ERASE_SCREEN, sizeof(ERASE_SCREEN));
-}
 
 
 // -- C O L O R ---------------------------------------------------------------
 
+/* hex color */
+Xf::String<char> Xf::Escape::_hex_color(const UInt32 color, const bool fore) {
+
+	// declare bytes color
+	UInt8 r, g, b;
+	// get color layer
+	r = (color >> 16) & 0xFF;
+	g = (color >> 8)  & 0xFF;
+	b = (color)       & 0xFF;
+
+	return _rgb_color(r, g, b, fore);
+
+}
+
 /* color rgb */
-void Escape::color_rgb(const UInt32 color, const bool fore) {
+Xf::String<char> Xf::Escape::_rgb_color(UInt8 r, UInt8 g, UInt8 b, const bool fore) {
 	// static 24bit color escape sequence
 	static UInt8	escape[] = {	'\x1b', '[',
 									' ', '8', ';', '2', ';',
@@ -227,78 +203,26 @@ void Escape::color_rgb(const UInt32 color, const bool fore) {
 									'0', '0', '0', ';',
 									'0', '0', '0', 'm', '\0'
 	};
-	#define RED_OFFSET		0x6
-	#define GREEN_OFFSET	0xA
-	#define BLUE_OFFSET		0xE
-	// declare bytes color
-	UInt8 r, g, b;
-	// get color layer
-	r = color >> 16    & 0xFF;
-	g = color >> 8	  & 0xFF;
-	b = color		 & 0xFF;
+	constexpr UInt32 r_off = 0x6;
+	constexpr UInt32 g_off = 0xA;
+	constexpr UInt32 b_off = 0xE;
+
 	// foreground / background char
 	escape[2] =  fore == true ? '3' : '4';
 	// integer to ascii
 	for (UInt32 x = 3; x; --x) {
 		// red integer to ascii
-		escape[x + RED_OFFSET]		= ((r % BASE) ^ ZERO_ASCII);
+		escape[x + r_off] = ((r % BASE) ^ ZERO_ASCII);
 		// green integer to ascii
-		escape[x + GREEN_OFFSET]	= ((g % BASE) ^ ZERO_ASCII);
+		escape[x + g_off] = ((g % BASE) ^ ZERO_ASCII);
 		// blue integer to ascii
-		escape[x + BLUE_OFFSET]		= ((b % BASE) ^ ZERO_ASCII);
+		escape[x + b_off] = ((b % BASE) ^ ZERO_ASCII);
 		// remove last digit
 		r /= BASE; g /= BASE; b /= BASE;
 	} // append escape sequence to buffer
-	Buffer::draw(escape, 19);
+	//Buffer::draw(escape, 19);
+	return Xf::String<char>((char*)escape, 19);
 }
-
-/* reset style */
-void Escape::reset_style(void) {
-	// append escape sequence to buffer
-	Buffer::draw(RESET_STYLE, sizeof(RESET_STYLE));
-}
-
-
-// -- C U R S O R -------------------------------------------------------------
-
-/* show cursor */
-void Escape::show_cursor(void) {
-	// append escape sequence to buffer
-	Buffer::draw(SHOW_CURSOR, sizeof(SHOW_CURSOR));
-}
-
-/* hide cursor */
-void Escape::hide_cursor(void) {
-	// append escape sequence to buffer
-	Buffer::draw(NO_CURSOR, sizeof(NO_CURSOR));
-}
-
-
-// -- C U R S O R  S T Y L E --------------------------------------------------
-
-/* cursor beam */
-void Escape::cursor_beam(void) {
-	// append escape sequence to buffer
-	Buffer::draw(CURSOR_BEAM, sizeof(CURSOR_BEAM));
-}
-
-/* cursor underline */
-void Escape::cursor_underline(void) {
-	// append escape sequence to buffer
-	Buffer::draw(CURSOR_UNDERLINE, sizeof(CURSOR_UNDERLINE));
-}
-
-/* cursor block */
-void Escape::cursor_block(void) {
-	// append escape sequence to buffer
-	Buffer::draw(CURSOR_BLOCK, sizeof(CURSOR_BLOCK));
-}
-
-
-
-
-
-
 
 
 
