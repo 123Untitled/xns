@@ -69,6 +69,10 @@ class Test {
 			return os;
 		}
 
+		void function(void) {
+			std::cout << "Hello World!" << std::endl;
+		}
+
 
 	private:
 
