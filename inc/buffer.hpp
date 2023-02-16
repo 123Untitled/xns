@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <iostream>
+#include <string>
 
 
 // -- B U F F E R  C L A S S --------------------------------------------------
@@ -58,6 +59,7 @@ class Buffer final {
 
 		/* [PUBLIC] draw */
 		static void draw(const void* ptr, const Size size);
+
 
 		/* [PUBLIC] render */
 		static int render(const int fd = STDOUT_FILENO);
