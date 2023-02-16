@@ -1,7 +1,10 @@
 #ifndef FORWARD_HEADER
 #define FORWARD_HEADER
 
-#include "type_traits.hpp"
+#include "enable_if.hpp"
+#include "remove_reference.hpp"
+#include "is_lvalue_reference.hpp"
+
 
 // -- N A M E S P A C E -------------------------------------------------------
 
@@ -14,17 +17,7 @@ namespace Xf {
 	struct identity { using type = T; };
 
 
-	// -- I S  L V A L U E  R E F E R E N C E ---------------------------------
-
-	template <typename T>
-	struct is_lvalue_reference { static constexpr bool value = false; };
-
-	template <typename T>
-	struct is_lvalue_reference<T&> { static constexpr bool value = true; };
-
-
-
-	// -- F O R W A R D ---------------------------------------------------------
+	// -- F O R W A R D -------------------------------------------------------
 
 	// forward lvalues as rvalues
 	template <typename T>
