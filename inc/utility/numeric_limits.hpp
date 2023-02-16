@@ -11,46 +11,66 @@ namespace Xf {
 	// -- M I N  M A X --------------------------------------------------------
 
 	/* max */
-	template <typename Type>
-	constexpr Type max(void) {
+	template <Xf::integral_c T>
+	constexpr T max(void) {
+		// remove cv
+		using Type = Xf::remove_cv_t<T>;
 		// number of bits in type
-		constexpr Type bits = (sizeof(Type) * 8) - is_signed<Type>::value;
+		constexpr Type bits = (sizeof(Type) * 8) - Xf::is_signed_v<Type>;
 		// max value of type
 		Type type_max = 0;
 		// loop through bits
 		for (Type x = 0; x < bits; ++x) {
 			// add shifted bit to max
-			type_max += (1 << x);
+			type_max += (static_cast<Type>(1) << x);
 		} // return max
 		return type_max;
 	}
 
+
 	/* min */
-	template <typename Type>
-	constexpr Type min(void) {
-		Type type_min = ~max<Type>();
-		//type_min = ~type_min;
-		return type_min;
+	template <class T>
+	constexpr T min(void) {
+		// inverse all bits
+		return static_cast<T>(~max<T>());
 	}
 
 	// -- M A X  D I G I T S --------------------------------------------------
 
 	// max number of digits in a type (base 10)
-	template <typename Type>
-	constexpr Type max_digits(void) {
+	template <class T>
+	constexpr T max_digits(void) {
+		// remove cv
+		using Type = Xf::remove_cv_t<T>;
 		// max value of type
-		Type type_max = max<Type>();
+		Type type_max = Xf::max<Type>();
 		// number of digits
 		Type digits = 0;
-		// loop through digits
-		while (type_max) {
-			// divide max by 10
-			type_max /= 10;
-			// increment digits
+		do { // increment digits
 			++digits;
-		} // return digits
+			// divide max by 10
+		} while ((type_max /= 10));
+		// return digits
 		return digits;
 	}
+
+	// max number of digits in a type (base 10)
+	template <class T>
+	constexpr T min_digits(void) {
+		// remove cv
+		using Type = Xf::remove_cv_t<T>;
+		// max value of type
+		Type type_max = Xf::min<Type>();
+		// number of digits
+		Type digits = 0;
+		do { // increment digits
+			++digits;
+			// divide max by 10
+		} while ((type_max /= 10));
+		// return digits
+		return digits;
+	}
+
 
 
 
