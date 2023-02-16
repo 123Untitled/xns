@@ -1,7 +1,8 @@
 #ifndef UTILITY_HEADER
 #define UTILITY_HEADER
 
-#include "type_traits.hpp"
+#include "remove_reference.hpp"
+
 
 // -- N A M E S P A C E -------------------------------------------------------
 
@@ -15,7 +16,6 @@ namespace Xf {
 		// remove reference from T and return as rvalue reference
 		return static_cast<typename Xf::remove_reference<T>::type&&>(obj);
 	}
-
 
 }
 
