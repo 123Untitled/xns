@@ -237,6 +237,12 @@ namespace Xf {
 			void duplicate(UniqueFd& other) const;
 
 
+			//
+
+			/* make fd */
+			static UniqueFd make_fd(const Fd);
+
+
 		private:
 
 			// -- E N U M S --------------------------------------------------
