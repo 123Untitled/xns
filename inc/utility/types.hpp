@@ -18,7 +18,7 @@
 
 		using SInt = int;
 		using UInt = unsigned int;
-		using Char = char;
+		//using Char = char;
 		using Char8 = char8_t;
 
 		using SInt8 = int8_t;
