@@ -1,43 +1,70 @@
 #ifndef _FILE_HEADER_
 #define _FILE_HEADER_
 
-
 #include "string.hpp"
 #include "draw.hpp"
+#include "unique.hpp"
 
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
 
 
-class File {
+// -- N A M E S P A C E -------------------------------------------------------
 
-private:
-	typedef struct stat Stat;
-	#define FILE_BUFFER_SIZE 64
+namespace Xf {
 
-	String		_file;
-	String		_path;
-	int     _fd;
-	Stat	_data;
+	// -- F I L E  C L A S S --------------------------------------------------
 
-	// deleted method
-	File(const File& copy) = delete;
-	File(const File&& move) = delete;
+	class File final {
 
-public:
-	// constructor and destructor
-	File(void);
-	File(const String& name);
-	~File(void);
+		public:
 
-	void	setFileName(String&& name);
-	int		openFile(void);
-	int		catchFile(void);
-	void	print(void);
+			// -- C O N S T R U C T O R S -------------------------------------
 
-	// getter
-	const String& getPath(void) const;
+			/* default constructor */
+			File(void);
+
+			/* path constructor */
+			File(const Xf::String<char>&);
+
+			/* non-assignable class */
+			NON_ASSIGNABLE(File);
+
+			/* destructor */
+			~File(void);
+
+
+			void setFileName(Xf::String<char>&& name);
+
+			/* open file */
+			void open(void);
+
+			/* get file content */
+			void content(void);
+
+
+			/* get path */
+			const Xf::String<char>& path(void) const;
+
+		private:
+
+			// -- A L I A S E S -----------------------------------------------
+
+			using Stat = struct stat;
+
+
+			// -- P R I V A T E  M E M B E R S --------------------------------
+
+			Xf::String<char> _file;
+			Xf::String<char> _path;
+			Xf::UniqueFd     _fd;
+			Stat             _data;
+			bool             _state;
+
+
+
+	};
 
 };
 
