@@ -5,7 +5,7 @@
 
 Xf::Input::Readed Xf::Input::_readed                = 0;
 Xf::Input::Char   Xf::Input::_buff[BUFFER_SIZE + 1] = { 0 };
-Xf::Input::String Xf::Input::_input                 = "";
+Xf::String<char> Xf::Input::_input                 = "";
 bool              Xf::Input::_is_running            = false;
 
 
@@ -13,12 +13,34 @@ bool              Xf::Input::_is_running            = false;
 
 /* input loop */
 void Xf::Input::start_loop(void) {
+
+	// get event instance
+	Xf::Event& evnt = Xf::Event::instance();
+
+	// activate requested mode
+	evnt.next_mode();
+
+	// exit if there is no active mode
+	if (!evnt.is_mode()) { return; }
+
+	Xf::Term::instance().raw_terminal();
+	Xf::Escape::draw<Xf::Escape::enter_screen_t>();
+	Buffer::render();
+
+
+
+
 	// set running flag
 	_is_running = true;
 	// loop over reading
 	while (_is_running) {
 
-		Xf::Event::instance().apply_mode();
+		// activate requested mode
+		evnt.next_mode();
+
+		evnt.call_event(Xf::Evntype::LOOP);
+
+
 		// read stdin
 		read_input();
 		// filter input
@@ -26,6 +48,11 @@ void Xf::Input::start_loop(void) {
 		// analyze readed bytes
 		dispatch();
 	}
+
+	Xf::Escape::draw<Xf::Escape::erase_screen_t>();
+	Xf::Escape::draw<Xf::Escape::exit_screen_t>();
+	Buffer::render();
+	Xf::Term::instance().restore_terminal();
 }
 
 /* stop input loop */
@@ -81,9 +108,9 @@ void Xf::Input::filter_extended(void) {
 	// loop over input
 	for (Size x = 0; x < _input.length(); ++x) {
 		// check if input is superiour to 0x7f (127)
-		if (::String::is_multibyte(_input[x])) {
+		//if (::String::is_multibyte(_input[x])) {
 			// remove charater
-			_input.erase(x, 1); }
+		 //   _input.erase(x, 1); }
 	}
 }
 
@@ -92,9 +119,9 @@ void Xf::Input::filter_control(void) {
 	// loop over input
 	for (Size x = 0; x < _input.length(); ++x) {
 		// check if input is in control range
-		if (::String::is_control(_input[x])) {
+		//if (::String::is_control(_input[x])) {
 			// remove charater
-			_input.erase(x, 1); }
+		 //   _input.erase(x, 1); }
 	}
 }
 
