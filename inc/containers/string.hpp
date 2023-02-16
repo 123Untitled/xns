@@ -989,9 +989,6 @@ namespace Xf {
 
 
 
-
-
-
 		private:
 
 			// -- P R I V A T E  M E T H O D S --------------------------------
@@ -1090,24 +1087,7 @@ namespace Xf {
 
 		public:
 
-
-
-
-
-			//bool cmpr(const String &compare) const;
-			//bool ncmpr(const String& compare) const;
-			//bool cmpr(const CharT* compare) const;
-			//bool ncmpr(const CharT* compare) const;
-			//bool strcmp(const CharT *first, const CharT* second) const;
-			//bool strncmp(const CharT* first, const CharT* second, UInt32 len) const;
-			//void copy(CharT *dest, const CharT *src, const UInt32 start);
-			//void copy(const CharT *str);
-			//void fill(const CharT c);
-
-
-
-
-			// -- D E B U G -------------------------------------------------------
+			// -- D E B U G ---------------------------------------------------
 
 			/* print string */
 			void _print_(void) const {
@@ -1127,11 +1107,9 @@ namespace Xf {
 			}
 
 
-
-
 		public:
 
-			// -- P U B L I C  S T A T I C  M E T H O D S -------------------------
+			// -- P U B L I C  S T A T I C  M E T H O D S ---------------------
 
 			/* get len */
 			static Size get_len(ConstPointer str) {
@@ -1231,180 +1209,8 @@ namespace Xf {
 			}
 
 
-
-
-
-
-
-
-
-//	// -- L S T R I N G  C L A S S ------------------------------------------------
-//
-//	class LString final {
-//
-//		public:
-//
-//			// -- A L I A S E S ---------------------------------------------------
-//
-//			using Size = String::Size;
-//
-//			// -- C O N S T R U C T O R S -----------------------------------------
-//
-//			/* default constructor */
-//			LString(void);
-//
-//			/* copy constructor */
-//			LString(const LString& copy);
-//
-//			/* move constructor */
-//			LString(LString&& move) noexcept;
-//
-//			/* destructor */
-//			~LString(void);
-//
-//
-//			// -- O P E R A T O R S -----------------------------------------------
-//
-//			/* assignment operator */
-//			LString& operator=(const LString& other);
-//
-//			/* move operator */
-//			LString& operator=(LString&& other) noexcept;
-//
-//			/* index operator */
-//			String* operator[](const UInt32 index) const;
-//
-//
-//		private:
-//
-//			// -- N O D E  C L A S S ----------------------------------------------
-//
-//			class Node final : public String {
-//
-//				public:
-//					Node*	_nxt;
-//					Node*	_prv;
-//
-//					// -- C O N S T R U C T O R S ---------------------------------
-//
-//					/* deleted default constructor */
-//					Node(void) = delete;
-//
-//					/* string copy constructor */
-//					Node(const String &obj);
-//
-//					/* string move constructor */
-//					Node(String &&obj);
-//
-//					/* copy constructor */
-//					Node(const Node& copy);
-//
-//					/* move constructor */
-//					Node(Node&& move) noexcept;
-//
-//					/* destructor */
-//					~Node(void);
-//			};
-//
-//
-//			// -- P R I V A T E  M E M B E R S ------------------------------------
-//
-//			Node* _head;
-//			Node* _tail;
-//
-//			Size _size;
-//			Size _node;
-//
-//			static bool _debug;
-//
-//
-//
-//			void deleteNode(Node *node);
-//
-//			/* initialize members */
-//			void initialize_members(void);
-//
-//			void front_link(Node *add);
-//
-//			void back_link(Node *add);
-//
-//			void freeLst();
-//
-//			void debug(const char *message) const;
-//
-//		public:
-//
-//			static void debugOn(void);
-//			static void debugOff(void);
-//
-//			void deleteList();
-//			void deleteAt(const UInt32 index);
-//
-//
-//
-//			void print(void) const;
-//
-//
-//			/* add front move */
-//			void add_front(String&& str);
-//
-//			/* add front copy */
-//			void add_front(const String& str);
-//
-//			/* add back move */
-//			void add_back(String&& str);
-//
-//			/* add back copy */
-//			void add_back(const String& str);
-//
-//
-//
-//			void separator(String&& sep);
-//
-//			/* merge */
-//			String merge(void);
-//
-//
-//
-//
-//			class Iterator {
-//				private:
-//					Node**	_ptr;
-//
-//					Iterator(Node** node);
-//					//Iterator(STRNode* node);
-//
-//				public:
-//					Iterator(LString& lst);
-//
-//					void start(LString& lst);
-//
-//					void end(LString& lst);
-//
-//
-//					operator bool();
-//
-//					bool operator!(void);
-//					// Prefix increment operator.
-//					Iterator& operator++(void);
-//					// Postfix increment operator.
-//					Iterator operator++(int);
-//					// Postfix decrement operator.
-//					Iterator operator--(int);
-//
-//					String& operator*(void);
-//
-//			};
-//
 	};
 
-	/*template <typename N, typename = Xf::enable_if_unsigned<N>>
-	void to_string(N number) {
-	}
-
-	template <typename N, typename = Xf::enable_if_signed<N>>
-	void to_string(N number) {
-	}*/
 
 };
 
