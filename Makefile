@@ -189,7 +189,7 @@ override COLOR := "\x1b[1F\x1b[0J\x1b[3;31m"
 
 # reset formatting
 override RESET := "\x1b[0m"
-
+override GREP := grep --color=auto '^\w\+'
 
 # -- P H O N Y  T A R G E T S -------------------------------------------------
 
@@ -205,14 +205,14 @@ all: lib test
 
 test: main.cpp
 	$(CCX) $(STD) $(OPT) $(CXXFLAGS) $< $(INCLUDES) -L. -lxfunc -o $(EXEC)
-	file $(EXEC)
+	file $(EXEC) | $(GREP)
 
 
 # -- L I B R A R Y  T A R G E T S ---------------------------------------------
 
 lib: $(DYNAMIC_LIB) $(STATIC_LIB) $(COMPILE_COMMANDS)
 	@echo $(COLOR)'[v]'$(RESET) "All targets are up to date !";
-	file $(STATIC_LIB) $(DYNAMIC_LIB)
+	file $(STATIC_LIB) $(DYNAMIC_LIB) | $(GREP)
 
 $(DYNAMIC_LIB): obj
 	@echo $(COLOR)Dynamic-Link$(RESET) $@;
