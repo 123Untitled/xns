@@ -40,11 +40,8 @@ class Buffer final {
 		/* [PRIVATE] default constructor */
 		Buffer(void);
 
-		/* deleted copy constructor */
-		Buffer(const Buffer&) = delete;
-
-		/* deleted move constructor */
-		Buffer(Buffer&&) = delete;
+		/* non-assignable class */
+		NON_ASSIGNABLE(Buffer);
 
 
 	public:
@@ -62,7 +59,9 @@ class Buffer final {
 
 
 		/* [PUBLIC] render */
-		static int render(const int fd = STDOUT_FILENO);
+		static void render(const int);
+
+		static void render(void);
 
 
 	private:
