@@ -1,6 +1,5 @@
 #include "unit_tests.hpp"
 
-using Xf::String;
 
 
 #define SUCCESS(msg) std::cout << "\x1b[32m" << "success" << "\x1b[0m" << ": " << msg << " > "
@@ -16,10 +15,11 @@ using Xf::String;
 #define ALLOCATED     true
 
 template <typename T>
-static void EXPECTED(	const String<T>& str,
+static void EXPECTED(	const Xf::String<T>& str,
 						const bool ptr,
-						const typename String<T>::Size len,
-						const typename String<T>::Size cap) {
+						const typename Xf::String<T>::Size len,
+						const typename Xf::String<T>::Size cap) {
+	using Xf::String;
 
 	// check pointer diff
 	if ((!str.pointer()) != (!ptr)) ERROR(POINTER);
@@ -150,5 +150,20 @@ void Xf::Tests::test_string(void) {
 	//append_string_test<char>();
 	//reserve_test<char>();
 	//append_fill_test();
+
+	Xf::String<char16_t> sss;
+   // sss.forward_remove_duplicates();
+	Xf::String<char> s;
+	const unsigned char c = 'a';
+
+	s.to_string(c);
+	for(char x = -11; x < +5'0; ++x) {
+		s.to_string(x);
+		//write(1, "final: ", 7);
+		write(1, s.pointer(), s.size());
+		write(1, "\n", 1);
+	}
+
+	return;
 
 }
