@@ -99,6 +99,7 @@ void Xf::Event::stack_mode(void) {
 
 /* stack mode */
 void Xf::Event::stack_mode(const Evntmode& mode, const Evntopt opt) {
+	//std::cout << "   stack mode" << std::endl;
 	// check if mode is valid
 	if (!mode._state) { return; }
 	// stack mode
@@ -115,11 +116,36 @@ void Xf::Event::stack_mode(const Evntmode& mode, const Evntopt opt) {
 /* unstack mode */
 void Xf::Event::unstack_mode(void) {
 	// check if there is a mode to unstack
-	if (_stack.empty()) { return; }
+	if (_stack.empty()) {
+		Xf::Input::stop_loop();
+		return; }
 	// unstack mode
-	_next.make(*_stack.top());
-	// remove mode from stack
+	//_next.make(*_stack.top());
+
+	auto t = Xf::move(_stack.top());
+
+	String<char> s;
+	Size size = *t;
+	s.to_string(size);
+	Xf::Escape::draw<Escape::move_position_t>(5, 9);
+	Buffer::draw("uNstack mode ", 13);
+	Buffer::draw(s.pointer(), s.size());
+	Buffer::draw("   .", 4);
+
+
+	/////////////
 	_stack.pop();
+	// maybe better to pop and set new top mode ???
+	if (_stack.empty()) {
+		Xf::Input::stop_loop();
+		return;
+	}
+	_next.make(*_stack.top());
+	//_current = Xf::move(_next);
+	//////////////
+
+	// remove mode from stack
+	//_stack.pop();
 }
 
 
