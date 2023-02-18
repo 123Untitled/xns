@@ -1,7 +1,10 @@
 #ifndef RECT_HEADER
 #define RECT_HEADER
 
+#include <iostream>
 #include "types.hpp"
+
+#define PRECT(rect) std::cout << "Rect(" << rect.x << ", " << rect.y << ", " << rect.w << ", " << rect.h << ")" << std::endl;
 
 // -- N A M E S P A C E -------------------------------------------------------
 
@@ -51,10 +54,25 @@ namespace Xf {
 		/* move assignment operator */
 		Rect& operator=(Rect&& other) noexcept;
 
+		/* bool operator */
+		explicit operator bool(void) const noexcept;
+
+		/* bool not operator */
+		bool operator!(void) const noexcept;
+
+		/* equality operator */
+		bool operator==(const Rect& other) const noexcept;
+
+		// -- M E T H O D S ---------------------------------------------------
+
+		/* empty */
+		bool empty(void) const noexcept;
+
 
 	};
 
-};
+
+}
 
 #endif
 
