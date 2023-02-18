@@ -46,3 +46,31 @@ Xf::Rect& Xf::Rect::operator=(Rect&& other) noexcept {
 	// return copy assignment
 	return operator=(other);
 }
+
+/* bool operator */
+Xf::Rect::operator bool(void) const noexcept {
+	// check if empty
+	return !empty();
+}
+
+/* bool not operator */
+bool Xf::Rect::operator!(void) const noexcept {
+	// check if empty
+	return empty();
+}
+
+/* equality operator */
+bool Xf::Rect::operator==(const Rect& other) const noexcept {
+	// check if equal
+	return x == other.x && y == other.y && w == other.w && h == other.h;
+}
+
+/* empty */
+bool Xf::Rect::empty(void) const noexcept {
+	// check if empty
+	return w == 0 || h == 0;
+}
+
+
+
+
