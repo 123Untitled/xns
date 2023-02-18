@@ -1,104 +1,41 @@
 #include "window.hpp"
 
-
-
-/* default constructor */
-Xf::Window::Window(void)
-:
-	_visible{false},
-	_active{false},
-	_selected{false},
-	_depth{0},
-	_rect{},
-	_parent{nullptr},
-	_border{},
-	_children{},
-	_mode{Xf::Event::instance().new_mode()} {
-	// code here...
-}
+// -- W I N D O W  B A S E  C L A S S -----------------------------------------
 
 /* rect constructor */
-Xf::Window::Window(const Xf::Rect& rect)
-:
-	_visible{false},
-	_active{false},
-	_selected{false},
-	_depth{0},
-	_rect{rect},
-	_parent{nullptr},
-	_border{rect},
-	_children{},
-	_mode{Xf::Event::instance().new_mode()} {
+Xf::WindowBase::WindowBase(const Xf::Rect& rect)
+: _rect{rect}, _border{rect} {
 	// code here...
 }
 
-/* window constructor */
-Xf::Window::Window(Window* parent)
-:
-	_visible{false},
-	_active{false},
-	_selected{false},
-	_depth{0},
-	_rect{},
-	_parent{parent},
-	_border{},
-	_children{},
-	_mode{Xf::Event::instance().new_mode()} {
 
+// -- W I N D O W  M A N A G E R ----------------------------------------------
 
+Xf::UniquePtr<Xf::WindowBase> Xf::WindowManager::_root{};
 
-	using Ev = Xf::Evntype;
-
-	// set event callback
-	_mode.subscribe(Ev::ESC, &Window::exit, this);
-}
-
-
-
-/* destructor */
-Xf::Window::~Window(void) {
+/* new root window */
+void Xf::WindowManager::new_root(void) noexcept {
 	// code here...
+	Term::Wsize width, height;
+	Term::get_terminal_size(width, height);
+
+	//_root.set_pointer(new Window<pane_one_t, hsplit_t>{{0, 0, width, height}});
+	_root.set_pointer(new Window<pane_one_t, vsplit_t>{{0, 0, width, height}});
 }
 
-/* set window */
-void Xf::Window::set(const Xf::Rect& rect) {
-	// set rect
-	_rect = rect;
-	// set border
-	_border.set(rect);
+
+/* draw all */
+void Xf::WindowManager::draw_all(void) noexcept {
+	// code here...
+	int i = 0;
+	_root->draw(i);
+	Xf::Debug::print("draw win: %d\n", i);
 }
 
-/* exit window */
-void Xf::Window::exit(void) {
-	std::cout << "exit" << std::endl;
+/* debug window */
+void Xf::WindowManager::debug_window(void) noexcept {
+	// code here...
+	int i = 0;
+	_root->debug(i);
 }
-
-/* select left window */
-void Xf::Window::select_left(void) {
-	if (_parent != nullptr) {
-		auto& children = _parent->_children;
-		Xf::Event::instance().unstack_mode();
-	}
-}
-
-/* update window */
-void Xf::Window::update(void) {
-	// get parent size
-	if (_parent != nullptr) {
-		_rect.w = _parent->_rect.w * 0.5;
-		_rect.h = _parent->_rect.h * 0.5;
-		_rect.x = _parent->_rect.x + _parent->_rect.w * 0.25;
-		_rect.y = _parent->_rect.y + _parent->_rect.h * 0.25;
-		_border.set(_rect);
-	}
-}
-
-/* draw window */
-void Xf::Window::draw(void) {
-	// draw border
-	_border.draw();
-
-
-}
-
 
