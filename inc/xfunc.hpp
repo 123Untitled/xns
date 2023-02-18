@@ -1,6 +1,9 @@
 #ifndef MYLIB_HEADER
 #define MYLIB_HEADER
 
+#include "debug.hpp"
+#include "numeric_limits.hpp"
+
 #include "terminal.hpp"
 #include "escape.hpp"
 #include "buffer.hpp"
