@@ -6,13 +6,17 @@
 #include <chrono>
 #include <climits>
 
-#include "string.hpp"
+#include "xfunc.hpp"
 
 namespace Xf {
 
 	namespace Tests {
 
 		void test_string(void);
+
+		void window_tests(void);
+
+		void numeric_limits_tests(void);
 
 	};
 
