@@ -15,6 +15,11 @@
 #include "stack.hpp"
 
 
+class Input;
+#include "input.hpp"
+
+
+
 #include <iostream>
 
 
