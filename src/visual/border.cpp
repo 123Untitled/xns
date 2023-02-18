@@ -32,7 +32,6 @@ Xf::Border::Border(void)
 Xf::Border::Border(const Xf::Rect& rect)
 : _border{} {
 	// call set method
-	if (rect.empty()) { _DBG("Border"); return;}
 	set(rect);
 }
 
@@ -73,6 +72,18 @@ Xf::Border& Xf::Border::operator=(Border&& other) noexcept {
 	return *this;
 }
 
+/* bool operator */
+Xf::Border::operator bool(void) const {
+	// check if border is empty
+	return !_border.empty();
+}
+
+/* bool not operator */
+bool Xf::Border::operator!(void) const {
+	// check if border is empty
+	return _border.empty();
+}
+
 /* draw border */
 void Xf::Border::draw(void) {
 	// check if border is empty
@@ -85,6 +96,8 @@ void Xf::Border::draw(void) {
 void Xf::Border::set(const Xf::Rect& rect) {
 	// avoid namespace pollution
 	using Esc = Xf::Escape;
+
+	if (rect.empty()) { _DBG("empty rect in border set method"); return;}
 
 	// clear previous border
 	_border.clear();
