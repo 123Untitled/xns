@@ -50,6 +50,12 @@ namespace Xf {
 			/* move assignment operator */
 			Border& operator=(Border&& other) noexcept;
 
+			/* bool operator */
+			explicit operator bool(void) const;
+
+			/* bool not operator */
+			bool operator!(void) const;
+
 
 			// -- M E T H O D S -----------------------------------------------
 
