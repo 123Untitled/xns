@@ -917,7 +917,6 @@ namespace Xf {
 			void to_string(N number) {
 				// temporary string
 				clear();
-				std::cout << "unsigned" << std::endl;
 
 				constexpr N size = Xf::max_digits<N>();
 
@@ -946,7 +945,6 @@ namespace Xf {
 			void to_string(N number) {
 				// temporary string
 				clear();
-				std::cout << "signed" << std::endl;
 
 				constexpr Size size = Xf::max_digits<N>() + 1; // INFO: +1 for negative sign
 				constexpr N type_min = Xf::min<N>();
