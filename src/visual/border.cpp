@@ -1,6 +1,7 @@
 
 // path: src/visual/border.hpp
 #include "border.hpp"
+#include <iostream>
 
 
 constinit Xf::Border::SymbolArray Xf::Border::_symbols = { {
@@ -31,6 +32,7 @@ Xf::Border::Border(void)
 Xf::Border::Border(const Xf::Rect& rect)
 : _border{} {
 	// call set method
+	if (rect.empty()) { _DBG("Border"); return;}
 	set(rect);
 }
 
@@ -99,7 +101,7 @@ void Xf::Border::set(const Xf::Rect& rect) {
 	// append top left corner
 	_border.append(_symb[CORNER_TL], 3);
 	// append top border
-	for (Size x = 1; x < w - 1; ++x) {
+	for (Size i = 1; i < w - 1; ++i) {
 		_border.append(_symb[LINE_H], 3);
 	}
 	// append top right corner
@@ -112,7 +114,7 @@ void Xf::Border::set(const Xf::Rect& rect) {
 	_border.append(_symb[CORNER_BL], 3);
 
 	// append bottom border
-	for (Size x = 1; x < w - 1; ++x) {
+	for (Size i = 1; i < w - 1; ++i) {
 		_border.append(_symb[LINE_H], 3);
 	}
 	// append bottom right corner
