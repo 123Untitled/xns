@@ -80,6 +80,10 @@ namespace Xf {
 
 			/* is_escape true */
 			template <>
+			struct is_escape<Xf::Escape::Esctype> : Xf::true_t {};
+
+			/* is_escape true */
+			template <>
 			struct is_escape<const Xf::Escape::Esctype> : Xf::true_t {};
 
 			/* get type of member */
