@@ -59,11 +59,16 @@ Buffer& Buffer::get_instance(void) {
 }
 
 /* render */
-int Buffer::render(const int fd) {
+void Buffer::render(const int fd) {
 	// get instance
 	Buffer& buffer = get_instance();
+	(void)buffer._render(fd);
+}
 
-	return buffer._render(fd);
+void Buffer::render(void) {
+	// get instance
+	Buffer& buffer = get_instance();
+	(void)buffer._render(STDOUT_FILENO);
 }
 
 /* [PRIVATE] render */
