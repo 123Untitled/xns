@@ -54,6 +54,9 @@ namespace Xf {
 				// code here...
 			}
 
+			/* non-copyable class */
+			NON_COPYABLE(UniquePtr);
+
 			/* forward constructor */
 			template <typename... A>
 			UniquePtr(A&&... arguments)
@@ -63,9 +66,6 @@ namespace Xf {
 					Allocator::construct(_pointer, Xf::forward<A>(arguments)...);
 				}
 			}
-
-			/* deleted copy constructor */
-			UniquePtr(const UniquePtr&) = delete;
 
 			/* move constructor */
 			UniquePtr(UniquePtr&& other) noexcept
@@ -87,9 +87,6 @@ namespace Xf {
 
 
 			// -- O P E R A T O R S -------------------------------------------
-
-			/* deleted copy operator */
-			UniquePtr& operator=(const UniquePtr&) = delete;
 
 			/* move operator */
 			UniquePtr& operator=(UniquePtr&& other) noexcept {
@@ -148,6 +145,16 @@ namespace Xf {
 
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
+			/* pointer */
+			Pointer pointer(void) {
+				return _pointer;
+			}
+
+			/* const pointer */
+			ConstPointer pointer(void) const {
+				return _pointer;
+			}
+
 			/* make unique */
 			template <typename... A>
 			void make(A&&... arguments) {
@@ -161,12 +168,30 @@ namespace Xf {
 				}
 			}
 
+			/* set */
+			void set_pointer(Pointer pointer) {
+				// call destructor
+				this->~UniquePtr();
+				// set pointer
+				_pointer = pointer;
+			}
+
 			/* clear */
 			void clear(void) {
 				// call destructor
 				this->~UniquePtr();
 				// initialize pointer
 				_pointer = nullptr;
+			}
+
+			/* release */
+			Pointer release(void) {
+				// get pointer
+				Pointer release = _pointer;
+				// initialize pointer
+				_pointer = nullptr;
+				// return pointer
+				return release;
 			}
 
 
