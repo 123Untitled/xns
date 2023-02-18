@@ -1,4 +1,6 @@
 #include "input.hpp"
+// tmp includes
+#include "window.hpp"
 
 
 // -- S T A T I C  P R I V A T E  M E M B E R S -------------------------------
@@ -21,7 +23,7 @@ void Xf::Input::start_loop(void) {
 	evnt.next_mode();
 
 	// exit if there is no active mode
-	if (!evnt.is_mode()) { return; }
+	if (!evnt.is_mode()) { return; std::cout << "no mode" << std::endl; }
 
 	Xf::Term::instance().raw_terminal();
 	Xf::Escape::draw<Xf::Escape::enter_screen_t>();
@@ -34,6 +36,14 @@ void Xf::Input::start_loop(void) {
 	_is_running = true;
 	// loop over reading
 	while (_is_running) {
+
+		Xf::Escape::draw<Xf::Escape::erase_screen_t>();
+		Xf::Debug::write("--------------------\n");
+		Xf::WindowManager::draw_all();
+		Buffer::render();
+		Xf::WindowManager::debug_window();
+		//Xf::Escape::draw<Escape::move_position_t>(5, 9);
+		//Buffer::draw("unstack mode ", 13);
 
 		// activate requested mode
 		evnt.next_mode();
