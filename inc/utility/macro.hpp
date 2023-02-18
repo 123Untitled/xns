@@ -43,6 +43,13 @@
 	OBJ& operator OP (OBJ&&) = delete
 
 
+#ifndef _MIN
+#define _MIN(a, b) ((a) < (b) ? (a) : (b))
+#endif
+
+#ifndef _MAX
+#define _MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
 
 #define IDX(type) static_cast<int>((type))
 
@@ -55,6 +62,37 @@
 #define RESET "\x1b[0m"
 
 #define newline std::cout.write("\n", 1);
+
+#define _DBG(msg) std::cout << YELLOW << msg << RESET << " : " << __PRETTY_FUNCTION__ << std::endl;
+
+
+// -- C L A S S  D E B U G  M A C R O -----------------------------------------
+
+/* constructor */
+#define _CTOR(obj) \
+	Xf::Debug::print("ctor: %s\n", #obj)
+
+/* destructor */
+#define _DTOR(obj) \
+	Xf::Debug::print("dtor: %s\n", #obj)
+
+/* copy constructor */
+#define _COPY(obj) \
+	Xf::Debug::print("copy: %s\n", #obj)
+
+/* move constructor */
+#define _MOVE(obj) \
+	Xf::Debug::print("move: %s\n", #obj)
+
+/* copy assignment */
+#define _COPY_ASSIGN(obj) \
+	Xf::Debug::print("copy assign: %s\n", #obj)
+
+/* move assignment */
+#define _MOVE_ASSIGN(obj) \
+	Xf::Debug::print("move assign: %s\n", #obj)
+
+
 
 
 #endif
