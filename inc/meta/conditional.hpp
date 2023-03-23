@@ -10,7 +10,11 @@ namespace Xf {
 
 	/* conditional */
 	template <bool B, class T, class F>
-	struct conditional                   { using type = T; };
+	struct conditional;
+
+	/* conditional for true */
+	template <class T, class F>
+	struct conditional<true, T, F>       { using type = T; };
 
 	/* conditional for false */
 	template <class T, class F>
@@ -20,13 +24,6 @@ namespace Xf {
 	template <bool B, class T, class F>
 	using conditional_t = typename conditional<B, T, F>::type;
 
-	/* conditional value */
-	template <bool B, class T, class F>
-	static constexpr bool conditional_v = conditional<B, T, F>::value;
-
-	/* conditional concept */
-	template <bool B, class T, class F>
-	concept conditional_c = conditional_v<B, T, F>;
 
 }
 
