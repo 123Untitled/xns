@@ -24,19 +24,17 @@
 	Obj(Obj&&)					= delete;	\
 	Obj(const Obj&)				= delete;	\
 	Obj& operator=(Obj&&)		= delete;	\
-	Obj& operator=(const Obj&)	= delete;
+	Obj& operator=(const Obj&)	= delete
 
 #define NON_COPYABLE(Obj)					\
 	Obj(const Obj&)				= delete;	\
-	Obj& operator=(const Obj&)	= delete;
+	Obj& operator=(const Obj&)	= delete
 
 #define NON_MOVABLE(Obj)					\
 	Obj(Obj&&)					= delete;	\
-	Obj& operator=(Obj&&)		= delete;
+	Obj& operator=(Obj&&)		= delete
 
-#define NON_ASSIGNABLE(Obj)					\
-	NON_COPYABLE(Obj)						\
-	NON_MOVABLE(Obj)
+#define NON_ASSIGNABLE(Obj) NON_COPYABLE(Obj); NON_MOVABLE(Obj)
 
 #define NO_OPERATOR(OBJ, OP) \
 	OBJ& operator OP (const OBJ&) = delete; \
