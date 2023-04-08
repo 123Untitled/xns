@@ -10,6 +10,13 @@
 #                                                                             #
 ###############################################################################
 
+# dependencies:
+# GNU Make 4.2 or later
+# clang++ 10.0.0 or later
+# zsh 5.7.1 or later
+# GNU ar 2.34 or later
+# GNU find 4.7.0 or later
+
 
 # -- V E R S I O N  C H E C K -------------------------------------------------
 
@@ -134,6 +141,8 @@ COMPILE_COMMANDS = compile_commands.json
 
 # compiler
 CCX := $(shell which clang++)
+
+#CCX := /opt/homebrew/Cellar/gcc/12.2.0/bin/g++-12
 
 # archiver
 AR := $(shell which ar)
