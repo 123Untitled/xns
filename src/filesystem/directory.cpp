@@ -1,8 +1,19 @@
 #include "directory.hpp"
 
 Directory::Directory(void)
-: _absolute{}, _directory{nullptr} {
+: _absolute{}, _directory{nullptr}, _content{}, _isopen{false} {
 	_absolute.reserve(MAXPATHLEN);
+}
+
+/* copy constructor */
+Directory::Directory(const Directory& other)
+: Directory{} {
+}
+
+/* copy assignment operator */
+Directory& Directory::operator=(const Directory& other)
+{
+	return *this;
 }
 
 Directory::~Directory(void) {
@@ -213,7 +224,8 @@ Typeindex Directory::getTypentity(const SInt32 type) {
 
 
 // DirEntity default constructor
-DirEntity::DirEntity(void) {
+DirEntity::DirEntity(void)
+: _name{}, _path{}, _dirent{}, _stat{} {
 	// structures manual initialization
 	std::memset(&_dirent,	0, sizeof(Dirent));
 	std::memset(&_stat,		0, sizeof(Stat));
@@ -221,7 +233,7 @@ DirEntity::DirEntity(void) {
 
 DirEntity::DirEntity(const String& path, const Dirent* dirent)
 // initialize name and full path
-: _name{dirent->d_name, strlen(dirent->d_name)}, _path{path + _name} {
+: _name{dirent->d_name, strlen(dirent->d_name)}, _path{path + _name}, _dirent{}, _stat{}  {
 	// memory copy 'Dirent' structure
 	std::memcpy(&_dirent, dirent, sizeof(Dirent));
 	// get stat data about entity
