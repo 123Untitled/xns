@@ -7,7 +7,8 @@ Xf::File::File(void)
 
 /* path constructor */
 Xf::File::File(const Xf::String<char>& path)
-: _path{path} {
+: _file{}, _path{path}, _fd{}, _data{}, _state{false} {
+	// code here...
 }
 
 Xf::File::~File(void) {
