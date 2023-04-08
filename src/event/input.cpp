@@ -26,7 +26,7 @@ void Xf::Input::start_loop(void) {
 	if (!evnt.is_mode()) { return; std::cout << "no mode" << std::endl; }
 
 	Xf::Term::instance().raw_terminal();
-	Xf::Escape::draw<Xf::Escape::enter_screen_t>();
+	Xf::Escape::draw<Xf::enter_screen_t>();
 	Buffer::render();
 
 
@@ -36,20 +36,21 @@ void Xf::Input::start_loop(void) {
 	_is_running = true;
 	// loop over reading
 	while (_is_running) {
-
-		Xf::Escape::draw<Xf::Escape::erase_screen_t>();
-		Xf::Debug::write("--------------------\n");
-		Xf::WindowManager::draw_all();
-		Buffer::render();
-		Xf::WindowManager::debug_window();
-		//Xf::Escape::draw<Escape::move_position_t>(5, 9);
-		//Buffer::draw("unstack mode ", 13);
-
+		Xf::Debug::write("loop\n");
 		// activate requested mode
 		evnt.next_mode();
 
+		Xf::Escape::draw<Xf::erase_screen_t>();
+		//sleep(1);
+		Xf::WindowManager::draw_all();
+		Buffer::render();
+		Xf::WindowManager::debug_window();
+
+
 		evnt.call_event(Xf::Evntype::LOOP);
 
+
+		Buffer::render();
 
 		// read stdin
 		read_input();
@@ -57,10 +58,11 @@ void Xf::Input::start_loop(void) {
 		filter_extended();
 		// analyze readed bytes
 		dispatch();
+		Xf::Debug::write("--------------------\n");
 	}
 
-	Xf::Escape::draw<Xf::Escape::erase_screen_t>();
-	Xf::Escape::draw<Xf::Escape::exit_screen_t>();
+	Xf::Escape::draw<Xf::erase_screen_t>();
+	Xf::Escape::draw<Xf::exit_screen_t>();
 	Buffer::render();
 	Xf::Term::instance().restore_terminal();
 }
@@ -115,24 +117,27 @@ SInt64 Xf::Input::read_stdin(void) {
 
 /* filter extended ascii codes */
 void Xf::Input::filter_extended(void) {
+	_input.filter(Xf::String<char>::is_multibyte, false);
+
 	// loop over input
-	for (Size x = 0; x < _input.length(); ++x) {
-		// check if input is superiour to 0x7f (127)
-		//if (::String::is_multibyte(_input[x])) {
-			// remove charater
-		 //   _input.erase(x, 1); }
-	}
+	//for (Size x = 0; x < _input.length(); ++x) {
+	//	// check if input is superiour to 0x7f (127)
+	//	//if (::String::is_multibyte(_input[x])) {
+	//		// remove charater
+	//	 //   _input.erase(x, 1); }
+	//}
 }
 
 /* filter control characters */
 void Xf::Input::filter_control(void) {
+	_input.filter(Xf::String<char>::is_control, false);
 	// loop over input
-	for (Size x = 0; x < _input.length(); ++x) {
-		// check if input is in control range
-		//if (::String::is_control(_input[x])) {
-			// remove charater
-		 //   _input.erase(x, 1); }
-	}
+	//for (Size x = 0; x < _input.length(); ++x) {
+	//	// check if input is in control range
+	//	//if (::String::is_control(_input[x])) {
+	//		// remove charater
+	//	 //   _input.erase(x, 1); }
+	//}
 }
 
 void Xf::Input::dispatch(void) {
