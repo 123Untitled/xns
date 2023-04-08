@@ -24,7 +24,7 @@ using Stat		= struct stat;
 using Dirent	= struct dirent;
 using Dir		= DIR;
 
-class DirEntity {
+class DirEntity final {
 	private:
 	String		_name;
 	String		_path;
@@ -62,36 +62,47 @@ enum : bool {
 	ERROR
 };
 
+// -- D I R E C T O R Y  C L A S S --------------------------------------------
 
-class Directory {
+class Directory final {
 
-	enum Err: bool {
-		NOERR,
-		ERROR
-	};
+	public:
+
+		// -- C O N S T R U C T O R S -----------------------------------------
+
+		/* default constructor */
+		Directory(void);
+
+		/* copy constructor */
+		Directory(const Directory& other);
+
+		/* destructor */
+		~Directory(void);
+
+
+		enum Err: bool { NOERR, ERROR };
 
 	private:
 
-	#define S_SLASH	"\x2F"
-	#define C_SLASH	'\x2F'
-	#define S_BACK	".."
+#define S_SLASH	"\x2F"
+#define C_SLASH	'\x2F'
+#define S_BACK	".."
 
-	// private members
-	String			_absolute;
-	Dir*			_directory;
-	List<DirEntity>	_content[TYPE_N];
-	bool			_isopen;
+		// -- P R I V A T E  M E M B E R S ------------------------------------
+
+		String _absolute;
+		Dir* _directory;
+		List<DirEntity> _content[TYPE_N];
+		bool _isopen;
 
 	void reset(void);
 	void deallocation(void);
 	void clearDirectory(void);
 	void removeDots(void);
 
-	public:
 	static Err makeDirectory(const String& path);
-	Directory(void);
-	Directory(Directory& copy) = delete;
-	~Directory(void);
+	Directory& operator=(const Directory& other);
+
 
 	static void simplify(String& path);
 	static void makeAbsolute(String& path);
