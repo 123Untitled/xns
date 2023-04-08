@@ -8,6 +8,9 @@
 #include <unistd.h>
 #include <iostream>
 
+#include <type_traits>
+
+
 // -- N A M E S P A C E -------------------------------------------------------
 
 namespace Xf {
@@ -58,17 +61,28 @@ namespace Xf {
 			NON_COPYABLE(UniquePtr);
 
 			/* forward constructor */
-			template <typename... A>
+			/*template <typename... A>
 			UniquePtr(A&&... arguments)
 			: _pointer{Allocator::allocate()} {
 				// construct pointer
 				if (_pointer != nullptr) {
 					Allocator::construct(_pointer, Xf::forward<A>(arguments)...);
 				}
-			}
+			}*/
 
 			/* move constructor */
 			UniquePtr(UniquePtr&& other) noexcept
+			: _pointer{other._pointer} {
+				// invalidate other pointer
+				other._pointer = nullptr;
+			}
+
+			template<class>
+			friend class UniquePtr;
+
+			/* move constructor */
+			template <class U>
+			UniquePtr(UniquePtr<U>&& other) noexcept requires std::derived_from<U, T>
 			: _pointer{other._pointer} {
 				// invalidate other pointer
 				other._pointer = nullptr;
@@ -168,6 +182,19 @@ namespace Xf {
 				}
 			}
 
+			template <class D, typename... A>
+			void make(A&&... arguments) requires std::derived_from<D, T> {
+				// call destructor
+				this->~UniquePtr();
+				// allocate pointer
+				D* pointer = Xf::Allocator<D>::allocate();
+				// construct pointer
+				if (pointer != nullptr) {
+					Xf::Allocator<D>::construct(pointer, Xf::forward<A>(arguments)...);
+				}
+				_pointer = pointer;
+			}
+
 			/* set */
 			void set_pointer(Pointer pointer) {
 				// call destructor
@@ -203,6 +230,17 @@ namespace Xf {
 			Pointer _pointer;
 
 	};
+
+	/* make unique */
+	template <typename T, typename... A>
+	UniquePtr<T> make_unique(A&&... arguments) {
+		// create unique pointer
+		UniquePtr<T> unique;
+		// make unique
+		unique.make(Xf::forward<A>(arguments)...);
+		// return unique pointer
+		return unique;
+	}
 
 
 	// -- U N I Q U E  F D  C L A S S ---------------------------------------
