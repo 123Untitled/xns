@@ -3,6 +3,7 @@
 
 #include "debug.hpp"
 #include "numeric_limits.hpp"
+#include "shared_ptr.hpp"
 
 #include "terminal.hpp"
 #include "escape.hpp"
