@@ -10,7 +10,6 @@
 	//	#include <cstddef>
 	//#endif
 
-
 using Nullptr = decltype(nullptr);
 
 using SInt = int;
@@ -46,7 +45,6 @@ using SInt32 = Signed<4>;
 using SInt64 = Signed<8>;
 
 using Size = UInt64;
-
 
 #endif
 
