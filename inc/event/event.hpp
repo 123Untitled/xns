@@ -13,6 +13,7 @@
 #include "evntype.hpp"
 #include "unique.hpp"
 #include "stack.hpp"
+#include "debug.hpp"
 
 
 class Input;
@@ -187,7 +188,8 @@ namespace Xf {
 			Optional _next;
 
 			/* mode index stack */
-			Xf::Stack<Optional> _stack;
+			Xf::Stack<Size> _stack;
+			//Xf::Stack<Optional> _stack;
 
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------
 
