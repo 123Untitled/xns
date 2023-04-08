@@ -3,7 +3,7 @@
 #define ESC "\x1b"
 
 const Xf::Array<Xf::String<char>,
-				Xf::Escape::_max_esc>
+				IDX(Xf::Esctype::ESCTYPE_MAX)>
 				Xf::Escape::_escapes = {
 	/* move home */
 	ESC"[H",
