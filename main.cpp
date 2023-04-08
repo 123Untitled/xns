@@ -1,3 +1,4 @@
+#include "shared_ptr.hpp"
 #include "xfunc.hpp"
 #include "unit_tests.hpp"
 
@@ -94,11 +95,32 @@ void func_for_8bit(T x) {
 	std::cout << "8bit" << std::endl;
 }
 
+#include <memory>
+#include "conditional.hpp"
+
+class B {
+public:
+	B(void) { std::cout << "B::B()" << std::endl; }
+	virtual void foo(void) = 0;
+	virtual ~B(void) { std::cout << "B::~B()" << std::endl; }
+};
+class D : public B {
+public:
+	D(void) { std::cout << "D::D()" << std::endl; }
+	void foo(void) override { std::cout << "D::foo()" << std::endl; }
+	~D(void) override { std::cout << "D::~D()" << std::endl; }
+};
+
+
+
+
 
 int main(int ac, char** av) {
 
 
-	Xf::Tests::window_tests();
+	//16bit x = 0;
+
+	//Xf::Tests::window_tests();
 	return 0;
 
 
