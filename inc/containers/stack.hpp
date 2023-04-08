@@ -311,6 +311,7 @@ namespace Xf {
 				return node;
 			}
 
+			/* link storage */
 			void link_storage(NodePointer node) {
 				// link node's next pointer to storage
 				node->_next = _storage;
@@ -318,6 +319,7 @@ namespace Xf {
 				_storage = node;
 			}
 
+			/* unlink storage */
 			NodePointer unlink_storage(void) {
 				// get storage node
 				NodePointer node = _storage;
@@ -368,10 +370,12 @@ namespace Xf {
 			}
 
 			/* copy constructor */
-			Node(Node& other)
+			//Node(Node& other)
+			Node(const Node& other) = delete;
+			/*Node(const Node& other)
 			: _value(other._value), _next(other._next) {
 				// code here...
-			}
+			}*/
 
 			/* move constructor */
 			Node(Node&& other)
@@ -403,6 +407,8 @@ namespace Xf {
 				// initialize next
 				_next = nullptr;
 			}
+
+			Node& operator=(const Node& other) = delete;
 
 
 			// -- M E M B E R S -----------------------------------------------
