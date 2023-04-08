@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <type_traits.hpp>
 #include <cstdio>
+#include <cstring>
 
 namespace Xf {
 
@@ -27,11 +28,11 @@ namespace Xf {
 				if (!msg)     { return; }
 				if (_tty < 0) { return; }
 				// avoid format-security warning
-				#pragma clang diagnostic push
-				#pragma clang diagnostic ignored "-Wformat-security"
+				//#pragma clang diagnostic push
+				//#pragma clang diagnostic ignored "-Wformat-security"
 				// call fd printf with packed arguments
-				dprintf(_tty, msg, Xf::forward<A>(args)...);
-				#pragma clang diagnostic pop
+				//dprintf(_tty, msg, Xf::forward<A>(args)...);
+				//#pragma clang diagnostic pop
 			}
 
 
