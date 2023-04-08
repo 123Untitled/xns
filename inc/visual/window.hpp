@@ -12,6 +12,8 @@
 #include "unique.hpp"
 #include "window_traits.hpp"
 #include "debug.hpp"
+#include "shared_ptr.hpp"
+#include "list.hpp"
 
 #include <iostream>
 
@@ -23,12 +25,12 @@ namespace Xf {
 	/* forward declaration */
 
 	struct WindowBase;
-
 	template <pane_c P, split_c S>
 	struct Window;
-
 	template <split_c S>
 	struct SplitWindow;
+
+
 
 
 	// -- W I N D O W  M A N A G E R ------------------------------------------
@@ -63,7 +65,10 @@ namespace Xf {
 				Term::Wsize width, height;
 				Term::get_terminal_size(width, height);
 
-				_root.set_pointer(new SplitWindow<S>{{0, 0, width, height}});
+				using Split = SplitWindow<S>;
+
+				_root.make<Split>(Xf::Rect{0, 0, width, height});
+
 			}
 
 
@@ -130,6 +135,11 @@ namespace Xf {
 			//virtual void split(void) = 0;
 
 
+			/*
+			virtual Evntmode* get_left(void) = 0;
+
+			virtual Evntmode* get_right(void) = 0;
+			*/
 
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
@@ -160,12 +170,28 @@ namespace Xf {
 	template <split_c S>
 	struct SplitWindow final : public WindowBase {
 
+		private:
+
+			// -- P R I V A T E  E N U M S ------------------------------------
+
+			enum { ONE, TWO };
+
+
 		public:
 
 			// -- A L I A S E S -----------------------------------------------
 
 			/* reinject type */
-			using Type = SplitWindow<S>;
+			using Self = SplitWindow<S>;
+
+			/* window one type */
+			using WinOne = Window<pane_one_t, S>;
+
+			/* window two type */
+			using WinTwo = Window<pane_two_t, S>;
+
+			/* parent type */
+			using Parent = SplitWindow<S>*;
 
 			// -- C O N S T R U C T O R S -------------------------------------
 
@@ -176,7 +202,7 @@ namespace Xf {
 			SplitWindow(const Rect& rect, const Size ratio = 50)
 			: WindowBase{rect}, _panes{ }, _ratio{ratio} {
 
-				if (rect.empty()) { return; }
+				if (rect.empty()) { Debug::print("empty rect"); return; }
 				helper_constructor();
 			}
 
@@ -185,7 +211,7 @@ namespace Xf {
 			SplitWindow(const Rect& rect, Window<P, T>* win)
 			: WindowBase{rect}, _panes{ }, _ratio{50} {
 
-				if (rect.empty()) { return; }
+				if (rect.empty()) { Debug::print("empty rect"); return; }
 				_split_ctor(win);
 			}
 
@@ -198,14 +224,13 @@ namespace Xf {
 				// compute pane 2 height
 				const Size p_h2 = win->_rect.h - p_h1;
 
-				// WARNING: need to set new window parent !
-				//win->set_rect();
-				//win->set_parent(this);
-				// allocate windows
-				//_panes[0].set_pointer(win);
-				_panes[0].set_pointer(new Window<pane_one_t, S>{{_rect.x, _rect.y,        _rect.w, p_h1}, Xf::move(win->_mode), this});
+				Rect r1{_rect.x, _rect.y,        _rect.w, p_h1};
+				Rect r2{_rect.x, _rect.y + p_h1, _rect.w, p_h2};
 
-				_panes[1].set_pointer(new Window<pane_two_t, S>{{_rect.x, _rect.y + p_h1, _rect.w, p_h2}, this});
+
+				_panes[ONE].template make<WinOne>(r1, this); // INFO: moved window
+				_panes[TWO].template make<WinTwo>(r2, this);
+
 			}
 
 			template <split_c T>
@@ -214,13 +239,13 @@ namespace Xf {
 				const Size p_h1 = win->_rect.h * _ratio / 100;
 				// compute pane 2 height
 				const Size p_h2 = win->_rect.h - p_h1;
-				// WARNING: need to set new window parent !
-				//win->set_rect({_rect.x, _rect.y + p_h1, _rect.w, p_h2});
-				//win->set_parent(this);
-				// allocate windows
-				//_panes[1].set_pointer(win);
-				_panes[1].set_pointer(new Window<pane_two_t, S>{{_rect.x, _rect.y + p_h1, _rect.w, p_h2}, Xf::move(win->_mode), this});
-				_panes[0].set_pointer(new Window<pane_one_t, S>{{_rect.x, _rect.y,        _rect.w, p_h1}, this});
+
+				Rect r1{_rect.x, _rect.y,        _rect.w, p_h1};
+				Rect r2{_rect.x, _rect.y + p_h1, _rect.w, p_h2};
+
+				_panes[ONE].template make<WinOne>(r1, this);
+				_panes[TWO].template make<WinTwo>(r2, this); // INFO: moved window
+
 			}
 
 
@@ -231,13 +256,12 @@ namespace Xf {
 				// compute pane 2 width
 				const Size p_w2 = _rect.w - p_w1;
 
-				// WARNING: need to set new window parent !
-				//win->set_rect({_rect.x, _rect.y, p_w1, _rect.h});
-				//win->set_parent(this);
-				// allocate windows
-				//_panes[0].set_pointer(win);
-				_panes[0].set_pointer(new Window<pane_one_t, S>{{_rect.x, _rect.y, p_w1, _rect.h}, Xf::move(win->_mode), this});
-				_panes[1].set_pointer(new Window<pane_two_t, S>{{_rect.x + p_w1, _rect.y, p_w2, _rect.h}, this});
+				Rect r1{_rect.x,        _rect.y, p_w1, _rect.h};
+				Rect r2{_rect.x + p_w1, _rect.y, p_w2, _rect.h};
+
+				_panes[ONE].template make<WinOne>(r1, this); // INFO: moved window
+				_panes[TWO].template make<WinTwo>(r2, this);
+
 			}
 
 			template <split_c T>
@@ -247,29 +271,28 @@ namespace Xf {
 				// compute pane 2 width
 				const Size p_w2 = _rect.w - p_w1;
 
-				// WARNING: need to set new window parent !
-				//win->set_rect({_rect.x + p_w1, _rect.y, p_w2, _rect.h});
-				//win->set_parent(this);
-				// allocate windows
-				//_panes[1].set_pointer(win);
+				Rect r1{_rect.x,        _rect.y, p_w1, _rect.h};
+				Rect r2{_rect.x + p_w1, _rect.y, p_w2, _rect.h};
 
-				_panes[1].set_pointer(new Window<pane_two_t, S>{{_rect.x + p_w1, _rect.y, p_w2, _rect.h}, Xf::move(win->_mode), this});
-				_panes[0].set_pointer(new Window<pane_one_t, S>{{_rect.x, _rect.y, p_w1, _rect.h}, this});
+				_panes[ONE].template make<WinOne>(r1, this);
+				_panes[TWO].template make<WinTwo>(r2, this); // INFO: moved window
+
 			}
-
-
-
-
 
 			/* helper constructor vsplit */
 			void helper_constructor(void) requires(vsplit_c<S>) {
 				// compute pane 1 width
-				const Size p_w1 = _rect.w * _ratio / 100;
+				const Size p_w1 = (_rect.w * _ratio / 100) - 1;
 				// compute pane 2 width
-				const Size p_w2 = _rect.w - p_w1;
+				const Size p_w2 = _rect.w - (p_w1 + 1);
+
+				Rect r1{_rect.x,        _rect.y, p_w1, _rect.h};
+				Rect r2{_rect.x + p_w1 + 1, _rect.y, p_w2, _rect.h};
+
 				// allocate windows
-				_panes[0].set_pointer(new Window<pane_one_t, S>{{_rect.x,        _rect.y, p_w1, _rect.h}, this});
-				_panes[1].set_pointer(new Window<pane_two_t, S>{{_rect.x + p_w1, _rect.y, p_w2, _rect.h}, this});
+				_panes[ONE].template make<WinOne>(r1, this);
+				_panes[TWO].template make<WinTwo>(r2, this);
+
 			}
 
 			/* helper constructor hsplit */
@@ -278,9 +301,12 @@ namespace Xf {
 				const Size p_h1 = _rect.h * _ratio / 100;
 				// compute pane 2 height
 				const Size p_h2 = _rect.h - p_h1;
+
+				Rect r1{_rect.x, _rect.y,        _rect.w, p_h1};
+				Rect r2{_rect.x, _rect.y + p_h1, _rect.w, p_h2};
 				// allocate windows
-				_panes[0].set_pointer(new Window<pane_one_t, S>{{_rect.x, _rect.y,        _rect.w, p_h1}, this});
-				_panes[1].set_pointer(new Window<pane_two_t, S>{{_rect.x, _rect.y + p_h1, _rect.w, p_h2}, this});
+				_panes[ONE].template make<WinOne>(r1, this);
+				_panes[TWO].template make<WinTwo>(r2, this);
 			}
 
 
@@ -288,15 +314,17 @@ namespace Xf {
 			NON_ASSIGNABLE(SplitWindow);
 
 			/* destructor */
-			~SplitWindow(void) override = default;
+			~SplitWindow(void) override {
+				Debug::print("dtor: \"split\"\n");
+			}
 
 
 			// -- O V E R R I D E S -------------------------------------------
 
 			/* draw override */
 			void draw(int& i) override {
-				if (_panes[0]) { _panes[0]->draw(i); }
-				if (_panes[1]) { _panes[1]->draw(i); }
+				if (_panes[0]) { _panes[0]->draw(i); } else { Debug::print("pane 1 is null"); }
+				if (_panes[1]) { _panes[1]->draw(i); } else { Debug::print("pane 2 is null"); }
 			}
 
 			void debug(int i) override {
@@ -304,9 +332,9 @@ namespace Xf {
 					Xf::Debug::print("  ");
 				}
 				if constexpr (vsplit_c<S>) {
-					Xf::Debug::print("\x1b[32mV_split\x1b[0m\n");
+					Xf::Debug::print("\x1b[32mV_split\x1b[0m %dx%d\n", _rect.w, _rect.h);
 				} else if constexpr (hsplit_c<S>) {
-					Xf::Debug::print("\x1b[35mH_split\x1b[0m\n");
+					Xf::Debug::print("\x1b[35mH_split\x1b[0m %dx%d\n", _rect.w, _rect.h);
 				}
 				// print split info
 				_panes[0]->debug(i + 1);
@@ -317,20 +345,35 @@ namespace Xf {
 			/* split pane one */
 			template <split_c T, pane_one_c P>
 			void split(Window<P, S>* window) {
-
-				Rect rect = _panes[0]->_rect; // INFO: rect is in window class
-				_panes[0].release();
-				_panes[0].set_pointer(new SplitWindow<T>{rect, window});
+				Debug::print("split pane one\n");
+				Pane unique = Xf::move(_panes[0]);
+				_panes[ONE].template make<SplitWindow<T>>(unique->_rect, window);
 			}
 
 			/* split pane two */
 			template <split_c T, pane_two_c P>
 			void split(Window<P, S>* window) {
-
-				Rect rect = _panes[1]->_rect; // INFO: rect is in window class
-				_panes[1].release();
-				_panes[1].set_pointer(new SplitWindow<T>{rect, window});
+				Debug::print("split pane two\n");
+				Pane unique = Xf::move(_panes[1]);
+				_panes[TWO].template make<SplitWindow<T>>(unique->_rect, window);
 			}
+
+			/*
+			template <pane_one_c P>
+			Evntmode* search_left(void) requires(vsplit_c<S>) {
+
+			}
+
+			template <pane_two_c P>
+			Evntmode* search_left(void) requires(vsplit_c<S>) {
+				return _panes[ONE].template search_left<P>();
+
+			}
+
+			Evntmode* get_left(void) {
+				return _panes[ONE].get_left();
+			}*/
+
 
 
 			// -- A L I A S E S -----------------------------------------------
@@ -338,22 +381,20 @@ namespace Xf {
 			/* size type */
 			using Size = UInt64;
 
+			/* pane type */
+			using Pane = UniquePtr<WindowBase>;
+
 			/* array type */
-			using Array = Array<UniquePtr<WindowBase>, 2>;
+			using PArray = Array<Pane, 2>;
 
 
 		//protected:
 
 			// -- P R O T E C T E D  M E M B E R S ----------------------------
 
-			Array _panes;
+			PArray _panes;
 
 			Size _ratio;
-
-
-		//private:
-
-			// -- P R I V A T E  M E T H O D S --------------------------------
 
 
 	};
@@ -374,6 +415,13 @@ namespace Xf {
 			/* size type */
 			using Size = UInt64;
 
+			/* self type */
+			using Self = Window<P, S>;
+
+			/* parent type */
+			using Parent = SplitWindow<S>*;
+
+
 
 			// -- C O N S T R U C T O R S -------------------------------------
 
@@ -389,19 +437,26 @@ namespace Xf {
 				subscribe();
 			}
 
-			Window(const Rect& rect, Evntmode&& mode, SplitWindow<S>* parent)
+			Window(const Rect& rect, Evntmode&& mode, Parent parent)
 			:   WindowBase{rect},
 				_parent{parent},
-				_mode{Xf::move(mode)} {
+				//_mode{Xf::move(mode)} { // WARNING: this causes a segfault
+				// because the mode use deleted object instance
+				_mode{Event::instance().new_mode()} {
 				// code here...
+				subscribe();
 			}
 
 			void subscribe(void) {
+
 				using Ev = Xf::Evntype;
+
 				// set event callback
-				_mode.subscribe(Ev::ESC,  &Window::exit, this);
-				_mode.subscribe(Ev::CR,   &Window::v_split, this);
+				_mode.subscribe(Ev::ESC,     &Window::exit,    this);
+				_mode.subscribe(Ev::CR,      &Window::v_split, this);
 				_mode.subscribe(Ev::SPACE,   &Window::h_split, this);
+				//_mode.subscribe(Ev::LEFT,    &Window::move_left,    this);
+
 				Event::instance().stack_mode(_mode, Evntopt::FORCE);
 			}
 
@@ -428,6 +483,11 @@ namespace Xf {
 
 			/* exit window */
 			void exit(void) {
+
+				if (Event::instance().is_mode(_mode)) {
+					Debug::print("IS MODE\n");
+				}
+
 				Xf::Event::instance().unstack_mode();
 				Xf::Debug::print("unstack window mode\n");
 			}
@@ -442,12 +502,12 @@ namespace Xf {
 			void draw(int& i) override {
 				if (Xf::Event::instance().is_mode(_mode)) {
 					// set color
-					Xf::Escape::draw<Xf::Escape::hex_color_t>(0x37FFDA, true);
+					Xf::Escape::draw<Xf::hex_color_t>(0x37FFDA, true);
 				}
 				// draw border
 				_border.draw();
 				// reset color
-				Xf::Escape::draw<Xf::Escape::reset_style_t>();
+				Xf::Escape::draw<Xf::reset_style_t>();
 				++i;
 			}
 
@@ -459,45 +519,61 @@ namespace Xf {
 					Xf::Debug::print("\x1b[37;1m");
 				}
 				if constexpr (pane_one_c<P>) {
-					Xf::Debug::print("pane one\n");
+					Xf::Debug::print("pane one");
 				} else if constexpr (pane_two_c<P>) {
-					Xf::Debug::print("pane two\n");
+					Xf::Debug::print("pane two");
 				}
+				Xf::Debug::print(" %dx%d\n", _rect.w, _rect.h);
 				Xf::Debug::print("\x1b[0m");
 			}
 
 			/* split window */
 			void v_split(void) {
-
+				// check if window is too small
+				if (_rect.w < 10) { Debug::print("too small\n"); return; }
+				// check if parent exists
 				if (!_parent) {
+					Debug::print("no parent\n");
+					// let window manager handle it
 					WindowManager::new_split<vsplit_t>();
-					return; } // INFO: need to handle this
-
-				if (_rect.w < 10) { return; }
-
+					return;
+				}
+				Debug::print("let parent split\n");
+				// let parent handle it
 				_parent->template split<vsplit_t>(this);
 			}
 
 			/* split window */
 			void h_split(void) {
-
+				// check if window is too small
+				if (_rect.h < 10) { Debug::print("too small\n"); return; }
+				// check if parent exists
 				if (!_parent) {
+					Debug::print("no parent\n");
+					// let window manager handle it
 					WindowManager::new_split<hsplit_t>();
-					return; } // INFO: need to handle this
-
-				if (_rect.h < 10) { return; }
-
+					return;
+				}
+				Debug::print("let parent split\n");
+				// let parent handle it
 				_parent->template split<hsplit_t>(this);
 			}
+
+			/* move left */
+			void move_left(void) {
+				if (_parent) {
+					;//Evntmode* mode = _parent->search_left(this);
+				}
+			}
+
+			/*Evntmode* search_left(void) {
+				return &_mode;
+			}*/
 
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
-			/*bool _visible;
-			bool _active;
-			bool _selected;*/
-
-			SplitWindow<S>* _parent;
+			Parent _parent;
 
 			Evntmode _mode;
 
@@ -508,9 +584,39 @@ namespace Xf {
 
 
 
+	class Win {
+
+		public:
+
+			Win(void) = delete;
+
+			Win(const Xf::Rect& rect) : _rect(rect) { }
+
+			~Win(void) = default;
+
+
+		private:
+
+			/* coordinates */
+			Xf::Rect   _rect;
+
+			/* border */
+			Xf::Border _border;
+
+			/* children */
+			Xf::List<Win> _children;
+
+			/* parent */
+			Win* _parent;
+	};
+
+
+
+
+
+
+
 
 }
-
-
 
 #endif
