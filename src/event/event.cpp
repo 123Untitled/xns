@@ -5,7 +5,7 @@
 
 /* default constructor */
 Xf::Event::Event(void)
-: _modes{ }, _current{ }, _next{ } {
+: _modes{ }, _current{ }, _next{ }, _stack{ } {
 	// code here...
 }
 
@@ -35,6 +35,7 @@ Xf::Event Xf::Event::_instance;
 /* add mode */
 Xf::Evntmode Xf::Event::new_mode(void) {
 	_modes.emplace_back(Mode{ });
+	Xf::Debug::print("new mode: %d\n", _modes.size() - 1);
 	if (_modes.empty()) {
 		// error
 		Evntmode mode{0};
@@ -69,6 +70,7 @@ void Xf::Event::set_mode(const Evntmode& mode, const Evntopt opt) {
 
 /* apply mode */
 void Xf::Event::next_mode(void) {
+	Xf::Debug::print("active mode: %d\n", *_current);
 	// check if there is a mode query
 	if (!_next) { return; }
 	// mode to current mode
@@ -122,17 +124,8 @@ void Xf::Event::unstack_mode(void) {
 	// unstack mode
 	//_next.make(*_stack.top());
 
-	auto t = Xf::move(_stack.top());
 
-	String<char> s;
-	Size size = *t;
-	s.to_string(size);
-	Xf::Escape::draw<Escape::move_position_t>(5, 9);
-	Buffer::draw("uNstack mode ", 13);
-	Buffer::draw(s.pointer(), s.size());
-	Buffer::draw("   .", 4);
-
-
+	Xf::Debug::print("unstack mode: %d\n", _stack.top());
 	/////////////
 	_stack.pop();
 	// maybe better to pop and set new top mode ???
@@ -140,8 +133,9 @@ void Xf::Event::unstack_mode(void) {
 		Xf::Input::stop_loop();
 		return;
 	}
-	_next.make(*_stack.top());
-	//_current = Xf::move(_next);
+	//_next.make(*_stack.top());
+	_next.make(_stack.top());
+	_current = Xf::move(_next);
 	//////////////
 
 	// remove mode from stack
@@ -221,6 +215,7 @@ Xf::Evntmode::Evntmode(const Size idx)
 Xf::Evntmode::~Evntmode(void) {
 	// check if mode is active
 	if (_state) {
+		Xf::Debug::write("EVNTMODE: destructor called\n");
 		// remove mode from event manager
 		Xf::Event::instance().remove_mode(*this);
 	}
