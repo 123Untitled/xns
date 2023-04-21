@@ -502,12 +502,14 @@ namespace Xf {
 			void draw(int& i) override {
 				if (Xf::Event::instance().is_mode(_mode)) {
 					// set color
-					Xf::Escape::draw<Xf::hex_color_t>(0x37FFDA, true);
+					//Xf::Escape::draw<Xf::hex_color_t>(0x37FFDA, true);
+					Xf::Escape::hex_color(0x37FFDA, true);
 				}
 				// draw border
 				_border.draw();
 				// reset color
-				Xf::Escape::draw<Xf::reset_style_t>();
+				//Xf::Escape::draw<Xf::reset_style_t>();
+				Xf::Escape::reset_style();
 				++i;
 			}
 

@@ -1,7 +1,7 @@
 #include "unit_tests.hpp"
 
 static void exit(void) { Xf::Input::stop_loop(); }
-static void render(void) { Buffer::render(); }
+static void render(void) { Xf::Output::render(); }
 static void press_enter(void) { Xf::Debug::print("enter\n"); }
 
 static Xf::Evntmode build_events(void) {

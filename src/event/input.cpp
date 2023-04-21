@@ -26,8 +26,10 @@ void Xf::Input::start_loop(void) {
 	if (!evnt.is_mode()) { return; std::cout << "no mode" << std::endl; }
 
 	Xf::Term::instance().raw_terminal();
-	Xf::Escape::draw<Xf::enter_screen_t>();
-	Buffer::render();
+	//Xf::Escape::draw<Xf::enter_screen_t>();
+	Xf::Escape::enter_screen();
+	//Buffer::render();
+	Xf::Output::render();
 
 
 
@@ -40,17 +42,20 @@ void Xf::Input::start_loop(void) {
 		// activate requested mode
 		evnt.next_mode();
 
-		Xf::Escape::draw<Xf::erase_screen_t>();
+		//Xf::Escape::draw<Xf::erase_screen_t>();
+		Xf::Escape::erase_screen();
 		//sleep(1);
 		Xf::WindowManager::draw_all();
-		Buffer::render();
+		//Buffer::render();
+		Xf::Output::render();
 		Xf::WindowManager::debug_window();
 
 
 		evnt.call_event(Xf::Evntype::LOOP);
 
 
-		Buffer::render();
+		//Buffer::render();
+		Xf::Output::render();
 
 		// read stdin
 		read_input();
@@ -61,9 +66,12 @@ void Xf::Input::start_loop(void) {
 		Xf::Debug::write("--------------------\n");
 	}
 
-	Xf::Escape::draw<Xf::erase_screen_t>();
-	Xf::Escape::draw<Xf::exit_screen_t>();
-	Buffer::render();
+	//Xf::Escape::draw<Xf::erase_screen_t>();
+	Xf::Escape::erase_screen();
+	//Xf::Escape::draw<Xf::exit_screen_t>();
+	Xf::Escape::exit_screen();
+	//Buffer::render();
+	Xf::Output::render();
 	Xf::Term::instance().restore_terminal();
 }
 
