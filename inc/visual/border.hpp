@@ -96,7 +96,7 @@ namespace Xf {
 			// -- M E M B E R S -----------------------------------------------
 
 			/* cached border sequence */
-			Xf::String<char> _border;
+			Xf::CString _border;
 
 
 
