@@ -16,7 +16,7 @@ void Draw::clearLine(UInt32 posX, UInt32 posY, UInt32 size) {
 /* drawLine */
 void Draw::drawLine(const UInt x, const UInt y, const void *ptr, const UInt size) {
 	//Escape::move_position(x, y);
-	Buffer::draw(ptr, size);
+	//Buffer::draw(ptr, size);
 }
 
 /* draw string */
@@ -24,14 +24,14 @@ void Draw::draw_string(const UInt x, const UInt y, const std::string& str) {
 	// move to position
 	//Escape::move_position(x, y);
 	// draw string
-	Buffer::draw(str.data(), str.size());
+	//Buffer::draw(str.data(), str.size());
 }
 
 /* vertivalDraw */
 void Draw::vertivalDraw(const UInt x, UInt y, const void *ptr, const UInt size, UInt line) {
 	while (line) {
 		//Escape::move_position(x, y);
-		Buffer::draw(ptr, size);
+		//Buffer::draw(ptr, size);
 		--line;
 		++y;
 	}
@@ -52,7 +52,7 @@ void Draw::drawInteger(UInt number) {
 		number /= 10;
 	}
 	UInt size = (seq + BUFFSIZE) - ptr;
-	Buffer::draw(ptr, size);
+	//Buffer::draw(ptr, size);
 
 
 }
