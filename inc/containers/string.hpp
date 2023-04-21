@@ -23,9 +23,20 @@ class LString;
 
 namespace Xf {
 
+
+	// forward declarations
+	template <typename T>
+	class String;
+
+	using CString = String<char>;
+	using WString = String<wchar_t>;
+	using UString = String<char16_t>;
+	using SString = String<char32_t>;
+
+
 	// -- S T R I N G  C L A S S ----------------------------------------------
 
-	template <typename T = char>
+	template <typename T>
 	class String {
 
 		// static check for valid character type
