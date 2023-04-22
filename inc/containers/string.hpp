@@ -28,9 +28,16 @@ namespace Xf {
 	template <typename T>
 	class String;
 
+	/* c-string ascii type */
 	using CString = String<char>;
+
+	/* wide string type */
 	using WString = String<wchar_t>;
+
+	/* utf-16 string type */
 	using UString = String<char16_t>;
+
+	/* utf-32 string type */
 	using SString = String<char32_t>;
 
 
