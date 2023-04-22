@@ -273,7 +273,9 @@ namespace Xf {
 
 			/* subscribe method to input */
 			template <typename C>
-			void subscribe(Event::EventMethod<C>, Event::Pointer<C>);
+			void subscribe(Event::InputMethod<C>, Event::Pointer<C>);
+			// !!!
+			//void subscribe(Event::EventMethod<C>, Event::Pointer<C>);
 
 	};
 
@@ -289,7 +291,8 @@ namespace Xf {
 
 	/* subscribe method to input */
 	template <typename C>
-	void Xf::Evntmode::subscribe(Event::EventMethod<C> method, Event::Pointer<C> instance) {
+	//void Xf::Evntmode::subscribe(Event::EventMethod<C> method, Event::Pointer<C> instance) {
+	void Xf::Evntmode::subscribe(Event::InputMethod<C> method, Event::Pointer<C> instance) {
 		// exit if not in a valid mode
 		if (!_state) { return; }
 		// call event class method
