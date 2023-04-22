@@ -402,6 +402,7 @@ namespace Xf {
 			void clear(void) {
 				// reset size
 				_size = 0;
+				// WARNING: nullchar not set
 			}
 
 			/* reserve */
@@ -587,13 +588,27 @@ namespace Xf {
 			}
 
 			/* null-terminated string insert */
-			String& insert(const Size index, ConstPointer str);
+			String& insert(const Size index, ConstPointer str) {
+				return insert(index, str, String::get_len(str));
+			}
 
 			/* buffer insert */
-			String& insert(const Size index, ConstPointer str, const Size size);
+			String& insert(const Size index, ConstPointer str, const Size size) {
+				// WARNING: not implemented
+
+				// check if size or pointer is null
+				if (!size || !str) { return *this; }
+
+
+
+				return *this;
+			}
 
 			/* string insert */
-			String& insert(const Size index, const String& str);
+			String& insert(const Size index, const String& str) {
+				// WARNING: good candidate for optimization
+				return insert(index, str._str, str._size);
+			}
 
 
 			/* erase character */
