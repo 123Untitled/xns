@@ -38,17 +38,18 @@ void Xf::Input::start_loop(void) {
 	_is_running = true;
 	// loop over reading
 	while (_is_running) {
-		Xf::Debug::write("loop\n");
+		//Xf::Debug::write("loop\n");
 		// activate requested mode
 		evnt.next_mode();
+		std::cout << "PIPI" << std::endl;
 
 		//Xf::Escape::draw<Xf::erase_screen_t>();
 		Xf::Escape::erase_screen();
 		//sleep(1);
-		Xf::WindowManager::draw_all();
+		//Xf::WindowManager::draw_all();
 		//Buffer::render();
 		Xf::Output::render();
-		Xf::WindowManager::debug_window();
+		//Xf::WindowManager::debug_window();
 
 
 		evnt.call_event(Xf::Evntype::LOOP);
