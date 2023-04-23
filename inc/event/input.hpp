@@ -80,7 +80,7 @@ namespace Xf {
 
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------
 
-			static Xf::String<Char>      _input;
+			static Xf::CString _input;
 			static Char        _buff[BUFFER_SIZE + 1];
 			static Readed      _readed;
 			static bool        _is_running;
