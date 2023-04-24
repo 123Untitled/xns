@@ -1,12 +1,10 @@
 #include "input.hpp"
-// tmp includes
-#include "window.hpp"
 
 
 // -- S T A T I C  P R I V A T E  M E M B E R S -------------------------------
 
 Xf::Input::Readed Xf::Input::_readed                = 0;
-Xf::Input::Char   Xf::Input::_buff[BUFFER_SIZE + 1] = { 0 };
+Xf::Input::CharT  Xf::Input::_buff[BUFFER_SIZE + 1] = { 0 };
 Xf::CString       Xf::Input::_input                 = "";
 bool              Xf::Input::_is_running            = false;
 
@@ -28,8 +26,6 @@ void Xf::Input::start_loop(void) {
 	Xf::Term::instance().raw_terminal();
 	Xf::Escape::enter_screen();
 	Xf::Output::render();
-
-
 
 
 	// set running flag
@@ -101,25 +97,19 @@ SInt64 Xf::Input::read_stdin(void) {
 	return _readed;
 }
 
-/* filter extended ascii codes */
-void Xf::Input::filter_extended(void) {
-	_input.filter(Xf::CString::is_multibyte, false);
-}
-
-/* filter control characters */
-void Xf::Input::filter_control(void) {
-	_input.filter(Xf::CString::is_control, false);
-}
 
 void Xf::Input::dispatch(void) {
+
+	if (_input.empty()) { return; }
 
 	// get event instance
 	Xf::Event& evnt = Xf::Event::instance();
 
 	using Ev = Xf::Evntype;
 
-	// filter input
-	filter_extended();
+	// filter extended ascii codes
+	_input.filter(Xf::CString::is_multibyte, false);
+
 
 	if (_input.length() == 3 && _input[0] == 0x1b) {
 
@@ -144,12 +134,15 @@ void Xf::Input::dispatch(void) {
 			}
 		}
 	}
+
 	if (_input.length() == 1) {
 		const UInt8 _char = _input[0];
 		evnt.call_event(static_cast<Ev>(_char));
 	}
-	filter_control();
-	if (_input.empty()) { return; }
+
+	// filter control characters
+	_input.filter(Xf::CString::is_control, false);
+
 	evnt.call_input(_input);
 }
 
