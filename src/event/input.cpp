@@ -25,6 +25,8 @@ void Xf::Input::start_loop(void) {
 
 	Xf::Term::instance().raw_terminal();
 	Xf::Escape::enter_screen();
+	Xf::Escape::erase_screen();
+	Xf::Escape::move_home();
 	Xf::Output::render();
 
 
