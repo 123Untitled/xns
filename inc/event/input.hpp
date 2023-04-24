@@ -41,17 +41,14 @@ namespace Xf {
 
 			// -- A L I A S E S -----------------------------------------------
 
-			/* string type */
-			using String = std::string;
-
 			/* character type */
-			using Char = String::value_type;
+			using CharT = CString::CharT;
 
 			/* readed bytes type */
 			using Readed = SInt64;
 
 			/* size type */
-			using Size = String::size_type;
+			using Size = CString::Size;
 
 
 			// -- S T A T I C  P R I V A T E  M E T H O D S -------------------
@@ -66,13 +63,6 @@ namespace Xf {
 			static void dispatch(void);
 
 
-			/* filter extended ascii codes */
-			static void filter_extended(void);
-
-			/* filter control characters */
-			static void filter_control(void);
-
-
 			// -- P R I V A T E  E N U M S ------------------------------------
 
 			enum { BUFFER_SIZE = 1024 };
@@ -81,7 +71,7 @@ namespace Xf {
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------
 
 			static Xf::CString _input;
-			static Char        _buff[BUFFER_SIZE + 1];
+			static CharT       _buff[BUFFER_SIZE + 1];
 			static Readed      _readed;
 			static bool        _is_running;
 
