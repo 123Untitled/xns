@@ -65,25 +65,6 @@ namespace Xf {
 
 
 
-	// -- C H A R A C T E R  T Y P E ------------------------------------------
-
-	template <typename T>
-	struct is_char_t           : false_t {};
-
-	template <>
-	struct is_char_t<char>     : true_t {};
-
-	template <>
-	struct is_char_t<wchar_t>  : true_t {};
-
-	template <>
-	struct is_char_t<char8_t>  : true_t {};
-
-	template <>
-	struct is_char_t<char16_t> : true_t {};
-
-	template <>
-	struct is_char_t<char32_t> : true_t {};
 
 
 	// -- C O N J U N C T I O N -----------------------------------------------
