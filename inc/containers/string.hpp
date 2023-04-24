@@ -9,7 +9,8 @@
 // local includes
 #include "types.hpp"
 #include "move.hpp"
-#include "type_traits.hpp"
+#include "string_traits.hpp"
+
 #include "allocator.hpp"
 #include "vector.hpp"
 #include "array.hpp"
@@ -25,7 +26,7 @@ namespace Xf {
 
 
 	// forward declarations
-	template <typename T>
+	template <is_char_c T>
 	class String;
 
 	/* c-string ascii type */
@@ -34,28 +35,29 @@ namespace Xf {
 	/* wide string type */
 	using WString = String<wchar_t>;
 
+	/* utf-8 string type */
+	using U8String = String<char8_t>;
+
 	/* utf-16 string type */
-	using UString = String<char16_t>;
+	using U16String = String<char16_t>;
 
 	/* utf-32 string type */
-	using SString = String<char32_t>;
+	using U32String = String<char32_t>;
+
 
 
 	// -- S T R I N G  C L A S S ----------------------------------------------
 
-	template <typename T>
+	template <is_char_c T>
 	class String {
 
-		// static check for valid character type
-		static_assert(Xf::is_char_t<T>::value,
-		"String: invalid character type");
 
 		public:
 
 			// -- A L I A S E S -----------------------------------------------
 
 			/* character type */
-			using CharT = T;
+			using CharT = remove_cv_t<T>;
 
 			/* size type */
 			using Size = UInt64;
@@ -161,7 +163,6 @@ namespace Xf {
 			/* fill constructor */
 			explicit String(const CharT character, const Size count)
 			: String{} {
-				std::cout << "fill constructor" << std::endl;
 				// exit if count is zero
 				if (!count) { return; }
 				// allocate memory
@@ -410,6 +411,7 @@ namespace Xf {
 				// reset size
 				_size = 0;
 				// WARNING: nullchar not set
+				if (_str) { _str[0] = 0; }
 			}
 
 			/* reserve */
@@ -426,6 +428,10 @@ namespace Xf {
 					_capacity = requested;
 				}
 			}
+
+
+
+			// -- A P P E N D -------------------------------------------------
 
 			/* fill append */
 			String& append(const CharT character, const Size count = 1) {
@@ -451,31 +457,23 @@ namespace Xf {
 
 			/* string append */
 			String& append(const String& str) {
-				//std::cout << "append(const String& str)" << std::endl;
-				// check if there is enough space
-				if (str._size > available()) {
-					// resize the string
-					Pointer new_str = _realloc(_size + str.length());
-					// check if reallocation failed
-					if (new_str == nullptr) { return *this; }
-					// update data
-					_str_and_capacity(new_str, _size + str._size);
-				}
-
-				// loop through new memory space
-				for (Size x = 0, z = _size; x < str._size; ++x, ++z) {
-					// set character
-					_str[z] = str._str[x];
-				}
-
-				_size_and_terminator(_size + str._size);
-
-				// return self reference
-				return *this;
+				// call buffer append
+				return append(str._str, str._size);
 			}
+
+			/* null-terminated string append */
+			String& append(ConstPointer str) {
+				// call buffer append
+				return append(str, String::get_len(str));
+			}
+
 
 			/* buffer append */ // WARNING: need to check nullptr
 			String& append(ConstPointer str, Size size) {
+
+				// check if size or pointer is null
+				if (!size || !str) { return *this; }
+
 				// check if there is enough space
 				if (size > available()) {
 					// resize the string
@@ -498,14 +496,6 @@ namespace Xf {
 				return *this;
 			}
 
-			/* null-terminated string append */
-			String& append(ConstPointer str) {
-				// INFO: get_len() check nullptr
-				const Size size = String::get_len(str);
-				// call buffer append
-				return append(str, size);
-			}
-
 
 
 
@@ -524,11 +514,13 @@ namespace Xf {
 
 			/* multiple string append */
 			template <typename... A>
-			Xf::enable_if_t<append_selector<A...>(), String&> append(A&&... strings) {
+			String& append(A&&... strings) requires(append_selector<A...>()) {
 
 				// get the size of the strings
 				Size size = 0;
 				((size += strings._size), ...);
+
+				if (!size) { return *this; }
 
 				// check if there is enough space
 				if (size > available()) {
@@ -553,6 +545,9 @@ namespace Xf {
 				return *this;
 			}
 
+
+
+			// -- I N S E R T -------------------------------------------------
 
 			/* fill insert */
 			String& insert(Size index, const CharT character, const Size count = 1) {
@@ -594,29 +589,65 @@ namespace Xf {
 				return *this;
 			}
 
-			/* null-terminated string insert */
-			String& insert(const Size index, ConstPointer str) {
-				return insert(index, str, String::get_len(str));
-			}
 
 			/* buffer insert */
-			String& insert(const Size index, ConstPointer str, const Size size) {
+			String& insert(Size index, ConstPointer str, const Size size) {
 				// WARNING: not implemented
 
 				// check if size or pointer is null
 				if (!size || !str) { return *this; }
 
+				// check if index is valid
+				index = index > _size ? _size : index;
 
+				Size required = _size + size;
 
+				// check if there is enough space
+				if (size > available()) {
+					// resize the string
+					Pointer new_str = _realloc(required);
+					// check if reallocation failed
+					if (new_str == nullptr) { return *this; }
+					// update data
+					_str_and_capacity(new_str, required);
+				}
+
+				Size range = _size - index;
+
+				// loop through new memory space and shift characters
+				for (Size x = 0, z = _size - 1; x < range; ++x, --z) {
+					// set character
+					_str[z + size] = _str[z];
+				}
+
+				Size to = index + size;
+				// loop through new memory space and set characters
+				for (Size x = index, z = 0; x < to; ++x, ++z) {
+					// set character
+					_str[x] = str[z];
+				}
+
+				_size_and_terminator(required);
+
+				// return self reference
 				return *this;
 			}
 
 			/* string insert */
 			String& insert(const Size index, const String& str) {
-				// WARNING: good candidate for optimization
+				// call buffer insert
 				return insert(index, str._str, str._size);
 			}
 
+			/* null-terminated string insert */
+			String& insert(const Size index, ConstPointer str) {
+				// call buffer insert with size
+				return insert(index, str, String::get_len(str));
+			}
+
+
+
+			// -- E R A S E ---------------------------------------------------
 
 			/* erase character */
 			String& erase(const Size index) {
@@ -1241,6 +1272,8 @@ namespace Xf {
 
 
 	};
+
+
 
 
 };
