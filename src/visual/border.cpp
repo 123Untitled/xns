@@ -1,7 +1,5 @@
-
 // path: src/visual/border.hpp
 #include "border.hpp"
-#include <iostream>
 
 
 constinit Xf::Border::SymbolArray Xf::Border::_symbols = { {
@@ -94,7 +92,7 @@ void Xf::Border::draw(void) {
 }
 
 
-void Xf::Border::set(const Xf::Rect& rect) {
+void Xf::Border::set(const Xf::Rect& rect, const Xf::Hexcolor color) {
 	// avoid namespace pollution
 	using Esc = Xf::Escape;
 
@@ -109,9 +107,9 @@ void Xf::Border::set(const Xf::Rect& rect) {
 	Xf::Rect::Size h = rect.h;
 
 
+	_border.append(Escape::get_hex_color(color));
 
 	// append move position top left corner
-	//_border.append(Esc::get<Xf::move_position_t>(x, y));
 	_border.append(Escape::get_move_position(x, y));
 	// append top left corner
 	_border.append(_symb[CORNER_TL], 3);
@@ -155,6 +153,8 @@ void Xf::Border::set(const Xf::Rect& rect) {
 		// append right vertical border
 		_border.append(_symb[LINE_V], 3);
 	}
+
+	_border.append(Escape::get(Xf::Esctype::RESET_STYLE));
 }
 
 
