@@ -117,7 +117,33 @@ public:
 
 int main(int ac, char** av) {
 
+	Xf::CString str = "toto";
 
+	Xf::Output::write(str);
+	Xf::Output::render();
+
+	str.insert(0, "my name is ");
+	write(1, "\n", 1);
+
+	Xf::CString str2 = " 2 ";
+	Xf::CString str3;
+	Xf::CString str4 = " 4 ";
+
+	//str.append(" 1 ", " 2 ", " 3 ");
+	str.append(str2, str3, str4);
+
+	Xf::Output::write(str);
+	Xf::Output::render();
+
+	//const wchar_t c = 'c';
+
+	//Xf::String<decltype(c)> str2{c, 29};
+
+
+
+
+
+	//Xf::Tests::test_string();
 	//16bit x = 0;
 
 	//Xf::Tests::window_tests();
