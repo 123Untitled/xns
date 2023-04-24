@@ -148,8 +148,9 @@ static void reserve_test(void) {
 void Xf::Tests::test_string(void) {
 
 	//append_string_test<char>();
-	//reserve_test<char>();
+	reserve_test<char>();
 	//append_fill_test();
+	return;
 
 	Xf::String<char16_t> sss;
    // sss.forward_remove_duplicates();
