@@ -7,6 +7,9 @@
 #include "rect.hpp"
 #include "escape.hpp"
 #include "allocator.hpp"
+#include "color.hpp"
+
+#include <iostream>
 
 // -- N A M E S P A C E -------------------------------------------------------
 
@@ -63,7 +66,8 @@ namespace Xf {
 			void draw(void);
 
 			/* set size and position */
-			void set(const Xf::Rect& rect);
+			void set(const Xf::Rect& rect,
+					const Xf::Hexcolor color = Xf::Color::GREY_COLOR);
 
 			/* set border color */
 			// INFO: not defined yet
