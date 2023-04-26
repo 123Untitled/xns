@@ -31,15 +31,6 @@ void Xf::Input::start_loop(void) {
 	// exit if there is no active mode
 	//if (!evnt.is_mode()) { return; std::cout << "no mode" << std::endl; }
 
-	Xf::Term::instance().raw_terminal();
-
-	if (_windowed) {
-		Xf::Escape::enter_screen();
-		Xf::Escape::erase_screen();
-		Xf::Escape::move_home();
-		Xf::Output::render();
-	}
-
 	// set running flag
 	_is_running = true;
 	// loop over reading
@@ -55,12 +46,6 @@ void Xf::Input::start_loop(void) {
 		dispatch();
 	}
 
-	if (_windowed) {
-		Xf::Escape::erase_screen();
-		Xf::Escape::exit_screen();
-		Xf::Output::render();
-	}
-	Xf::Term::instance().restore_terminal();
 }
 
 /* stop input loop */
