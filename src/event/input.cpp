@@ -26,10 +26,10 @@ void Xf::Input::start_loop(void) {
 	Xf::Event& evnt = Xf::Event::instance();
 
 	// activate requested mode
-	evnt.next_mode();
+	//evnt.next_mode();
 
 	// exit if there is no active mode
-	if (!evnt.is_mode()) { return; std::cout << "no mode" << std::endl; }
+	//if (!evnt.is_mode()) { return; std::cout << "no mode" << std::endl; }
 
 	Xf::Term::instance().raw_terminal();
 

@@ -70,11 +70,19 @@ void Xf::Event::set_mode(const Evntmode& mode, const Evntopt opt) {
 
 /* apply mode */
 void Xf::Event::next_mode(void) {
-	Xf::Debug::print("active mode: %d\n", *_current);
+	//Xf::Debug::print("active mode: %d\n", *_current);
 	// check if there is a mode query
 	if (!_next) { return; }
 	// mode to current mode
 	_current = Xf::move(_next);
+
+	// get subscribers index by event type
+	EventVector& subscribers = _modes[*_current]._second[IDX(Evntype::BEGIN)];
+	// loop through all observers
+	for (Size x = 0; x < subscribers.size(); ++x) {
+		// call subscriber
+		subscribers[x].call();
+	}
 }
 
 /* is mode active */

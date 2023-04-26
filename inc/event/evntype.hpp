@@ -147,6 +147,9 @@ namespace Xf {
 		// special events
 		TERMINAL_RESIZE, // terminal resize
 
+		// enter in mode
+		BEGIN,
+
 		// event for each loop
 		LOOP,
 
