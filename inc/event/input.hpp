@@ -36,6 +36,9 @@ namespace Xf {
 			/* stop input loop */
 			static void stop_loop(void);
 
+			/* parameters */
+			static void parameters(const bool windowed);
+
 
 		private:
 
@@ -74,6 +77,8 @@ namespace Xf {
 			static CharT       _buff[BUFFER_SIZE + 1];
 			static Readed      _readed;
 			static bool        _is_running;
+
+			static bool        _windowed;
 
 	};
 
