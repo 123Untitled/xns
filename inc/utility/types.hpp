@@ -46,6 +46,13 @@ using SInt64 = Signed<8>;
 
 using Size = UInt64;
 
+// include for struct winsize
+#include <sys/ioctl.h>
+// include for declval
+#include <utility>
+
+using TSize = decltype(std::declval<struct winsize>().ws_row);
+
 #endif
 
 
