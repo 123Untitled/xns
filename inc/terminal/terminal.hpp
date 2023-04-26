@@ -38,7 +38,6 @@ namespace Xf {
 			// -- A L I A S E S -----------------------------------------------
 
 			/* window size type */
-			//using Wsize = decltype(std::declval<struct winsize>().ws_row);
 			using Wsize = unsigned short;
 
 
