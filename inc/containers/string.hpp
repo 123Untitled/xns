@@ -220,7 +220,29 @@ namespace Xf {
 			/* buffer assignment */
 			String& assign(ConstPointer str, const Size size) {
 
+				// WARNING: need to handle this case !
+				// check if size or pointer is null
+				if (!size || !str) { clear(); return *this; }
 
+				// check if capacity is sufficient
+				if (_capacity < size) {
+					// resize the string
+					Pointer tmp = _realloc(size);
+					// check if reallocation failed
+					if (tmp == nullptr) { return *this; }
+					// update members
+					_str_and_capacity(tmp, size);
+				}
+
+				// loop through string
+				for (Size x = 0; x < size; ++x) {
+					// copy character
+					_str[x] = str[x];
+				}
+
+				_size_and_terminator(size);
+
+				return *this;
 			}
 
 			/* fill assignment */
@@ -228,6 +250,7 @@ namespace Xf {
 
 			}
 
+			// WARNING: need to rework this with realloc
 			/* copy assignment */
 			String& assign(const String& other) {
 				// check for self-assignment
