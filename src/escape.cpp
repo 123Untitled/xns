@@ -189,8 +189,10 @@ bool Xf::Escape::request_position(UInt32& x, UInt32& y) {
 			else if (c == ';') num = &x;
 		} // check control character
 		else if (c == '[') bracket = true;
-	} // final check sequence
-	return (bracket && x && y && c == 'R');
+	}
+	--x; --y;
+	// final check sequence
+	return (bracket && c == 'R');
 }
 
 
