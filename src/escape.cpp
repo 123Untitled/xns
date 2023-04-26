@@ -168,9 +168,9 @@ void Xf::Escape::cursor_block(void) {
 #define BACKGROUND				false
 
 
-bool Xf::Escape::request_position(UInt32& x, UInt32& y) {
+bool Xf::Escape::request_position(TSize& x, TSize& y) {
 
-	UInt32* num     = &y;
+	TSize* num     = &y;
 	bool    bracket = false;
 	char    c       = 0;
 
@@ -205,16 +205,18 @@ bool Xf::Escape::request_position(UInt32& x, UInt32& y) {
 
 
 /* move position */
-void Xf::Escape::move_position(UInt32 x, UInt32 y) {
+void Xf::Escape::move_position(TSize x, TSize y) {
 	Xf::Output::write(get_move_position(x, y));
 }
 
 /* get move position */
-Xf::CString Xf::Escape::get_move_position(UInt32 x, UInt32 y) {
+Xf::CString Xf::Escape::get_move_position(TSize x, TSize y) {
+	// ESC[{line};{column}H
+
 	UInt8  escape[ESCAPE_BUFFER_SIZE];
 	UInt32 ite;
 
-	constexpr const UInt32 max = Xf::max<UInt32>();
+	constexpr const UInt32 max = Xf::max<TSize>();
 
 	x += (x != max);
 	y += (y != max);
@@ -240,6 +242,52 @@ Xf::CString Xf::Escape::get_move_position(UInt32 x, UInt32 y) {
 
 	// append escape sequence to buffer
 	return Xf::CString((char*)&escape[ite], ESCAPE_BUFFER_SIZE - ite);
+}
+
+
+/* move x position */
+void Xf::Escape::move_x(TSize x) {
+	Xf::Output::write(get_move_x(x));
+}
+
+/* get move x position */
+const Xf::CString& Xf::Escape::get_move_x(TSize x) {
+
+	// static returned string
+	static Xf::CString escape;
+
+	// compile time buffer size
+	constexpr const UInt64 size = sizeof("\x1b[G")
+								+ Xf::max_digits<TSize>();
+	// buffer
+	Xf::CString::CharT buffer[size];
+
+	// init iterator
+	UInt64 i = size - 1;
+
+	// increment x if not max
+	x += (x != Xf::max<TSize>());
+
+	// last character
+	buffer[i] = 'G';
+
+	// integer to ascii X pos
+	while (x) {
+		buffer[--i] = ((x % BASE) ^ ZERO_ASCII);
+		x /= BASE;
+	}
+
+	// ctrl character
+	buffer[--i] = '[';
+
+	// escape character
+	buffer[--i] = '\x1b';
+
+	// assign escape sequence to string
+	escape.assign(&buffer[i], size - i);
+
+	// return escape
+	return escape;
 }
 
 

@@ -137,10 +137,22 @@ namespace Xf {
 			// -- S P E C I A L  E S C A P E  S E Q U E N C E S ---------------
 
 			/* request position */
-			static bool request_position(UInt32&, UInt32&);
+			static bool request_position(TSize&, TSize&);
+
 
 			/* move position */
-			static void move_position(UInt32, UInt32);
+			static void move_position(TSize, TSize);
+
+			/* get move position */
+			static Xf::CString get_move_position(TSize, TSize);
+
+
+			/* move x position */
+			static void move_x(TSize);
+
+			/* get move x position */
+			static const Xf::CString& get_move_x(TSize);
+
 
 			/* hex color */
 			static void hex_color(const UInt32, const bool = true);
@@ -149,8 +161,7 @@ namespace Xf {
 			static void rgb_color(UInt8, UInt8, UInt8, const bool = true);
 
 
-			/* get move position */
-			static Xf::CString get_move_position(UInt32, UInt32);
+
 
 			/* get hex color */
 			static Xf::CString get_hex_color(const UInt32, const bool = true);
