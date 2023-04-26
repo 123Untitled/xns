@@ -113,9 +113,24 @@ public:
 
 
 
+void itoa(void) {
+	int num = 123;
 
+	int powers[]= { 1, 100, 10000, 1000000 };
+
+	do {
+	}
+	while (num > 0);
+}
 
 int main(int ac, char** av) {
+
+	TSize n = 0;
+
+	std::cout << "max: " << Xf::max<TSize>() << std::endl;
+	std::cout << "digits: " << Xf::max_digits<TSize>() << std::endl;
+
+	return 0 ;
 
 	Xf::CString str = "toto";
 
