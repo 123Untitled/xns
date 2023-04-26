@@ -67,7 +67,7 @@ namespace Xf {
 
 
 			/* get terminal size */
-			static int get_terminal_size(Wsize& width, Wsize& height);
+			static void get_terminal_size(Wsize& width, Wsize& height);
 
 
 			/* check tty and control terminal */
@@ -102,8 +102,12 @@ namespace Xf {
 			/* setup raw terminal */
 			void setup_raw(void);
 
+			/* query terminal size */
+			static int query_terminal_size(void);
+
 			/* signal handler */
 			static void terminal_resize_handler(int signum);
+
 
 
 			// -- M E M B E R S -----------------------------------------------
@@ -125,6 +129,12 @@ namespace Xf {
 
 			// raw terminal settings
 			Termios _raw;
+
+			/* terminal width */
+			Wsize _width;
+
+			/* terminal height */
+			Wsize _height;
 
 
 

@@ -27,7 +27,8 @@ Xf::Term Xf::Term::_instance{};
 /* private default constructor */
 Xf::Term::Term(void)
 :	_is_raw{false}, _is_origin{false}, _is_setup{false},
-	_origin{setup_terminal()}, _raw{} {
+	_origin{setup_terminal()}, _raw{},
+ 	_width{0}, _height{0} {
 
 	// check if original terminal settings are available
 	if (_is_origin) {
@@ -38,6 +39,9 @@ Xf::Term::Term(void)
 		// set setup flag
 		_is_setup = true;
 	}
+
+	// query terminal size
+	query_terminal_size();
 
 	// set resize signal handler
 	std::signal(SIGWINCH, &Term::terminal_resize_handler);
@@ -120,7 +124,14 @@ void Xf::Term::restore_terminal(void) {
 }
 
 
-int Xf::Term::get_terminal_size(Wsize& width, Wsize& height) {
+void Xf::Term::get_terminal_size(Wsize& width, Wsize& height) {
+	// assign reference parameters
+	width  = _instance._width;
+	height = _instance._height;
+}
+
+/* query terminal size */
+int Xf::Term::query_terminal_size(void) {
 
 	// winsize structure
 	Winsize win;
@@ -128,18 +139,24 @@ int Xf::Term::get_terminal_size(Wsize& width, Wsize& height) {
 	// query terminal dimensions
 	int err = ioctl(STDOUT_FILENO, TIOCGWINSZ, &win);
 
-	// assign result to reference parameters
-	width = win.ws_col;
-	height = win.ws_row;
-
+	// check error
+	if (err != -1) {
+		// assign result to reference parameters
+		_instance._width = win.ws_col;
+		_instance._height = win.ws_row;
+	}
 	// error return
 	return err;
+
 }
 
 void Xf::Term::terminal_resize_handler(int signum) {
 	static_cast<void>(signum);
-	// call resize event subscribers
-	Xf::Event::instance().call_event(Xf::Evntype::TERMINAL_RESIZE);
+	// query terminal size
+	if (query_terminal_size() != -1) {
+		// call resize event subscribers
+		Xf::Event::instance().call_event(Xf::Evntype::TERMINAL_RESIZE);
+	}
 }
 
 
