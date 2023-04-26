@@ -101,25 +101,25 @@ void Xf::Term::flush(void) {
 void Xf::Term::raw_terminal(const VFlag vmin) {
 
 	// check if terminal is setup
-	if (!_is_setup) { return; }
+	if (!_instance._is_setup) { return; }
 
 	// VMIN = Minimum number of characters to read
-	_raw.c_cc[VMIN] = static_cast<UInt8>(vmin);
+	_instance._raw.c_cc[VMIN] = static_cast<UInt8>(vmin);
 
 	// set non-canonical mode
-	if (!tcsetattr(STDIN_FILENO, TCSANOW, &_raw)) {
-		_is_raw = true;
+	if (!tcsetattr(STDIN_FILENO, TCSANOW, &_instance._raw)) {
+		_instance._is_raw = true;
 	}
 }
 
 void Xf::Term::restore_terminal(void) {
 
 	// check if terminal is setup
-	if (!_is_setup) { return; }
+	if (!_instance._is_setup) { return; }
 
 	// reset orignal terminal settings
-	if (!tcsetattr(STDIN_FILENO, TCSAFLUSH, &_origin)) {
-		_is_raw = false;
+	if (!tcsetattr(STDIN_FILENO, TCSAFLUSH, &_instance._origin)) {
+		_instance._is_raw = false;
 	}
 }
 
@@ -142,8 +142,8 @@ int Xf::Term::query_terminal_size(void) {
 	// check error
 	if (err != -1) {
 		// assign result to reference parameters
-		_instance._width = win.ws_col;
-		_instance._height = win.ws_row;
+		_width = win.ws_col;
+		_height = win.ws_row;
 	}
 	// error return
 	return err;
@@ -153,7 +153,7 @@ int Xf::Term::query_terminal_size(void) {
 void Xf::Term::terminal_resize_handler(int signum) {
 	static_cast<void>(signum);
 	// query terminal size
-	if (query_terminal_size() != -1) {
+	if (_instance.query_terminal_size() != -1) {
 		// call resize event subscribers
 		Xf::Event::instance().call_event(Xf::Evntype::TERMINAL_RESIZE);
 	}

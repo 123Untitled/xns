@@ -38,6 +38,7 @@ namespace Xf {
 			// -- A L I A S E S -----------------------------------------------
 
 			/* window size type */
+			//using Wsize = decltype(std::declval<struct winsize>().ws_row);
 			using Wsize = unsigned short;
 
 
@@ -56,10 +57,10 @@ namespace Xf {
 			static Term& instance(void);
 
 			/* set raw terminal */
-			void raw_terminal(const VFlag vmin = Xf::VFlag::BLOCKING);
+			static void raw_terminal(const VFlag vmin = Xf::VFlag::BLOCKING);
 
 			/* restore original terminal */
-			void restore_terminal(void);
+			static void restore_terminal(void);
 
 
 			/* flush stdin buffer */
@@ -103,7 +104,9 @@ namespace Xf {
 			void setup_raw(void);
 
 			/* query terminal size */
-			static int query_terminal_size(void);
+			int query_terminal_size(void);
+
+
 
 			/* signal handler */
 			static void terminal_resize_handler(int signum);
