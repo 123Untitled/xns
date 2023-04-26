@@ -12,6 +12,7 @@
 
 namespace Xf {
 
+
 	// -- A L L O C A T O R  C L A S S ----------------------------------------
 
 	template <typename T>
@@ -108,7 +109,7 @@ namespace Xf {
 			/* forward construct */
 			template <typename... Args>
 			static void construct(Pointer addrs, Args&&... args) {
-				// construct object by forwarding
+				// construct object by forwarding arguments
 				new(addrs) Value{Xf::forward<Args>(args)...};
 			}
 
@@ -117,7 +118,7 @@ namespace Xf {
 
 			/* destroy */
 			static void destroy(Pointer addrs) {
-				// destroy object
+				// call object destructor
 				addrs->~Value();
 			}
 
