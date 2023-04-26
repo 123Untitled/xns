@@ -72,7 +72,7 @@ void Xf::Input::read_input(void) {
 		// buffer is full, loop over reading
 		if (_readed == BUFFER_SIZE) {
 			// set to non-blocking read
-			Xf::Term::instance().raw_terminal(VFlag::NON_BLOCKING);
+			Xf::Term::raw_terminal(VFlag::NON_BLOCKING);
 			// read stdin again
 			while (read_stdin() > 0) {
 				// append buffer to the string
@@ -80,7 +80,7 @@ void Xf::Input::read_input(void) {
 			}
 
 			// back to blocking read
-			Xf::Term::instance().raw_terminal(VFlag::BLOCKING);
+			Xf::Term::raw_terminal(VFlag::BLOCKING);
 		}
 
 	}
