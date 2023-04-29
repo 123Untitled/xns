@@ -145,7 +145,7 @@ static void reserve_test(void) {
 //	////str.append(str2, str2, str2);
 //
 
-void Xf::Tests::test_string(void) {
+void UT::string_ut(void) {
 
 	//append_string_test<char>();
 	reserve_test<char>();

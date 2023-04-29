@@ -25,7 +25,7 @@ static Xf::Evntmode build_events(void) {
 }
 
 
-void Xf::Tests::window_tests(void) {
+void UT::window_ut(void) {
 	using namespace Xf;
 
 	auto mode = build_events();
@@ -34,5 +34,5 @@ void Xf::Tests::window_tests(void) {
 	WindowManager::new_split<Xf::vsplit_t>();
 	//WindowManager win;
 
-	Input::start_loop();
+	Xf::Input::start_loop();
 }
