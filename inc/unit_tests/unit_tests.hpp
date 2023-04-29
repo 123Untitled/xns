@@ -7,18 +7,19 @@
 #include <climits>
 
 #include "xfunc.hpp"
+#include "testclass.hpp"
 
-namespace Xf {
+namespace UT {
 
-	namespace Tests {
 
-		void test_string(void);
+	void string_ut(void);
 
-		void window_tests(void);
+	void window_ut(void);
 
-		void numeric_limits_tests(void);
+	void numeric_limits_ut(void);
 
-	};
+	void auto_pointer_ut(void);
+
 
 };
 
