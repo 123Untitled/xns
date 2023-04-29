@@ -117,7 +117,7 @@ namespace Xf {
 			}
 
 			/* clear operator */
-			UniquePtr& operator=(Nullptr) {
+			UniquePtr& operator=(Xf::Nullptr) {
 				// clear this
 				this->~UniquePtr();
 				// initialize pointer
