@@ -4,6 +4,7 @@
 #include "debug.hpp"
 #include "numeric_limits.hpp"
 #include "shared_ptr.hpp"
+#include "auto_pointer.hpp"
 
 #include "terminal.hpp"
 #include "escape.hpp"
