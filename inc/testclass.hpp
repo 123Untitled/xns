@@ -12,71 +12,102 @@
 #define debug(msg)
 #endif
 
+#undef TESTCLASS_DEBUG
 
-template <typename T>
-class Test {
+template <class T>
+class Base {
+
+	public:
+
+		Base(void) {}
+		virtual ~Base(void) {}
+
+		virtual void echo(void) const = 0;
+
+};
+
+
+template <class T, class U, class V>
+class Class final : public Base<T> {
 
 	public:
 
 		/* default constructor */
-		Test(void)
-		: _value{} {
-			debug("DEFAULT CONSTRUCTOR");
+		Class(void)
+		:	_value_1{},
+			_value_2{},
+			_value_3{} {
+			debug("class default constructor");
 		}
 
 		/* value constructor */
-		Test(const T& value) noexcept
-		: _value{value} {
-			debug("VALUE CONSTRUCTOR");
+		Class(const T& value_1, const U& value_2, const V& value_3)
+		:	_value_1{value_1},
+			_value_2{value_2},
+			_value_3{value_3} {
+			debug("class value constructor");
 		}
 
 		/* copy constructor */
-		Test(const Test& other)
-		: _value{other._value} {
-			debug("COPY CONSTRUCTOR");
+		Class(const Class& other)
+		:	_value_1{other._value_1},
+			_value_2{other._value_2},
+			_value_3{other._value_3} {
+			debug("class copy constructor");
 		}
 
 		/* move constructor */
-		Test(Test&& other) noexcept
-		: _value{Xf::move(other._value)} {
-			debug("MOVE CONSTRUCTOR");
+		Class(Class&& other) noexcept
+		:	_value_1{Xf::move(other._value_1)},
+			_value_2{Xf::move(other._value_2)},
+			_value_3{Xf::move(other._value_3)} {
+			debug("class move constructor");
 		}
 
 		/* destructor */
-		~Test(void) {
-			debug("DESTRUCTOR");
+		~Class(void) {
+			debug("class destructor");
 		}
 
 		/* copy operator */
-		Test& operator=(const Test& t) {
-			debug("COPY ASSIGNMENT");
-			if (this != &t) {
-				_value = t._value;
-			} return *this;
+		Class& operator=(const Class& other) {
+			if (this != &other) {
+				_value_1 = other._value_1;
+				_value_2 = other._value_2;
+				_value_3 = other._value_3;
+			}
+			debug("class copy operator");
+			return *this;
 		}
 
 		/* move operator */
-		Test& operator=(Test&& t) noexcept {
-			debug("MOVE ASSIGNMENT");
-			if (this != &t) {
-				_value = Xf::move(t._value);
-			} return *this;
+		Class& operator=(Class&& other) noexcept {
+			if (this != &other) {
+				_value_1 = Xf::move(other._value_1);
+				_value_2 = Xf::move(other._value_2);
+				_value_3 = Xf::move(other._value_3);
+			}
+			debug("TEST MOVE ASSIGNMENT");
+			return *this;
+		}
+
+		/* echo */
+		void echo(void) const override {
+			std::cout << "echo class" << std::endl;
 		}
 
 		/* print operator */
-		friend std::ostream& operator<<(std::ostream& os, const Test& t) {
-			os << t._value;
+		friend std::ostream& operator<<(std::ostream& os, const Class& t) {
+			os << t._value_1 << " " << t._value_2 << " " << t._value_3;
 			return os;
-		}
-
-		void function(void) {
-			std::cout << "Hello World!" << std::endl;
 		}
 
 
 	private:
 
-		T _value;
+		T _value_1;
+		U _value_2;
+		V _value_3;
 
 
 };
