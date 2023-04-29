@@ -10,13 +10,51 @@
 	//	#include <cstddef>
 	//#endif
 
-using Nullptr = decltype(nullptr);
+// -- N A M E S P A C E -------------------------------------------------------
 
-using SInt = int;
-using UInt = unsigned int;
-using Char = char;
-using Double = double;
-using Float = float;
+namespace Xf {
+
+	// -- T Y P E S -------------------------------------------------------------
+
+	/* null pointer */
+	using Nullptr = decltype(nullptr);
+
+}
+
+/* char types */
+using Char    = char;
+using SChar   = signed   char;
+using UChar   = unsigned char;
+
+/* short types */
+using Short   = short;
+using SShort  = signed   short;
+using UShort  = unsigned short;
+
+/* int types */
+using Int     = int;
+using SInt    = signed   int;
+using UInt    = unsigned int;
+
+/* long types */
+using Long    = long;
+using SLong   = signed   long;
+using ULong   = unsigned long;
+
+/* long long types */
+using LLong   = long long;
+using SLLong  = signed   long long;
+using ULLong  = unsigned long long;
+
+/* float types */
+using Float   = float;
+using Double  = double;
+using LDouble = long double;
+
+/* boolean types */
+using Bool    = bool;
+
+
 
 template <decltype(sizeof(char)) N>
 using Unsigned =	Xf::conditional_t<(sizeof(unsigned char)      == N), unsigned char,
@@ -34,15 +72,41 @@ using Signed =		Xf::conditional_t<(sizeof(signed char)        == N), signed char
 					Xf::conditional_t<(sizeof(signed long long)   == N), signed long long,
 					void > > > > >;
 
+using SInt8  = Signed<1>;
 using UInt8  = Unsigned<1>;
+
+using SInt16 = Signed<2>;
 using UInt16 = Unsigned<2>;
+
+using SInt32 = Signed<4>;
 using UInt32 = Unsigned<4>;
+
+using SInt64 = Signed<8>;
 using UInt64 = Unsigned<8>;
 
-using SInt8  = Signed<1>;
-using SInt16 = Signed<2>;
-using SInt32 = Signed<4>;
-using SInt64 = Signed<8>;
+
+// get number of bytes for current architecture
+#define ARCH_BYTES (sizeof(void*))
+
+
+
+using SizeT = Unsigned<ARCH_BYTES>;
+
+
+
+
+// compile time get greatest integer type
+template <typename T, typename U>
+struct GetGreatestIntegerType {
+	using Type = Xf::conditional_t<(sizeof(T) > sizeof(U)), T, U>;
+};
+
+template <typename T, typename U>
+using GetGreatestIntegerType_t = typename GetGreatestIntegerType<T, U>::Type;
+
+
+
+
 
 using Size = UInt64;
 
