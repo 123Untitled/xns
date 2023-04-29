@@ -13,20 +13,25 @@
 
 namespace Xf {
 
+
 	// -- L I S T  C L A S S ----------------------------------------------------
 
-	template <typename T>
+	template <class T>
 	class List final {
 
 		public:
 
 			// -- A L I A S E S -----------------------------------------------
 
+
 			/* value type */
 			using Value = T;
 
+			/* self type */
+			using Self = List<Value>;
+
 			/* size type */
-			using Size = UInt64;
+			using Size = SizeT;
 
 			/* reference type */
 			using Reference = Value&;
@@ -55,7 +60,7 @@ namespace Xf {
 			: _head{nullptr}, _tail{nullptr}, _size{0} { }
 
 			/* copy constructor */
-			List(const List& other)
+			List(const Self& other)
 			// initializations
 			: List{} {
 				// assign other
@@ -63,7 +68,7 @@ namespace Xf {
 			}
 
 			/* move constructor */
-			List(List&& other) noexcept
+			List(Self&& other) noexcept
 			// initializations
 			: _head{other._head}, _tail{other._tail}, _size{other._size} {
 				// invalidate other list
