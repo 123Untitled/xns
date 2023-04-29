@@ -20,46 +20,78 @@
 
 namespace Xf {
 
+	struct Esctype_def {
 
-	// -- E N U M S -----------------------------------------------------------
-
-	enum class Esctype {
-
-		// -- M O V E ---------------------------------------------------------
-
-		MOVE_HOME, MOVE_LEFT, MOVE_RIGHT,
-
-		// -- E R A S E -------------------------------------------------------
-
-		ERASE_SCREEN, ERASE_LINE, ERASE_TO_END, ERASE_FROM_START,
-
-		// -- S C R E E N -----------------------------------------------------
-
-		ENTER_SCREEN, EXIT_SCREEN, SAVE_SCREEN, RESTORE_SCREEN,
-
-		// -- C O L O R -------------------------------------------------------
-
-		RESET_STYLE,
-
-		// -- C U R S O R -----------------------------------------------------
-
-		SHOW_CURSOR, HIDE_CURSOR, REQUEST_POSITION,
-
-		// -- C U R S O R  S T Y L E ------------------------------------------
-
-		CURSOR_BEAM, CURSOR_UNDERLINE, CURSOR_BLOCK,
-
-		// -- M A X -----------------------------------------------------------
-
-		ESCTYPE_MAX
+		enum Type : UInt {
+			/* move */
+			MOVE_HOME,
+			/* erase */
+			ERASE_SCREEN, ERASE_LINE, ERASE_TO_END, ERASE_FROM_START,
+			/* screen */
+			ENTER_SCREEN, EXIT_SCREEN, SAVE_SCREEN, RESTORE_SCREEN,
+			/* color */
+			RESET_STYLE,
+			/* cursor */
+			SHOW_CURSOR, HIDE_CURSOR, REQUEST_POSITION,
+			/* cursor style */
+			CURSOR_BEAM, CURSOR_UNDERLINE, CURSOR_BLOCK,
+			/* max */
+			ESCTYPE_MAX
+		};
 	};
+
+
+	/* safe enum class */
+	template <typename T>
+	class SafeEnum : public T {
+
+		private:
+			using Type = typename T::Type;
+			Type value;
+
+		public:
+			SafeEnum(const Type v) : value(v) { }
+			Type get(void) const { return value; }
+	};
+
+
+	// -- E S C A P E  T Y P E ------------------------------------------------
+
+	using Esctype = SafeEnum<Esctype_def>;
+
+
+
 
 
 	// -- E S C A P E  C L A S S ----------------------------------------------
 
 	class Escape final {
 
+
+		private:
+
+			// -- P R I V A T E  A L I A S E S --------------------------------
+
+
+			/* value type */
+			using Value = Xf::CString;
+
+			/* char type */
+			using CharT = Value::CharT;
+
+			/* reference type */
+			using Reference = Value&;
+
+			/* const reference type */
+			using ConstRef = const Value&;
+
+			/* array type */
+			using Array = Xf::Array<Value, IDX(Esctype::ESCTYPE_MAX)>;
+
+
+
 		public:
+
 
 			// -- P U B L I C  C O N S T R U C T O R S ------------------------
 
@@ -69,68 +101,64 @@ namespace Xf {
 
 			// -- P U B L I C  S T A T I C  M E T H O D S ---------------------
 
-			/* get escape sequence */
-			static const Xf::CString& get(const Esctype);
-
-
 			/* move home */
-			static void move_home(void);
+			static const Xf::CString& move_home(void);
 
 			/* move left */
-			static void move_left(void);
+			static const Xf::CString& move_left(void);
 
 			/* move right */
-			static void move_right(void);
+			static const Xf::CString& move_right(void);
 
 
 			/* erase screen */
-			static void erase_screen(void);
+			static const Xf::CString& erase_screen(void);
 
 			/* erase line */
-			static void erase_line(void);
+			static const Xf::CString& erase_line(void);
 
 			/* erase to end of line */
-			static void erase_to_end(void);
+			static const Xf::CString& erase_to_end(void);
 
 			/* erase from start of line */
-			static void erase_from_start(void);
+			static const Xf::CString& erase_from_start(void);
 
 
 			/* enter screen */
-			static void enter_screen(void);
+			static const Xf::CString& enter_screen(void);
 
 			/* exit screen */
-			static void exit_screen(void);
+			static const Xf::CString& exit_screen(void);
 
 			/* save screen */
-			static void save_screen(void);
+			static const Xf::CString& save_screen(void);
 
 			/* restore screen */
-			static void restore_screen(void);
+			static const Xf::CString& restore_screen(void);
 
 
 			/* reset style */
-			static void reset_style(void);
+			static const Xf::CString& reset_style(void);
 
 
 			/* show cursor */
-			static void show_cursor(void);
+			static const Xf::CString& show_cursor(void);
 
 			/* hide cursor */
-			static void hide_cursor(void);
+			static const Xf::CString& hide_cursor(void);
 
 			/* request position */
-			static void request_position(void);
+			static const Xf::CString& request_position(void);
 
 
 			/* cursor beam */
-			static void cursor_beam(void);
+			static const Xf::CString& cursor_beam(void);
 
 			/* cursor underline */
-			static void cursor_underline(void);
+			static const Xf::CString& cursor_underline(void);
 
 			/* cursor block */
-			static void cursor_block(void);
+			static const Xf::CString& cursor_block(void);
 
 
 
@@ -141,43 +169,42 @@ namespace Xf {
 
 
 			/* move position */
-			static void move_position(TSize, TSize);
-
-			/* get move position */
-			static Xf::CString get_move_position(TSize, TSize);
-
+			static Xf::CString move_position(TSize, TSize);
 
 			/* move x position */
-			static void move_x(TSize);
+			static const Xf::CString& move_x(TSize);
 
-			/* get move x position */
-			static const Xf::CString& get_move_x(TSize);
+			/* move left */
+			static Xf::CString move_left(const TSize);
 
+			/* move right */
+			static Xf::CString move_right(const TSize);
+
+			/* move up */
+			static Xf::CString move_up(const TSize);
+
+			/* move down */
+			static Xf::CString move_down(const TSize);
+
+		private:
+
+			/* move direction */
+			static Xf::CString _move_direction(TSize, const Char);
+
+
+		public:
 
 			/* hex color */
-			static void hex_color(const UInt32, const bool = true);
+			static Xf::CString hex_color(const UInt32, const bool = true);
 
 			/* rgb color */
-			static void rgb_color(UInt8, UInt8, UInt8, const bool = true);
-
-
-
-
-			/* get hex color */
-			static Xf::CString get_hex_color(const UInt32, const bool = true);
-
-			/* get rgb color */
-			static Xf::CString get_rgb_color(UInt8, UInt8, UInt8, const bool = true);
+			static Xf::CString rgb_color(UInt8, UInt8, UInt8, const bool = true);
 
 
 
 
 		private:
 
-			// -- P R I V A T E  A L I A S E S --------------------------------
-
-			/* array type */
-			using Array = Xf::Array<Xf::CString, IDX(Esctype::ESCTYPE_MAX)>;
 
 
 			// -- P R I V A T E  S T A T I C  M E M B E R S -------------------
@@ -190,91 +217,6 @@ namespace Xf {
 }
 
 
-
-
-			/* get escape sequence */
-			//template <is_escape_c E>
-			//static const Xf::String<char>& get(void) {
-			//	// return escape sequence
-			//	return _escapes[IDX(Esctype(E::type))];
-			//}
-
-			///* draw escape sequence */
-			//template <is_escape_c E>
-			//static void draw(void) {
-			//	// draw escape sequence
-			//	Buffer::draw(_escapes[IDX(E::type)].pointer(),
-			//			_escapes[IDX(E::type)].size());
-			//}
-
-			///* get special escape */
-			//template <is_dyn_escape_c E, typename... A>
-			//static
-			//Xf::String<char>
-			//get(A&&... arguments) {
-			//	if constexpr (Xf::is_same_v<E, move_position_t>) {
-			//		// move position
-			//		return _move_position(Xf::forward<A>(arguments)...);
-			//	}
-			//	else if constexpr (Xf::is_same_v<E, hex_color_t>) {
-			//		// hex color
-			//		return _hex_color(Xf::forward<A>(arguments)...);
-			//	}
-			//	else if constexpr (Xf::is_same_v<E, rgb_color_t>) {
-			//		// rgb color
-			//		return _rgb_color(Xf::forward<A>(arguments)...);
-			//	}
-			//	//return E::call(Xf::forward<A>(arguments)...);
-			//}
-
-			/////* draw special escape */
-			//template <is_dyn_escape_c E, typename... A>
-			//static void draw(A&&... arguments) {
-			//	Xf::String<char> esc;
-			//	if constexpr (Xf::is_same_v<E, move_position_t>) {
-			//		// move position
-			//		esc = _move_position(Xf::forward<A>(arguments)...);
-			//	}
-			//	else if constexpr (Xf::is_same_v<E, hex_color_t>) {
-			//		// hex color
-			//		esc = _hex_color(Xf::forward<A>(arguments)...);
-			//	}
-			//	else if constexpr (Xf::is_same_v<E, rgb_color_t>) {
-			//		// rgb color
-			//		esc = _rgb_color(Xf::forward<A>(arguments)...);
-			//	}
-			//	// get private escape sequence index
-			//	//esc = E::call(Xf::forward<A>(arguments)...);
-			//	Buffer::draw(esc.pointer(), esc.size());
-			//}
-
-			///* request cursor position */
-			//static bool request_position(UInt32& x, UInt32& y);
-
-
-//		private:
-//
-//
-//			/* hex color */
-//			static Xf::String<char> _hex_color(const UInt32 color, const bool fore = true);
-//
-//			/* color rgb */
-//			static Xf::String<char> _rgb_color(UInt8 r, UInt8 g, UInt8 b, const bool fore = true);
-//
-//			/* move position */
-//			static Xf::String<char> _move_position(UInt32 x, UInt32 y);
-//
-//
-//
-//
-//		public:
-//
-//
-//
-//	};
-//
-//
-//};
 
 
 

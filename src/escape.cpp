@@ -3,12 +3,9 @@
 #define ESC "\x1b"
 
 const Xf::Escape::Array Xf::Escape::_escapes = {
+
 	/* move home */
 	ESC"[H",
-	/* move left */
-	ESC"[1D",
-	/* move right */
-	ESC"[1C",
 
 	/* erase screen */
 	ESC"[2J",
@@ -49,108 +46,134 @@ const Xf::Escape::Array Xf::Escape::_escapes = {
 #undef ESC
 
 
-/* get escape sequence */
-const Xf::CString& Xf::Escape::get(const Esctype type) {
-	return _escapes[IDX(type) % IDX(Esctype::ESCTYPE_MAX)];
-}
-
 
 /* move home */
-void Xf::Escape::move_home(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::MOVE_HOME)]);
+const Xf::CString& Xf::Escape::move_home(void) {
+	// return escape sequence
+	return _escapes[Esctype::MOVE_HOME];
 }
 
-/* move left */
-void Xf::Escape::move_left(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::MOVE_LEFT)]);
-}
-
-/* move right */
-void Xf::Escape::move_right(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::MOVE_RIGHT)]);
-}
 
 
 /* erase screen */
-void Xf::Escape::erase_screen(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::ERASE_SCREEN)]);
+const Xf::CString& Xf::Escape::erase_screen(void) {
+	// return escape sequence
+	return _escapes[Esctype::ERASE_SCREEN];
 }
 
 /* erase line */
-void Xf::Escape::erase_line(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::ERASE_LINE)]);
+const Xf::CString& Xf::Escape::erase_line(void) {
+	// return escape sequence
+	return _escapes[Esctype::ERASE_LINE];
 }
 
 /* erase to end of line */
-void Xf::Escape::erase_to_end(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::ERASE_TO_END)]);
+const Xf::CString& Xf::Escape::erase_to_end(void) {
+	// return escape sequence
+	return _escapes[Esctype::ERASE_TO_END];
 }
 
 /* erase from start of line */
-void Xf::Escape::erase_from_start(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::ERASE_FROM_START)]);
+const Xf::CString& Xf::Escape::erase_from_start(void) {
+	// return escape sequence
+	return _escapes[Esctype::ERASE_FROM_START];
 }
 
 
 /* enter screen */
-void Xf::Escape::enter_screen(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::ENTER_SCREEN)]);
+const Xf::CString& Xf::Escape::enter_screen(void) {
+	// return escape sequence
+	return _escapes[Esctype::ENTER_SCREEN];
 }
 
 /* exit screen */
-void Xf::Escape::exit_screen(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::EXIT_SCREEN)]);
+const Xf::CString& Xf::Escape::exit_screen(void) {
+	// return escape sequence
+	return _escapes[Esctype::EXIT_SCREEN];
 }
 
 /* save screen */
-void Xf::Escape::save_screen(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::SAVE_SCREEN)]);
+const Xf::CString& Xf::Escape::save_screen(void) {
+	// return escape sequence
+	return _escapes[Esctype::SAVE_SCREEN];
 }
 
 /* restore screen */
-void Xf::Escape::restore_screen(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::RESTORE_SCREEN)]);
+const Xf::CString& Xf::Escape::restore_screen(void) {
+	// return escape sequence
+	return _escapes[Esctype::RESTORE_SCREEN];
 }
 
 
 /* reset style */
-void Xf::Escape::reset_style(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::RESET_STYLE)]);
+const Xf::CString& Xf::Escape::reset_style(void) {
+	// return escape sequence
+	return _escapes[Esctype::RESET_STYLE];
 }
 
 
 /* show cursor */
-void Xf::Escape::show_cursor(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::SHOW_CURSOR)]);
+const Xf::CString& Xf::Escape::show_cursor(void) {
+	// return escape sequence
+	return _escapes[Esctype::SHOW_CURSOR];
 }
 
 /* hide cursor */
-void Xf::Escape::hide_cursor(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::HIDE_CURSOR)]);
+const Xf::CString& Xf::Escape::hide_cursor(void) {
+	// return escape sequence
+	return _escapes[Esctype::HIDE_CURSOR];
 }
 
 /* request position */
-void Xf::Escape::request_position(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::REQUEST_POSITION)]);
+const Xf::CString& Xf::Escape::request_position(void) {
+	// return escape sequence
+	return _escapes[Esctype::REQUEST_POSITION];
 }
 
 
 /* cursor beam */
-void Xf::Escape::cursor_beam(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::CURSOR_BEAM)]);
+const Xf::CString& Xf::Escape::cursor_beam(void) {
+	// return escape sequence
+	return _escapes[Esctype::CURSOR_BEAM];
 }
 
 /* cursor underline */
-void Xf::Escape::cursor_underline(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::CURSOR_UNDERLINE)]);
+const Xf::CString& Xf::Escape::cursor_underline(void) {
+	// return escape sequence
+	return _escapes[Esctype::CURSOR_UNDERLINE];
 }
 
 /* cursor block */
-void Xf::Escape::cursor_block(void) {
-	Xf::Output::write(_escapes[IDX(Esctype::CURSOR_BLOCK)]);
+const Xf::CString& Xf::Escape::cursor_block(void) {
+	// return escape sequence
+	return _escapes[Esctype::CURSOR_BLOCK];
 }
 
 
+
+/* move left */
+Xf::CString Xf::Escape::move_left(const TSize cells) {
+	// return escape sequence
+	return _move_direction(cells, 'D');
+}
+
+/* move right */
+Xf::CString Xf::Escape::move_right(const TSize cells) {
+	// return escape sequence
+	return _move_direction(cells, 'C');
+}
+
+/* move up */
+Xf::CString Xf::Escape::move_up(const TSize cells) {
+	// return escape sequence
+	return _move_direction(cells, 'A');
+}
+
+/* move down */
+Xf::CString Xf::Escape::move_down(const TSize cells) {
+	// return escape sequence
+	return _move_direction(cells, 'B');
+}
 
 
 
@@ -204,16 +227,11 @@ bool Xf::Escape::request_position(TSize& x, TSize& y) {
 // -- M O V E -----------------------------------------------------------------
 
 
-/* move position */
-void Xf::Escape::move_position(TSize x, TSize y) {
-	Xf::Output::write(get_move_position(x, y));
-}
-
 /* get move position */
-Xf::CString Xf::Escape::get_move_position(TSize x, TSize y) {
+Xf::CString Xf::Escape::move_position(TSize x, TSize y) {
 	// ESC[{line};{column}H
 
-	UInt8  escape[ESCAPE_BUFFER_SIZE];
+	char  escape[ESCAPE_BUFFER_SIZE];
 	UInt32 ite;
 
 	constexpr const UInt32 max = Xf::max<TSize>();
@@ -241,17 +259,47 @@ Xf::CString Xf::Escape::get_move_position(TSize x, TSize y) {
 	escape[--ite] = '\x1b';
 
 	// append escape sequence to buffer
-	return Xf::CString((char*)&escape[ite], ESCAPE_BUFFER_SIZE - ite);
+	return Xf::CString(&escape[ite], ESCAPE_BUFFER_SIZE - ite);
 }
+
+
+
+/* move direction */
+Xf::CString Xf::Escape::_move_direction(TSize cells, const Char dir) {
+	// static returned string
+	//static Xf::CString escape;
+	// compile time buffer size
+	constexpr const SizeT size = 3 + Xf::max_digits<TSize>();
+
+	// buffer
+	Xf::CString::CharT buffer[size];
+
+	// init iterator to last index
+	SizeT i = size - 1;
+
+	// direction character
+	buffer[i] = dir;
+
+	// integer to ascii X pos
+	while (cells) {
+		buffer[--i] = ((cells % BASE) ^ ZERO_ASCII);
+		cells /= BASE;
+	}
+
+	// ctrl character
+	buffer[--i] = '[';
+	// escape character
+	buffer[--i] = '\x1b';
+
+	// append escape sequence to buffer
+	return Xf::CString(&buffer[i], size - i);
+}
+
+
 
 
 /* move x position */
-void Xf::Escape::move_x(TSize x) {
-	Xf::Output::write(get_move_x(x));
-}
-
-/* get move x position */
-const Xf::CString& Xf::Escape::get_move_x(TSize x) {
+const Xf::CString& Xf::Escape::move_x(TSize x) {
 
 	// static returned string
 	static Xf::CString escape;
@@ -294,19 +342,9 @@ const Xf::CString& Xf::Escape::get_move_x(TSize x) {
 
 // -- C O L O R ---------------------------------------------------------------
 
-/* hex color */
-void Xf::Escape::hex_color(const UInt32 color, const bool fore) {
-	Xf::Output::write(get_hex_color(color, fore));
-}
-
-/* rgb color */
-void Xf::Escape::rgb_color(UInt8 r, UInt8 g, UInt8 b, const bool fore) {
-	Xf::Output::write(get_rgb_color(r, g, b, fore));
-}
-
 
 /* hex color */
-Xf::CString Xf::Escape::get_hex_color(const UInt32 color, const bool fore) {
+Xf::CString Xf::Escape::hex_color(const UInt32 color, const bool fore) {
 
 	// declare bytes color
 	UInt8 r, g, b;
@@ -315,11 +353,11 @@ Xf::CString Xf::Escape::get_hex_color(const UInt32 color, const bool fore) {
 	g = (color >> 8)  & 0xFF;
 	b = (color)       & 0xFF;
 
-	return get_rgb_color(r, g, b, fore);
+	return rgb_color(r, g, b, fore);
 }
 
 /* color rgb */
-Xf::CString Xf::Escape::get_rgb_color(UInt8 r, UInt8 g, UInt8 b, const bool fore) {
+Xf::CString Xf::Escape::rgb_color(UInt8 r, UInt8 g, UInt8 b, const bool fore) {
 	// static 24bit color escape sequence
 	static UInt8	escape[] = {	'\x1b', '[',
 									' ', '8', ';', '2', ';',
@@ -461,13 +499,10 @@ Xf::CString Xf::Escape::get_rgb_color(UInt8 r, UInt8 g, UInt8 b, const bool fore
 
 
 
-// ESC[#A	moves cursor up # lines
-// ESC[#B	moves cursor down # lines
 
 // ESC[#E	moves cursor to beginning of next line, # lines down
 // ESC[#F	moves cursor to beginning of previous line, # lines up
 
-// ESC[#G	moves cursor to column #
 // ESC M	moves cursor one line up, scrolling if needed
 
 
