@@ -107,10 +107,10 @@ void Xf::Border::set(const Xf::Rect& rect, const Xf::Hexcolor color) {
 	Xf::Rect::Size h = rect.h;
 
 
-	_border.append(Escape::get_hex_color(color));
+	_border.append(Esc::hex_color(color));
 
 	// append move position top left corner
-	_border.append(Escape::get_move_position(x, y));
+	_border.append(Esc::move_position(x, y));
 	// append top left corner
 	_border.append(_symb[CORNER_TL], 3);
 	// append top border
@@ -122,7 +122,7 @@ void Xf::Border::set(const Xf::Rect& rect, const Xf::Hexcolor color) {
 
 	// append move position bottom left corner
 	//_border.append(Esc::get<Xf::move_position_t>(x, y + h - 1));
-	_border.append(Escape::get_move_position(x, y + h - 1));
+	_border.append(Esc::move_position(x, y + h - 1));
 
 	// append bottom left corner
 	_border.append(_symb[CORNER_BL], 3);
@@ -139,7 +139,7 @@ void Xf::Border::set(const Xf::Rect& rect, const Xf::Hexcolor color) {
 	for (Size i = y + 1; i < y_pos; ++i) {
 		// append move position left border
 		//_border.append(Esc::get<Xf::move_position_t>(x, i));
-		_border.append(Escape::get_move_position(x, i));
+		_border.append(Esc::move_position(x, i));
 		// append left vertical border
 		_border.append(_symb[LINE_V], 3);
 	}
@@ -149,12 +149,12 @@ void Xf::Border::set(const Xf::Rect& rect, const Xf::Hexcolor color) {
 	for (Size i = y + 1; i < y_pos; ++i) {
 		// append move position right border
 		//_border.append(Esc::get<Xf::move_position_t>(x_pos, i));
-		_border.append(Escape::get_move_position(x_pos, i));
+		_border.append(Esc::move_position(x_pos, i));
 		// append right vertical border
 		_border.append(_symb[LINE_V], 3);
 	}
 
-	_border.append(Escape::get(Xf::Esctype::RESET_STYLE));
+	_border.append(Esc::reset_style());
 }
 
 
