@@ -1,7 +1,7 @@
 #ifndef UTILITY_HEADER
 #define UTILITY_HEADER
 
-#include "remove_reference.hpp"
+#include "remove.hpp"
 
 
 // -- N A M E S P A C E -------------------------------------------------------
