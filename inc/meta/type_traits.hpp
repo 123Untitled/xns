@@ -9,9 +9,11 @@
 #include "is_integral.hpp"
 #include "is_lvalue_reference.hpp"
 #include "is_same.hpp"
+#include "is_void.hpp"
 
-#include "remove_cv.hpp"
-#include "remove_reference.hpp"
+#include "remove.hpp"
+
+#include "inheritance.hpp"
 
 #include "move.hpp"
 #include "forward.hpp"
