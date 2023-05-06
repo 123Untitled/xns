@@ -2,7 +2,7 @@
 
 #define ESC "\x1b"
 
-const Xf::Escape::Array Xf::Escape::_escapes = {
+const Xf::Escape::EscArray Xf::Escape::_escapes = {
 
 	/* move home */
 	ESC"[H",
