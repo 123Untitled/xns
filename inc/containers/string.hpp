@@ -25,32 +25,31 @@ class LString;
 namespace Xf {
 
 
+	// -- S T R I N G  C L A S S ----------------------------------------------
+
 	// forward declarations
-	template <is_char_c T>
+	template <Xf::is_char_c T>
 	class String;
 
 	/* c-string ascii type */
-	using CString = String<char>;
+	using CString   = String<char>;
 
 	/* wide string type */
-	using WString = String<wchar_t>;
+	using WString   = String<wchar_t>;
 
 	/* utf-8 string type */
-	using U8String = String<char8_t>;
+	using String8  = String<char8_t>;
 
 	/* utf-16 string type */
-	using U16String = String<char16_t>;
+	using String16 = String<char16_t>;
 
 	/* utf-32 string type */
-	using U32String = String<char32_t>;
+	using String32 = String<char32_t>;
 
 
-
-	// -- S T R I N G  C L A S S ----------------------------------------------
-
+	/* string class */
 	template <is_char_c T>
 	class String {
-
 
 		public:
 
@@ -202,11 +201,6 @@ namespace Xf {
 				}
 			}
 
-
-			// -- F R I E N D S ---------------------------------------------------
-
-			/* LString class */
-			friend class LString; // INFO: imcomplete type
 
 
 
@@ -1197,7 +1191,7 @@ namespace Xf {
 			// -- P U B L I C  S T A T I C  M E T H O D S ---------------------
 
 			/* get len */
-			static Size get_len(ConstPointer str) {
+			static constexpr Size get_len(ConstPointer str) {
 				// check if str is null
 				if (!str) { return 0; }
 				// loop through str
@@ -1295,6 +1289,310 @@ namespace Xf {
 
 
 	};
+
+
+
+
+	// -- S T A T I C  T E X T  C L A S S -------------------------------------
+
+	/* forward declaration */
+	template <Xf::is_char_c T, typename Xf::String<T>::Size N>
+	class StaticText;
+
+	/* c-string ascii type */
+	template <typename Xf::String<char>::Size N>
+	using CText = StaticText<char, N>;
+
+	/* wide string type */
+	template <typename Xf::String<wchar_t>::Size N>
+	using WText = StaticText<wchar_t, N>;
+
+	/* utf-8 string type */
+	template <typename Xf::String<char8_t>::Size N>
+	using Text8 = StaticText<char8_t, N>;
+
+	/* utf-16 string type */
+	template <typename Xf::String<char8_t>::Size N>
+	using Text16 = StaticText<char16_t, N>;
+
+	/* utf-32 string type */
+	template <typename Xf::String<char8_t>::Size N>
+	using Text32 = StaticText<char32_t, N>;
+
+
+	// -- D E D U C T I O N  G U I D E S --------------------------------------
+
+	/* null terminated string deduction guide */
+	template <typename T>
+	StaticText(const T* s)
+		-> StaticText<T, sizeof(s) - 1>;
+
+	/* null terminated string deduction guide */
+	/*template <typename T, typename Xf::String<T>::Size N>
+	StaticText(const T (&)[N])
+		-> StaticText<T, N>;*/
+
+	/* buffer string deduction guide */
+	template <typename T, typename Xf::String<T>::Size N>
+	StaticText(const T (&)[N], typename Xf::String<T>::Size)
+		-> StaticText<T, N - 1>;
+
+
+
+	/* copy constructor deduction guide */
+	//template <typename T, typename Xf::String<T>::Size N>
+	//StaticText(const StaticText<T, N>&)
+		//-> StaticText<T, N>;
+
+	/* default constructor deduction guide */
+	//StaticText(void) -> StaticText<char, 3>;
+
+
+
+	/* static text class */
+	template <Xf::is_char_c T, typename Xf::String<T>::Size N>
+	class StaticText {
+
+		public:
+
+			// -- A L I A S E S -----------------------------------------------
+
+			/* character type */
+			using CharT         = remove_cv_t<T>;
+
+			/* size type */
+			using Size          = typename Xf::String<CharT>::Size;
+
+			/* comparison type */
+			using Signed        = typename Xf::String<CharT>::Signed;
+
+			/* pointer type */
+			using Pointer       = typename Xf::String<CharT>::Pointer;
+
+			/* reference type */
+			using Reference     = typename Xf::String<CharT>::Reference;
+
+			/* move reference type */
+			using MoveReference = typename Xf::String<CharT>::MoveReference;
+
+			/* const reference type */
+			using ConstRef      = typename Xf::String<CharT>::ConstRef;
+
+			/* const pointer type */
+			using ConstPointer  = typename Xf::String<CharT>::ConstPointer;
+
+
+		private:
+
+			// -- M E M B E R S -----------------------------------------------
+
+			/* pointer */
+			CharT _str[N + 1];
+
+
+		public:
+
+			// -- C O N S T R U C T O R S -------------------------------------
+
+			/* default constructor */
+			consteval StaticText(void) noexcept {
+				// code here...
+				for (Size x = 0; x <= N; ++x) {
+					_str[x] = '\0';
+				}
+			}
+
+			/* null-terminated string constructor */ // INFO: this handle array
+			consteval StaticText(ConstPointer str) noexcept {
+
+				for (Size x = 0; x < N; ++x) {
+					_str[x] = str[x];
+				}
+				_str[N] = '\0';
+			}
+
+
+			/*
+			constexpr StaticText(const CharT str[N]) noexcept {
+
+				for (Size x = 0; x < N; ++x) {
+					_str[x] = str[x];
+				}
+				_str[N] = '\0';
+			}*/
+
+			/* buffer string constructor */
+			consteval StaticText(ConstPointer str, Size size) noexcept {
+
+				Size x = 0;
+				for (;x < size && x < N; ++x) {
+					_str[x] = str[x];
+				}
+				_str[x] = '\0';
+			}
+
+			/* fill constructor */
+			consteval StaticText(const CharT character, Size size) noexcept {
+
+				Size x = 0;
+				for (;x < size && x < N; ++x) {
+					_str[x] = character;
+				}
+				_str[x] = '\0';
+			}
+
+			/* copy constructor */
+			consteval StaticText(const StaticText& other) noexcept {
+
+				/*
+				for (Size x = 0; x < N; ++x) {
+					_str[x] = other._str[x];
+				}
+				_str[N] = '\0';
+				*/
+			}
+
+			/* move constructor */
+			consteval StaticText(StaticText&& other) noexcept {
+
+				/*
+				for (Size x = 0; x < N; ++x) {
+					_str[x] = other._str[x];
+				}
+				_str[N] = '\0';
+				*/
+			}
+
+
+			// -- S U B S C R I P T  O P E R A T O R S ------------------------
+
+			/* subscript operator */
+			consteval Reference operator[](const Size index) noexcept {
+				return _str[index];
+			}
+
+			/* const subscript operator */
+			consteval ConstRef operator[](const Size index) const noexcept {
+				return _str[index];
+			}
+
+
+			// -- A C C E S S O R S -------------------------------------------
+
+			/* empty */
+			consteval bool empty(void) const noexcept {
+				// return true if empty
+				return *_str == 0;
+			}
+
+			/* not empty */
+			consteval bool not_empty(void) const noexcept {
+				// return true if not empty
+				return *_str != 0;
+			}
+
+			/* length */
+			consteval Size length(void) const noexcept {
+				for (Size x = 0; x < N; ++x) {
+					if (_str[x] == '\0') {
+						return x;
+					}
+				} return N;
+			}
+
+			/* size */
+			consteval Size size(void) const noexcept {
+				// return size
+				return length();
+			}
+
+			/* capacity */
+			consteval Size capacity(void) const noexcept {
+				// return capacity
+				return N;
+			}
+
+			/* available */
+			consteval Size available(void) const noexcept {
+				// return available space
+				return N - length();
+			}
+
+			/* pointer */
+			consteval Pointer pointer(void) {
+				// return pointer to first element
+				return _str;
+			}
+
+			/* const pointer */
+			consteval ConstPointer pointer(void) const {
+				// return constant pointer to first element
+				return _str;
+			}
+
+
+			consteval void set_size(const Size size) noexcept {
+				if (size <= N) {
+					_str[size] = '\0';
+				}
+			}
+
+			consteval void reverse(void) noexcept {
+
+				Size x = 0;
+				Size y = length() - 1;
+
+				while (x < y) {
+					CharT temp = _str[x];
+					_str[x] = _str[y];
+					_str[y] = temp;
+					++x;
+					--y;
+				}
+			}
+
+			// -- S T A T I C  F U N C T I O N S ------------------------------
+
+
+
+
+	};
+
+	/* number to static text */
+	template <Xf::is_char_c C = char, Xf::integral_c T>
+	consteval auto to_text(const T number) {
+
+		// remove const and volatile
+		using Type = Xf::remove_cv_t<T>;
+
+		SizeT digits = Xf::static_digits<Xf::Dec, Type>(number);
+
+		Xf::StaticText<C, digits> text;
+
+		Type num = number;
+
+		SizeT x = 0;
+
+		do {
+			text[x] = number % 10 + '0';
+			number /= 10;
+			++x;
+		} while (number);
+
+		text.set_size(x);
+		text.reverse();
+
+		return text;
+	}
+
+	/* deduction guide */
+	//template <Xf::is_char_c C, Xf::integral_c T, T N>
+	//to_text(void) -> to_text<C, T, N>(void);
+
+
+
+
+
 
 
 
