@@ -11,19 +11,19 @@ namespace Xf {
 	// -- E N A B L E  I F ----------------------------------------------------
 
 	/* enable if */
-	template <bool B, typename T = void>
-	struct enable_if { /* empty */ };
+	template <bool B, class T>
+	struct enable_if;
 
 	/* enable if for true */
-	template <typename T>
+	template <class T>
 	struct enable_if<true, T> { using type = T; };
 
 	/* enable if for false */
-	template <typename T>
+	template <class T>
 	struct enable_if<false, T> { /* empty */ };
 
 	/* enable if type */
-	template <bool B, typename T = void>
+	template <bool B, class T>
 	using enable_if_t = typename enable_if<B, T>::type;
 
 
