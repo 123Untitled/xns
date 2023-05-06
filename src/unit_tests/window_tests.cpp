@@ -30,8 +30,8 @@ void UT::window_ut(void) {
 
 	auto mode = build_events();
 
-	WindowManager::new_root();
-	WindowManager::new_split<Xf::vsplit_t>();
+	//WindowManager::new_root();
+	//WindowManager::new_split<Xf::vsplit_t>();
 	//WindowManager win;
 
 	Xf::Input::start_loop();
