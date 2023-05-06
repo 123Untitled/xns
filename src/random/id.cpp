@@ -1,7 +1,7 @@
 #include "id.hpp"
 
 // alphabetic list combinaison (650)
-constinit Xf::Id::Array<Xf::Id::ALPHA_COMB> Xf::Id::_alpha = {
+constinit Xf::Id::IDArray<Xf::Id::ALPHA_COMB> Xf::Id::_alpha = {
 	"ab", "ac", "ad", "ae", "af", "ag", "ah", "ai", "aj", "ak", "al", "am", "an", "ao", "ap", "aq", "ar", "as", "at", "au", "av", "aw", "ax", "ay", "az",
 	"ba", "bc", "bd", "be", "bf", "bg", "bh", "bi", "bj", "bk", "bl", "bm", "bn", "bo", "bp", "bq", "br", "bs", "bt", "bu", "bv", "bw", "bx", "by", "bz",
 	"ca", "cb", "cd", "ce", "cf", "cg", "ch", "ci", "cj", "ck", "cl", "cm", "cn", "co", "cp", "cq", "cr", "cs", "ct", "cu", "cv", "cw", "cx", "cy", "cz",
@@ -32,7 +32,7 @@ constinit Xf::Id::Array<Xf::Id::ALPHA_COMB> Xf::Id::_alpha = {
 
 
 // numeric list combinaison (100)
-constinit Xf::Id::Array<Xf::Id::DIGIT_COMB> Xf::Id::_digit = {
+constinit Xf::Id::IDArray<Xf::Id::DIGIT_COMB> Xf::Id::_digit = {
 	"00", "01", "02", "03", "04", "05", "06", "07", "08", "09",
 	"10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
 	"20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
