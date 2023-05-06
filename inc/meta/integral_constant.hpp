@@ -29,6 +29,10 @@ namespace Xf {
 
 	};
 
+	/* bool constant */
+	template <bool B>
+	using bool_constant = integral_constant<bool, B>;
+
 
 	// -- T R U E  T Y P E -----------------------------------------------------
 
