@@ -56,6 +56,7 @@ namespace Xf {
 			static void render(const int = STDOUT_FILENO);
 
 
+
 		private:
 
 			// -- P R I V A T E  E N U M S ------------------------------------
