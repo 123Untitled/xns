@@ -88,10 +88,7 @@ namespace Xf {
 			// -- A L I A S E S -----------------------------------------------
 
 			/* symbol type */
-			using Symbol = Xf::Array<char8_t, 3>;
-
-			/* symbol array type */
-			using SymbolArray = Xf::Array<Symbol, BORDER_MAX>;
+			using Symbol = Xf::Array<const char*, BORDER_MAX>;
 
 			/* allocator type */
 			using Allocator = Xf::Allocator<char>;
@@ -103,11 +100,10 @@ namespace Xf {
 			Xf::CString _border;
 
 
-
 			// -- S T A T I C  M E M B E R S ----------------------------------
 
 			/* symbol array */
-			static constinit SymbolArray _symbols;
+			static constinit Symbol _symb;
 
 
 
