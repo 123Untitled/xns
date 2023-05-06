@@ -2,16 +2,7 @@
 #include "border.hpp"
 
 
-constinit Xf::Border::SymbolArray Xf::Border::_symbols = { {
-		{ 0xe2, 0x94, 0x80 },
-		{ 0xe2, 0x94, 0x82 },
-		{ 0xe2, 0x95, 0xad },
-		{ 0xe2, 0x95, 0xae },
-		{ 0xe2, 0x95, 0xb0 },
-		{ 0xe2, 0x95, 0xaf }
-} };
-
-constexpr const char* _symb[] = {
+constinit Xf::Border::Symbol Xf::Border::_symb = {
 	"\xe2\x94\x80",
 	"\xe2\x94\x82",
 	"\xe2\x95\xad",
@@ -19,6 +10,7 @@ constexpr const char* _symb[] = {
 	"\xe2\x95\xb0",
 	"\xe2\x95\xaf"
 };
+
 
 /* default constructor */
 Xf::Border::Border(void)
