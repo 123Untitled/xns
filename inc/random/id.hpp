@@ -44,13 +44,14 @@ namespace Xf {
 
 			/* array type */
 			template <UInt64 N>
-			using Array = Xf::Array<const Char*, N>;
+			using IDArray = Xf::Array<const Char*, N>;
+
 
 
 
 			// -- E N U M S ---------------------------------------------------
 
-			enum {
+			enum : UInt64 {
 				IDNBR      = 4,
 				ALPHA_COMB = 650,
 				DIGIT_COMB = 100
@@ -60,10 +61,10 @@ namespace Xf {
 			// -- M E M B E R S -----------------------------------------------
 
 			/* alpha combinations */
-			static constinit Array<ALPHA_COMB> _alpha;
+			static constinit IDArray<ALPHA_COMB> _alpha;
 
 			/* digit combinations */
-			static constinit Array<DIGIT_COMB> _digit;
+			static constinit IDArray<DIGIT_COMB> _digit;
 
 			/* alpha combinations */
 			//static constexpr Char* _alpha[ALPHA_COMB];
