@@ -3,7 +3,7 @@
 
 #include "types.hpp"
 #include "integral_constant.hpp"
-#include "remove_cv.hpp"
+#include "remove.hpp"
 
 
 // -- N A M E S P A C E -------------------------------------------------------
