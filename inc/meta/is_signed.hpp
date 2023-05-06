@@ -4,7 +4,7 @@
 #include "types.hpp"
 #include "integral_constant.hpp"
 #include "enable_if.hpp"
-#include "remove_cv.hpp"
+#include "remove.hpp"
 #include "is_integral.hpp"
 
 // -- N A M E S P A C E -------------------------------------------------------
@@ -27,8 +27,8 @@ namespace Xf {
 	concept is_signed_c = Xf::is_signed_v<T>;
 
 	/* enable for signed */
-	template <typename T>
-	using enable_if_signed = enable_if_t<is_signed<T>::value, T>;
+	//template <typename T>
+	//using enable_if_signed = enable_if_t<is_signed<T>::value, T>;
 
 
 	// -- I S  U N S I G N E D ------------------------------------------------
@@ -46,8 +46,8 @@ namespace Xf {
 	concept is_unsigned_c = Xf::is_unsigned_v<T>;
 
 	/* enable for unsigned */
-	template <class T>
-	using enable_if_unsigned = enable_if_t<is_unsigned<T>::value, T>;
+	//template <class T>
+	//using enable_if_unsigned = enable_if_t<is_unsigned<T>::value, T>;
 
 
 	// -- I S  I N T E G R A L  S I G N E D -----------------------------------
