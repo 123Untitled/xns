@@ -3,7 +3,8 @@
 
 #include "types.hpp"
 #include "integral_constant.hpp"
-#include "remove_cv.hpp"
+#include "remove.hpp"
+#include "enable_if.hpp"
 
 // -- N A M E S P A C E -------------------------------------------------------
 
@@ -82,7 +83,8 @@ namespace Xf {
 	template <class T>
 	concept integral_c = Xf::is_integral_v<T>;
 
-
+	template <auto N>
+	using Integral = Xf::enable_if_t<Xf::is_integral_v<decltype(N)>, decltype(N)>;
 
 }
 
