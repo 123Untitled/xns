@@ -54,10 +54,26 @@ namespace Xf {
 			Type get(void) const { return value; }
 	};
 
+		enum Esctype : SizeT {
+			/* move */
+			MOVE_HOME,
+			/* erase */
+			ERASE_SCREEN, ERASE_LINE, ERASE_TO_END, ERASE_FROM_START,
+			/* screen */
+			ENTER_SCREEN, EXIT_SCREEN, SAVE_SCREEN, RESTORE_SCREEN,
+			/* color */
+			RESET_STYLE,
+			/* cursor */
+			SHOW_CURSOR, HIDE_CURSOR, REQUEST_POSITION,
+			/* cursor style */
+			CURSOR_BEAM, CURSOR_UNDERLINE, CURSOR_BLOCK,
+			/* max */
+			ESCTYPE_MAX
+		};
 
 	// -- E S C A P E  T Y P E ------------------------------------------------
 
-	using Esctype = SafeEnum<Esctype_def>;
+	//using Esctype = SafeEnum<Esctype_def>;
 
 
 
@@ -86,7 +102,7 @@ namespace Xf {
 			using ConstRef = const Value&;
 
 			/* array type */
-			using Array = Xf::Array<Value, IDX(Esctype::ESCTYPE_MAX)>;
+			using EscArray = Xf::Array<Value, IDX(Esctype::ESCTYPE_MAX)>;
 
 
 
@@ -210,7 +226,7 @@ namespace Xf {
 			// -- P R I V A T E  S T A T I C  M E M B E R S -------------------
 
 			/* escape sequences */
-			static const Array _escapes;
+			static const EscArray _escapes;
 
 	};
 
