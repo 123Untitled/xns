@@ -2,6 +2,7 @@
 #define NUMERIC_LIMIT_HPP
 
 #include "type_traits.hpp"
+#include "base.hpp"
 #include <iostream>
 
 // -- N A M E S P A C E -------------------------------------------------------
@@ -12,7 +13,7 @@ namespace Xf {
 
 	/* max */
 	template <Xf::integral_c T>
-	constexpr T max(void) {
+	consteval auto max(void) {
 		// remove cv
 		using Type = Xf::remove_cv_t<T>;
 		// number of bits in type
@@ -29,8 +30,8 @@ namespace Xf {
 
 
 	/* min */
-	template <class T>
-	constexpr T min(void) {
+	template <Xf::integral_c T>
+	consteval auto min(void) {
 		// inverse all bits
 		return static_cast<T>(~max<T>());
 	}
@@ -38,8 +39,8 @@ namespace Xf {
 	// -- M A X  D I G I T S --------------------------------------------------
 
 	// max number of digits in a type (base 10)
-	template <class T>
-	constexpr T max_digits(void) {
+	template <Xf::integral_c T>
+	consteval T max_digits(void) {
 		// remove cv
 		using Type = Xf::remove_cv_t<T>;
 		// max value of type
@@ -55,18 +56,36 @@ namespace Xf {
 	}
 
 	// max number of digits in a type (base 10)
-	template <class T>
-	constexpr T min_digits(void) {
+	template <Xf::integral_c T>
+	consteval T min_digits(void) {
 		// remove cv
 		using Type = Xf::remove_cv_t<T>;
-		// max value of type
-		Type type_max = Xf::min<Type>();
+		// min value of type
+		Type type_min = Xf::min<Type>();
 		// number of digits
 		Type digits = 0;
 		do { // increment digits
 			++digits;
 			// divide max by 10
-		} while ((type_max /= 10));
+		} while ((type_min /= 10));
+		// return digits
+		return digits;
+	}
+
+
+
+	template <Xf::is_base_c B, Xf::integral_c T>
+	consteval SizeT static_digits(const T number) {
+		// remove const and volatile
+		using Type = Xf::remove_cv_t<T>;
+		// instance of new type
+		Type num = number;
+		// number of digits
+		SizeT digits = 0; // number < 0;
+		// increment digits
+		do { ++digits;
+			// divide num by base
+		} while ((num /= static_cast<Type>(B::base)));
 		// return digits
 		return digits;
 	}
