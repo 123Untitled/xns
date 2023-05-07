@@ -120,12 +120,6 @@ namespace Xf {
 			/* move home */
 			static const Xf::CString& move_home(void);
 
-			/* move left */
-			static const Xf::CString& move_left(void);
-
-			/* move right */
-			static const Xf::CString& move_right(void);
-
 
 			/* erase screen */
 			static const Xf::CString& erase_screen(void);
@@ -191,16 +185,16 @@ namespace Xf {
 			static const Xf::CString& move_x(TSize);
 
 			/* move left */
-			static Xf::CString move_left(const TSize);
+			static Xf::CString move_left(const TSize = 1);
 
 			/* move right */
-			static Xf::CString move_right(const TSize);
+			static Xf::CString move_right(const TSize = 1);
 
 			/* move up */
-			static Xf::CString move_up(const TSize);
+			static Xf::CString move_up(const TSize = 1);
 
 			/* move down */
-			static Xf::CString move_down(const TSize);
+			static Xf::CString move_down(const TSize = 1);
 
 		private:
 
