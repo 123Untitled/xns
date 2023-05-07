@@ -70,18 +70,23 @@ namespace Xf {
 			/* default constructor */
 			AutoPointer(void)
 			// initialize pointer
-			: _data(nullptr) {
+			: _data{nullptr} {
 				// code here...
 			}
 
 			/* copy constructor */
 			AutoPointer(const Self& other)
 			// allocate memory
-			: _data(Allocator::allocate()) {
-				// check allocation success
-				if (_data != nullptr) {
-					// construct object copy
-					Allocator::construct(_data, *other._data);
+			: AutoPointer{} {
+				// check other pointer validity
+				if (other._data != nullptr) {
+					// allocate memory
+					_data = Allocator::allocate();
+					// check allocation success
+					if (_data != nullptr) {
+						// construct object copy
+						Allocator::construct(_data, *other._data);
+					}
 				}
 			}
 
@@ -118,8 +123,10 @@ namespace Xf {
 					if (other._data != nullptr) {
 						// allocate memory
 						_data = Allocator::allocate();
-						// construct object by copy
-						Allocator::construct(_data, *other._data); }
+						// check allocation success
+						if (_data != nullptr) {
+							// construct object by copy
+							Allocator::construct(_data, *other._data); } }
 				} // return self reference
 				return *this;
 			}
@@ -258,6 +265,34 @@ namespace Xf {
 				// return pointer validity
 				return _data == nullptr;
 			}
+
+
+			// -- E Q U A L I T Y  O P E R A T O R S --------------------------
+
+			/* equality operator */
+			bool operator==(const Self& other) const {
+				// return pointer equality
+				return _data == other._data;
+			}
+
+			/* inequality operator */
+			bool operator!=(const Self& other) const {
+				// return pointer inequality
+				return _data != other._data;
+			}
+
+			/* nullptr equality operator */
+			bool operator==(Xf::Nullptr) const {
+				// return pointer validity
+				return _data == nullptr;
+			}
+
+			/* nullptr inequality operator */
+			bool operator!=(Xf::Nullptr) const {
+				// return pointer validity
+				return _data != nullptr;
+			}
+
 
 
 
