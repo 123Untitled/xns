@@ -15,7 +15,7 @@ namespace Xf {
 	// -- S H A R E D  P T R  C L A S S ---------------------------------------
 
 	template <class S, class... A>
-	concept not_self = (!Xf::is_same<Xf::remove_reference_t<A>, S>::value&& ...) || (sizeof...(A) > 1);
+	concept not_self = (!Xf::IsSame_s<Xf::remove_reference_t<A>, S>::value&& ...) || (sizeof...(A) > 1);
 
 	template <typename T>
 	class SharedPointer final {
