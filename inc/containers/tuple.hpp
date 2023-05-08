@@ -24,6 +24,10 @@ namespace Xf {
 	template <class... A>
 	class Tuple final {
 
+		/* check number of elements */
+		static_assert(sizeof...(A) > 1, "TUPLE MUST HAVE AT LEAST ONE ELEMENT");
+
+
 		public:
 
 			// -- P U B L I C  A L I A S E S ----------------------------------
@@ -58,14 +62,14 @@ namespace Xf {
 			struct TupleImpl;
 
 			/* specialization for index sequence */
-			template <size_t... IDX>
+			template <Size... IDX>
 			struct TupleImpl<Xf::IndexSeq<IDX...>> final : public Element<IDX, A>... {
 
 
 				// -- A L I A S E S -------------------------------------------
 
 				/* self type */
-				using Self = TupleImpl<Xf::IndexSeq<IDX...>>;
+				using SelfImpl = TupleImpl<Xf::IndexSeq<IDX...>>;
 
 
 				// -- C O N S T R U C T O R S ---------------------------------
@@ -78,21 +82,22 @@ namespace Xf {
 				}
 
 				/* variadic constructor */
-				TupleImpl(A&&... args)
+				template <class... U>
+				TupleImpl(U&&... args) requires (sizeof...(U) > 1)
 				// fold expression to initialize tuple elements
-				: Element<IDX, A>{Xf::forward<A>(args)}... {
+				: Element<IDX, A>{Xf::forward<U>(args)}... {
 					// code here...
 				}
 
 				/* copy constructor */
-				TupleImpl(const Self& other)
+				TupleImpl(const SelfImpl& other)
 				// fold expression to copy-initialize tuple elements
 				: Element<IDX, A>{other}... {
 					// code here...
 				}
 
 				/* move constructor */
-				TupleImpl(Self&& other) noexcept
+				TupleImpl(SelfImpl&& other) noexcept
 				// fold expression to move-initialize tuple elements
 				: Element<IDX, A>{Xf::move(other)}... {
 					// code here...
@@ -107,7 +112,7 @@ namespace Xf {
 				// -- A S S I G N M E N T  O P E R A T O R S ------------------
 
 				/* copy assignment operator */
-				Self& operator=(const Self& other) {
+				SelfImpl& operator=(const SelfImpl& other) {
 					// INFO: check for self-assignment is not necessary (see below)
 					// because this check is already done in the Tuple::operator=()
 					((Element<IDX, A>::operator=(other)), ...);
@@ -116,7 +121,7 @@ namespace Xf {
 				}
 
 				/* move assignment operator */
-				Self& operator=(Self&& other) noexcept {
+				SelfImpl& operator=(SelfImpl&& other) noexcept {
 					// INFO: check for self-assignment is not necessary (see below)
 					// because this check is already done in the Tuple::operator=()
 					((Element<IDX, A>::operator=(Xf::move(other))), ...);
@@ -146,7 +151,6 @@ namespace Xf {
 			Impl impl;
 
 
-
 		public:
 
 			/* default constructor */
@@ -156,8 +160,9 @@ namespace Xf {
 			}
 
 			/* variadic constructor */
-			Tuple(A&&... args)
-			: impl{Xf::forward<A>(args)...} {
+			template <class... U> requires (sizeof...(U) > 1)
+			Tuple(U&&... args)
+			: impl{Xf::forward<U>(args)...} {
 				// code here...
 			}
 
@@ -165,6 +170,14 @@ namespace Xf {
 			Tuple(const Self& tuple)
 			: impl{tuple.impl} {
 				// code here...
+			}
+
+			/* copy constructor static assert overload */
+			template <class... U>
+			Tuple(const Tuple<U...>&) {
+				// check if tuple types are the same
+				static_assert(IsSame<Xf::Pack<A...>, Xf::Pack<U...>>,
+							"TUPLE ARE NOT THE SAME !!!");
 			}
 
 			/* move constructor */
@@ -197,7 +210,7 @@ namespace Xf {
 			}
 
 
-
+			// -- P U B L I C  A C C E S S O R S ------------------------------
 
 			/* get tuple element */
 			template <Size IDX, class T = Indexed<IDX>>
@@ -212,6 +225,9 @@ namespace Xf {
 				// return a constant reference to the tuple element
 				return impl.Element<IDX, T>::value;
 			}
+
+
+
 
 
 			template <SizeT... IDX>
@@ -242,8 +258,15 @@ namespace Xf {
 
 
 
-
-
 }
 
 #endif
+
+
+
+
+
+
+
+
+
