@@ -1,9 +1,12 @@
 #ifndef TRIE_HEADER
 #define TRIE_HEADER
 
-#include "Types.hpp"
+#include "types.hpp"
 #include "vector.hpp"
 #include "pair.hpp"
+#include "tuple.hpp"
+#include "auto_pointer.hpp"
+#include "string.hpp"
 
 // -- N A M E S P A C E -------------------------------------------------------
 
@@ -11,7 +14,12 @@ namespace Xf {
 
 	// -- T R I E  C L A S S ----------------------------------------------------
 
-	template <typename K, typename V>
+	// this class implements a trie data structure
+	// WARNING: this class stores pointers in a ascii lookup table
+	// size of the lookup table is only printable ascii characters (95)
+	// class do not check if the key is a printable ascii character !
+
+	template <class T>
 	class Trie final {
 
 		public:
@@ -19,51 +27,84 @@ namespace Xf {
 			// -- A L I A S E S -----------------------------------------------
 
 			/* value type */
-			using Value = V;
-
-			/* value reference type */
-			using ValueRef = Value&;
-
-			/* value const reference type */
-			using ValueConstRef = const Value&;
-
-			/* value move reference type */
-			using ValueMoveRef = Value&&;
+			using Value = T;
 
 			/* value pointer type */
-			using ValuePointer = Value*;
-
-			/* value const pointer type */
-			using ValueConstPointer = const Value*;
-
-			/* key type */
-			using Key = K;
-
-			/* key reference type */
-			using KeyRef = Key&;
-
-			/* key const reference type */
-			using KeyConstRef = const Key&;
-
-			/* key move reference type */
-			using KeyMoveRef = Key&&;
-
-			/* key pointer type */
-			using KeyPointer = Key*;
-
-			/* key const pointer type */
-			using KeyConstPointer = const Key*;
+			using ValuePtr = Xf::AutoPointer<Value>;
 
 			/* size type */
-			using Size = UInt64;
+			using Size = SizeT;
 
+
+		private:
+
+
+			// -- P R I V A T E  E N U M S ------------------------------------
+
+			/* lookup table size */
+			enum : Size {
+				OFFSET = 32,
+				LOOKUP_SIZE = 95
+			};
+
+
+			/* forward declaration */
+			struct Node;
+
+
+			// -- P R I V A T E  A L I A S E S --------------------------------
+
+			/* children type */
+			using Childs = Xf::Array<Xf::AutoPointer<Node>, LOOKUP_SIZE>;
+
+
+
+			// -- N O D E  S T R U C T ----------------------------------------
+
+			struct Node final {
+
+				// -- M E M B E R S -------------------------------------------
+
+				/* childs */
+				Childs _childs;
+
+				/* value */
+				ValuePtr _value;
+
+
+				// -- C O N S T R U C T O R S ---------------------------------
+
+				/* default constructor */
+				Node(void)
+				: _childs{}, _value{} {
+					// code here...
+				}
+
+				/* value constructor */
+				Node(Value* value)
+				: _childs{}, _value{value} {
+					// code here...
+				}
+
+				/* destructor */
+				~Node(void) {
+					// code here...
+				}
+
+			};
+
+
+
+
+		public:
 
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* default constructor */
 			Trie(void)
-			// initializations
-			: _root{nullptr} { }
+			: _root{ } {
+				// code here...
+			}
 
 			/* destructor */
 			~Trie(void) {
@@ -73,72 +114,68 @@ namespace Xf {
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* insert */
-			void insert(KeyConstPointer key, Size size, ValueConstPointer value) {
+			void insert(const Xf::CString& str, const Value& value) {
+				// get root node
+				Node* node = &_root;
+				// loop through string
+				for (Xf::CString::Size x = 0; x < str.size(); ++x) {
+					// get character index
+					const Size index = to_index(str[x]);
+					// check indexed node validity
+					if (node->_childs.at(index) == nullptr) {
+						// make new node
+						node->_childs.at(index) = Xf::make_auto_pointer<Node>();
+					} // move to node
+					node = &(*node->_childs.at(index));
+				} // allocate value
+				node->_value = Xf::make_auto_pointer<Value>(value);
 			}
+
+			/* find */
+			Xf::AutoPointer<Value> find(const Xf::CString& str) {
+				// get root node
+				Node* node = &_root;
+				// loop through string
+				for (Xf::CString::Size x = 0; x < str.size(); ++x) {
+					// get character
+					const Size index = to_index(str[x]);
+
+					if (node->_childs.at(index) == nullptr) {
+						// return null pointer
+						return {};
+					}
+
+					// enter in node
+					node = &(*node->_childs.at(index));
+
+				}
+
+				// return value
+				return node->_value;
+
+			}
+
 
 		private:
 
-			// -- P R I V A T E  N E S T E D  C L A S S E S -------------------
+			// -- P R I V A T E  M E T H O D S --------------------------------
 
-			/* forward declaration */
-			class Node;
-
-
-			// -- P R I V A T E  A L I A S E S --------------------------------
-
-			/* node pointer type */
-			using NodePointer = Node*;
-
-			/* pair type */
-			using Pair = Xf::Pair<Key, NodePointer>;
-
-			/* children type */
-			using Children = Xf::Vector<Pair>;
+			/* to index */
+			template <class C>
+			Size to_index(const C c) const {
+				static_assert(sizeof(C) == 1, "C must be a char type");
+				return (static_cast<Size>(c)) - OFFSET;
+			}
 
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
 			/* root children */
-			Children _root;
-	};
-
-
-	// -- N O D E  P R I V A T E  N E S T E D  C L A S S ----------------------
-
-	template <typename K, typename V>
-	class Trie<K, V>::Node final {
-
-		public:
-
-			// -- C O N S T R U C T O R S -------------------------------------
-
-			/* default constructor */
-			Node(void)
-			// initializations
-			: _children{}, _value{nullptr} { }
-
-			/* value constructor */
-			Node(ValuePointer value)
-			// initializations
-			: _children{}, _value{value} { }
-
-			/* destructor */
-			~Node(void) {
-				// delete children
-			}
-
-
-			// -- P U B L I C  M E M B E R S ----------------------------------
-
-			/* children */
-			Children _children;
-
-			/* value pointer */
-			ValuePointer _value;
-
-
+			Node _root;
 
 	};
+
+
 
 };
 
