@@ -522,7 +522,7 @@ namespace Xf {
 				// minimum arguments needed
 				constexpr Size min = 2;
 				// check if all arguments are of type String
-				constexpr bool type = (Xf::is_same<Xf::remove_reference_t<A>, String<CharT>>::value&& ...);
+				constexpr bool type = (Xf::IsSame_s<Xf::remove_reference_t<A>, String<CharT>>::value&& ...);
 				// check if there are at least two arguments
 				constexpr bool required = sizeof...(A) >= min;
 				// return boolean
