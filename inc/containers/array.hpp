@@ -137,6 +137,17 @@ namespace Xf {
 				return _data[_subscript(std::forward<I>(indexs)...)];
 			}
 
+			/* at */
+			template <class... I>
+			Value& at(I&&... indexs) {
+				// check number of indices is valid
+				static_assert(sizeof...(I) == _ndim, "WRONG NUMBER OF INDICES");
+				// return reference to element indexed by linearized indices
+				return _data[_subscript(std::forward<I>(indexs)...)];
+			}
+
+
+
 			/* subscript operator */
 			//template <Xf::integral_c Index>
 			template <class Index>
@@ -156,6 +167,7 @@ namespace Xf {
 				// return reference to element
 				return _data[index];
 			}
+
 
 
 
