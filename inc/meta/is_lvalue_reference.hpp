@@ -8,27 +8,23 @@
 
 namespace Xf {
 
-	// -- I S  L V A L U E  R E F E R E N C E ------------------------------------
+	// -- I S  L V A L U E  R E F E R E N C E ---------------------------------
 
 	/* is lvalue reference */
 	template <class T>
-	struct is_lvalue_reference : false_t {};
+	struct Is_lvalue_s : Xf::false_t {};
 
 	/* is lvalue reference for lvalue reference */
 	template <class T>
-	struct is_lvalue_reference<T&> : true_t {};
-
-	/* is lvalue reference type */
-	template <class T>
-	using is_lvalue_reference_t = typename is_lvalue_reference<T>::type;
+	struct Is_lvalue_s<T&> : Xf::true_t {};
 
 	/* is lvalue reference value */
 	template <class T>
-	static constexpr bool is_lvalue_reference_v = is_lvalue_reference<T>::value;
+	static constexpr bool is_lvalue_v = Is_lvalue_s<T>::value;
 
 	/* is lvalue reference concept */
 	template <class T>
-	concept is_lvalue_reference_c = is_lvalue_reference_v<T>;
+	concept LeftValue = is_lvalue_v<T>;
 
 }
 
