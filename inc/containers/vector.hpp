@@ -148,6 +148,18 @@ namespace Xf {
 				return _vector[index];
 			}
 
+			/* at */
+			Reference at(const Size index) {
+				// return reference
+				return _vector[index];
+			}
+
+			/* const at */
+			ConstReference at(const Size index) const {
+				// return reference
+				return _vector[index];
+			}
+
 
 			// -- E L E M E N T  A C C E S S ----------------------------------
 
