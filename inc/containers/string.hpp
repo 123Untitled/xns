@@ -48,7 +48,7 @@ namespace Xf {
 
 
 	/* string class */
-	template <is_char_c T>
+	template <Xf::is_char_c T>
 	class String {
 
 		public:
@@ -1590,14 +1590,153 @@ namespace Xf {
 	//to_text(void) -> to_text<C, T, N>(void);
 
 
+	// -- S C R O L L A B L E  S T R I N G ------------------------------------
+
+	// class to encapsulate a string used for being displayed on a screen
+	// in a scrollable view
+
+	template <Xf::is_char_c T>
+	class ScrollString {
+
+		private:
+
+			// -- M E M B E R S -----------------------------------------------
+
+			/* string */
+			Xf::String<T> _str;
+
+			/* view size */
+			Size _view_size; // size of view
+
+			/* start position */
+			Size _view_start; // offset from start of string
+
+			/* view position */
+			Size _cursor_pos; // position in string
+
+			/* view position */
+			Size _view_pos; // position in view
+
+
+
+		public:
+
+			// -- P U B L I C  C O N S T R U C T O R S ------------------------
+
+			/* default constructor */
+			ScrollString(void) noexcept
+			: _str(), _view_size(0), _view_start(0), _cursor_pos(0), _view_pos(0) {}
+
+			/* destructor */
+			~ScrollString(void) noexcept = default;
+
+
+			// -- P U B L I C  S E T T E R S ----------------------------------
+
+			/* set view size */
+			void set_view_size(const Size view_size) noexcept {
+				_view_size = view_size;
+			}
 
 
 
 
+
+			// -- P U B L I C  M O D I F I E R S ------------------------------
+
+			/* insert */
+			void insert(const Xf::String<T> input) {
+				_str.insert(_cursor_pos, input);
+				_cursor_pos += input.length();
+				_compute_move();
+			}
+
+
+			/* move left */
+			void move_left(void) {
+				// check if cursor is not at start
+				if (_cursor_pos > 0) {
+					// decrement cursor position
+					--_cursor_pos;
+					_compute_move();
+				}
+
+			}
+
+			/* move right */
+			void move_right(void) {
+				// check if cursor is not at end
+				if (_cursor_pos < _str.length()) {
+					// increment cursor position
+					++_cursor_pos;
+					_compute_move();
+				}
+			}
+
+
+
+			// -- P U B L I C  A C C E S S O R S ------------------------------
+
+			/* const pointer */
+			typename Xf::String<T>::ConstPointer view_pointer(void) const {
+				// return constant pointer to first display element
+				return _str.pointer() + _view_start;
+			}
+
+			/* view size */
+			Size view_size(void) const {
+				// check if string is smaller than view size
+				if (_str.length() < _view_size) {
+					// return string length
+					return _str.length();
+				} // else return view size
+				return _view_size;
+			}
+
+			/* get cursor position */
+			Size cursor_position(void) const {
+				return _view_pos;
+			}
+
+
+		private:
+
+			// -- P R I V A T E  M E T H O D S --------------------------------
+
+			/* ajust after move */
+			// implement scrolloff like in vim
+			// let cursor be at the middle of the view
+			void _compute_move(void) {
+				// check if cursor is before view
+				if (_cursor_pos < _view_start) {
+					// move view start to cursor
+					_view_start = _cursor_pos;
+				}
+				else if (_cursor_pos >= _view_start + _view_size) {
+					// move view start to cursor
+					_view_start = _cursor_pos - _view_size + 1;
+				}
+
+				// compute view position
+				_view_pos = _cursor_pos - _view_start;
+			}
+
+
+
+
+
+	};
 
 
 
 };
+
+
+
+
+
+
+
 
 
 #endif
