@@ -1612,10 +1612,13 @@ namespace Xf {
 			Size _view_start; // offset from start of string
 
 			/* view position */
-			Size _cursor_pos; // position in string
+			Size _string_cursor; // position in string
 
 			/* view position */
-			Size _view_pos; // position in view
+			Size _screen_cursor; // position in view
+
+			/* scroll offset */
+			Size _scrolloff; // vim-like scroll offset (half of view size)
 
 
 
@@ -1625,7 +1628,9 @@ namespace Xf {
 
 			/* default constructor */
 			ScrollString(void) noexcept
-			: _str(), _view_size(0), _view_start(0), _cursor_pos(0), _view_pos(0) {}
+			: _str{ }, _view_size{0}, _view_start{0}, _string_cursor{0}, _screen_cursor{0} {
+				// code here...
+			}
 
 			/* destructor */
 			~ScrollString(void) noexcept = default;
@@ -1634,8 +1639,9 @@ namespace Xf {
 			// -- P U B L I C  S E T T E R S ----------------------------------
 
 			/* set view size */
-			void set_view_size(const Size view_size) noexcept {
-				_view_size = view_size;
+			void set_view_width(const Size width) noexcept {
+				// set view size and scroll offset (half of view size)
+				_scrolloff = (_view_size = width) / 2;
 			}
 
 
@@ -1646,31 +1652,59 @@ namespace Xf {
 
 			/* insert */
 			void insert(const Xf::String<T> input) {
-				_str.insert(_cursor_pos, input);
-				_cursor_pos += input.length();
-				_compute_move();
+				_str.insert(_string_cursor, input);
+				_string_cursor += input.length();
+				_compute();
+			}
+
+			/* backspace */
+			void backspace(void) {
+				// check if cursor is not at start
+				if (_string_cursor > 0) {
+					// decrement cursor position
+					//--_string_cursor;
+					_str.erase(--_string_cursor);
+					_compute();
+				}
+			}
+
+			/* erase */
+			void erase(void) {
+				// check if cursor is not at end
+				if (_str.not_empty()) {
+					// erase character
+					_str.erase(_string_cursor);
+					_compute();
+				}
 			}
 
 
 			/* move left */
-			void move_left(void) {
+			bool move_left(void) {
 				// check if cursor is not at start
-				if (_cursor_pos > 0) {
+				if (_string_cursor > 0) {
 					// decrement cursor position
-					--_cursor_pos;
-					_compute_move();
-				}
-
+					--_string_cursor;
+					// compute view
+					_compute();
+					// return true
+					return true;
+				} // return false
+				return false;
 			}
 
 			/* move right */
-			void move_right(void) {
+			bool move_right(void) {
 				// check if cursor is not at end
-				if (_cursor_pos < _str.length()) {
+				if (_string_cursor < _str.length()) {
 					// increment cursor position
-					++_cursor_pos;
-					_compute_move();
-				}
+					++_string_cursor;
+					// compute view
+					_compute();
+					// return true
+					return true;
+				} // return false
+				return false;
 			}
 
 
@@ -1693,9 +1727,16 @@ namespace Xf {
 				return _view_size;
 			}
 
-			/* get cursor position */
+			/* get screen cursor position */
 			Size cursor_position(void) const {
-				return _view_pos;
+				// return screen cursor position
+				return _screen_cursor;
+			}
+
+			/* get string */
+			const Xf::String<T>& string(void) const {
+				// return string
+				return _str;
 			}
 
 
@@ -1706,19 +1747,88 @@ namespace Xf {
 			/* ajust after move */
 			// implement scrolloff like in vim
 			// let cursor be at the middle of the view
-			void _compute_move(void) {
-				// check if cursor is before view
-				if (_cursor_pos < _view_start) {
-					// move view start to cursor
-					_view_start = _cursor_pos;
+
+			void _compute(void) {
+
+
+				// VERSION: LOCKED ON RIGHT
+
+				/*
+				if (_str.length() < _view_size) {
+					_view_start = 0;
+					_screen_cursor = _string_cursor;
+					return;
 				}
-				else if (_cursor_pos >= _view_start + _view_size) {
+				else {
+					if (_string_cursor >= _view_size) {
+						_view_start = _string_cursor - _view_size;
+						_screen_cursor = _view_size;
+					}
+					else {
+						_view_start = 0;
+						_screen_cursor = _string_cursor;
+					}
+					return;
+
+				}
+				return;
+
+
+				// VERSION: NO SCROLLOFF
+
+				// check if cursor is before view
+				if (_string_cursor < _view_start) {
 					// move view start to cursor
-					_view_start = _cursor_pos - _view_size + 1;
+					_view_start = _string_cursor;
+				}
+
+				else if (_string_cursor >= _view_start + _view_size) {
+					// move view start to cursor
+					_view_start = _string_cursor - _view_size;
 				}
 
 				// compute view position
-				_view_pos = _cursor_pos - _view_start;
+				_screen_cursor = _string_cursor - _view_start;
+
+
+				return;
+
+				*/
+
+
+				// VERSION: SCROLLOFF
+
+				// If string_cursor is closer to the start of the string than the scrolloff
+				if (_string_cursor < _scrolloff) {
+					_view_start = 0;
+				}
+
+				// string_cursor is closer to the end than the scrolloff
+				else if (_string_cursor > _str.length() - _scrolloff) {
+					_view_start = _str.length() - _view_size;
+					if (_view_start < 0) {
+						_view_start = 0;
+					}
+				}
+
+				// string_cursor is somewhere in the middle
+				else {
+					_view_start = _string_cursor - _scrolloff;
+				}
+
+
+				// If the string is shorter than the view
+				if (_str.length() < _view_size) {
+					// Start the view at the beginning
+					_view_start = 0;
+					// And position the cursor relative to the start of the string
+					_screen_cursor = _string_cursor;
+				}
+				else {
+					// Otherwise compute screen cursor position normally
+					_screen_cursor = _string_cursor - _view_start;
+				}
+
 			}
 
 
