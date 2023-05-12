@@ -43,6 +43,7 @@
 #include "unique.hpp"
 #include "shared_ptr.hpp"
 #include "auto_pointer.hpp"
+#include "weak_pointer.hpp"
 
 /* event */
 #include "input.hpp"
