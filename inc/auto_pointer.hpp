@@ -8,6 +8,8 @@
 
 #include <iostream>
 
+
+
 /* namespace name idea */
 namespace OWN { }
 
@@ -16,12 +18,19 @@ namespace OWN { }
 
 namespace Xf {
 
+	/* WeakPointer forward declaration */
+	template <class T>
+	class WeakPointer;
+
 	// -- P O I N T E R  C L A S S --------------------------------------------
 
 	template <class T>
 	class AutoPointer final {
 
 		public:
+
+			template <class U>
+			friend class WeakPointer;
 
 			// -- P U B L I C  A L I A S E S ----------------------------------
 
@@ -68,7 +77,7 @@ namespace Xf {
 			// -- P U B L I C  C O N S T R U C T O R S ------------------------
 
 			/* default constructor */
-			AutoPointer(void)
+			AutoPointer(void) noexcept
 			// initialize pointer
 			: _data{nullptr} {
 				// code here...
@@ -176,52 +185,6 @@ namespace Xf {
 			Self& operator=(Xf::Nullptr) {
 				// return nullptr assignment
 				return assign(nullptr);
-			}
-
-
-			/* copy assignment operator */
-			Self& operator<<(const Self& other) {
-				// return copy assignment
-				return assign(other);
-			}
-
-			/* move assignment operator */
-			template <class D>
-			Self& operator<<(AutoPointer<D>&& other)
-			// requires derived or self type
-			requires (Xf::is_base_of_c<T, D>) {
-				// return move assignment
-				return assign(Xf::move(other));
-			}
-
-			/* nullptr assignment operator */
-			Self& operator<<(Xf::Nullptr) {
-				// return nullptr assignment
-				return assign(nullptr);
-			}
-
-
-			/* copy assignment operator */
-			Self& operator>>(Self& other) {
-				// return copy assignment
-				return other.assign(*this);
-			}
-
-			/* move assignment operator */
-			template <class D>
-			Self& operator>>(AutoPointer<D>& other)
-			// requires derived or self type
-			requires (Xf::is_base_of_c<T, D>) {
-				// return move assignment
-				return other.assign(Xf::move(*this));
-			}
-
-			/* nullptr assignment operator */
-			Self& operator>>(Xf::Nullptr) {
-				// clean up
-				_clean();
-				// return self reference
-				return *this;
 			}
 
 
