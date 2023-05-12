@@ -42,6 +42,11 @@ void func1(A&&... args) {
 
 int main(int ac, char** av) {
 
+
+	Xf::AutoPointer<int> ap;
+	Xf::WeakPointer<int> wp{ap};
+
+
 	const volatile int n = 10;
 	float f = 10.0f;
 
