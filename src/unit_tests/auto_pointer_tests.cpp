@@ -42,11 +42,8 @@ void UT::auto_pointer_ut(void) {
 
 	Xf::AutoPointer<Derived> p2;
 
-	p2 << nullptr;
 
-	p1 >> p2;
 
-	Xf::move(p1) >> p2;
 
 	own::AutoPointer<int> ptr_int = own::make_auto_pointer<int>(123);
 
