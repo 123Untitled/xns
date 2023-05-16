@@ -304,8 +304,20 @@ namespace Xf {
 				++_size;
 			}
 
-			/* move push back */
+			/* move push back */ // WARNING: this will be deprecated
 			void push_back(Value&& value) {
+				// check capacity
+				if (!available()) {
+					// double capacity
+					reserve(grow());
+				} // construct element
+				Allocator::construct(_vector + _size, Xf::move(value));
+				// increment size
+				++_size;
+			}
+
+			/* move back */ // INFO: this is preferred over move push back
+			void move_back(Value&& value) {
 				// check capacity
 				if (!available()) {
 					// double capacity
