@@ -73,23 +73,35 @@ Xf::UniquePointer<B> f() {
 
 int main(int ac, char** av) {
 
-
-	using Proto = Xf::PolyMethod<Xf::UniquePointer<B>(void)>;
-
-	Xf::PolyMethod<Xf::UniquePointer<B>(void)> pm{f};
-
-	invoke<Proto>(pm);
+	//using Proto = Xf::PolyMethod<Xf::UniquePointer<B>(void)>;
+	//Xf::PolyMethod<Xf::UniquePointer<B>(void)> pm{f};
+	//invoke<Proto>(pm);
 
 
 
-	Xf::Trie<B> trie;
+	Xf::Trie<Xf::CString> trie;
 
-	trie.insert("hello", D1{});
-	//Xf::Trie<Proto> trie3;
+	Xf::Vector<Xf::CString> v;
 
-	//trie3.insert("hello", []() -> Xf::AutoPointer<B> {
-	//	return Xf::AutoPointer<D1>{};
-	//});
+	v.emplace_back("cd");
+	v.emplace_back("go");
+	v.emplace_back("move");
+
+	trie.insert(v, "!!!");
+
+	for (Xf::Vector<Xf::CString>::Size x = 0; x < v.size(); ++x) {
+		auto weak = trie.find(v[x]);
+		if (weak != nullptr) {
+			std::cout.write(weak->pointer(), weak->size()) << std::endl;
+			std::cout << (Size)weak->pointer() << std::endl;
+		}
+		else {
+			std::cout << "not found" << std::endl;
+		}
+	}
+
+	return EXIT_SUCCESS;
+
 
 
 
@@ -105,8 +117,8 @@ int main(int ac, char** av) {
 
 	Xf::Trie<std::string> trie2;
 	Xf::CString str = "hello";
-	trie2.insert(str, "world");
-	trie2.insert(str, "world2");
+	//trie2.insert(str, "world");
+	//trie2.insert(str, "world2");
 
 	//Xf::AutoPointer<std::string> p = trie.find(Xf::CString{"hello"});
 
@@ -120,9 +132,9 @@ int main(int ac, char** av) {
 		std::cout << "not found" << std::endl;
 	}*/
 
-    Xf::Vector<Xf::Tuple<int, float>> v;
+    //Xf::Vector<Xf::Tuple<int, float>> v;
 
-    v.emplace_back(2, 2.2f);
+    //v.emplace_back(2, 2.2f);
 
 	//char c = 'a';
 	//int n = 10;
