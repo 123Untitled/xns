@@ -3,6 +3,7 @@
 
 #include "types.hpp"
 #include "allocator.hpp"
+#include "inheritance.hpp"
 
 
 
@@ -19,7 +20,13 @@ namespace Xf {
 	template <class T>
 	class WeakPointer final {
 
+
 		public:
+
+			// -- F R I E N D S -----------------------------------------------
+
+			template <class U>
+			friend class WeakPointer;
 
 			// -- P U B L I C  A L I A S E S ----------------------------------
 
@@ -56,6 +63,12 @@ namespace Xf {
 				// code here...
 			}
 
+			/* nullptr constructor */
+			WeakPointer(Xf::Nullptr) noexcept
+			: _data{nullptr} {
+				// code here...
+			}
+
 			/* pointer constructor */
 			WeakPointer(Pointer ptr) noexcept
 			: _data{ptr} {
@@ -63,7 +76,9 @@ namespace Xf {
 			}
 
 			/* auto pointer constructor */
-			WeakPointer(const Xf::AutoPointer<Value>& ptr) noexcept
+			template <class D>
+			WeakPointer(const Xf::AutoPointer<D>& ptr) noexcept
+			requires (Xf::is_base_of_c<T, D>)
 			: _data{ptr._data} {
 				// code here...
 			}
@@ -74,8 +89,18 @@ namespace Xf {
 				// code here...
 			}
 
+			/* derived copy constructor */
+			template <class D>
+			WeakPointer(const WeakPointer<D>& other) noexcept
+			requires (Xf::is_base_of_c<T, D>)
+			: _data{other._data} {
+				// code here...
+			}
+
 			/* move constructor */
-			WeakPointer(Self&& other) noexcept
+			template <class D>
+			WeakPointer(WeakPointer<D>&& other) noexcept
+			requires (Xf::is_base_of_c<T, D>)
 			: _data{other._data} {
 				// invalidate other
 				other._data = nullptr;
@@ -99,8 +124,20 @@ namespace Xf {
 				return *this;
 			}
 
+			/* derived copy assignment */
+			template <class D>
+			Self& assign(const WeakPointer<D>& other) noexcept
+			requires (Xf::is_base_of_c<T, D>) {
+				// INFO: no need to check for self assignment
+				// assign other data
+				_data = other._data;
+				// return self reference
+				return *this;
+			}
+
 			/* move assignment */
-			Self& assign(Self&& other) noexcept {
+			template <class D>
+			Self& assign(WeakPointer<D>&& other) noexcept requires (Xf::is_base_of_c<T, D>) {
 				// check for self assignment
 				if (this != &other) {
 					// assign other data
@@ -120,7 +157,9 @@ namespace Xf {
 			}
 
 			/* auto pointer assignment */
-			Self& assign(const Xf::AutoPointer<Value>& ptr) noexcept {
+			template <class D>
+			Self& assign(const Xf::AutoPointer<D>& ptr) noexcept
+			requires (Xf::is_base_of_c<T, D>) {
 				// assign pointer
 				_data = ptr._data;
 				// return self reference
@@ -140,6 +179,14 @@ namespace Xf {
 
 			/* copy assignment operator */
 			Self& operator=(const Self& other) noexcept {
+				// assign other
+				return assign(other);
+			}
+
+			/* derived copy assignment operator */
+			template <class D>
+			Self& operator=(const WeakPointer<D>& other) noexcept
+			requires (Xf::is_base_of_c<T, D>) {
 				// assign other
 				return assign(other);
 			}
