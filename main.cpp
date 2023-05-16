@@ -59,10 +59,11 @@ int main(int ac, char** av) {
 
 	Xf::Trie<std::string> trie;
 	Xf::CString str = "hello";
-	trie.insert(str, "world");
-	trie.insert(str, "world2");
+	//trie.insert<>(str, "world");
+	//trie.insert(str, "world2");
 
 	Xf::AutoPointer<std::string> p = trie.find(Xf::CString{"hello"});
+
 
 	std::cout << "check" << std::endl;
 	if (p != nullptr) {
