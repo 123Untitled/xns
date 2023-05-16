@@ -90,21 +90,24 @@ namespace Xf {
 				// code here...
 			}
 
+			/* non-copyable class */
+			NON_COPYABLE(AutoPointer);
+
 			/* copy constructor */
-			AutoPointer(const Self& other)
-			// allocate memory
-			: AutoPointer{} {
-				// check other pointer validity
-				if (other._data != nullptr) {
-					// allocate memory
-					_data = Allocator::allocate();
-					// check allocation success
-					if (_data != nullptr) {
-						// construct object copy
-						Allocator::construct(_data, *other._data);
-					}
-				}
-			}
+			//AutoPointer(const Self& other)
+			//// allocate memory
+			//: AutoPointer{} {
+			//	// check other pointer validity
+			//	if (other._data != nullptr) {
+			//		// allocate memory
+			//		_data = Allocator::allocate();
+			//		// check allocation success
+			//		if (_data != nullptr) {
+			//			// construct object copy
+			//			Allocator::construct(_data, *other._data);
+			//		}
+			//	}
+			//}
 
 			/* move constructor for derived types */
 			template <class D>
@@ -130,22 +133,22 @@ namespace Xf {
 			// -- A S S I G N -------------------------------------------------
 
 			/* copy assignment */
-			Self& assign(const Self& other) {
-				// check for self assignment
-				if (this != &other) {
-					// clean up
-					_clean();
-					// check other pointer validity
-					if (other._data != nullptr) {
-						// allocate memory
-						_data = Allocator::allocate();
-						// check allocation success
-						if (_data != nullptr) {
-							// construct object by copy
-							Allocator::construct(_data, *other._data); } }
-				} // return self reference
-				return *this;
-			}
+			//Self& assign(const Self& other) {
+			//	// check for self assignment
+			//	if (this != &other) {
+			//		// clean up
+			//		_clean();
+			//		// check other pointer validity
+			//		if (other._data != nullptr) {
+			//			// allocate memory
+			//			_data = Allocator::allocate();
+			//			// check allocation success
+			//			if (_data != nullptr) {
+			//				// construct object by copy
+			//				Allocator::construct(_data, *other._data); } }
+			//	} // return self reference
+			//	return *this;
+			//}
 
 			/* move assignment for derived types */
 			template <class D>
@@ -174,10 +177,10 @@ namespace Xf {
 			// -- A S S I G N M E N T  O P E R A T O R S ----------------------
 
 			/* copy assignment operator */
-			Self& operator=(const Self& other) {
+			//Self& operator=(const Self& other) {
 				// return copy assignment
-				return assign(other);
-			}
+			//	return assign(other);
+			//}
 
 			/* move assignment operator */
 			template <class D>
