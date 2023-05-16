@@ -25,7 +25,7 @@ namespace Xf {
 	// -- P O I N T E R  C L A S S --------------------------------------------
 
 	template <class T>
-	class AutoPointer final {
+	class UniquePointer final {
 
 		public:
 
@@ -38,7 +38,7 @@ namespace Xf {
 			using Value     = T;
 
 			/* self type */
-			using Self      = AutoPointer<Value>;
+			using Self      = UniquePointer<Value>;
 
 			/* reference type */
 			using Reference = Value&;
@@ -67,51 +67,44 @@ namespace Xf {
 
 			/* inherited types as friends */
 			template <class>
-			friend class AutoPointer;
+			friend class UniquePointer;
 
 			/* make auto pointer function as friend */
 			template <class U, class... A>
-			friend AutoPointer<U> make_auto_pointer(A&&... args);
+			friend UniquePointer<U> make_unique_pointer(A&&... args);
 
 
 			// -- P U B L I C  C O N S T R U C T O R S ------------------------
 
 			/* default constructor */
-			AutoPointer(void) noexcept
+			UniquePointer(void) noexcept
 			// initialize pointer
 			: _data{nullptr} {
 				// code here...
 			}
 
 			/* nullptr constructor */
-			AutoPointer(Xf::Nullptr) noexcept
+			UniquePointer(Xf::Nullptr) noexcept
 			// initialize pointer
 			: _data{nullptr} {
 				// code here...
 			}
 
 			/* non-copyable class */
-			NON_COPYABLE(AutoPointer);
+			NON_COPYABLE(UniquePointer);
 
-			/* copy constructor */
-			//AutoPointer(const Self& other)
-			//// allocate memory
-			//: AutoPointer{} {
-			//	// check other pointer validity
-			//	if (other._data != nullptr) {
-			//		// allocate memory
-			//		_data = Allocator::allocate();
-			//		// check allocation success
-			//		if (_data != nullptr) {
-			//			// construct object copy
-			//			Allocator::construct(_data, *other._data);
-			//		}
-			//	}
-			//}
+			/* move constructor for self type */
+			UniquePointer(Self&& other) noexcept
+			// initialize pointer
+			: _data(other._data) {
+				// invalidate other
+				other._data = nullptr;
+			}
 
 			/* move constructor for derived types */
 			template <class D>
-			AutoPointer(AutoPointer<D>&& other) requires (Xf::is_base_of_c<T, D>)
+			UniquePointer(UniquePointer<D>&& other) noexcept
+			requires (Xf::is_base_of_c<T, D>)
 			// initialize pointer
 			: _data(other._data) {
 				// invalidate other
@@ -119,44 +112,35 @@ namespace Xf {
 			}
 
 			/* destructor */
-			~AutoPointer(void) {
-				// check pointer validity
-				if (_data != nullptr) {
-					// destroy object
-					Allocator::destroy(_data);
-					// deallocate memory
-					Allocator::deallocate(_data);
-				}
+			~UniquePointer(void) {
+				// clean up
+				reset();
 			}
 
 
 			// -- A S S I G N -------------------------------------------------
 
-			/* copy assignment */
-			//Self& assign(const Self& other) {
-			//	// check for self assignment
-			//	if (this != &other) {
-			//		// clean up
-			//		_clean();
-			//		// check other pointer validity
-			//		if (other._data != nullptr) {
-			//			// allocate memory
-			//			_data = Allocator::allocate();
-			//			// check allocation success
-			//			if (_data != nullptr) {
-			//				// construct object by copy
-			//				Allocator::construct(_data, *other._data); } }
-			//	} // return self reference
-			//	return *this;
-			//}
+			/* move assignment for self type */
+			Self& assign(Self&& other) {
+				// check for self assignment
+				if (this != &other) {
+					// clean up
+					reset();
+					// initialize pointer
+					_data = other._data;
+					// invalidate other
+					other._data = nullptr;
+				} // return self reference
+				return *this;
+			}
 
 			/* move assignment for derived types */
 			template <class D>
-			Self& assign(AutoPointer<D>&& other) requires (Xf::is_base_of_c<T, D>) {
+			Self& assign(UniquePointer<D>&& other) requires (Xf::is_base_of_c<T, D>) {
 				// check for self assignment
 				if (this != reinterpret_cast<Self*>(&other)) {
 					// clean up
-					_clean();
+					reset();
 					// initialize pointer
 					_data = other._data;
 					// invalidate other
@@ -168,7 +152,9 @@ namespace Xf {
 			/* nullptr assignment */
 			Self& assign(Xf::Nullptr) {
 				// clean up
-				_clean();
+				reset();
+				// invalidate pointer
+				_data = nullptr;
 				// return self reference
 				return *this;
 			}
@@ -176,15 +162,15 @@ namespace Xf {
 
 			// -- A S S I G N M E N T  O P E R A T O R S ----------------------
 
-			/* copy assignment operator */
-			//Self& operator=(const Self& other) {
+			/* move assignment operator for self type */
+			Self& operator=(Self&& other) {
 				// return copy assignment
-			//	return assign(other);
-			//}
+				return assign(Xf::move(other));
+			}
 
-			/* move assignment operator */
+			/* move assignment operator for derived types */
 			template <class D>
-			Self& operator=(AutoPointer<D>&& other)
+			Self& operator=(UniquePointer<D>&& other)
 			// requires derived or self type
 			requires (Xf::is_base_of_c<T, D>) {
 				// return move assignment
@@ -262,30 +248,26 @@ namespace Xf {
 
 			/* nullptr inequality operator */
 			bool operator!=(Xf::Nullptr) const {
-				// return pointer validity
+				// return pointer invalidity
 				return _data != nullptr;
 			}
 
 
+			// -- P U B L I C  M E T H O D S ----------------------------------
 
-
-
-
-		private:
-
-			// -- P R I V A T E  M E T H O D S --------------------------------
-
-			void _clean(void) {
+			/* reset pointer */
+			void reset(void) {
 				// check pointer validity
 				if (_data != nullptr) {
 					// destroy object
 					Allocator::destroy(_data);
 					// deallocate memory
 					Allocator::deallocate(_data);
-					// invalidate pointer
-					_data = nullptr;
 				}
 			}
+
+
+		private:
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
@@ -298,16 +280,17 @@ namespace Xf {
 
 	// -- F R I E N D  F U N C T I O N S --------------------------------------
 
+	/* make unique pointer */
 	template <class U, class... A>
-	AutoPointer<U> make_auto_pointer(A&&... args) {
+	UniquePointer<U> make_unique_pointer(A&&... args) {
 		// instantiate auto pointer
-		AutoPointer<U> ptr;
+		UniquePointer<U> ptr;
 		// memory allocation
-		ptr._data = AutoPointer<U>::Allocator::allocate();
+		ptr._data = UniquePointer<U>::Allocator::allocate();
 		// check allocation success
 		if (ptr._data) {
 			// construct object by forwarding arguments
-			AutoPointer<U>::Allocator::construct(ptr._data, Xf::forward<A>(args)...);
+			UniquePointer<U>::Allocator::construct(ptr._data, Xf::forward<A>(args)...);
 		} // return instance
 		return ptr;
 	}
