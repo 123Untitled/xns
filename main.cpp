@@ -63,20 +63,20 @@ class D2 : public B {
 
 template <class T>
 void invoke(const T& t) {
-	Xf::AutoPointer<T> p = Xf::make_auto_pointer<T>(t);
+	Xf::UniquePointer<T> p = Xf::make_unique_pointer<T>(t);
 	//(*p)();
 }
 
-Xf::AutoPointer<B> f() {
-	return Xf::AutoPointer<D1>{};
+Xf::UniquePointer<B> f() {
+	return Xf::UniquePointer<D1>{};
 }
 
 int main(int ac, char** av) {
 
 
-	using Proto = Xf::PolyMethod<Xf::AutoPointer<B>(void)>;
+	using Proto = Xf::PolyMethod<Xf::UniquePointer<B>(void)>;
 
-	Xf::PolyMethod<Xf::AutoPointer<B>(void)> pm{f};
+	Xf::PolyMethod<Xf::UniquePointer<B>(void)> pm{f};
 
 	invoke<Proto>(pm);
 
@@ -96,7 +96,7 @@ int main(int ac, char** av) {
 
 
 
-	Xf::AutoPointer<int> ap;
+	Xf::UniquePointer<int> ap;
 	Xf::WeakPointer<int> wp{ap};
 	return EXIT_SUCCESS;
 
