@@ -41,7 +41,7 @@
 /* memory */
 #include "allocator.hpp"
 #include "unique.hpp"
-#include "shared_ptr.hpp"
+#include "shared_pointer.hpp"
 #include "auto_pointer.hpp"
 #include "weak_pointer.hpp"
 
