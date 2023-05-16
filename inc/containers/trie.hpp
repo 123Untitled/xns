@@ -6,6 +6,7 @@
 #include "pair.hpp"
 #include "tuple.hpp"
 #include "unique_pointer.hpp"
+#include "shared_pointer.hpp"
 #include "weak_pointer.hpp"
 #include "string.hpp"
 
@@ -25,19 +26,25 @@ namespace Xf {
 
 		public:
 
-			// -- A L I A S E S -----------------------------------------------
+			// -- P U B L I C  A L I A S E S ----------------------------------
 
 			/* value type */
 			using Value = T;
 
-			/* value pointer type */
-			using ValuePtr = Xf::UniquePointer<Value>;
+			/* self type */
+			using Self = Trie<Value>;
+
+			/* weak value type */
+			using WeakValue = Xf::WeakPointer<Value>;
 
 			/* size type */
 			using Size = SizeT;
 
 
+
 		private:
+
+
 
 
 			// -- P R I V A T E  E N U M S ------------------------------------
@@ -55,8 +62,17 @@ namespace Xf {
 
 			// -- P R I V A T E  A L I A S E S --------------------------------
 
-			/* children type */
-			using Childs = Xf::Array<Xf::UniquePointer<Node>, LOOKUP_SIZE>;
+			/* unique node type */
+			using UniqueNode = Xf::UniquePointer<Node>;
+
+			/* lookup table type */
+			using Table = Xf::Array<UniqueNode, LOOKUP_SIZE>;
+
+			/* node pointer type */
+			using WeakNode = Xf::WeakPointer<Node>;
+
+			/* value pointer type */
+			using Shared = Xf::SharedPointer<Value>;
 
 
 
@@ -67,23 +83,23 @@ namespace Xf {
 				// -- M E M B E R S -------------------------------------------
 
 				/* childs */
-				Childs _childs;
+				Table _table;
 
 				/* value */
-				ValuePtr _value;
+				Shared _value;
 
 
 				// -- C O N S T R U C T O R S ---------------------------------
 
 				/* default constructor */
 				Node(void)
-				: _childs{}, _value{} {
+				: _table{}, _value{} {
 					// code here...
 				}
 
 				/* value constructor */
 				Node(Value* value)
-				: _childs{}, _value{value} {
+				: _table{}, _value{value} {
 					// code here...
 				}
 
@@ -109,6 +125,7 @@ namespace Xf {
 
 			/* destructor */
 			~Trie(void) {
+				// code here...
 			}
 
 
@@ -119,7 +136,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate default value
-				node->_value = Xf::make_unique_pointer<Value>();
+				node->_value = Xf::make_shared_pointer<Value>();
 			}
 
 			/* copy insert */
@@ -127,7 +144,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate copied value
-				node->_value = Xf::make_unique_pointer<Value>(value);
+				node->_value = Xf::make_shared_pointer<Value>(value);
 			}
 
 			/* move insert */
@@ -135,7 +152,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate moved value
-				node->_value = Xf::make_unique_pointer<Value>(Xf::move(value));
+				node->_value = Xf::make_shared_pointer<Value>(Xf::move(value));
 			}
 
 			/* variadic insert */
@@ -144,9 +161,8 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate value
-				node->_value = Xf::make_unique_pointer<Value>(Xf::forward<A>(args)...);
+				node->_value = Xf::make_shared_pointer<Value>(Xf::forward<A>(args)...);
 			}
-
 
 			/* derived default insert */
 			template <class D> requires (Xf::is_base_of_c<T, D>)
@@ -154,7 +170,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate default value
-				node->_value = Xf::make_unique_pointer<D>();
+				node->_value = Xf::make_shared_pointer<D>();
 			}
 
 			/* derived copy insert */
@@ -163,7 +179,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate copied value
-				node->_value = Xf::make_unique_pointer<D>(value);
+				node->_value = Xf::make_shared_pointer<D>(value);
 			}
 
 			/* derived move insert */
@@ -172,36 +188,69 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate moved value
-				node->_value = Xf::make_unique_pointer<D>(Xf::move(value));
+				node->_value = Xf::make_shared_pointer<D>(Xf::move(value));
 			}
 
+			/* derived variadic insert */
+			template <class D, class... A> requires (Xf::is_base_of_c<T, D>)
+			void insert(const Xf::CString& key, A&&... args) {
+				// insert key
+				Node* node = _insert(key);
+				// allocate value
+				node->_value = Xf::make_shared_pointer<D>(Xf::forward<A>(args)...);
+			}
+
+			using KeyVector = Xf::Vector<Xf::CString>;
 
 
+			/* derived multi insert */
+			template <class D, class... A> requires (Xf::is_base_of_c<T, D>)
+			void insert(const KeyVector& alias, A&&... args) {
+				// instanciate value
+				Shared value = Xf::make_shared_pointer<D>(Xf::forward<A>(args)...);
+				// loop through alias
+				for (KeyVector::Size x = 0; x < alias.size(); ++x) {
+					// insert key
+					Node* node = _insert(alias[x]);
+					// allocate value
+					node->_value = value;
+				}
+			}
 
+			/* variadic multi insert */
+			template <class... A>
+			void insert(const KeyVector& alias, A&&... args) {
+				// instanciate value
+				Shared value = Xf::make_shared_pointer<Value>(Xf::forward<A>(args)...);
+				// loop through alias
+				for (KeyVector::Size x = 0; x < alias.size(); ++x) {
+					// insert key
+					Node* node = _insert(alias[x]);
+					// allocate value
+					node->_value = value;
+				}
+			}
 
 			/* find */
-			Xf::WeakPointer<Value> find(const Xf::CString& str) {
+			WeakValue find(const Xf::CString& str) {
 				// get root node
 				Node* node = &_root;
 				// loop through string
 				for (Xf::CString::Size x = 0; x < str.size(); ++x) {
-					// get character
 					const Size index = to_index(str[x]);
-
-					if (node->_childs.at(index) == nullptr) {
-						// return weak null pointer
-						return nullptr;
+					if (node->_table.at(index) != nullptr) {
+						// enter in node
+						node = &(*node->_table.at(index));
 					}
-
-					// enter in node
-					node = &(*node->_childs.at(index));
-
+					// else return nullptr
+					else { return nullptr; }
 				}
-
 				// return value
 				return node->_value;
-
 			}
+
+
+
 
 
 		private:
@@ -217,11 +266,11 @@ namespace Xf {
 					// get character index
 					const Size index = to_index(str[x]);
 					// check indexed node validity
-					if (node->_childs.at(index) == nullptr) {
+					if (node->_table.at(index) == nullptr) {
 						// make new node
-						node->_childs.at(index) = Xf::make_unique_pointer<Node>();
+						node->_table.at(index) = Xf::make_unique_pointer<Node>();
 					} // move to node
-					node = &(*node->_childs.at(index));
+					node = &(*node->_table.at(index));
 				} // return node
 				return node;
 			}
