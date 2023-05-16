@@ -11,69 +11,189 @@
 
 namespace Xf {
 
-	//// -- F U N C T I O N  C L A S S --------------------------------------------
+	// -- F U N C T I O N  C L A S S ------------------------------------------
 
-	//template <typename R, typename... A>
-	//class Function final {
+	// empty definition
+	template <class>
+	class Function;
 
-	//	public:
+	template <typename R, typename... A>
+	class Function<R(A...)> final {
 
-	//		// -- A L I A S E S -----------------------------------------------
+		public:
 
-	//		/* function pointer type */
-	//		using Prototype = R(*)(A...);
+			// -- P U B L I C  A L I A S E S ----------------------------------
 
-	//		/* return type */
-	//		using Return = R;
+			/* self type */
+			using Self = Function<R(A...)>;
 
-	//		// -- C O N S T R U C T O R S -------------------------------------
+			/* prototype type */
+			using Prototype = R(*)(A...);
 
-	//		/* deleted default constructor */
-	//		//Function(void) = delete;
-	//		Function() { }
-
-	//		/* function pointer constructor */
-	//		Function(Prototype function)
-	//		// initializations
-	//		: _function{function} { }
-
-	//		/* destructor */
-	//		~Function(void) { /* nothing to do */ }
+			/* return type */
+			using Return = R;
 
 
-	//		// -- O P E R A T O R S -------------------------------------------
+			// -- C O N S T R U C T O R S -------------------------------------
 
-	//		/* copy operator */
-	//		Function& operator=(const Function& other) {
-	//			// copy function pointer
-	//			_function = other._function;
-	//			// return self reference
-	//			return *this;
-	//		}
+			/* default constructor */
+			Function(void) noexcept
+			: _function{nullptr} {
+				// code here...
+			}
 
-	//		/* function call operator */
-	//		Return operator()(A&&... arguments) {
-	//			// call function
-	//			return _function(Xf::forward<A>(arguments)...);
-	//		}
+			/* nullptr constructor */
+			Function(Xf::Nullptr) noexcept
+			: _function{nullptr} {
+				// code here...
+			}
+
+			/* function pointer constructor */
+			Function(const Prototype function) noexcept
+			: _function{function} {
+				// code here...
+			}
+
+			/* copy constructor */
+			Function(const Self& other) noexcept
+			: _function{other._function} {
+				// code here...
+			}
+
+			/* move constructor */
+			Function(Self&& other) noexcept
+			: _function{Xf::move(other._function)} {
+				// code here...
+			}
+
+			/* destructor */
+			~Function(void) noexcept = default;
 
 
-	//		// -- P U B L I C  M E T H O D S ----------------------------------
+			// -- P U B L I C  A S S I G N M E N T ----------------------------
 
-	//		/* call method */
-	//		Return call(A&&... arguments) const {
-	//			// call function
-	//			return _function(Xf::forward<A>(arguments)...);
-	//		}
+			/* nullptr assignment */
+			Self& assign(Xf::Nullptr) noexcept {
+				// set function pointer to null
+				_function = nullptr;
+				// return self reference
+				return *this;
+			}
 
-	//	private:
+			/* function pointer assignment */
+			Self& assign(const Prototype function) noexcept {
+				// set function pointer
+				_function = function;
+				// return self reference
+				return *this;
+			}
 
-	//		// -- P R I V A T E  M E M B E R S ----------------------------
+			/* copy assignment */
+			Self& assign(const Self& other) noexcept {
+				// copy function pointer
+				_function = other._function;
+				// return self reference
+				return *this;
+			}
 
-	//		/* function to call */
-	//		Prototype _function;
+			/* move assignment */
+			Self& assign(Self&& other) noexcept {
+				// move function pointer
+				_function = Xf::move(other._function);
+				// return self reference
+				return *this;
+			}
 
-	//};
+
+			// -- P U B L I C  A S S I G N M E N T  O P E R A T O R S ---------
+
+			/* nullptr assignment operator */
+			Self& operator=(Xf::Nullptr) noexcept {
+				// return assign method
+				return assign(nullptr);
+			}
+
+			/* function pointer assignment operator */
+			Self& operator=(const Prototype function) noexcept {
+				// return assign method
+				return assign(function);
+			}
+
+			/* copy assignment operator */
+			Self& operator=(const Self& other) noexcept {
+				// return assign method
+				return assign(other);
+			}
+
+			/* move assignment operator */
+			Self& operator=(Self&& other) noexcept {
+				// return assign method
+				return assign(Xf::move(other));
+			}
+
+
+			// -- P U B L I C  B O O L E A N  O P E R A T O R S ---------------
+
+			/* boolean operator */
+			explicit operator bool(void) const noexcept {
+				// return function pointer validity
+				return _function != nullptr;
+			}
+
+			/* not operator */
+			bool operator!(void) const noexcept {
+				// return function pointer invalidity
+				return _function == nullptr;
+			}
+
+
+			// -- P U B L I C  C O M P A R I S O N  O P E R A T O R S ---------
+
+			/* equality operator */
+			bool operator==(const Self& other) const noexcept {
+				// return true if function pointers are equal
+				return _function == other._function;
+			}
+
+			/* inequality operator */
+			bool operator!=(const Self& other) const noexcept {
+				// return true if function pointers are not equal
+				return _function != other._function;
+			}
+
+
+			// -- P U B L I C  C A L L  O P E R A T O R -----------------------
+
+			/* function call operator */
+			Return operator()(A&&... arguments) {
+				// call function
+				return _function(Xf::forward<A>(arguments)...);
+			}
+
+
+			// -- P U B L I C  M E T H O D S ----------------------------------
+
+			/* call */
+			Return call(A&&... arguments) const {
+				// call function
+				return _function(Xf::forward<A>(arguments)...);
+			}
+
+			/* reset */
+			void reset(void) noexcept {
+				// set function pointer to null
+				_function = nullptr;
+			}
+
+
+		private:
+
+			// -- P R I V A T E  M E M B E R S --------------------------------
+
+			/* function pointer */
+			Prototype _function;
+
+	};
 
 
 
