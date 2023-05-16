@@ -1,8 +1,8 @@
-#include "auto_pointer.hpp"
+#include "unique_pointer.hpp"
 #include "unit_tests.hpp"
 
 template <class T>
-using AutoP = Xf::AutoPointer<T>;
+using AutoP = Xf::UniquePointer<T>;
 
 #define OWN Xf
 #define own Xf
@@ -10,7 +10,7 @@ using AutoP = Xf::AutoPointer<T>;
 
 void f(...) {}
 
-void UT::auto_pointer_ut(void) {
+void UT::unique_pointer_ut(void) {
 
 	using namespace Xf;
 	/*
@@ -33,23 +33,23 @@ void UT::auto_pointer_ut(void) {
 
 	//AutoP<B> p3{Xf::move(p1)};
 
-	AutoP<Derived> p1 = make_auto_pointer<Derived>(123, 99.9f, 'X');
+	AutoP<Derived> p1 = make_unique_pointer<Derived>(123, 99.9f, 'X');
 	if (!p1) {
 		std::cout << "null" << std::endl;
 	}
 
 	AutoP<Base> p3;
 
-	Xf::AutoPointer<Derived> p2;
+	Xf::UniquePointer<Derived> p2;
 
 
 
 
-	own::AutoPointer<int> ptr_int = own::make_auto_pointer<int>(123);
+	own::UniquePointer<int> ptr_int = own::make_unique_pointer<int>(123);
 
-	own::Vector<own::AutoPointer<int>> vec;
+	own::Vector<own::UniquePointer<int>> vec;
 
-	vec.push_back(Xf::make_auto_pointer<int>(123));
+	vec.push_back(Xf::make_unique_pointer<int>(123));
 
 	//Xf::AutoPointer<void> v{};
 
