@@ -83,6 +83,13 @@ namespace Xf {
 				// code here...
 			}
 
+			/* nullptr constructor */
+			AutoPointer(Xf::Nullptr) noexcept
+			// initialize pointer
+			: _data{nullptr} {
+				// code here...
+			}
+
 			/* copy constructor */
 			AutoPointer(const Self& other)
 			// allocate memory
@@ -144,7 +151,7 @@ namespace Xf {
 			template <class D>
 			Self& assign(AutoPointer<D>&& other) requires (Xf::is_base_of_c<T, D>) {
 				// check for self assignment
-				if (this != &other) {
+				if (this != reinterpret_cast<Self*>(&other)) {
 					// clean up
 					_clean();
 					// initialize pointer
