@@ -139,13 +139,21 @@ namespace Xf {
 
 			/* at */
 			template <class... I>
-			Value& at(I&&... indexs) {
+			Reference at(I&&... indexs) {
 				// check number of indices is valid
 				static_assert(sizeof...(I) == _ndim, "WRONG NUMBER OF INDICES");
 				// return reference to element indexed by linearized indices
 				return _data[_subscript(std::forward<I>(indexs)...)];
 			}
 
+			/* const at */
+			template <class... I>
+			ConstRef at(I&&... indexs) const {
+				// check number of indices is valid
+				static_assert(sizeof...(I) == _ndim, "WRONG NUMBER OF INDICES");
+				// return reference to element indexed by linearized indices
+				return _data[_subscript(std::forward<I>(indexs)...)];
+			}
 
 
 			/* subscript operator */
@@ -278,7 +286,7 @@ namespace Xf {
 
 			/* helper function for subscript operator */
 			template<class... I>
-			constexpr Size _subscript(I&&... indexs) {
+			constexpr Size _subscript(I&&... indexs) const {
 				// initialize array with indexs casted to Size
 				Size index_arr[_ndim] = { static_cast<Size>(indexs)... };
 				// linear index declaration
