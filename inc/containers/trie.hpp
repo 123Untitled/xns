@@ -114,7 +114,8 @@ namespace Xf {
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* insert */
-			void insert(const Xf::CString& str, const Value& value) {
+			template <class D>
+			void insert(const Xf::CString& str, const D& value) {
 				// get root node
 				Node* node = &_root;
 				// loop through string
@@ -128,8 +129,9 @@ namespace Xf {
 					} // move to node
 					node = &(*node->_childs.at(index));
 				} // allocate value
-				node->_value = Xf::make_auto_pointer<Value>(value);
+				node->_value = Xf::make_auto_pointer<D>(value);
 			}
+
 
 			/* find */
 			Xf::AutoPointer<Value> find(const Xf::CString& str) {
