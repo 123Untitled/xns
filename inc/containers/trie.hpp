@@ -5,7 +5,7 @@
 #include "vector.hpp"
 #include "pair.hpp"
 #include "tuple.hpp"
-#include "auto_pointer.hpp"
+#include "unique_pointer.hpp"
 #include "weak_pointer.hpp"
 #include "string.hpp"
 
@@ -31,7 +31,7 @@ namespace Xf {
 			using Value = T;
 
 			/* value pointer type */
-			using ValuePtr = Xf::AutoPointer<Value>;
+			using ValuePtr = Xf::UniquePointer<Value>;
 
 			/* size type */
 			using Size = SizeT;
@@ -56,7 +56,7 @@ namespace Xf {
 			// -- P R I V A T E  A L I A S E S --------------------------------
 
 			/* children type */
-			using Childs = Xf::Array<Xf::AutoPointer<Node>, LOOKUP_SIZE>;
+			using Childs = Xf::Array<Xf::UniquePointer<Node>, LOOKUP_SIZE>;
 
 
 
@@ -119,7 +119,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate default value
-				node->_value = Xf::make_auto_pointer<Value>();
+				node->_value = Xf::make_unique_pointer<Value>();
 			}
 
 			/* copy insert */
@@ -127,7 +127,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate copied value
-				node->_value = Xf::make_auto_pointer<Value>(value);
+				node->_value = Xf::make_unique_pointer<Value>(value);
 			}
 
 			/* move insert */
@@ -135,7 +135,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate moved value
-				node->_value = Xf::make_auto_pointer<Value>(Xf::move(value));
+				node->_value = Xf::make_unique_pointer<Value>(Xf::move(value));
 			}
 
 			/* variadic insert */
@@ -144,7 +144,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate value
-				node->_value = Xf::make_auto_pointer<Value>(Xf::forward<A>(args)...);
+				node->_value = Xf::make_unique_pointer<Value>(Xf::forward<A>(args)...);
 			}
 
 
@@ -154,7 +154,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate default value
-				node->_value = Xf::make_auto_pointer<D>();
+				node->_value = Xf::make_unique_pointer<D>();
 			}
 
 			/* derived copy insert */
@@ -163,7 +163,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate copied value
-				node->_value = Xf::make_auto_pointer<D>(value);
+				node->_value = Xf::make_unique_pointer<D>(value);
 			}
 
 			/* derived move insert */
@@ -172,7 +172,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate moved value
-				node->_value = Xf::make_auto_pointer<D>(Xf::move(value));
+				node->_value = Xf::make_unique_pointer<D>(Xf::move(value));
 			}
 
 
@@ -219,7 +219,7 @@ namespace Xf {
 					// check indexed node validity
 					if (node->_childs.at(index) == nullptr) {
 						// make new node
-						node->_childs.at(index) = Xf::make_auto_pointer<Node>();
+						node->_childs.at(index) = Xf::make_unique_pointer<Node>();
 					} // move to node
 					node = &(*node->_childs.at(index));
 				} // return node
