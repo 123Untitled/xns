@@ -77,7 +77,7 @@ namespace Xf {
 				// code here...
 			}
 
-			/* copy constructor */
+			/* self copy constructor */
 			SharedPointer(const Self& other) noexcept
 			: _data{other._data}, _count{other._count} {
 				// check pointer validity
@@ -87,8 +87,28 @@ namespace Xf {
 				}
 			}
 
-			/* move constructor */
+			/* derived copy constructor */
+			template <class D> requires Xf::is_base_of_c<T, D>
+			SharedPointer(const SharedPointer<D>& other) noexcept
+			: _data{other._data}, _count{other._count} {
+				// check pointer validity
+				if (_data) {
+					// increment number of references
+					++(*_count);
+				}
+			}
+
+			/* self move constructor */
 			SharedPointer(Self&& other) noexcept
+			: _data{other._data}, _count{other._count} {
+				// invalidate other
+				other._data  = nullptr;
+				other._count = nullptr;
+			}
+
+			/* derived move constructor */
+			template <class D> requires Xf::is_base_of_c<T, D>
+			SharedPointer(SharedPointer<D>&& other) noexcept
 			: _data{other._data}, _count{other._count} {
 				// invalidate other
 				other._data  = nullptr;
@@ -119,7 +139,7 @@ namespace Xf {
 				return *this;
 			}
 
-			/* copy assignment */
+			/* self copy assignment */
 			Self& assign(const Self& other) {
 				// check for self assignment
 				if (this != &other) {
@@ -136,10 +156,46 @@ namespace Xf {
 				return *this;
 			}
 
-			/* move assignment */
+			/* derived copy assignment */
+			template <class D> requires Xf::is_base_of_c<T, D>
+			Self& assign(const SharedPointer<D>& other) {
+				// check for self assignment
+				if (this != &other) {
+					// deallocate memory
+					this->~SharedPointer();
+					// assign pointer and counter
+					_data  = other._data;
+					_count = other._count;
+					// check pointer validity
+					if (_data) {
+						// increment number of references
+						++(*_count); }
+				} // return self reference
+				return *this;
+			}
+
+
+			/* self move assignment */
 			Self& assign(Self&& other) {
 				// check for self assignment
 				if (this != &other) {
+					// deallocate memory
+					this->~SharedPointer();
+					// assign pointer and counter
+					_data  = other._data;
+					_count = other._count;
+					// invalidate other
+					other._data  = nullptr;
+					other._count = nullptr;
+				} // return self reference
+				return *this;
+			}
+
+			/* derived move assignment */
+			template <class D> requires Xf::is_base_of_c<T, D>
+			Self& assign(SharedPointer<D>&& other) {
+				// check for self assignment
+				if (this != reinterpret_cast<Self*>(&other)) {
 					// deallocate memory
 					this->~SharedPointer();
 					// assign pointer and counter
@@ -161,15 +217,29 @@ namespace Xf {
 				return assign(nullptr);
 			}
 
-			/* copy assignment operator */
+			/* self copy assignment operator */
 			SharedPointer& operator=(const Self& other) {
-				// return copy assignment
+				// return self copy assignment
 				return assign(other);
 			}
 
-			/* move assignment operator */
+			/* derived copy assignment operator */
+			template <class D> requires Xf::is_base_of_c<T, D>
+			SharedPointer& operator=(const SharedPointer<D>& other) {
+				// return derived copy assignment
+				return assign(other);
+			}
+
+			/* self move assignment operator */
 			SharedPointer& operator=(Self&& other) {
-				// return move assignment
+				// return self move assignment
+				return assign(Xf::move(other));
+			}
+
+			/* derived move assignment operator */
+			template <class D> requires Xf::is_base_of_c<T, D>
+			SharedPointer& operator=(SharedPointer<D>&& other) {
+				// return derived move assignment
 				return assign(Xf::move(other));
 			}
 

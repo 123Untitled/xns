@@ -83,17 +83,16 @@ namespace Xf {
 			/* non-copyable class */
 			NON_COPYABLE(UniquePointer);
 
-			/* move constructor for self type */
+			/* self move constructor */
 			UniquePointer(Self&& other) noexcept
 			: _data(other._data) {
 				// invalidate other
 				other._data = nullptr;
 			}
 
-			/* move constructor for derived types */
-			template <class D>
+			/* derived move constructor */
+			template <class D> requires (Xf::is_base_of_c<T, D>)
 			UniquePointer(UniquePointer<D>&& other) noexcept
-			requires (Xf::is_base_of_c<T, D>)
 			: _data(other._data) {
 				// invalidate other
 				other._data = nullptr;
@@ -121,7 +120,7 @@ namespace Xf {
 				return *this;
 			}
 
-			/* move assignment for self type */
+			/* self move assignment */
 			Self& assign(Self&& other) {
 				// check for self assignment
 				if (this != &other) {
@@ -135,9 +134,9 @@ namespace Xf {
 				return *this;
 			}
 
-			/* move assignment for derived types */
-			template <class D>
-			Self& assign(UniquePointer<D>&& other) requires (Xf::is_base_of_c<T, D>) {
+			/* derived move assignment */
+			template <class D> requires (Xf::is_base_of_c<T, D>)
+			Self& assign(UniquePointer<D>&& other) {
 				// check for self assignment
 				if (this != reinterpret_cast<Self*>(&other)) {
 					// deallocate memory
@@ -159,18 +158,16 @@ namespace Xf {
 				return assign(nullptr);
 			}
 
-			/* move assignment operator for self type */
+			/* self move assignment operator */
 			Self& operator=(Self&& other) {
-				// return copy assignment
+				// return self move assignment
 				return assign(Xf::move(other));
 			}
 
-			/* move assignment operator for derived types */
-			template <class D>
-			Self& operator=(UniquePointer<D>&& other)
-			// requires derived or self type
-			requires (Xf::is_base_of_c<T, D>) {
-				// return move assignment
+			/* derived move assignment operator */
+			template <class D> requires (Xf::is_base_of_c<T, D>)
+			Self& operator=(UniquePointer<D>&& other) {
+				// return derived move assignment
 				return assign(Xf::move(other));
 			}
 
