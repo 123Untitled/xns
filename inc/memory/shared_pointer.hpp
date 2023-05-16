@@ -1,9 +1,8 @@
 #ifndef SHARED_PTR_HEADER
 #define SHARED_PTR_HEADER
-#include <iostream>
 
-#include "macro.hpp"
 #include "types.hpp"
+#include "macro.hpp"
 #include "type_traits.hpp"
 #include "allocator.hpp"
 
@@ -12,188 +11,308 @@
 
 namespace Xf {
 
-	// -- S H A R E D  P T R  C L A S S ---------------------------------------
+	// -- S H A R E D  P O I N T E R  C L A S S -------------------------------
 
-	template <class S, class... A>
-	concept not_self = (!Xf::IsSame_s<Xf::remove_reference_t<A>, S>::value&& ...) || (sizeof...(A) > 1);
-
-	template <typename T>
+	template <class T>
 	class SharedPointer final {
 
 		public:
 
-			// -- A L I A S E S -----------------------------------------------
-
-			/* size type */
-			using Size = UInt64;
+			// -- P U B L I C  A L I A S E S ----------------------------------
 
 			/* value type */
-			using Value = T;
+			using Value     = T;
+
+			/* self type */
+			using Self      = SharedPointer<Value>;
 
 			/* reference type */
 			using Reference = Value&;
 
+			/* move reference type */
+			using MoveRef   = Value&&;
+
 			/* pointer type */
-			using Pointer = Value*;
+			using Pointer   = Value*;
 
 			/* const reference type */
-			using ConstReference = const Value&;
+			using ConstRef  = const Value&;
 
 			/* const pointer type */
-			using ConstPointer = const Value*;
-
-			/* move reference type */
-			using MoveReference = Value&&;
-
-			/* self type */
-			using Self = SharedPointer<Value>;
+			using ConstPtr  = const Value*;
 
 			/* allocator type */
-			using Alloc = Allocator<Value>;
+			using Allocator = Allocator<Value>;
+
+			/* size type */
+			using Size      = typename Allocator::Size;
 
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- F R I E N D S -----------------------------------------------
+
+			/* weak pointer as friend */
+			template <class U>
+			friend class WeakPointer;
+
+			/* derived types as friend */
+			template <class>
+			friend class SharedPointer;
+
+			/* make shared pointer as friend */
+			template <class U, class... A>
+			friend SharedPointer<U> make_shared_pointer(A&&... args);
+
+
+			// -- P U B L I C  C O N S T R U C T O R S ------------------------
 
 			/* default constructor */
-			SharedPointer(void)
-			: _pointer{nullptr}, _count{nullptr} {
+			SharedPointer(void) noexcept
+			: _data{nullptr}, _count{nullptr} {
 				// code here...
 			}
 
-
-			/* forward constructor */
-			template <class... A> // requires argument is not Self
-			SharedPointer(A&&... arguments) requires (not_self<Self, A...>)
-			: SharedPointer{} {
-				make(Xf::forward<A>(arguments)...);
+			/* nullptr constructor */
+			SharedPointer(Xf::Nullptr) noexcept
+			: SharedPointer{ } {
+				// code here...
 			}
 
-
-			/* move constructor */
-			SharedPointer(const Self& other)
-			: _pointer{other._pointer}, _count{other._count} {
-				// check if pointer is not null
-				if (_pointer) {
+			/* copy constructor */
+			SharedPointer(const Self& other) noexcept
+			: _data{other._data}, _count{other._count} {
+				// check pointer validity
+				if (_data) {
 					// increment number of references
 					++(*_count);
 				}
 			}
 
 			/* move constructor */
-			SharedPointer(Self&& other)
-			: _pointer{other._pointer}, _count{other._count} {
+			SharedPointer(Self&& other) noexcept
+			: _data{other._data}, _count{other._count} {
 				// invalidate other
-				other._pointer = nullptr;
+				other._data  = nullptr;
 				other._count = nullptr;
 			}
 
 			/* destructor */
 			~SharedPointer(void) {
-				if ((_pointer != nullptr) && (--(*_count) == 0)) {
-					Alloc::destroy(_pointer);
-					Alloc::deallocate(_pointer);
-					Allocator<Size>::deallocate(_count);
+				// check pointer validity
+				if ((_data != nullptr) && (--(*_count) == 0)) {
+					// destroy object
+					Allocator::destroy(_data);
+					// deallocate memory
+					Allocator::deallocate(_data);
+					// deallocate counter
+					Xf::Allocator<Size>::deallocate(_count);
 				}
 			}
 
 
-			// -- O P E R A T O R S -------------------------------------------
+			// -- P U B L I C  A S S I G N M E N T ----------------------------
+
+			/* nullptr assignment */
+			Self& assign(Xf::Nullptr) {
+				// clean up
+				reset();
+				// return self reference
+				return *this;
+			}
+
+			/* copy assignment */
+			Self& assign(const Self& other) {
+				// check for self assignment
+				if (this != &other) {
+					// deallocate memory
+					this->~SharedPointer();
+					// assign pointer and counter
+					_data  = other._data;
+					_count = other._count;
+					// check pointer validity
+					if (_data) {
+						// increment number of references
+						++(*_count); }
+				} // return self reference
+				return *this;
+			}
+
+			/* move assignment */
+			Self& assign(Self&& other) {
+				// check for self assignment
+				if (this != &other) {
+					// deallocate memory
+					this->~SharedPointer();
+					// assign pointer and counter
+					_data  = other._data;
+					_count = other._count;
+					// invalidate other
+					other._data  = nullptr;
+					other._count = nullptr;
+				} // return self reference
+				return *this;
+			}
+
+
+			// -- P U B L I C  A S S I G N M E N T  O P E R A T O R S ---------
+
+			/* nullptr assignment operator */
+			Self& operator=(Xf::Nullptr) {
+				// return nullptr assignment
+				return assign(nullptr);
+			}
 
 			/* copy assignment operator */
 			SharedPointer& operator=(const Self& other) {
-
-				if (this != &other) {
-					this->~SharedPointer();
-					_pointer = other._pointer;
-					_count   = other._count;
-					if (_pointer) {
-						++(*_count);
-					} // return self reference
-				} return *this;
+				// return copy assignment
+				return assign(other);
 			}
 
 			/* move assignment operator */
-			SharedPointer& operator=(SharedPointer&& move) {
-
-				if (this != &move) {
-					this->~SharedPointer();
-					_pointer = move._pointer;
-					_count   = move._count;
-					move._pointer = nullptr;
-					move._count   = nullptr;
-				} return *this;
+			SharedPointer& operator=(Self&& other) {
+				// return move assignment
+				return assign(Xf::move(other));
 			}
+
+
+			// -- P U B L I C  A C C E S S O R S  O P E R A T O R S -----------
 
 			/* dereference operator */
 			Reference operator*(void) {
-				// return dereferenced pointer
-				return *_pointer;
+				// return reference
+				return *_data;
 			}
 
 			/* const dereference operator */
-			ConstReference operator*(void) const {
-				// return dereferenced const pointer
-				return *_pointer;
+			ConstRef operator*(void) const {
+				// return const reference
+				return *_data;
 			}
 
 			/* arrow operator */
 			Pointer operator->(void) {
 				// return pointer
-				return _pointer;
+				return _data;
 			}
 
 			/* const arrow operator */
-			ConstPointer operator->(void) const {
+			ConstPtr operator->(void) const {
 				// return const pointer
-				return _pointer;
+				return _data;
 			}
 
 
-			// -- M E T H O D S -----------------------------------------------
+			// -- P U B L I C  B O O L E A N  O P E R A T O R S ---------------
 
-			/* make shared */
-			template <class... A>
-			void make(A&&... arguments) {
-				this->~SharedPointer();
-				// WARNING: need to deallocate existing pointer
-				if ((_pointer = Alloc::allocate())) {
+			/* boolean operator */
+			operator bool(void) const {
+				// return pointer validity
+				return _data != nullptr;
+			}
 
-					if ((_count = Allocator<Size>::allocate())) {
-						Alloc::construct(_pointer, Xf::forward<A>(arguments)...);
-						*_count = 1;
-						return;
-					}
-					Alloc::deallocate(_pointer);
-					_pointer = nullptr;
+			/* not operator */
+			bool operator!(void) const {
+				// return pointer invalidity
+				return _data == nullptr;
+			}
+
+
+			// -- P U B L I C  C O M P A R I S O N  O P E R A T O R S ---------
+
+			/* equality operator */
+			bool operator==(const Self& other) const noexcept {
+				// return pointer equality
+				return _data == other._data;
+			}
+
+			/* inequality operator */
+			bool operator!=(const Self& other) const noexcept {
+				// return pointer inequality
+				return _data != other._data;
+			}
+
+			/* nullptr equality operator */
+			bool operator==(Xf::Nullptr) const noexcept {
+				// return pointer invalidity
+				return _data == nullptr;
+			}
+
+			/* nullptr inequality operator */
+			bool operator!=(Xf::Nullptr) const noexcept {
+				// return pointer validity
+				return _data != nullptr;
+			}
+
+
+			// -- P U B L I C  M E T H O D S ----------------------------------
+
+			/* reset */
+			void reset(void) {
+				// check pointer validity
+				if ((_data != nullptr) && (--(*_count) == 0)) {
+					// destroy object
+					Allocator::destroy(_data);
+					// deallocate memory
+					Allocator::deallocate(_data);
+					// deallocate counter
+					Xf::Allocator<Size>::deallocate(_count);
+					// initialize pointer
+					_data = nullptr;
+					// initialize counter
+					_count = nullptr;
 				}
-				_count = nullptr;
 			}
 
-			/* release */
-			void release(void) {
-				this->~SharedPointer();
-				_pointer = nullptr;
-				_count   = nullptr;
+			/* count */
+			Size count(void) const {
+				// return number of references
+				return _data ? *_count : 0;
 			}
-
-			UInt use_count(void) const {
-				return _pointer ? *_count : 0;
-			}
-
-
-
 
 
 		private:
 
-			/* pointer */
-			Pointer _pointer;
+			// -- P R I V A T E  M E M B E R S --------------------------------
+
+			/* data */
+			Pointer _data;
 
 			/* count */
 			Size* _count;
 
-
 	};
+
+
+	// -- F R I E N D  F U N C T I O N S --------------------------------------
+
+	/* make shared pointer */
+	template <class T, class... A>
+	SharedPointer<T> make_shared_pointer(A&&... args) {
+		// instantiate shared pointer
+		SharedPointer<T> ptr;
+		// allocate memory
+		ptr._data = SharedPointer<T>::Allocator::allocate();
+		// check allocation failure
+		if (ptr._data == nullptr) { return ptr; }
+		// allocate counter
+		ptr._count = Xf::Allocator<typename SharedPointer<T>::Size>::allocate();
+		// check allocation failure
+		if (ptr._count == nullptr) {
+			// deallocate memory
+			SharedPointer<T>::Allocator::deallocate(ptr._data);
+			// set pointer to nullptr
+			ptr._data = nullptr;
+			// return shared pointer
+			return ptr;
+		} // else construct object by forwarding arguments
+		SharedPointer<T>::Allocator::construct(ptr._data, Xf::forward<A>(args)...);
+		// initialize counter
+		*ptr._count = 1;
+		// return shared pointer
+		return ptr;
+	}
+
+
+
 
 }
 

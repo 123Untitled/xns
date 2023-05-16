@@ -1,17 +1,11 @@
-#ifndef POINTER_HEADER
-#define POINTER_HEADER
+#ifndef UNIQUE_POINTER_HEADER
+#define UNIQUE_POINTER_HEADER
 
 #include "types.hpp"
 #include "allocator.hpp"
 #include "inheritance.hpp"
 #include "is_same.hpp"
 
-#include <iostream>
-
-
-
-/* namespace name idea */
-namespace OWN { }
 
 
 // -- N A M E S P A C E -------------------------------------------------------
@@ -19,18 +13,16 @@ namespace OWN { }
 namespace Xf {
 
 	/* WeakPointer forward declaration */
-	template <class T>
-	class WeakPointer;
+	//template <class T>
+	//class WeakPointer;
 
-	// -- P O I N T E R  C L A S S --------------------------------------------
+
+	// -- U N I Q U E  P O I N T E R  C L A S S -------------------------------
 
 	template <class T>
 	class UniquePointer final {
 
 		public:
-
-			template <class U>
-			friend class WeakPointer;
 
 			// -- P U B L I C  A L I A S E S ----------------------------------
 
@@ -58,18 +50,18 @@ namespace Xf {
 			/* allocator type */
 			using Allocator = Xf::Allocator<Value>;
 
-			/* size type */
-			using Size      = SizeT;
-
-
 
 			// -- F R I E N D S -----------------------------------------------
 
-			/* inherited types as friends */
+			/* weak pointer as friend */
+			template <class>
+			friend class WeakPointer;
+
+			/* derived types as friend */
 			template <class>
 			friend class UniquePointer;
 
-			/* make auto pointer function as friend */
+			/* make unique pointer as friend */
 			template <class U, class... A>
 			friend UniquePointer<U> make_unique_pointer(A&&... args);
 
@@ -78,15 +70,13 @@ namespace Xf {
 
 			/* default constructor */
 			UniquePointer(void) noexcept
-			// initialize pointer
 			: _data{nullptr} {
 				// code here...
 			}
 
 			/* nullptr constructor */
 			UniquePointer(Xf::Nullptr) noexcept
-			// initialize pointer
-			: _data{nullptr} {
+			: UniquePointer{ } {
 				// code here...
 			}
 
@@ -95,7 +85,6 @@ namespace Xf {
 
 			/* move constructor for self type */
 			UniquePointer(Self&& other) noexcept
-			// initialize pointer
 			: _data(other._data) {
 				// invalidate other
 				other._data = nullptr;
@@ -105,7 +94,6 @@ namespace Xf {
 			template <class D>
 			UniquePointer(UniquePointer<D>&& other) noexcept
 			requires (Xf::is_base_of_c<T, D>)
-			// initialize pointer
 			: _data(other._data) {
 				// invalidate other
 				other._data = nullptr;
@@ -113,19 +101,32 @@ namespace Xf {
 
 			/* destructor */
 			~UniquePointer(void) {
-				// clean up
-				reset();
+				// check pointer validity
+				if (_data != nullptr) {
+					// destroy object
+					Allocator::destroy(_data);
+					// deallocate memory
+					Allocator::deallocate(_data);
+				}
 			}
 
 
-			// -- A S S I G N -------------------------------------------------
+			// -- P U B L I C  A S S I G N M E N T ----------------------------
+
+			/* nullptr assignment */
+			Self& assign(Xf::Nullptr) {
+				// clean up
+				reset();
+				// return self reference
+				return *this;
+			}
 
 			/* move assignment for self type */
 			Self& assign(Self&& other) {
 				// check for self assignment
 				if (this != &other) {
-					// clean up
-					reset();
+					// deallocate memory
+					this->~UniquePointer();
 					// initialize pointer
 					_data = other._data;
 					// invalidate other
@@ -139,8 +140,8 @@ namespace Xf {
 			Self& assign(UniquePointer<D>&& other) requires (Xf::is_base_of_c<T, D>) {
 				// check for self assignment
 				if (this != reinterpret_cast<Self*>(&other)) {
-					// clean up
-					reset();
+					// deallocate memory
+					this->~UniquePointer();
 					// initialize pointer
 					_data = other._data;
 					// invalidate other
@@ -149,18 +150,14 @@ namespace Xf {
 				return *this;
 			}
 
-			/* nullptr assignment */
-			Self& assign(Xf::Nullptr) {
-				// clean up
-				reset();
-				// invalidate pointer
-				_data = nullptr;
-				// return self reference
-				return *this;
+
+			// -- P U B L I C  A S S I G N M E N T  O P E R A T O R S ---------
+
+			/* nullptr assignment operator */
+			Self& operator=(Xf::Nullptr) {
+				// return nullptr assignment
+				return assign(nullptr);
 			}
-
-
-			// -- A S S I G N M E N T  O P E R A T O R S ----------------------
 
 			/* move assignment operator for self type */
 			Self& operator=(Self&& other) {
@@ -177,14 +174,8 @@ namespace Xf {
 				return assign(Xf::move(other));
 			}
 
-			/* nullptr assignment operator */
-			Self& operator=(Xf::Nullptr) {
-				// return nullptr assignment
-				return assign(nullptr);
-			}
 
-
-			// -- A C C E S S O R S  O P E R A T O R S ------------------------
+			// -- P U B L I C  A C C E S S O R S  O P E R A T O R S -----------
 
 			/* dereference operator */
 			Reference operator*(void) {
@@ -213,7 +204,7 @@ namespace Xf {
 
 			// -- B O O L E A N  O P E R A T O R S ----------------------------
 
-			/* bool operator */
+			/* boolean operator */
 			operator bool(void) const {
 				// return pointer validity
 				return _data != nullptr;
@@ -221,34 +212,34 @@ namespace Xf {
 
 			/* not operator */
 			bool operator!(void) const {
-				// return pointer validity
+				// return pointer invalidity
 				return _data == nullptr;
 			}
 
 
-			// -- E Q U A L I T Y  O P E R A T O R S --------------------------
+			// -- P U B L I C  C O M P A R I S O N  O P E R A T O R S ---------
 
 			/* equality operator */
-			bool operator==(const Self& other) const {
+			bool operator==(const Self& other) const noexcept {
 				// return pointer equality
 				return _data == other._data;
 			}
 
 			/* inequality operator */
-			bool operator!=(const Self& other) const {
+			bool operator!=(const Self& other) const noexcept {
 				// return pointer inequality
 				return _data != other._data;
 			}
 
 			/* nullptr equality operator */
-			bool operator==(Xf::Nullptr) const {
-				// return pointer validity
+			bool operator==(Xf::Nullptr) const noexcept {
+				// return pointer invalidity
 				return _data == nullptr;
 			}
 
 			/* nullptr inequality operator */
-			bool operator!=(Xf::Nullptr) const {
-				// return pointer invalidity
+			bool operator!=(Xf::Nullptr) const noexcept {
+				// return pointer validity
 				return _data != nullptr;
 			}
 
@@ -263,6 +254,8 @@ namespace Xf {
 					Allocator::destroy(_data);
 					// deallocate memory
 					Allocator::deallocate(_data);
+					// invalidate pointer
+					_data = nullptr;
 				}
 			}
 
@@ -281,16 +274,16 @@ namespace Xf {
 	// -- F R I E N D  F U N C T I O N S --------------------------------------
 
 	/* make unique pointer */
-	template <class U, class... A>
-	UniquePointer<U> make_unique_pointer(A&&... args) {
-		// instantiate auto pointer
-		UniquePointer<U> ptr;
-		// memory allocation
-		ptr._data = UniquePointer<U>::Allocator::allocate();
+	template <class T, class... A>
+	UniquePointer<T> make_unique_pointer(A&&... args) {
+		// instantiate unique pointer
+		UniquePointer<T> ptr;
+		// allocate memory
+		ptr._data = UniquePointer<T>::Allocator::allocate();
 		// check allocation success
 		if (ptr._data) {
 			// construct object by forwarding arguments
-			UniquePointer<U>::Allocator::construct(ptr._data, Xf::forward<A>(args)...);
+			UniquePointer<T>::Allocator::construct(ptr._data, Xf::forward<A>(args)...);
 		} // return instance
 		return ptr;
 	}

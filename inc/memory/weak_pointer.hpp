@@ -11,22 +11,28 @@
 
 namespace Xf {
 
-	/* AutoPointer forward declaration */
-	template <class T>
-	class AutoPointer;
+	/* unique pointer forward declaration */
+	template <class>
+	class UniquePointer;
+
+	/* shared pointer forward declaration */
+	template <class>
+	class SharedPointer;
+
 
 	// -- W E A K  P O I N T E R  C L A S S -----------------------------------
 
 	template <class T>
 	class WeakPointer final {
 
-
 		public:
 
 			// -- F R I E N D S -----------------------------------------------
 
-			template <class U>
+			/* derived types as friend */
+			template <class>
 			friend class WeakPointer;
+
 
 			// -- P U B L I C  A L I A S E S ----------------------------------
 
@@ -65,7 +71,7 @@ namespace Xf {
 
 			/* nullptr constructor */
 			WeakPointer(Xf::Nullptr) noexcept
-			: _data{nullptr} {
+			: WeakPointer{ } {
 				// code here...
 			}
 
@@ -75,11 +81,19 @@ namespace Xf {
 				// code here...
 			}
 
-			/* auto pointer constructor */
+			/* unique pointer constructor */
 			template <class D>
-			WeakPointer(const Xf::AutoPointer<D>& ptr) noexcept
+			WeakPointer(const Xf::UniquePointer<D>& unique) noexcept
 			requires (Xf::is_base_of_c<T, D>)
-			: _data{ptr._data} {
+			: _data{unique._data} {
+				// code here...
+			}
+
+			/* shared pointer constructor */
+			template <class D>
+			WeakPointer(const Xf::SharedPointer<D>& shared) noexcept
+			requires (Xf::is_base_of_c<T, D>)
+			: _data{shared._data} {
 				// code here...
 			}
 
@@ -98,6 +112,13 @@ namespace Xf {
 			}
 
 			/* move constructor */
+			WeakPointer(Self&& other) noexcept
+			: _data{other._data} {
+				// invalidate other
+				other._data = nullptr;
+			}
+
+			/* derived move constructor */
 			template <class D>
 			WeakPointer(WeakPointer<D>&& other) noexcept
 			requires (Xf::is_base_of_c<T, D>)
@@ -107,44 +128,16 @@ namespace Xf {
 			}
 
 			/* destructor */
-			~WeakPointer(void) noexcept {
-				// code here...
-			}
+			~WeakPointer(void) noexcept = default;
 
 
-			// -- P U B L I C  M E T H O D S ----------------------------------
+			// -- P U B L I C  A S S I G N M E N T ----------------------------
 
-			/* copy assignment */
-			Self& assign(const Self& other) noexcept {
-				// check for self assignment
-				if (this != &other) {
-					// assign other data
-					_data = other._data;
-				} // return self reference
-				return *this;
-			}
-
-			/* derived copy assignment */
-			template <class D>
-			Self& assign(const WeakPointer<D>& other) noexcept
-			requires (Xf::is_base_of_c<T, D>) {
-				// INFO: no need to check for self assignment
-				// assign other data
-				_data = other._data;
+			/* nullptr assignment */
+			Self& assign(Xf::Nullptr) noexcept {
+				// assign null pointer
+				_data = nullptr;
 				// return self reference
-				return *this;
-			}
-
-			/* move assignment */
-			template <class D>
-			Self& assign(WeakPointer<D>&& other) noexcept requires (Xf::is_base_of_c<T, D>) {
-				// check for self assignment
-				if (this != &other) {
-					// assign other data
-					_data = other._data;
-					// invalidate other
-					other._data = nullptr;
-				} // return self reference
 				return *this;
 			}
 
@@ -156,9 +149,53 @@ namespace Xf {
 				return *this;
 			}
 
-			/* auto pointer assignment */
+			/* copy assignment */
+			Self& assign(const Self& other) noexcept {
+				// assign other data
+				_data = other._data;
+				// return self reference
+				return *this;
+			}
+
+			/* derived copy assignment */
 			template <class D>
-			Self& assign(const Xf::AutoPointer<D>& ptr) noexcept
+			Self& assign(const WeakPointer<D>& other) noexcept
+			requires (Xf::is_base_of_c<T, D>) {
+				// assign other data
+				_data = other._data;
+				// return self reference
+				return *this;
+			}
+
+			/* move assignment */
+			Self& assign(Self&& other) noexcept {
+				// check for self assignment
+				if (this != &other) {
+					// assign other data
+					_data = other._data;
+					// invalidate other
+					other._data = nullptr;
+				} // return self reference
+				return *this;
+			}
+
+			/* derived move assignment */
+			template <class D>
+			Self& assign(WeakPointer<D>&& other) noexcept
+			requires (Xf::is_base_of_c<T, D>) {
+				// check for self assignment
+				if (this != &other) {
+					// assign other data
+					_data = other._data;
+					// invalidate other
+					other._data = nullptr;
+				} // return self reference
+				return *this;
+			}
+
+			/* unique pointer assignment */
+			template <class D>
+			Self& assign(const Xf::UniquePointer<D>& ptr) noexcept
 			requires (Xf::is_base_of_c<T, D>) {
 				// assign pointer
 				_data = ptr._data;
@@ -166,20 +203,34 @@ namespace Xf {
 				return *this;
 			}
 
-			/* nullptr assignment */
-			Self& assign(Xf::Nullptr) noexcept {
+			/* shared pointer assignment */
+			template <class D>
+			Self& assign(const Xf::SharedPointer<D>& ptr) noexcept
+			requires (Xf::is_base_of_c<T, D>) {
 				// assign pointer
-				_data = nullptr;
+				_data = ptr._data;
 				// return self reference
 				return *this;
 			}
 
 
-			// -- P U B L I C  O P E R A T O R S ------------------------------
+			// -- P U B L I C  A S S I G N M E N T  O P E R A T O R S ---------
+
+			/* nullptr assignment operator */
+			Self& operator=(Xf::Nullptr) noexcept {
+				// return nullptr assignment
+				return assign(nullptr);
+			}
+
+			/* pointer assignment operator */
+			Self& operator=(Pointer ptr) noexcept {
+				// return pointer assignment
+				return assign(ptr);
+			}
 
 			/* copy assignment operator */
 			Self& operator=(const Self& other) noexcept {
-				// assign other
+				// return copy assignment
 				return assign(other);
 			}
 
@@ -187,36 +238,42 @@ namespace Xf {
 			template <class D>
 			Self& operator=(const WeakPointer<D>& other) noexcept
 			requires (Xf::is_base_of_c<T, D>) {
-				// assign other
+				// return derived copy assignment
 				return assign(other);
 			}
 
 			/* move assignment operator */
 			Self& operator=(Self&& other) noexcept {
-				// assign other
-				return assign(other);
+				// return move assignment
+				return assign(Xf::move(other));
 			}
 
-			/* pointer assignment operator */
-			Self& operator=(Pointer ptr) noexcept {
-				// assign pointer
+			/* derived move assignment operator */
+			template <class D>
+			Self& operator=(WeakPointer<D>&& other) noexcept
+			requires (Xf::is_base_of_c<T, D>) {
+				// return derived move assignment
+				return assign(Xf::move(other));
+			}
+
+			/* unique pointer assignment operator */
+			template <class D>
+			Self& operator=(const Xf::UniquePointer<D>& ptr) noexcept
+			requires (Xf::is_base_of_c<T, D>) {
+				// return unique pointer assignment
 				return assign(ptr);
 			}
 
-			/* auto pointer assignment operator */
-			Self& operator=(const Xf::AutoPointer<Value>& ptr) noexcept {
-				// assign pointer
+			/* shared pointer assignment operator */
+			template <class D>
+			Self& operator=(const Xf::SharedPointer<D>& ptr) noexcept
+			requires (Xf::is_base_of_c<T, D>) {
+				// return shared pointer assignment
 				return assign(ptr);
 			}
 
-			/* nullptr assignment operator */
-			Self& operator=(Xf::Nullptr) noexcept {
-				// assign pointer
-				return assign(nullptr);
-			}
 
-
-			// -- P U B L I C  A C C E S S O R S ------------------------------
+			// -- P U B L I C  A C C E S S O R S  O P E R A T O R S -----------
 
 			/* dereference operator */
 			Reference operator*(void) noexcept {
@@ -226,7 +283,7 @@ namespace Xf {
 
 			/* const dereference operator */
 			ConstRef operator*(void) const noexcept {
-				// return reference
+				// return const reference
 				return *_data;
 			}
 
@@ -238,7 +295,7 @@ namespace Xf {
 
 			/* const arrow operator */
 			ConstPtr operator->(void) const noexcept {
-				// return pointer
+				// return const pointer
 				return _data;
 			}
 
@@ -253,7 +310,7 @@ namespace Xf {
 
 			/* not operator */
 			Bool operator!(void) const noexcept {
-				// return pointer validity
+				// return pointer invalidity
 				return _data == nullptr;
 			}
 
@@ -274,13 +331,13 @@ namespace Xf {
 
 			/* null equality operator */
 			Bool operator==(Xf::Nullptr) const noexcept {
-				// return pointer equality
+				// return pointer invalidity
 				return _data == nullptr;
 			}
 
 			/* null inequality operator */
 			Bool operator!=(Xf::Nullptr) const noexcept {
-				// return pointer inequality
+				// return pointer validity
 				return _data != nullptr;
 			}
 
