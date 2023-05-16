@@ -1287,9 +1287,25 @@ namespace Xf {
 				return is_uppercase(character) ? character + 0x20 : character;
 			}
 
+			template <Xf::is_char_c U>
+			friend std::ostream& operator<<(std::ostream& os, const String<U>& string);
 
 	};
 
+
+	// -- <<  O P E R A T O R  ------------------------------------------------
+
+	/* output stream operator */
+	template <Xf::is_char_c T>
+	std::ostream& operator<<(std::ostream& os, const String<T>& string) {
+		// check if string is null
+		if (string._str) {
+			// write string to os
+			os.write(string._str, string._size);
+		}
+		else { os.write("nullptr", 7); }
+		return os;
+	}
 
 
 
@@ -1707,6 +1723,14 @@ namespace Xf {
 				return false;
 			}
 
+			/* reset */
+			void reset(void) {
+				// reset all members
+				_str.clear();
+				_view_start = 0;
+				_string_cursor = 0;
+				_screen_cursor = 0;
+			}
 
 
 			// -- P U B L I C  A C C E S S O R S ------------------------------
@@ -1733,11 +1757,19 @@ namespace Xf {
 				return _screen_cursor;
 			}
 
-			/* get string */
+			/* string */
+			Xf::String<T>& string(void) {
+				// return string
+				return _str;
+			}
+
+			/* const string */
 			const Xf::String<T>& string(void) const {
 				// return string
 				return _str;
 			}
+
+
 
 
 		private:
