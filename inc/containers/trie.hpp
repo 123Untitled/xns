@@ -114,23 +114,24 @@ namespace Xf {
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* insert */
-			template <class D>
-			void insert(const Xf::CString& str, const D& value) {
-				// get root node
-				Node* node = &_root;
-				// loop through string
-				for (Xf::CString::Size x = 0; x < str.size(); ++x) {
-					// get character index
-					const Size index = to_index(str[x]);
-					// check indexed node validity
-					if (node->_childs.at(index) == nullptr) {
-						// make new node
-						node->_childs.at(index) = Xf::make_auto_pointer<Node>();
-					} // move to node
-					node = &(*node->_childs.at(index));
-				} // allocate value
+			void insert(const Xf::CString& key, const Value& value) {
+				// insert value
+				Node* node = _insert(key);
+				// allocate value
+				node->_value = Xf::make_auto_pointer<Value>(value);
+			}
+
+			/* insert */
+			template <class D> requires (Xf::is_base_of_c<T, D>)
+			void insert(const Xf::CString& key, const D& value) {
+				// insert value
+				Node* node = _insert(key);
+				// allocate value
 				node->_value = Xf::make_auto_pointer<D>(value);
 			}
+
+
+
 
 
 			/* find */
@@ -161,6 +162,24 @@ namespace Xf {
 		private:
 
 			// -- P R I V A T E  M E T H O D S --------------------------------
+
+			/* _insert */
+			Node* _insert(const Xf::CString& str) {
+				// get root node
+				Node* node = &_root;
+				// loop through string
+				for (Xf::CString::Size x = 0; x < str.size(); ++x) {
+					// get character index
+					const Size index = to_index(str[x]);
+					// check indexed node validity
+					if (node->_childs.at(index) == nullptr) {
+						// make new node
+						node->_childs.at(index) = Xf::make_auto_pointer<Node>();
+					} // move to node
+					node = &(*node->_childs.at(index));
+				} // return node
+				return node;
+			}
 
 			/* to index */
 			template <class C>
