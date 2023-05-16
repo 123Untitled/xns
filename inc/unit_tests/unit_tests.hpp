@@ -23,7 +23,7 @@ namespace UT {
 
 	void numeric_limits_ut(void);
 
-	void auto_pointer_ut(void);
+	void unique_pointer_ut(void);
 
 	void array_ut(void);
 
