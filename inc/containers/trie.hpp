@@ -6,6 +6,7 @@
 #include "pair.hpp"
 #include "tuple.hpp"
 #include "auto_pointer.hpp"
+#include "weak_pointer.hpp"
 #include "string.hpp"
 
 // -- N A M E S P A C E -------------------------------------------------------
@@ -113,21 +114,65 @@ namespace Xf {
 
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
-			/* insert */
-			void insert(const Xf::CString& key, const Value& value) {
-				// insert value
+			/* default insert */
+			void insert(const Xf::CString& key) {
+				// insert key
 				Node* node = _insert(key);
-				// allocate value
+				// allocate default value
+				node->_value = Xf::make_auto_pointer<Value>();
+			}
+
+			/* copy insert */
+			void insert(const Xf::CString& key, const Value& value) {
+				// insert key
+				Node* node = _insert(key);
+				// allocate copied value
 				node->_value = Xf::make_auto_pointer<Value>(value);
 			}
 
-			/* insert */
-			template <class D> requires (Xf::is_base_of_c<T, D>)
-			void insert(const Xf::CString& key, const D& value) {
-				// insert value
+			/* move insert */
+			void insert(const Xf::CString& key, Value&& value) {
+				// insert key
+				Node* node = _insert(key);
+				// allocate moved value
+				node->_value = Xf::make_auto_pointer<Value>(Xf::move(value));
+			}
+
+			/* variadic insert */
+			template <class... A>
+			void insert(const Xf::CString& key, A&&... args) {
+				// insert key
 				Node* node = _insert(key);
 				// allocate value
+				node->_value = Xf::make_auto_pointer<Value>(Xf::forward<A>(args)...);
+			}
+
+
+			/* derived default insert */
+			template <class D> requires (Xf::is_base_of_c<T, D>)
+			void insert(const Xf::CString& key) {
+				// insert key
+				Node* node = _insert(key);
+				// allocate default value
+				node->_value = Xf::make_auto_pointer<D>();
+			}
+
+			/* derived copy insert */
+			template <class D> requires (Xf::is_base_of_c<T, D>)
+			void insert(const Xf::CString& key, const D& value) {
+				// insert key
+				Node* node = _insert(key);
+				// allocate copied value
 				node->_value = Xf::make_auto_pointer<D>(value);
+			}
+
+			/* derived move insert */
+			template <class D> requires (Xf::is_base_of_c<T, D>)
+			void insert(const Xf::CString& key, D&& value) {
+				// insert key
+				Node* node = _insert(key);
+				// allocate moved value
+				node->_value = Xf::make_auto_pointer<D>(Xf::move(value));
 			}
 
 
@@ -135,7 +180,7 @@ namespace Xf {
 
 
 			/* find */
-			Xf::AutoPointer<Value> find(const Xf::CString& str) {
+			Xf::WeakPointer<Value> find(const Xf::CString& str) {
 				// get root node
 				Node* node = &_root;
 				// loop through string
@@ -144,8 +189,8 @@ namespace Xf {
 					const Size index = to_index(str[x]);
 
 					if (node->_childs.at(index) == nullptr) {
-						// return null pointer
-						return {};
+						// return weak null pointer
+						return nullptr;
 					}
 
 					// enter in node
