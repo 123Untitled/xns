@@ -14,64 +14,111 @@
 #include "random.hpp"
 #include "trie.hpp"
 
-// const, left reference, right reference, volatile, const volatile
+
+// curiously recurring template pattern (CRTP) learn
 
 template <class T>
-void func3(T&& arg) {
+class _Base {
+	public:
+		_Base() = default;
+		~_Base() = default;
+};
 
-	if constexpr (Xf::is_lvalue_v<T>)
-		std::cout << "left ref, ";
-	else
-		std::cout << "right ref, ";
+class _Derived1 : public _Base<_Derived1> {
+	public:
+		_Derived1() = default;
+		~_Derived1() = default;
+};
 
-	std::cout << "type: " << typeid(T).name() << ", ";
-	std::cout << "value: " << arg << std::endl;
+class _Derived2 : public _Base<_Derived2> {
+	public:
+		_Derived2() = default;
+		~_Derived2() = default;
+};
+
+class B {
+	public:
+		B() = default;
+		virtual ~B() = default;
+		virtual void echo() const = 0;
+};
+
+class D1 : public B {
+	public:
+		D1() = default;
+		~D1() = default;
+		void echo() const override {
+			std::cout << "D1" << std::endl;
+		}
+};
+
+class D2 : public B {
+	public:
+		D2() = default;
+		~D2() = default;
+		void echo() const override {
+			std::cout << "D2" << std::endl;
+		}
+};
+
+template <class T>
+void invoke(const T& t) {
+	Xf::AutoPointer<T> p = Xf::make_auto_pointer<T>(t);
+	//(*p)();
 }
 
-
-template <class... A>
-void func2(A&&... args) {
-	(func3(Xf::forward<A>(args)), ...);
+Xf::AutoPointer<B> f() {
+	return Xf::AutoPointer<D1>{};
 }
-
-template <class... A>
-void func1(A&&... args) {
-	func2(Xf::forward<A>(args)...);
-}
-
 
 int main(int ac, char** av) {
 
 
+	using Proto = Xf::PolyMethod<Xf::AutoPointer<B>(void)>;
+
+	Xf::PolyMethod<Xf::AutoPointer<B>(void)> pm{f};
+
+	invoke<Proto>(pm);
+
+
+
+	Xf::Trie<B> trie;
+
+	trie.insert("hello", D1{});
+	//Xf::Trie<Proto> trie3;
+
+	//trie3.insert("hello", []() -> Xf::AutoPointer<B> {
+	//	return Xf::AutoPointer<D1>{};
+	//});
+
+
+
+
+
+
 	Xf::AutoPointer<int> ap;
 	Xf::WeakPointer<int> wp{ap};
-
-
-	const volatile int n = 10;
-	float f = 10.0f;
-
-	func1(n, f, 10, 10.0f);
-
 	return EXIT_SUCCESS;
 
 
 
 
-	Xf::Trie<std::string> trie;
+	Xf::Trie<std::string> trie2;
 	Xf::CString str = "hello";
-	//trie.insert<>(str, "world");
-	//trie.insert(str, "world2");
+	trie2.insert(str, "world");
+	trie2.insert(str, "world2");
 
-	Xf::AutoPointer<std::string> p = trie.find(Xf::CString{"hello"});
+	//Xf::AutoPointer<std::string> p = trie.find(Xf::CString{"hello"});
 
 
+	/*
 	std::cout << "check" << std::endl;
 	if (p != nullptr) {
 		std::cout << "found: " << *p << std::endl;
 	}
 	else {
 		std::cout << "not found" << std::endl;
-	}
+	}*/
 
     Xf::Vector<Xf::Tuple<int, float>> v;
 
