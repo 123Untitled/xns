@@ -17,6 +17,12 @@ namespace Xf {
 
 		public:
 
+			// -- F R I E N D S -----------------------------------------------
+
+			/* make vector as friend */
+			template <class U, class... A>
+			friend Vector<U> make_vector(A&&... args);
+
 			// -- A L I A S E S -----------------------------------------------
 
 			/* value type */
@@ -381,6 +387,22 @@ namespace Xf {
 
 
 	};
+
+
+	// -- F R I E N D  F U N C T I O N S --------------------------------------
+
+	/* make vector */
+	template <class T, class... A>
+	Vector<T> make_vector(A&&... args) {
+		// create vector
+		Vector<T> vec;
+		// reserve memory
+		vec.reserve(sizeof...(args));
+		// fold expression to emplace back
+		(vec.emplace_back(Xf::forward<A>(args)), ...);
+		// return vector
+		return vec;
+	}
 
 };
 
