@@ -1,9 +1,8 @@
-#ifndef FUNCTION_HEADER
-#define FUNCTION_HEADER
+#ifndef METHOD_HEADER
+#define METHOD_HEADER
 
+#include "types.hpp"
 #include "type_traits.hpp"
-#include "forward.hpp"
-#include "macro.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -11,24 +10,27 @@
 namespace xns {
 
 
-	// -- F U N C T I O N  C L A S S ------------------------------------------
+	// -- M E T H O D  C L A S S ----------------------------------------------
 
 	/* empty declaration */
-	template <class, class...>
-	class function;
+	template <class, class, class...>
+	class method;
 
-	template <class R, class... A>
-	class function<R(A...)> final {
+	template <class O, class R, class... A>
+	class method<O, R(A...)> final {
 
 		public:
 
 			// -- P U B L I C  T Y P E S --------------------------------------
 
 			/* self type */
-			using self = function<R(A...)>;
+			using self        = method<O, R(A...)>;
+
+			/* object type */
+			using object      = O;
 
 			/* prototype type */
-			using prototype = R(*)(A...);
+			using prototype   = R(O::*)(A...);
 
 			/* return type */
 			using return_type = R;
@@ -37,69 +39,69 @@ namespace xns {
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* default constructor */
-			function(void) noexcept
-			: _function{nullptr} {
+			method(void) noexcept
+			: _method{nullptr} {
 				// code here...
 			}
 
 			/* nullptr constructor */
-			function(Xf::Nullptr) noexcept
-			: _function{nullptr} {
+			method(Xf::Nullptr) noexcept
+			: _method{nullptr} {
 				// code here...
 			}
 
-			/* function pointer constructor */
-			function(const prototype function) noexcept
-			: _function{function} {
+			/* method pointer constructor */
+			method(const prototype method) noexcept
+			: _method{method} {
 				// code here...
 			}
 
 			/* copy constructor */
-			function(const self& other) noexcept
-			: _function{other._function} {
+			method(const self& other) noexcept
+			: _method{other._method} {
 				// code here...
 			}
 
 			/* move constructor */
-			function(self&& other) noexcept
-			: _function{Xf::move(other._function)} {
+			method(self&& other) noexcept
+			: _method{Xf::move(other._method)} {
 				// code here...
 			}
 
 			/* destructor */
-			~function(void) noexcept = default;
+			~method(void) noexcept = default;
 
 
 			// -- P U B L I C  A S S I G N M E N T ----------------------------
 
 			/* nullptr assignment */
-			self& assign(xns::null) noexcept {
-				// set function pointer to null
-				_function = nullptr;
+			self& assign(Xf::Nullptr) noexcept {
+				// set method pointer to null
+				_method = nullptr;
 				// return self reference
 				return *this;
 			}
 
-			/* function pointer assignment */
-			self& assign(const prototype function) noexcept {
-				// set function pointer
-				_function = function;
+			/* method pointer assignment */
+			self& assign(const prototype method) noexcept {
+				// set method pointer
+				_method = method;
 				// return self reference
 				return *this;
 			}
 
 			/* copy assignment */
 			self& assign(const self& other) noexcept {
-				// copy function pointer
-				_function = other._function;
+				// copy method pointer
+				_method = other._method;
 				// return self reference
 				return *this;
 			}
 
 			/* move assignment */
 			self& assign(self&& other) noexcept {
-				// move function pointer
-				_function = Xf::move(other._function);
+				// move method pointer
+				_method = Xf::move(other._method);
 				// return self reference
 				return *this;
 			}
@@ -108,27 +110,26 @@ namespace xns {
 			// -- P U B L I C  A S S I G N M E N T  O P E R A T O R S ---------
 
 			/* nullptr assignment operator */
-			self& operator=(xns::null) noexcept {
-				// return assign method
+			self& operator=(Xf::Nullptr) noexcept {
+				// return nullptr assignment
 				return assign(nullptr);
 			}
 
-
-			/* function pointer assignment operator */
-			self& operator=(const prototype function) noexcept {
-				// return assign method
-				return assign(function);
+			/* method pointer assignment operator */
+			self& operator=(const prototype method) noexcept {
+				// return method pointer assignment
+				return assign(method);
 			}
 
 			/* copy assignment operator */
 			self& operator=(const self& other) noexcept {
-				// return assign method
+				// return copy assignment
 				return assign(other);
 			}
 
 			/* move assignment operator */
 			self& operator=(self&& other) noexcept {
-				// return assign method
+				// return move assignment
 				return assign(Xf::move(other));
 			}
 
@@ -137,14 +138,14 @@ namespace xns {
 
 			/* boolean operator */
 			explicit operator bool(void) const noexcept {
-				// return function pointer validity
-				return _function != nullptr;
+				// return method pointer validity
+				return _method != nullptr;
 			}
 
 			/* not operator */
 			bool operator!(void) const noexcept {
-				// return function pointer invalidity
-				return _function == nullptr;
+				// return method pointer invalidity
+				return _method == nullptr;
 			}
 
 
@@ -152,38 +153,40 @@ namespace xns {
 
 			/* equality operator */
 			bool operator==(const self& other) const noexcept {
-				// return true if function pointers are equal
-				return _function == other._function;
+				// return true if method pointers are equal
+				return _method == other._method;
 			}
 
 			/* inequality operator */
 			bool operator!=(const self& other) const noexcept {
 				// return true if function pointers are not equal
-				return _function != other._function;
+				return _method != other._method;
 			}
 
 
 			// -- P U B L I C  C A L L  O P E R A T O R -----------------------
 
-			/* function call operator */
-			return_type operator()(A&&... arguments) {
-				// call function
-				return _function(Xf::forward<A>(arguments)...);
+			/* method call operator */
+			return_type operator()(object& instance, A&&... arguments) {
+				// call method
+				return (instance.*_method)(Xf::forward<A>(arguments)...);
+				//return _method(Xf::forward<A>(arguments)...);
 			}
 
 
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* call */
-			return_type call(A&&... arguments) const {
-				// call function
-				return _function(Xf::forward<A>(arguments)...);
+			return_type call(object& instance, A&&... arguments) const {
+				// call method
+				return (instance.*_method)(Xf::forward<A>(arguments)...);
+				//return _method(Xf::forward<A>(arguments)...);
 			}
 
 			/* reset */
 			void reset(void) noexcept {
 				// set function pointer to null
-				_function = nullptr;
+				_method = nullptr;
 			}
 
 
@@ -191,8 +194,9 @@ namespace xns {
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
-			/* function pointer */
-			prototype _function;
+			/* method pointer */
+			prototype _method;
+
 
 	};
 
@@ -201,4 +205,3 @@ namespace xns {
 }
 
 #endif
-

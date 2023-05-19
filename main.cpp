@@ -15,6 +15,8 @@
 #include "trie.hpp"
 
 
+#include "safe_enum.hpp"
+
 // curiously recurring template pattern (CRTP) learn
 
 template <class T>
@@ -71,6 +73,25 @@ Xf::UniquePointer<B> f() {
 	return Xf::UniquePointer<D1>{};
 }
 
+using color = xns::safe_enum<color_def>;
+
+
+template <class T>
+void ffunc(void) {
+
+	color c{static_cast<color::enum_type>(10000000)};
+	color d{color::RED};
+
+	if (c == d) {
+		std::cout << "equal" << std::endl;
+	}
+
+	//std::cout << c.size() << std::endl;
+
+
+
+}
+
 int main(int ac, char** av) {
 
 	//using Proto = Xf::PolyMethod<Xf::UniquePointer<B>(void)>;
@@ -79,9 +100,12 @@ int main(int ac, char** av) {
 
 
 
-	Xf::Trie<Xf::CString> trie;
+	return EXIT_SUCCESS;
 
-	Xf::Vector<Xf::CString> v;
+
+	Xf::Trie<xns::cstring> trie;
+
+	xns::vector<xns::cstring> v;
 
 	v.emplace_back("cd");
 	v.emplace_back("go");
@@ -89,7 +113,7 @@ int main(int ac, char** av) {
 
 	trie.insert(v, "!!!");
 
-	for (Xf::Vector<Xf::CString>::Size x = 0; x < v.size(); ++x) {
+	for (xns::vector<xns::cstring>::size x = 0; x < v.length(); ++x) {
 		auto weak = trie.find(v[x]);
 		if (weak != nullptr) {
 			std::cout.write(weak->pointer(), weak->size()) << std::endl;
@@ -116,7 +140,7 @@ int main(int ac, char** av) {
 
 
 	Xf::Trie<std::string> trie2;
-	Xf::CString str = "hello";
+	xns::cstring str = "hello";
 	//trie2.insert(str, "world");
 	//trie2.insert(str, "world2");
 

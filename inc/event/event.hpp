@@ -15,6 +15,7 @@
 #include "stack.hpp"
 #include "debug.hpp"
 
+#include "poly_method.hpp"
 
 class Input;
 #include "input.hpp"
@@ -65,10 +66,10 @@ namespace Xf {
 
 			/* input prototype */
 			template <typename C>
-			using InputMethod = void(C::*)(const Xf::String<char>&);
+			using InputMethod = void(C::*)(const xns::cstring&);
 
 			/* input function prototype */
-			using InputFunction = void(*)(const Xf::String<char>&);
+			using InputFunction = void(*)(const xns::cstring&);
 
 
 
@@ -131,7 +132,7 @@ namespace Xf {
 			void call_event(const Evntype);
 
 			/* call all input subscribers */
-			void call_input(const Xf::String<char>&);
+			void call_input(const xns::cstring&);
 
 
 		private:
@@ -139,10 +140,10 @@ namespace Xf {
 			// -- P R I V A T E  A L I A S E S --------------------------------
 
 			/* input vector type */
-			using InputVector = Vector<PolyMethod<void(const Xf::String<char>&)>>;
+			using InputVector = xns::vector<xns::poly_method<void(const xns::cstring&)>>;
 
 			/* event vector type */
-			using EventVector = Vector<PolyMethod<void(void)>>;
+			using EventVector = xns::vector<xns::poly_method<void(void)>>;
 
 			/* event array type */
 			using EventArray = Array<EventVector, IDX(Evntype::EVNT_MAX)>;
@@ -152,7 +153,7 @@ namespace Xf {
 			using Mode = Pair<InputVector, EventArray>;
 
 			/* mode list type */
-			using Modelist = Vector<Mode>;
+			using Modelist = xns::vector<Mode>;
 
 
 			/* optional type */

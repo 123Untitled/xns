@@ -22,13 +22,13 @@ void Xf::Output::write(const char* str) {
 }
 
 /* write bytes */
-void Xf::Output::write(const char* str, const Xf::CString::Size size) {
+void Xf::Output::write(const char* str, const xns::cstring::size_type size) {
 	// append to buffer
 	_instance._buffer.append(str, size);
 }
 
 /* write string */
-void Xf::Output::write(const CString& str) {
+void Xf::Output::write(const xns::cstring& str) {
 	// append to buffer
 	_instance._buffer.append(str);
 }

@@ -29,16 +29,16 @@ namespace Xf {
 			using Tuple = Xf::Tuple<Value, Float>;
 
 			/* vector type */
-			using Vector = Xf::Vector<Tuple>;
+			using vector = xns::vector<Tuple>;
 
 			/* size type */
-			using Size = typename Vector::Size;
+			using size = typename vector::size;
 
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
 			/* data */
-			Vector _data;
+			vector _data;
 
 			/* sum */
 			Float _sum;

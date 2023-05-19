@@ -45,13 +45,13 @@ namespace Xf {
 			// -- A L I A S E S -----------------------------------------------
 
 			/* character type */
-			using CharT = CString::CharT;
+			using CharT = xns::cstring::char_t;
 
 			/* readed bytes type */
 			using Readed = SInt64;
 
 			/* size type */
-			using Size = CString::Size;
+			using Size = xns::cstring::size_type;
 
 
 			// -- S T A T I C  P R I V A T E  M E T H O D S -------------------
@@ -73,7 +73,7 @@ namespace Xf {
 
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------
 
-			static Xf::CString _input;
+			static xns::cstring _input;
 			static CharT       _buff[BUFFER_SIZE + 1];
 			static Readed      _readed;
 			static bool        _is_running;

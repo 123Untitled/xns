@@ -132,7 +132,7 @@ namespace Xf {
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* default insert */
-			void insert(const Xf::CString& key) {
+			void insert(const xns::cstring& key) {
 				// insert key
 				Node* node = _insert(key);
 				// allocate default value
@@ -140,7 +140,7 @@ namespace Xf {
 			}
 
 			/* copy insert */
-			void insert(const Xf::CString& key, const Value& value) {
+			void insert(const xns::cstring& key, const Value& value) {
 				// insert key
 				Node* node = _insert(key);
 				// allocate copied value
@@ -148,7 +148,7 @@ namespace Xf {
 			}
 
 			/* move insert */
-			void insert(const Xf::CString& key, Value&& value) {
+			void insert(const xns::cstring& key, Value&& value) {
 				// insert key
 				Node* node = _insert(key);
 				// allocate moved value
@@ -157,7 +157,7 @@ namespace Xf {
 
 			/* variadic insert */
 			template <class... A>
-			void insert(const Xf::CString& key, A&&... args) {
+			void insert(const xns::cstring& key, A&&... args) {
 				// insert key
 				Node* node = _insert(key);
 				// allocate value
@@ -166,7 +166,7 @@ namespace Xf {
 
 			/* derived default insert */
 			template <class D> requires (Xf::is_base_of_c<T, D>)
-			void insert(const Xf::CString& key) {
+			void insert(const xns::cstring& key) {
 				// insert key
 				Node* node = _insert(key);
 				// allocate default value
@@ -175,7 +175,7 @@ namespace Xf {
 
 			/* derived copy insert */
 			template <class D> requires (Xf::is_base_of_c<T, D>)
-			void insert(const Xf::CString& key, const D& value) {
+			void insert(const xns::cstring& key, const D& value) {
 				// insert key
 				Node* node = _insert(key);
 				// allocate copied value
@@ -184,7 +184,7 @@ namespace Xf {
 
 			/* derived move insert */
 			template <class D> requires (Xf::is_base_of_c<T, D>)
-			void insert(const Xf::CString& key, D&& value) {
+			void insert(const xns::cstring& key, D&& value) {
 				// insert key
 				Node* node = _insert(key);
 				// allocate moved value
@@ -193,14 +193,14 @@ namespace Xf {
 
 			/* derived variadic insert */
 			template <class D, class... A> requires (Xf::is_base_of_c<T, D>)
-			void insert(const Xf::CString& key, A&&... args) {
+			void insert(const xns::cstring& key, A&&... args) {
 				// insert key
 				Node* node = _insert(key);
 				// allocate value
 				node->_value = Xf::make_shared_pointer<D>(Xf::forward<A>(args)...);
 			}
 
-			using KeyVector = Xf::Vector<Xf::CString>;
+			using KeyVector = xns::vector<xns::cstring>;
 
 
 			/* derived multi insert */
@@ -209,7 +209,7 @@ namespace Xf {
 				// instanciate value
 				Shared value = Xf::make_shared_pointer<D>(Xf::forward<A>(args)...);
 				// loop through alias
-				for (KeyVector::Size x = 0; x < alias.size(); ++x) {
+				for (KeyVector::size x = 0; x < alias.length(); ++x) {
 					// insert key
 					Node* node = _insert(alias[x]);
 					// allocate value
@@ -223,7 +223,7 @@ namespace Xf {
 				// instanciate value
 				Shared value = Xf::make_shared_pointer<Value>(Xf::forward<A>(args)...);
 				// loop through alias
-				for (KeyVector::Size x = 0; x < alias.size(); ++x) {
+				for (KeyVector::size x = 0; x < alias.length(); ++x) {
 					// insert key
 					Node* node = _insert(alias[x]);
 					// allocate value
@@ -232,11 +232,11 @@ namespace Xf {
 			}
 
 			/* find */
-			WeakValue find(const Xf::CString& str) {
+			WeakValue find(const xns::cstring& str) {
 				// get root node
 				Node* node = &_root;
 				// loop through string
-				for (Xf::CString::Size x = 0; x < str.size(); ++x) {
+				for (xns::cstring::size_type x = 0; x < str.size(); ++x) {
 					const Size index = to_index(str[x]);
 					if (node->_table.at(index) != nullptr) {
 						// enter in node
@@ -258,11 +258,11 @@ namespace Xf {
 			// -- P R I V A T E  M E T H O D S --------------------------------
 
 			/* _insert */
-			Node* _insert(const Xf::CString& str) {
+			Node* _insert(const xns::cstring& str) {
 				// get root node
 				Node* node = &_root;
 				// loop through string
-				for (Xf::CString::Size x = 0; x < str.size(); ++x) {
+				for (xns::cstring::size_type x = 0; x < str.size(); ++x) {
 					// get character index
 					const Size index = to_index(str[x]);
 					// check indexed node validity

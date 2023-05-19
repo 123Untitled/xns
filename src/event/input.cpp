@@ -5,7 +5,7 @@
 
 Xf::Input::Readed Xf::Input::_readed                = 0;
 Xf::Input::CharT  Xf::Input::_buff[BUFFER_SIZE + 1] = { 0 };
-Xf::CString       Xf::Input::_input                 = "";
+xns::cstring       Xf::Input::_input                 = "";
 bool              Xf::Input::_is_running            = false;
 
 bool              Xf::Input::_windowed              = false;
@@ -107,7 +107,7 @@ void Xf::Input::dispatch(void) {
 	using Ev = Xf::Evntype;
 
 	// filter extended ascii codes
-	_input.filter(Xf::CString::is_multibyte, false);
+	_input.filter(xns::cstring::is_multibyte, false);
 
 
 	if (_input.length() == 3 && _input[0] == 0x1b) {
@@ -140,7 +140,7 @@ void Xf::Input::dispatch(void) {
 	}
 
 	// filter control characters
-	_input.filter(Xf::CString::is_control, false);
+	_input.filter(xns::cstring::is_control, false);
 
 	evnt.call_input(_input);
 }

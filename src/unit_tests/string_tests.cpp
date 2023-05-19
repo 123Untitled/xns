@@ -15,11 +15,11 @@
 #define ALLOCATED     true
 
 template <typename T>
-static void EXPECTED(	const Xf::String<T>& str,
+static void EXPECTED(	const xns::string<T>& str,
 						const bool ptr,
-						const typename Xf::String<T>::Size len,
-						const typename Xf::String<T>::Size cap) {
-	using Xf::String;
+						const typename xns::string<T>::size_type len,
+						const typename xns::string<T>::size_type cap) {
+	using xns::string;
 
 	// check pointer diff
 	if ((!str.pointer()) != (!ptr)) ERROR(POINTER);
@@ -52,7 +52,7 @@ static void EXPECTED(	const Xf::String<T>& str,
 template <typename T>
 static void reserve_test(void) {
 
-	using Str = Xf::String<T>;
+	using Str = xns::string<T>;
 
 	{
 		Str s;
@@ -84,7 +84,7 @@ static void reserve_test(void) {
 	}
 	{
 		Str s;
-		s.reserve(std::numeric_limits<typename Str::Size>::max() - 1);
+		s.reserve(std::numeric_limits<typename Str::size_type>::max() - 1);
 		EXPECTED(s, NULLPTR, 0, 0);
 	}
 }
@@ -152,9 +152,9 @@ void UT::string_ut(void) {
 	//append_fill_test();
 	return;
 
-	Xf::String<char16_t> sss;
+	xns::string<char16_t> sss;
    // sss.forward_remove_duplicates();
-	Xf::String<char> s;
+	xns::string<char> s;
 	const unsigned char c = 'a';
 
 	s.to_string(c);

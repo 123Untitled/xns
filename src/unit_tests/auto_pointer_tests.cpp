@@ -47,7 +47,7 @@ void UT::unique_pointer_ut(void) {
 
 	own::UniquePointer<int> ptr_int = own::make_unique_pointer<int>(123);
 
-	own::Vector<own::UniquePointer<int>> vec;
+	xns::vector<own::UniquePointer<int>> vec;
 
 	vec.push_back(Xf::make_unique_pointer<int>(123));
 

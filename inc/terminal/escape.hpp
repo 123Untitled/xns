@@ -90,10 +90,10 @@ namespace Xf {
 
 
 			/* value type */
-			using Value = Xf::CString;
+			using Value = xns::cstring;
 
 			/* char type */
-			using CharT = Value::CharT;
+			using CharT = Value::char_t;
 
 			/* reference type */
 			using Reference = Value&;
@@ -118,57 +118,57 @@ namespace Xf {
 			// -- P U B L I C  S T A T I C  M E T H O D S ---------------------
 
 			/* move home */
-			static const Xf::CString& move_home(void);
+			static const xns::cstring& move_home(void);
 
 
 			/* erase screen */
-			static const Xf::CString& erase_screen(void);
+			static const xns::cstring& erase_screen(void);
 
 			/* erase line */
-			static const Xf::CString& erase_line(void);
+			static const xns::cstring& erase_line(void);
 
 			/* erase to end of line */
-			static const Xf::CString& erase_to_end(void);
+			static const xns::cstring& erase_to_end(void);
 
 			/* erase from start of line */
-			static const Xf::CString& erase_from_start(void);
+			static const xns::cstring& erase_from_start(void);
 
 
 			/* enter screen */
-			static const Xf::CString& enter_screen(void);
+			static const xns::cstring& enter_screen(void);
 
 			/* exit screen */
-			static const Xf::CString& exit_screen(void);
+			static const xns::cstring& exit_screen(void);
 
 			/* save screen */
-			static const Xf::CString& save_screen(void);
+			static const xns::cstring& save_screen(void);
 
 			/* restore screen */
-			static const Xf::CString& restore_screen(void);
+			static const xns::cstring& restore_screen(void);
 
 
 			/* reset style */
-			static const Xf::CString& reset_style(void);
+			static const xns::cstring& reset_style(void);
 
 
 			/* show cursor */
-			static const Xf::CString& show_cursor(void);
+			static const xns::cstring& show_cursor(void);
 
 			/* hide cursor */
-			static const Xf::CString& hide_cursor(void);
+			static const xns::cstring& hide_cursor(void);
 
 			/* request position */
-			static const Xf::CString& request_position(void);
+			static const xns::cstring& request_position(void);
 
 
 			/* cursor beam */
-			static const Xf::CString& cursor_beam(void);
+			static const xns::cstring& cursor_beam(void);
 
 			/* cursor underline */
-			static const Xf::CString& cursor_underline(void);
+			static const xns::cstring& cursor_underline(void);
 
 			/* cursor block */
-			static const Xf::CString& cursor_block(void);
+			static const xns::cstring& cursor_block(void);
 
 
 
@@ -179,36 +179,36 @@ namespace Xf {
 
 
 			/* move position */
-			static Xf::CString move_position(TSize, TSize);
+			static xns::cstring move_position(TSize, TSize);
 
 			/* move x position */
-			static const Xf::CString& move_x(TSize);
+			static const xns::cstring& move_x(TSize);
 
 			/* move left */
-			static Xf::CString move_left(const TSize = 1);
+			static xns::cstring move_left(const TSize = 1);
 
 			/* move right */
-			static Xf::CString move_right(const TSize = 1);
+			static xns::cstring move_right(const TSize = 1);
 
 			/* move up */
-			static Xf::CString move_up(const TSize = 1);
+			static xns::cstring move_up(const TSize = 1);
 
 			/* move down */
-			static Xf::CString move_down(const TSize = 1);
+			static xns::cstring move_down(const TSize = 1);
 
 		private:
 
 			/* move direction */
-			static Xf::CString _move_direction(TSize, const Char);
+			static xns::cstring _move_direction(TSize, const Char);
 
 
 		public:
 
 			/* hex color */
-			static Xf::CString hex_color(const UInt32, const bool = true);
+			static xns::cstring hex_color(const UInt32, const bool = true);
 
 			/* rgb color */
-			static Xf::CString rgb_color(UInt8, UInt8, UInt8, const bool = true);
+			static xns::cstring rgb_color(UInt8, UInt8, UInt8, const bool = true);
 
 
 

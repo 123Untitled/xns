@@ -17,70 +17,71 @@
 #include "numeric_limits.hpp"
 
 
-// forward declarations
-class LString;
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
 
 
 	// -- S T R I N G  C L A S S ----------------------------------------------
 
 	// forward declarations
 	template <Xf::is_char_c T>
-	class String;
+	class string;
 
 	/* c-string ascii type */
-	using CString   = String<char>;
+	using cstring   = string<char>;
 
 	/* wide string type */
-	using WString   = String<wchar_t>;
+	using WString   = string<wchar_t>;
 
 	/* utf-8 string type */
-	using String8  = String<char8_t>;
+	using string8   = string<char8_t>;
 
 	/* utf-16 string type */
-	using String16 = String<char16_t>;
+	using string16  = string<char16_t>;
 
 	/* utf-32 string type */
-	using String32 = String<char32_t>;
+	using string32  = string<char32_t>;
 
 
 	/* string class */
 	template <Xf::is_char_c T>
-	class String {
+	class string {
 
 		public:
 
-			// -- A L I A S E S -----------------------------------------------
+			// -- T Y P E S ---------------------------------------------------
 
 			/* character type */
-			using CharT = remove_cv_t<T>;
+			using char_t = Xf::remove_cv_t<T>;
+
+			/* self type */
+			using self = string<char_t>;
 
 			/* size type */
-			using Size = UInt64;
+			using size_type = UInt64;
 
 			/* comparison type */
-			using Signed = SInt32;
+			using signed_type = SInt32;
 
 			/* pointer type */
-			using Pointer = CharT*;
+			using mut_pointer = char_t*;
 
 			/* reference type */
-			using Reference = CharT&;
+			using reference = char_t&;
 
 			/* move reference type */
-			using MoveReference = CharT&&;
+			using move_ref = char_t&&;
 
 			/* const reference type */
-			using ConstRef = const CharT&;
+			using const_ref = const char_t&;
 
 			/* const pointer type */
-			using ConstPointer = const CharT*;
+			using const_pointer = const char_t*;
 
 			/* allocator type */
-			using Allocator = Xf::Allocator<CharT>;
+			using allocator = Xf::Allocator<char_t>;
 
 
 		private:
@@ -88,7 +89,7 @@ namespace Xf {
 			// -- M E M B E R S -----------------------------------------------
 
 			/* pointer */
-			Pointer _str;
+			mut_pointer _str;
 
 			/* capacity */
 			Size _capacity;
@@ -102,19 +103,19 @@ namespace Xf {
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* default constructor */
-			String(void)
+			string(void)
 			: _str{nullptr}, _capacity{0}, _size{0} {
 				// code here...
 			}
 
 			/* capacity constructor */
-			explicit String(const Size capacity)
-			: String{} {
+			explicit string(const Size capacity)
+			: string{} {
 				std::cout << "capacity constructor" << std::endl;
 				// exit if capacity is zero
 				if (!capacity) { return; }
 				// allocate memory
-				_str = Allocator::allocate(capacity + 1);
+				_str = allocator::allocate(capacity + 1);
 				// set capacity if allocation was successful
 				if (_str == nullptr) { return; }
 				// set capacity
@@ -124,14 +125,14 @@ namespace Xf {
 			}
 
 			/* null-terminated string constructor */
-			String(ConstPointer str)
-			: String{} {
+			string(const_pointer str)
+			: string{} {
 				// exit if string is null or empty
 				if ((_size = get_len(str)) == 0) { return; }
 				// set capacity
 				_capacity = _size;
 				// allocate memory
-				_str = Allocator::allocate(_capacity + 1);
+				_str = allocator::allocate(_capacity + 1);
 				// exit if allocation failed
 				if (_str == nullptr) { _initialize_members(); return; }
 				// set nullchar
@@ -141,12 +142,12 @@ namespace Xf {
 			}
 
 			/* buffer constructor */
-			explicit String(ConstPointer str, const Size size)
-			: String{} {
+			explicit string(const_pointer str, const size_t size)
+			: string{} {
 				// exit if string is null or empty
 				if (!str || !size) { return; }
 				// allocate memory
-				_str = Allocator::allocate(size + 1);
+				_str = allocator::allocate(size + 1);
 				// exit if allocation failed
 				if (_str == nullptr) { return; }
 				// set capacity
@@ -160,12 +161,12 @@ namespace Xf {
 			}
 
 			/* fill constructor */
-			explicit String(const CharT character, const Size count)
-			: String{} {
+			explicit string(const char_t character, const Size count)
+			: string{} {
 				// exit if count is zero
 				if (!count) { return; }
 				// allocate memory
-				_str = Allocator::allocate(count + 1);
+				_str = allocator::allocate(count + 1);
 				// exit if allocation failed
 				if (_str == nullptr) { return; }
 				// set capacity
@@ -179,25 +180,25 @@ namespace Xf {
 			}
 
 			/* copy constructor */
-			String(const String& other)
-			: String{other._str, other._size} {
+			string(const string& other)
+			: string{other._str, other._size} {
 				// code here...
 			}
 
 
 			/* move constructor */
-			String(String&& other) noexcept
+			string(string&& other) noexcept
 			: _str{other._str}, _capacity{other._capacity}, _size{other._size} {
 				// invalidate other
 				other._initialize_members();
 			}
 
 			/* destructor */
-			~String(void) {
+			~string(void) {
 				// check if pointer is valid
 				if (_str) {
 					// deallocate memory
-					Allocator::deallocate(_str);
+					allocator::deallocate(_str);
 				}
 			}
 
@@ -207,12 +208,12 @@ namespace Xf {
 			// -- A S S I G N -----------------------------------------------------
 
 			/* null-terminated string assignment */
-			String& assign(ConstPointer str) {
+			string& assign(const_pointer str) {
 				return assign(str, get_len(str));
 			}
 
 			/* buffer assignment */
-			String& assign(ConstPointer str, const Size size) {
+			string& assign(const_pointer str, const Size size) {
 
 				// WARNING: need to handle this case !
 				// check if size or pointer is null
@@ -221,7 +222,7 @@ namespace Xf {
 				// check if capacity is sufficient
 				if (_capacity < size) {
 					// resize the string
-					Pointer tmp = _realloc(size);
+					mut_pointer tmp = _realloc(size);
 					// check if reallocation failed
 					if (tmp == nullptr) { return *this; }
 					// update members
@@ -240,21 +241,21 @@ namespace Xf {
 			}
 
 			/* fill assignment */
-			String& assign(const CharT character, const Size size = 1) {
+			string& assign(const char_t character, const Size size = 1) {
 
 			}
 
 			// WARNING: need to rework this with realloc
 			/* copy assignment */
-			String& assign(const String& other) {
+			string& assign(const string& other) {
 				// check for self-assignment
 				if (this != &other) {
 					// check if capacity is sufficient
 					if (_capacity < other._size) {
 						// deallocate memory
-						if (_str) { Allocator::deallocate(_str); }
+						if (_str) { allocator::deallocate(_str); }
 						// allocate memory
-						_str = Allocator::allocate(other._size + 1);
+						_str = allocator::allocate(other._size + 1);
 						// check if allocation was successful
 						if (_str == nullptr) { return *this; }
 						// set capacity
@@ -272,11 +273,11 @@ namespace Xf {
 			}
 
 			/* move assignment */
-			String& assign(String&& other) noexcept {
+			string& assign(string&& other) noexcept {
 				// check for self-assignment
 				if (this != &other) {
 					// deallocate memory
-					if (_str) { Allocator::deallocate(_str); }
+					if (_str) { allocator::deallocate(_str); }
 					// move members
 					_str = other._str;
 					_capacity = other._capacity;
@@ -294,22 +295,22 @@ namespace Xf {
 			// -- A S S I G N M E N T  O P E R A T O R S ----------------------
 
 			/* copy assignment operator */
-			String& operator=(const String& other) {
+			string& operator=(const string& other) {
 				return assign(other);
 			}
 
 			/* move assignment operator */
-			String& operator=(String&& other) noexcept {
+			string& operator=(string&& other) noexcept {
 				return assign(Xf::move(other));
 			}
 
 			/* null-terminated string assignment operator */
-			String& operator=(ConstPointer str) {
+			string& operator=(const_pointer str) {
 				return assign(str, get_len(str));
 			}
 
 			/* character assignment operator */
-			String& operator=(const CharT character) {
+			string& operator=(const char_t character) {
 				return assign(character, 1);
 			}
 
@@ -317,17 +318,17 @@ namespace Xf {
 			// -- C O N C A T E N A T I O N  O P E R A T O R S ----------------
 
 			/* concatenation assignment operator */
-			String& operator+=(const String& str) {
+			string& operator+=(const string& str) {
 				return append(str);
 			}
 
 			/* null-terminated string concatenation assignment operator */
-			String& operator+=(ConstPointer str) {
+			string& operator+=(const_pointer str) {
 				return append(str, get_len(str));
 			}
 
 			/* character concatenation assignment operator */
-			String& operator+=(const CharT character) {
+			string& operator+=(const char_t character) {
 				return append(character);
 			}
 
@@ -335,12 +336,12 @@ namespace Xf {
 			// -- S U B S C R I P T  O P E R A T O R S ------------------------
 
 			/* subscript operator */
-			Reference operator[](const Size index) {
+			reference operator[](const size_type index) {
 				return _str[index];
 			}
 
 			/* const subscript operator */
-			ConstRef operator[](const Size index) const {
+			const_ref operator[](const size_type index) const {
 				return _str[index];
 			}
 
@@ -361,13 +362,13 @@ namespace Xf {
 			// -- C O M P A R I S O N  O P E R A T O R S ----------------------
 
 			/* equality operator */
-			bool operator==(const String& str) const {
+			bool operator==(const string& str) const {
 				// call compare method
 				return compare(str._str) == 0;
 			}
 
 			/* null-terminated string equality operator */
-			bool operator==(ConstPointer str) const {
+			bool operator==(const_pointer str) const {
 				// call compare method
 				return compare(str) == 0;
 			}
@@ -407,12 +408,12 @@ namespace Xf {
 			}
 
 			/* pointer */
-			Pointer pointer(void) {
+			mut_pointer pointer(void) {
 				return _str;
 			}
 
 			/* const pointer */
-			ConstPointer pointer(void) const {
+			const_pointer pointer(void) const {
 				return _str;
 			}
 
@@ -436,7 +437,7 @@ namespace Xf {
 				// check if size is greater than capacity
 				if (requested > _capacity) {
 					// reallocate memory
-					Pointer new_str = Allocator::realloc(_str, requested + 1);
+					mut_pointer new_str = allocator::realloc(_str, requested + 1);
 					// check if reallocation failed
 					if (new_str == nullptr) { return; }
 					// set new pointer
@@ -451,11 +452,11 @@ namespace Xf {
 			// -- A P P E N D -------------------------------------------------
 
 			/* fill append */
-			String& append(const CharT character, const Size count = 1) {
+			string& append(const char_t character, const Size count = 1) {
 				// check if there is enough space
 				if (count > available()) {
 					// resize the string
-					Pointer new_str = _realloc(_size + count);
+					mut_pointer new_str = _realloc(_size + count);
 					// check if reallocation failed
 					if (new_str == nullptr) { return *this; }
 					// update data
@@ -473,20 +474,20 @@ namespace Xf {
 
 
 			/* string append */
-			String& append(const String& str) {
+			string& append(const string& str) {
 				// call buffer append
 				return append(str._str, str._size);
 			}
 
 			/* null-terminated string append */
-			String& append(ConstPointer str) {
+			string& append(const_pointer str) {
 				// call buffer append
-				return append(str, String::get_len(str));
+				return append(str, string::get_len(str));
 			}
 
 
 			/* buffer append */ // WARNING: need to check nullptr
-			String& append(ConstPointer str, Size size) {
+			string& append(const_pointer str, Size size) {
 
 				// check if size or pointer is null
 				if (!size || !str) { return *this; }
@@ -494,7 +495,7 @@ namespace Xf {
 				// check if there is enough space
 				if (size > available()) {
 					// resize the string
-					Pointer new_str = _realloc(_size + size);
+					mut_pointer new_str = _realloc(_size + size);
 					// check if reallocation failed
 					if (new_str == nullptr) { return *this; }
 					// update data
@@ -521,8 +522,8 @@ namespace Xf {
 			static constexpr bool append_selector(void) {
 				// minimum arguments needed
 				constexpr Size min = 2;
-				// check if all arguments are of type String
-				constexpr bool type = (Xf::IsSame_s<Xf::remove_reference_t<A>, String<CharT>>::value&& ...);
+				// check if all arguments are of type string
+				constexpr bool type = (Xf::IsSame_s<Xf::remove_reference_t<A>, string<char_t>>::value&& ...);
 				// check if there are at least two arguments
 				constexpr bool required = sizeof...(A) >= min;
 				// return boolean
@@ -531,7 +532,7 @@ namespace Xf {
 
 			/* multiple string append */
 			template <typename... A>
-			String& append(A&&... strings) requires(append_selector<A...>()) {
+			string& append(A&&... strings) requires(append_selector<A...>()) {
 
 				// get the size of the strings
 				Size size = 0;
@@ -542,7 +543,7 @@ namespace Xf {
 				// check if there is enough space
 				if (size > available()) {
 					// resize the string
-					Pointer new_str = _realloc(_size + size);
+					mut_pointer new_str = _realloc(_size + size);
 					// check if reallocation failed
 					if (new_str == nullptr) { return *this; }
 					// update data
@@ -567,7 +568,7 @@ namespace Xf {
 			// -- I N S E R T -------------------------------------------------
 
 			/* fill insert */
-			String& insert(Size index, const CharT character, const Size count = 1) {
+			string& insert(Size index, const char_t character, const Size count = 1) {
 				// check count is not null
 				if (!count) { return *this; }
 
@@ -578,7 +579,7 @@ namespace Xf {
 				// check if there is enough space
 				if (count > available()) {
 					// resize the string
-					Pointer new_str = _realloc(required);
+					mut_pointer new_str = _realloc(required);
 					// check if reallocation failed
 					if (new_str == nullptr) { return *this; }
 					// update data
@@ -608,7 +609,7 @@ namespace Xf {
 
 
 			/* buffer insert */
-			String& insert(Size index, ConstPointer str, const Size size) {
+			string& insert(Size index, const_pointer str, const Size size) {
 				// WARNING: not implemented
 
 				// check if size or pointer is null
@@ -622,7 +623,7 @@ namespace Xf {
 				// check if there is enough space
 				if (size > available()) {
 					// resize the string
-					Pointer new_str = _realloc(required);
+					mut_pointer new_str = _realloc(required);
 					// check if reallocation failed
 					if (new_str == nullptr) { return *this; }
 					// update data
@@ -651,15 +652,15 @@ namespace Xf {
 			}
 
 			/* string insert */
-			String& insert(const Size index, const String& str) {
+			string& insert(const Size index, const string& str) {
 				// call buffer insert
 				return insert(index, str._str, str._size);
 			}
 
 			/* null-terminated string insert */
-			String& insert(const Size index, ConstPointer str) {
+			string& insert(const Size index, const_pointer str) {
 				// call buffer insert with size
-				return insert(index, str, String::get_len(str));
+				return insert(index, str, string::get_len(str));
 			}
 
 
@@ -667,7 +668,7 @@ namespace Xf {
 			// -- E R A S E ---------------------------------------------------
 
 			/* erase character */
-			String& erase(const Size index) {
+			string& erase(const Size index) {
 				// check if index is valid and string is not null
 				if (index < _size && _str != nullptr) {
 					// loop through string
@@ -681,7 +682,7 @@ namespace Xf {
 			}
 
 			/* erase range */
-			String& erase(const Size start, const Size end) {
+			string& erase(const Size start, const Size end) {
 				// check if index is valid and string is not null
 				if (start <= end && end < _size && _str != nullptr) {
 
@@ -706,7 +707,7 @@ namespace Xf {
 				if (_str != nullptr) {
 					// convert to uppercase
 					for (Size x = 0; x < _size; ++x) {
-						_str[x] = String::to_uppercase(_str[x]);
+						_str[x] = string::to_uppercase(_str[x]);
 					}
 				}
 			}
@@ -717,13 +718,13 @@ namespace Xf {
 				if (_str != nullptr) {
 					// convert to lowercase
 					for (Size x = 0; x < _size; ++x) {
-						_str[x] = String::to_lowercase(_str[x]);
+						_str[x] = string::to_lowercase(_str[x]);
 					}
 				}
 			}
 
 			/* filter */ // INFO: ref functor
-			void filter(bool (&is_type)(const CharT), bool keep = true) {
+			void filter(bool (&is_type)(const char_t), bool keep = true) {
 				// exit if string is null
 				if (_str == nullptr) { return; }
 				// offset
@@ -746,7 +747,7 @@ namespace Xf {
 					// reverse string
 					for (Size x = 0, z = _size - 1; x < z; ++x, --z) {
 						// swap characters
-						CharT tmp = _str[x];
+						char_t tmp = _str[x];
 						_str[x] = _str[z];
 						_str[z] = tmp;
 					}
@@ -770,7 +771,7 @@ namespace Xf {
 
 			/* forward remove duplicates */
 			void forward_remove_duplicates(void) {
-				static_assert(Xf::is_8bit_v<CharT>, "CharT must be 8-bit");
+				static_assert(Xf::is_8bit_v<char_t>, "char_t must be 8-bit");
 
 				bool seen[UINT8_MAX] = { false };
 
@@ -847,9 +848,9 @@ namespace Xf {
 
 					Size x = index;
 					// skip whitespace characters
-					while (x != 0 && String::is_whitespace(_str[x])) { --x; }
+					while (x != 0 && string::is_whitespace(_str[x])) { --x; }
 					// skip printable characters
-					while (x != 0 && String::is_alpha(_str[x])) { --x; }
+					while (x != 0 && string::is_alpha(_str[x])) { --x; }
 
 					return x;
 				}
@@ -857,7 +858,7 @@ namespace Xf {
 			}
 
 			/* next character */
-			Size next_character(const Size index, const CharT character) const {
+			Size next_character(const Size index, const char_t character) const {
 				// idle if nullptr or index exceed length
 				if (_str != nullptr && index < _size) {
 					// loop through string
@@ -870,7 +871,7 @@ namespace Xf {
 			}
 
 			/* previous character */
-			Size previous_character(const Size index, const CharT character) const {
+			Size previous_character(const Size index, const char_t character) const {
 				// idle if nullptr or index exceed length
 				if (_str != nullptr && index < _size) {
 					// loop through string
@@ -883,7 +884,7 @@ namespace Xf {
 			}
 
 			/* is only */
-			bool is_only(bool (&is_type)(const CharT)) const {
+			bool is_only(bool (&is_type)(const char_t)) const {
 				// return false if string is null or empty
 				if (!_str || !_size) { return false; } // WARNING: functor is not checked
 				// loop through string
@@ -897,9 +898,9 @@ namespace Xf {
 			// -- E X T R A C T I O N -----------------------------------------
 
 			/* split */
-			Xf::Vector<String<CharT>> split(String&& sep) const {
+			xns::vector<string<char_t>> split(string&& sep) const {
 				// vector of strings
-				Xf::Vector<String<CharT>> vec;
+				xns::vector<string<char_t>> vec;
 				// check if string is not null
 				if (_str) {
 					// loop through string characters
@@ -917,9 +918,9 @@ namespace Xf {
 
 
 			/* divide */ // INFO: split but keep separators
-			Xf::Vector<String<CharT>> divide(String&& sep) const {
+			xns::vector<string<char_t>> divide(string&& sep) const {
 				// vector of strings
-				Xf::Vector<String<CharT>> vec;
+				xns::vector<string<char_t>> vec;
 
 				if (_str) {
 					UInt32 z, x = 0;
@@ -951,15 +952,15 @@ namespace Xf {
 			// need to fix this.
 
 			/* string compare */
-			Signed compare(const String& str) const {
+			signed_type compare(const string& str) const {
 				// call null-terminated string compare
 				return compare(str._str);
 			}
 
 			/* null-terminated string compare */
-			Signed compare(ConstPointer str2) const {
+			signed_type compare(const_pointer str2) const {
 				// temporary pointers
-				ConstPointer str1 = _str;
+				const_pointer str1 = _str;
 				// compare nullptr-ness
 				if (!str1) { if (!str2) { return 0; } return -1; }
 				if (!str2) { return 1; }
@@ -971,15 +972,15 @@ namespace Xf {
 			}
 
 			/* string size compare */
-			Signed compare(const String& str, const Size size) const {
+			signed compare(const string& str, const Size size) const {
 				// call null-terminated string size compare
 				return compare(str._str, size);
 			}
 
 			/* null-terminated string size compare */
-			Signed compare(ConstPointer str2, Size size) const {
+			signed compare(const_pointer str2, Size size) const {
 				// temporary pointers
-				ConstPointer str1 = _str;
+				const_pointer str1 = _str;
 				// compare nullptr-ness
 				if (!str1) { if (!str2) { return 0; } return -1; }
 				if (!str2) { return 1; }
@@ -1082,7 +1083,7 @@ namespace Xf {
 				_str[_size = size] = 0;
 			}
 
-			void _str_and_capacity(Pointer str, const Size capacity) {
+			void _str_and_capacity(mut_pointer str, const Size capacity) {
 				// set capacity
 				_capacity = capacity;
 				// set pointer
@@ -1090,7 +1091,7 @@ namespace Xf {
 			}
 
 			/* set members */
-			void _set_members(CharT* str, const Size size, const Size capacity) {
+			void _set_members(char_t* str, const Size size, const Size capacity) {
 				// set members
 				_str = str; _size = size; _capacity = capacity;
 			}
@@ -1101,30 +1102,30 @@ namespace Xf {
 				// check requested capacity
 				if (!capacity) { return; }
 				// allocate memory
-				_str = Allocator::allocate(capacity);
+				_str = allocator::allocate(capacity);
 				// set capacity on success
 				if (_str) { _capacity = capacity; }
 			}
 
 			/* realloc */
-			Pointer _realloc(const Size requested) {
+			mut_pointer _realloc(const Size requested) {
 				// reallocate memory
-				return Allocator::realloc(_str, requested + 1);
+				return allocator::realloc(_str, requested + 1);
 			}
 
 			/* allocate other */
-			Pointer _allocate(const Size capacity) const {
+			mut_pointer _allocate(const Size capacity) const {
 				// check requested capacity
 				if (!capacity) { return nullptr; }
 				// allocate memory
-				return Allocator::allocate(capacity);
+				return allocator::allocate(capacity);
 			}
 
 
 			/* deallocate members */
 			void _deallocate(void) {
 				// check if memory is allocated
-				if (_str) { Allocator::deallocate(_str); }
+				if (_str) { allocator::deallocate(_str); }
 				// reset members
 				_initialize_members();
 			}
@@ -1136,7 +1137,7 @@ namespace Xf {
 
 
 			/* unsafe copy */
-			void _unsafe_copy(Pointer dst, ConstPointer src, const Size size) {
+			void _unsafe_copy(mut_pointer dst, const_pointer src, const Size size) {
 				// loop through source
 				for (Size x = 0; x < size; ++x) {
 					// copy character to dst
@@ -1145,7 +1146,7 @@ namespace Xf {
 			}
 
 			/* unsafe fill */
-			void _unsafe_fill(Pointer dst, const CharT character, const Size size) {
+			void _unsafe_fill(mut_pointer dst, const char_t character, const Size size) {
 				// loop through dst
 				for (Size x = 0; x < size; ++x) {
 					// set each character to character
@@ -1154,7 +1155,7 @@ namespace Xf {
 			}
 
 			/* unsafe bzero */
-			void _unsafe_bzero(Pointer dst, const Size size) {
+			void _unsafe_bzero(mut_pointer dst, const Size size) {
 				// loop through dst
 				for (Size x = 0; x < size; ++x) {
 					// set each character to null
@@ -1178,9 +1179,9 @@ namespace Xf {
 			/* debug string */
 			void _debug_(void) const {
 				if (_str) {
-					if (_size) { std::cout << "String:   " << _str      << std::endl; }
-					else { std::cout       << "String:   " << "empty"   << std::endl; }
-				} else { std::cout         << "String:   " << "nullptr" << std::endl; }
+					if (_size) { std::cout << "string:   " << _str      << std::endl; }
+					else { std::cout       << "string:   " << "empty"   << std::endl; }
+				} else { std::cout         << "string:   " << "nullptr" << std::endl; }
 				std::cout                  << "Size:     " << _size     << std::endl;
 				std::cout                  << "Capacity: " << _capacity << std::endl;
 			}
@@ -1191,7 +1192,7 @@ namespace Xf {
 			// -- P U B L I C  S T A T I C  M E T H O D S ---------------------
 
 			/* get len */
-			static constexpr Size get_len(ConstPointer str) {
+			static constexpr Size get_len(const_pointer str) {
 				// check if str is null
 				if (!str) { return 0; }
 				// loop through str
@@ -1202,31 +1203,31 @@ namespace Xf {
 			}
 
 			/* is upper */
-			static bool is_uppercase(const CharT character) {
+			static bool is_uppercase(const char_t character) {
 				// return true if character is upper
 				return (character > 0x40 && character < 0x5b);
 			}
 
 			/* is lower */
-			static bool is_lowercase(const CharT character) {
+			static bool is_lowercase(const char_t character) {
 				// return true if character is lower
 				return (character > 0x60 && character < 0x7b);
 			}
 
 			/* is alpha */
-			static bool is_alpha(const CharT character) {
+			static bool is_alpha(const char_t character) {
 				// return true if character is alpha
 				return (is_uppercase(character) || is_lowercase(character));
 			}
 
 			/* is digit */
-			static bool is_digit(const CharT character) {
+			static bool is_digit(const char_t character) {
 				// return true if character is digit
 				return (character > 0x2f && character < 0x3a);
 			}
 
 			/* is hexadecimal */
-			static bool is_hexadecimal(const CharT character) {
+			static bool is_hexadecimal(const char_t character) {
 				// return true if character is hexadecimal
 				return (is_digit(character)
 						|| (character > 0x40 && character < 0x47)
@@ -1234,37 +1235,37 @@ namespace Xf {
 			}
 
 			/* is print */
-			static bool is_printable(const CharT character) {
+			static bool is_printable(const char_t character) {
 				// return true if character is printable
 				return (character > 0x1f && character < 0x7f);
 			}
 
 			/* is whitespace */
-			static bool is_whitespace(const CharT character) {
+			static bool is_whitespace(const char_t character) {
 				// return true if character is white-space
 				return ((character > 0x08 && character < 0x0e) || character == 0x20);
 			}
 
 			/* is control */
-			static bool is_control(const CharT character) {
+			static bool is_control(const char_t character) {
 				// return true if character is control
 				return character < 0x20 || character == 0x7f;
 			}
 
 			/* is graphical */
-			static bool is_graphical(const CharT character) {
+			static bool is_graphical(const char_t character) {
 				// return true if character is graphical
 				return (character > 0x20 && character < 0x7f);
 			}
 
 			/* is multi-byte */
-			static bool is_multibyte(const CharT character) {
+			static bool is_multibyte(const char_t character) {
 				// return true if character is multi-byte
 				return character & 0x80;
 			}
 
 			/* is charset */
-			static bool is_charset(const CharT character, ConstPointer charset) {
+			static bool is_charset(const char_t character, const_pointer charset) {
 				// check if charset is null
 				if (!charset) { return false; }
 				// loop through charset
@@ -1276,19 +1277,19 @@ namespace Xf {
 			}
 
 			/* to uppercase */
-			static CharT to_uppercase(const CharT character) {
+			static char_t to_uppercase(const char_t character) {
 				// return uppercase character
 				return is_lowercase(character) ? character - 0x20 : character;
 			}
 
 			/* to lowercase */
-			static CharT to_lowercase(const CharT character) {
+			static char_t to_lowercase(const char_t character) {
 				// return lowercase character
 				return is_uppercase(character) ? character + 0x20 : character;
 			}
 
 			template <Xf::is_char_c U>
-			friend std::ostream& operator<<(std::ostream& os, const String<U>& string);
+			friend std::ostream& operator<<(std::ostream& os, const string<U>& string);
 
 	};
 
@@ -1297,7 +1298,7 @@ namespace Xf {
 
 	/* output stream operator */
 	template <Xf::is_char_c T>
-	std::ostream& operator<<(std::ostream& os, const String<T>& string) {
+	std::ostream& operator<<(std::ostream& os, const string<T>& string) {
 		// check if string is null
 		if (string._str) {
 			// write string to os
@@ -1312,27 +1313,27 @@ namespace Xf {
 	// -- S T A T I C  T E X T  C L A S S -------------------------------------
 
 	/* forward declaration */
-	template <Xf::is_char_c T, typename Xf::String<T>::Size N>
+	template <Xf::is_char_c T, typename xns::string<T>::size_type N>
 	class StaticText;
 
 	/* c-string ascii type */
-	template <typename Xf::String<char>::Size N>
+	template <typename xns::string<char>::size_type N>
 	using CText = StaticText<char, N>;
 
 	/* wide string type */
-	template <typename Xf::String<wchar_t>::Size N>
+	template <typename xns::string<wchar_t>::size_type N>
 	using WText = StaticText<wchar_t, N>;
 
 	/* utf-8 string type */
-	template <typename Xf::String<char8_t>::Size N>
+	template <typename xns::string<char8_t>::size_type N>
 	using Text8 = StaticText<char8_t, N>;
 
 	/* utf-16 string type */
-	template <typename Xf::String<char8_t>::Size N>
+	template <typename xns::string<char8_t>::size_type N>
 	using Text16 = StaticText<char16_t, N>;
 
 	/* utf-32 string type */
-	template <typename Xf::String<char8_t>::Size N>
+	template <typename xns::string<char8_t>::size_type N>
 	using Text32 = StaticText<char32_t, N>;
 
 
@@ -1344,19 +1345,19 @@ namespace Xf {
 		-> StaticText<T, sizeof(s) - 1>;
 
 	/* null terminated string deduction guide */
-	/*template <typename T, typename Xf::String<T>::Size N>
+	/*template <typename T, typename Xf::string<T>::Size N>
 	StaticText(const T (&)[N])
 		-> StaticText<T, N>;*/
 
 	/* buffer string deduction guide */
-	template <typename T, typename Xf::String<T>::Size N>
-	StaticText(const T (&)[N], typename Xf::String<T>::Size)
+	template <typename T, typename xns::string<T>::size_type N>
+	StaticText(const T (&)[N], typename xns::string<T>::size_type)
 		-> StaticText<T, N - 1>;
 
 
 
 	/* copy constructor deduction guide */
-	//template <typename T, typename Xf::String<T>::Size N>
+	//template <typename T, typename Xf::string<T>::Size N>
 	//StaticText(const StaticText<T, N>&)
 		//-> StaticText<T, N>;
 
@@ -1366,7 +1367,7 @@ namespace Xf {
 
 
 	/* static text class */
-	template <Xf::is_char_c T, typename Xf::String<T>::Size N>
+	template <Xf::is_char_c T, typename xns::string<T>::size_type N>
 	class StaticText {
 
 		public:
@@ -1374,28 +1375,28 @@ namespace Xf {
 			// -- A L I A S E S -----------------------------------------------
 
 			/* character type */
-			using CharT         = remove_cv_t<T>;
+			using char_t         = Xf::remove_cv_t<T>;
 
 			/* size type */
-			using Size          = typename Xf::String<CharT>::Size;
+			using Size          = typename xns::string<char_t>::Size;
 
 			/* comparison type */
-			using Signed        = typename Xf::String<CharT>::Signed;
+			using Signed        = typename xns::string<char_t>::Signed;
 
 			/* pointer type */
-			using Pointer       = typename Xf::String<CharT>::Pointer;
+			using Pointer       = typename xns::string<char_t>::Pointer;
 
 			/* reference type */
-			using Reference     = typename Xf::String<CharT>::Reference;
+			using Reference     = typename xns::string<char_t>::Reference;
 
 			/* move reference type */
-			using MoveReference = typename Xf::String<CharT>::MoveReference;
+			using MoveReference = typename xns::string<char_t>::MoveReference;
 
 			/* const reference type */
-			using ConstRef      = typename Xf::String<CharT>::ConstRef;
+			using ConstRef      = typename xns::string<char_t>::ConstRef;
 
 			/* const pointer type */
-			using ConstPointer  = typename Xf::String<CharT>::ConstPointer;
+			using ConstPointer  = typename xns::string<char_t>::ConstPointer;
 
 
 		private:
@@ -1403,7 +1404,7 @@ namespace Xf {
 			// -- M E M B E R S -----------------------------------------------
 
 			/* pointer */
-			CharT _str[N + 1];
+			char_t _str[N + 1];
 
 
 		public:
@@ -1429,7 +1430,7 @@ namespace Xf {
 
 
 			/*
-			constexpr StaticText(const CharT str[N]) noexcept {
+			constexpr StaticText(const char_t str[N]) noexcept {
 
 				for (Size x = 0; x < N; ++x) {
 					_str[x] = str[x];
@@ -1448,7 +1449,7 @@ namespace Xf {
 			}
 
 			/* fill constructor */
-			consteval StaticText(const CharT character, Size size) noexcept {
+			consteval StaticText(const char_t character, Size size) noexcept {
 
 				Size x = 0;
 				for (;x < size && x < N; ++x) {
@@ -1559,7 +1560,7 @@ namespace Xf {
 				Size y = length() - 1;
 
 				while (x < y) {
-					CharT temp = _str[x];
+					char_t temp = _str[x];
 					_str[x] = _str[y];
 					_str[y] = temp;
 					++x;
@@ -1583,7 +1584,7 @@ namespace Xf {
 
 		SizeT digits = Xf::static_digits<Xf::Dec, Type>(number);
 
-		Xf::StaticText<C, digits> text;
+		xns::StaticText<C, digits> text;
 
 		Type num = number;
 
@@ -1612,14 +1613,14 @@ namespace Xf {
 	// in a scrollable view
 
 	template <Xf::is_char_c T>
-	class ScrollString {
+	class Scrollstring {
 
 		private:
 
 			// -- M E M B E R S -----------------------------------------------
 
 			/* string */
-			Xf::String<T> _str;
+			xns::string<T> _str;
 
 			/* view size */
 			Size _view_size; // size of view
@@ -1643,13 +1644,13 @@ namespace Xf {
 			// -- P U B L I C  C O N S T R U C T O R S ------------------------
 
 			/* default constructor */
-			ScrollString(void) noexcept
+			Scrollstring(void) noexcept
 			: _str{ }, _view_size{0}, _view_start{0}, _string_cursor{0}, _screen_cursor{0} {
 				// code here...
 			}
 
 			/* destructor */
-			~ScrollString(void) noexcept = default;
+			~Scrollstring(void) noexcept = default;
 
 
 			// -- P U B L I C  S E T T E R S ----------------------------------
@@ -1667,7 +1668,7 @@ namespace Xf {
 			// -- P U B L I C  M O D I F I E R S ------------------------------
 
 			/* insert */
-			void insert(const Xf::String<T> input) {
+			void insert(const xns::string<T> input) {
 				_str.insert(_string_cursor, input);
 				_string_cursor += input.length();
 				_compute();
@@ -1736,7 +1737,7 @@ namespace Xf {
 			// -- P U B L I C  A C C E S S O R S ------------------------------
 
 			/* const pointer */
-			typename Xf::String<T>::ConstPointer view_pointer(void) const {
+			typename xns::string<T>::ConstPointer view_pointer(void) const {
 				// return constant pointer to first display element
 				return _str.pointer() + _view_start;
 			}
@@ -1758,13 +1759,13 @@ namespace Xf {
 			}
 
 			/* string */
-			Xf::String<T>& string(void) {
+			xns::string<T>& string(void) {
 				// return string
 				return _str;
 			}
 
 			/* const string */
-			const Xf::String<T>& string(void) const {
+			const xns::string<T>& string(void) const {
 				// return string
 				return _str;
 			}

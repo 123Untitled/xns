@@ -26,7 +26,7 @@ namespace Xf {
 			File(void);
 
 			/* path constructor */
-			File(const Xf::String<char>&);
+			File(const xns::cstring&);
 
 			/* non-assignable class */
 			NON_ASSIGNABLE(File);
@@ -35,7 +35,7 @@ namespace Xf {
 			~File(void);
 
 
-			void setFileName(Xf::String<char>&& name);
+			void setFileName(xns::cstring&& name);
 
 			/* open file */
 			void open(void);
@@ -45,7 +45,7 @@ namespace Xf {
 
 
 			/* get path */
-			const Xf::String<char>& path(void) const;
+			const xns::cstring& path(void) const;
 
 		private:
 
@@ -56,8 +56,8 @@ namespace Xf {
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
-			Xf::String<char> _file;
-			Xf::String<char> _path;
+			xns::cstring _file;
+			xns::cstring _path;
 			Xf::UniqueFd     _fd;
 			Stat             _data;
 			bool             _state;

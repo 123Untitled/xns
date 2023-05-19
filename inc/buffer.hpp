@@ -47,10 +47,10 @@ namespace Xf {
 			static void write(const char* str);
 
 			/* write bytes */
-			static void write(const char* str, const Xf::CString::Size size);
+			static void write(const char* str, const xns::cstring::size_type size);
 
 			/* write string */
-			static void write(const CString& str);
+			static void write(const xns::cstring& str);
 
 			/* render */
 			static void render(const int = STDOUT_FILENO);
@@ -68,7 +68,7 @@ namespace Xf {
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
 			/* buffers */
-			Xf::CString _buffer;
+			xns::cstring _buffer;
 
 
 			// -- P R I V A T E  S T A T I C  M E M B E R S -------------------

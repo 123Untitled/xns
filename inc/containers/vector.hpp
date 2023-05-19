@@ -6,14 +6,15 @@
 #include "allocator.hpp"
 #include "array.hpp"
 
-// -- N A M E S P A C E -------------------------------------------------------
 
-namespace Xf {
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
 
 	// -- V E C T O R  C L A S S ----------------------------------------------
 
 	template <typename T>
-	class Vector final {
+	class vector final {
 
 		public:
 
@@ -21,60 +22,63 @@ namespace Xf {
 
 			/* make vector as friend */
 			template <class U, class... A>
-			friend Vector<U> make_vector(A&&... args);
+			friend vector<U> make_vector(A&&... args);
 
 			// -- A L I A S E S -----------------------------------------------
 
 			/* value type */
-			using Value = T;
+			using value = T;
+
+			/* self type */
+			using self = vector<value>;
 
 			/* size type */
-			using Size = UInt64;
+			using size = UInt64;
 
 			/* reference type */
-			using Reference = Value&;
+			using reference = value&;
 
 			/* const reference type */
-			using ConstReference = const Value&;
+			using const_reference = const value&;
 
 			/* move reference type */
-			using MoveReference = Value&&;
+			using move_reference = value&&;
 
 			/* pointer type */
-			using Pointer = Value*;
+			using pointer = value*;
 
 			/* const pointer type */
-			using ConstPointer = const Value*;
+			using const_pointer = const value*;
 
 			/* allocator type */
-			using Allocator = Xf::Allocator<Value>;
+			using allocator = Xf::Allocator<value>;
 
 
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* default constructor */
-			Vector(void)
+			vector(void)
 			// initializations
 			: _vector{nullptr}, _capacity{0}, _size{0} { }
 
 
 
 			/* copy constructor */
-			Vector(const Vector& other)
+			vector(const self& other)
 			// initializations
-			: Vector{} {
+			: vector{} {
 				// reserve other size
 				reserve(other._size);
 				// loop through other vector
 				for (Size x = 0; x < other._size; ++x) {
 					// construct value by copy
-					Allocator::construct(_vector + x, other._vector[x]);
+					allocator::construct(_vector + x, other._vector[x]);
 				} // set size
 				_size = other._size;
 			}
 
 			/* move constructor */
-			Vector(Vector&& other) noexcept
+			vector(self&& other) noexcept
 			// initializations
 			: _vector{other._vector}, _capacity{other._capacity}, _size{other._size} {
 				// invalidate other vector
@@ -82,13 +86,13 @@ namespace Xf {
 			}
 
 			/* destructor */
-			~Vector(void) {
+			~vector(void) {
 				// check pointer
 				if (_vector) {
 					// clear vector
 					clear();
 					// deallocate memory
-					Allocator::deallocate(_vector);
+					allocator::deallocate(_vector);
 				}
 			}
 
@@ -106,7 +110,7 @@ namespace Xf {
 			// -- O P E R A T O R S -------------------------------------------
 
 			/* copy operator */
-			Vector& operator=(const Vector& other) {
+			vector& operator=(const self& other) {
 				// check for self-assignment
 				if (this != &other) {
 					// clear vector
@@ -117,7 +121,7 @@ namespace Xf {
 					// loop through other vector
 					for (Size x = 0; x < other._size; ++x) {
 						// construct value by copy
-						Allocator::construct(_vector + x, other._vector[x]);
+						allocator::construct(_vector + x, other._vector[x]);
 					} // set size
 					_size = other._size;
 				} // return self reference
@@ -125,7 +129,7 @@ namespace Xf {
 			}
 
 			/* move operator */
-			Vector& operator=(Vector&& other) noexcept {
+			vector& operator=(self&& other) noexcept {
 				// check for self-assignment
 				if (this != &other) {
 					// clear vector
@@ -143,25 +147,25 @@ namespace Xf {
 			}
 
 			/* subscript operator */
-			Reference operator[](const Size index) {
+			reference operator[](const size index) {
 				// return reference
 				return _vector[index];
 			}
 
 			/* const subscript operator */
-			ConstReference operator[](const Size index) const {
+			const_reference operator[](const size index) const {
 				// return reference
 				return _vector[index];
 			}
 
 			/* at */
-			Reference at(const Size index) {
+			reference at(const size index) {
 				// return reference
 				return _vector[index];
 			}
 
 			/* const at */
-			ConstReference at(const Size index) const {
+			const_reference at(const size index) const {
 				// return reference
 				return _vector[index];
 			}
@@ -170,37 +174,37 @@ namespace Xf {
 			// -- E L E M E N T  A C C E S S ----------------------------------
 
 			/* front */
-			Reference front(void) {
+			reference front(void) {
 				// return reference
 				return *_vector;
 			}
 
 			/* const front */
-			ConstReference front(void) const {
+			const_reference front(void) const {
 				// return reference
 				return *_vector;
 			}
 
 			/* back */
-			Reference back(void) {
+			reference back(void) {
 				// return reference
 				return *(_vector + (_size - 1));
 			}
 
 			/* const back */
-			ConstReference back(void) const {
+			const_reference back(void) const {
 				// return reference
 				return *(_vector + (_size - 1));
 			}
 
 			/* data */
-			Pointer data(void) {
+			pointer data(void) {
 				// return pointer
 				return _vector;
 			}
 
 			/* const data */
-			ConstPointer data(void) const {
+			const_pointer data(void) const {
 				// return pointer
 				return _vector;
 			}
@@ -215,7 +219,7 @@ namespace Xf {
 			}
 
 			/* size */
-			Size size(void) const {
+			size length(void) const {
 				// return size
 				return _size;
 			}
@@ -227,9 +231,9 @@ namespace Xf {
 			}
 
 			/* max size */
-			Size max_size(void) const {
+			size max_size(void) const {
 				// return max size
-				return Allocator::max_size();
+				return allocator::max_size();
 			}
 
 			/* reserve */
@@ -237,15 +241,15 @@ namespace Xf {
 				// check capacity
 				if (capacity > _capacity) {
 					// allocate memory
-					Pointer tmp = Allocator::allocate(capacity);
+					pointer tmp = allocator::allocate(capacity);
 					// check pointer
 					if (_vector != nullptr) {
 						// loop through vector
-						for (Size x = 0; x < _size; ++x) {
+						for (size x = 0; x < _size; ++x) {
 							// move elements
 							tmp[x] = Xf::move(_vector[x]);
 						} // deallocate memory
-						Allocator::deallocate(_vector);
+						allocator::deallocate(_vector);
 					} // assign capacity
 					_capacity = capacity;
 					// assign pointer
@@ -259,9 +263,9 @@ namespace Xf {
 			/* clear */
 			void clear(void) {
 				// loop through vector
-				for (Size x = 0; x < _size; ++x) {
+				for (size x = 0; x < _size; ++x) {
 					// destroy object
-					Allocator::destroy(_vector + x);
+					allocator::destroy(_vector + x);
 				} // reset size
 				_size = 0;
 			}
@@ -276,60 +280,60 @@ namespace Xf {
 					// double capacity
 					reserve(grow());
 				} // move elements
-				for (Size x = _size; x > pos; --x) {
+				for (size x = _size; x > pos; --x) {
 					// move element
 					_vector[x] = Xf::move(_vector[x - 1]);
 				} // construct element
-				Allocator::construct(_vector + pos, Xf::forward<Args>(args)...);
+				allocator::construct(_vector + pos, Xf::forward<Args>(args)...);
 				// increment size
 				++_size;
 			}
 
 			/* emplace back */
-			template <typename... Args>
-			void emplace_back(Args&&... args) {
+			template <class... A>
+			void emplace_back(A&&... args) {
 				// check capacity
 				if (!available()) {
 					// double capacity
 					reserve(grow());
 				} // construct element
-				Allocator::construct(_vector + _size, Xf::forward<Args>(args)...);
+				allocator::construct(_vector + _size, Xf::forward<A>(args)...);
 				// increment size
 				++_size;
 			}
 
 			/* copy push back */
-			void push_back(const Value& value) {
+			void push_back(const value& value) {
 				// check capacity
 				if (!available()) {
 					// double capacity
 					reserve(grow());
 				} // construct element
-				Allocator::construct(_vector + _size, value);
+				allocator::construct(_vector + _size, value);
 				// increment size
 				++_size;
 			}
 
 			/* move push back */ // WARNING: this will be deprecated
-			void push_back(Value&& value) {
+			void push_back(value&& value) {
 				// check capacity
 				if (!available()) {
 					// double capacity
 					reserve(grow());
 				} // construct element
-				Allocator::construct(_vector + _size, Xf::move(value));
+				allocator::construct(_vector + _size, Xf::move(value));
 				// increment size
 				++_size;
 			}
 
 			/* move back */ // INFO: this is preferred over move push back
-			void move_back(Value&& value) {
+			void move_back(value&& value) {
 				// check capacity
 				if (!available()) {
 					// double capacity
 					reserve(grow());
 				} // construct element
-				Allocator::construct(_vector + _size, Xf::move(value));
+				allocator::construct(_vector + _size, Xf::move(value));
 				// increment size
 				++_size;
 			}
@@ -339,7 +343,7 @@ namespace Xf {
 				// check size
 				if (!_size) { return; }
 				// destroy object
-				Allocator::destroy(_vector + (_size - 1));
+				allocator::destroy(_vector + (_size - 1));
 				// decrement size
 				--_size;
 			}
@@ -376,13 +380,13 @@ namespace Xf {
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
 			/* data */
-			Pointer _vector;
+			pointer _vector;
 
 			/* capacity */
-			Size _capacity;
+			size _capacity;
 
 			/* size */
-			Size _size;
+			size _size;
 
 
 
@@ -393,13 +397,35 @@ namespace Xf {
 
 	/* make vector */
 	template <class T, class... A>
-	Vector<T> make_vector(A&&... args) {
+	xns::vector<T> make_vector(A&&... args) {
+
+		using allocator = typename xns::vector<T>::Allocator;
+
 		// create vector
-		Vector<T> vec;
+		vector<T> vec;
+
+		// allocate memory
+		vec._vector = allocator::allocate(sizeof...(args));
+
+		// check allocation success
+		if (vec._vector == nullptr) { return vec; }
+
+		// assign sizes
+		vec._size = vec._capacity = sizeof...(args);
+
+
+		typename vector<T>::Size x = 0;
+
+		// fold expression to construct by forwarding
+		(allocator::construct(&vec._vector[x++], Xf::forward<A>(args)), ...);
+
+
+
+
 		// reserve memory
-		vec.reserve(sizeof...(args));
+		//vec.reserve(sizeof...(args));
 		// fold expression to emplace back
-		(vec.emplace_back(Xf::forward<A>(args)), ...);
+		//(vec.emplace_back(Xf::forward<A>(args)), ...);
 		// return vector
 		return vec;
 	}

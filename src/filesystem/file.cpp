@@ -6,7 +6,7 @@ Xf::File::File(void)
 }
 
 /* path constructor */
-Xf::File::File(const Xf::String<char>& path)
+Xf::File::File(const xns::cstring& path)
 : _file{}, _path{path}, _fd{}, _data{}, _state{false} {
 	// code here...
 }
@@ -34,13 +34,13 @@ void Xf::File::open(void) {
 }
 
 /* get path */
-const Xf::String<char>& Xf::File::path(void) const {
+const xns::cstring& Xf::File::path(void) const {
 	// return file path
 	return _path;
 }
 
 
-void Xf::File::setFileName(Xf::String<char>&& path) {
+void Xf::File::setFileName(xns::cstring&& path) {
 	//_path = static_cast<String&&>(path);
 }
 

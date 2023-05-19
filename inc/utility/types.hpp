@@ -10,6 +10,17 @@
 	//	#include <cstddef>
 	//#endif
 
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
+
+	// -- T Y P E S -------------------------------------------------------------
+
+	/* null pointer type */
+	using null = decltype(nullptr);
+
+}
+
 // -- N A M E S P A C E -------------------------------------------------------
 
 namespace Xf {

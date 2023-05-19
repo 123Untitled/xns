@@ -25,7 +25,12 @@
 #include "stack.hpp"
 #include "array.hpp"
 #include "tuple.hpp"
+
+
+/* invoke */
 #include "function.hpp"
+#include "method.hpp"
+#include "poly_method.hpp"
 
 
 /* random */

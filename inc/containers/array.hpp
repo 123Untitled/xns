@@ -284,6 +284,9 @@ namespace Xf {
 
 			// -- P R I V A T E  M E T H O D S --------------------------------
 
+			// WARNING: this function has to be debugged
+			// TODO: constexpr condition for single dimansionnal array
+
 			/* helper function for subscript operator */
 			template<class... I>
 			constexpr Size _subscript(I&&... indexs) const {
