@@ -234,7 +234,7 @@ xns::cstring Xf::Escape::move_position(TSize x, TSize y) {
 	char  escape[ESCAPE_BUFFER_SIZE];
 	UInt32 ite;
 
-	constexpr const UInt32 max = Xf::max<TSize>();
+	constexpr const UInt32 max = xns::max<TSize>();
 
 	x += (x != max);
 	y += (y != max);
@@ -269,7 +269,7 @@ xns::cstring Xf::Escape::_move_direction(TSize cells, const Char dir) {
 	// static returned string
 	//static Xf::CString escape;
 	// compile time buffer size
-	constexpr const SizeT size = 3 + Xf::max_digits<TSize>();
+	constexpr const SizeT size = 3 + xns::max_digits<TSize>();
 
 	// buffer
 	xns::cstring::char_t buffer[size];
@@ -306,7 +306,7 @@ const xns::cstring& Xf::Escape::move_x(TSize x) {
 
 	// compile time buffer size
 	constexpr const UInt64 size = sizeof("\x1b[G")
-								+ Xf::max_digits<TSize>();
+								+ xns::max_digits<TSize>();
 	// buffer
 	xns::cstring::char_t buffer[size];
 
@@ -314,7 +314,7 @@ const xns::cstring& Xf::Escape::move_x(TSize x) {
 	UInt64 i = size - 1;
 
 	// increment x if not max
-	x += (x != Xf::max<TSize>());
+	x += (x != xns::max<TSize>());
 
 	// last character
 	buffer[i] = 'G';
