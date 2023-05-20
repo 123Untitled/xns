@@ -11,36 +11,37 @@
 
 #include <iostream>
 
-// -- N A M E S P A C E -------------------------------------------------------
 
-namespace Xf {
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
 
 	// -- A R R A Y  M E T A  U T I L I T I E S -------------------------------
 
 	/* array forward declaration */
-	template <class T, SizeT... N>
-	class Array;
+	template <class T, xns::size_t... N>
+	class array;
 
 
 	/* is array false type */
 	template <class T>
-	struct IsArray_s                 : Xf::false_t { };
+	struct is_array_s                 : xns::false_t { };
 
 	/* is array true type */
 	template <class T, SizeT... N>
-	struct IsArray_s<Array<T, N...>> : Xf::true_t  { };
+	struct is_array_s<array<T, N...>> : xns::true_t  { };
 
 	/* is array for c style arrays */
-	template <class T, SizeT N>
-	struct IsArray_s<T[N]>           : Xf::true_t  { };
+	template <class T, xns::size_t N>
+	struct is_array_s<T[N]>           : xns::true_t  { };
 
 	/* is array value */
 	template <class T>
-	constexpr bool IsArray_v = IsArray_s<T>::value;
+	constexpr bool is_array_v = is_array_s<T>::value;
 
 	/* is array concept */
 	template <class T>
-	concept IsArray = IsArray_v<T>;
+	concept is_array = is_array_v<T>;
 
 
 
@@ -48,36 +49,36 @@ namespace Xf {
 
 	// -- A R R A Y  C L A S S ------------------------------------------------
 
-	template <class T, SizeT... N>
-	class Array final {
+	template <class T, xns::size_t... N>
+	class array final {
 
 		public:
 
-			// -- P U B L I C  A L I A S E S ----------------------------------
+			// -- T Y P E S ---------------------------------------------------
 
 			/* value type */
-			using Value     = T;
+			using value         = T;
 
 			/* self type */
-			using Self      = Array<Value, N...>;
+			using self          = array<value, N...>;
 
 			/* reference type */
-			using Reference = Value&;
+			using reference     = value&;
 
 			/* move reference type */
-			using MoveRef   = Value&&;
+			using MoveRef       = value&&;
 
 			/* pointer type */
-			using Pointer   = Value*;
+			using mut_pointer   = value*;
 
 			/* const reference type */
-			using ConstRef  = const Value&;
+			using const_ref     = const value&;
 
 			/* const pointer type */
-			using ConstPtr  = const Value*;
+			using const_pointer = const value*;
 
 			/* size type */
-			using Size      = decltype((N * ...));
+			using size_type     = decltype((N * ...));
 
 
 		private:
@@ -85,10 +86,10 @@ namespace Xf {
 			// -- P R I V A T E  C O N S T A N T S ----------------------------
 
 			/* number of dimensions */
-			static constexpr Size _ndim = sizeof...(N);
+			static constexpr size_type _ndim = sizeof...(N);
 
 			/* number of elements */
-			static constexpr Size _size = (N * ...);
+			static constexpr size_type _size = (N * ...);
 
 
 			// -- A S S E R T I O N S -----------------------------------------
@@ -97,7 +98,7 @@ namespace Xf {
 			//static_assert(!IsArray<T>,        "USE MULTIPLE DIMENSIONS INSTEAD -> Array<T, 3, 3, 3>");
 
 			/* check if T is not void */
-			static_assert(IsNotVoid<T>,       "VOID IS NOT ALLOWED");
+			static_assert(xns::is_not_void<T>,       "VOID IS NOT ALLOWED");
 
 			/* check if there is at least one dimension */
 			static_assert(_ndim > 0,          "NEED AT LEAST ONE DIMENSION");
@@ -115,7 +116,7 @@ namespace Xf {
 			// -- P R I V A T E  C O N S T A N T S ----------------------------
 
 			/* dimension sizes */
-			static constexpr SizeT _dims[_ndim] = { N... };
+			static constexpr size_type _dims[_ndim] = { N... };
 
 
 		public:
@@ -123,14 +124,14 @@ namespace Xf {
 			// -- P U B L I C  M E M B E R S ----------------------------------
 
 			/* array data */
-			Value _data[_size];
+			value _data[_size];
 
 
 			// -- P U B L I C  S U B S C R I P T  O P E R A T O R S -----------
 
 			/* multidimensional subscript operator */
 			template<class... I> // Size required all same
-			Value& operator()(I&&... indexs) requires (... && std::is_same_v<I, std::remove_reference_t<I>>) {
+			constexpr value& operator()(I&&... indexs) requires (... && std::is_same_v<I, std::remove_reference_t<I>>) {
 				// check number of indices is valid
 				static_assert(sizeof...(I) == _ndim, "WRONG NUMBER OF INDICES");
 				// return reference to element indexed by linearized indices
@@ -139,7 +140,7 @@ namespace Xf {
 
 			/* at */
 			template <class... I>
-			Reference at(I&&... indexs) {
+			constexpr reference at(I&&... indexs) {
 				// check number of indices is valid
 				static_assert(sizeof...(I) == _ndim, "WRONG NUMBER OF INDICES");
 				// return reference to element indexed by linearized indices
@@ -148,7 +149,7 @@ namespace Xf {
 
 			/* const at */
 			template <class... I>
-			ConstRef at(I&&... indexs) const {
+			constexpr const_ref at(I&&... indexs) const {
 				// check number of indices is valid
 				static_assert(sizeof...(I) == _ndim, "WRONG NUMBER OF INDICES");
 				// return reference to element indexed by linearized indices
@@ -159,7 +160,7 @@ namespace Xf {
 			/* subscript operator */
 			//template <Xf::integral_c Index>
 			template <class Index>
-			Reference operator[](const Index index) {
+			constexpr reference operator[](const Index index) {
 				// check number of indices is valid
 				static_assert(_ndim == 1, "FOR MULTIDIMENSIONAL SUBSCRIPT USE -> operator()");
 				// return reference to element
@@ -169,7 +170,7 @@ namespace Xf {
 			/* const subscript operator */
 			//template <Xf::integral_c Index>
 			template <class Index>
-			ConstRef operator[](const Index index) const {
+			constexpr const_ref operator[](const Index index) const {
 				// check number of indices is valid
 				static_assert(_ndim == 1, "FOR MULTIDIMENSIONAL SUBSCRIPT USE -> operator()");
 				// return reference to element
@@ -183,62 +184,62 @@ namespace Xf {
 			// -- P U B L I C  A C C E S S O R S ------------------------------
 
 			/* dimensions */
-			constexpr Size dimensions(void) const {
+			constexpr size_type dimensions(void) const {
 				// return number of dimensions
 				return _ndim;
 			}
 
 			/* capacity */
-			constexpr Size capacity(void) const {
+			constexpr size_type capacity(void) const {
 				// return number of elements
 				return _size;
 			}
 
 			/* size */
-			constexpr Size size(void) const {
+			constexpr size_type size(void) const {
 				// return number of elements
 				return _size;
 			}
 
 			/* size of dimension */
-			template <Size IDX>
-			constexpr Size size(void) const {
+			template <size_type IDX>
+			constexpr size_type size(void) const {
 				// return size of dimension indexed by IDX
 				return _dims[IDX];
 			}
 
 			/* front */
-			constexpr Reference front(void) {
+			constexpr reference front(void) {
 				// return reference to first element
 				return _data[0];
 			}
 
 			/* const front */
-			constexpr ConstRef front(void) const {
+			constexpr const_ref front(void) const {
 				// return constant reference to first element
 				return _data[0];
 			}
 
 			/* back */
-			constexpr Reference back(void) {
+			constexpr reference back(void) {
 				// return reference to last element
 				return _data[_size - 1];
 			}
 
 			/* const back */
-			constexpr ConstRef back(void) const {
+			constexpr const_ref back(void) const {
 				// return constant reference to last element
 				return _data[_size - 1];
 			}
 
 			/* pointer */
-			constexpr Pointer pointer(void) {
+			constexpr mut_pointer pointer(void) {
 				// return pointer to data
 				return _data;
 			}
 
 			/* const pointer */
-			constexpr ConstPtr pointer(void) const {
+			constexpr const_pointer pointer(void) const {
 				// return constant pointer to data
 				return _data;
 			}
@@ -288,14 +289,14 @@ namespace Xf {
 			// TODO: constexpr condition for single dimansionnal array
 
 			/* helper function for subscript operator */
-			template<class... I>
-			constexpr Size _subscript(I&&... indexs) const {
+			template <class... I> requires (_ndim > 1)
+			inline constexpr size_type _subscript(I&&... indexs) const {
 				// initialize array with indexs casted to Size
-				Size index_arr[_ndim] = { static_cast<Size>(indexs)... };
+				size_type index_arr[_ndim] = { static_cast<size_type>(indexs)... };
 				// linear index declaration
-				Size linear = 0;
+				size_type linear = 0;
 				// stride declaration
-				Size stride = 1;
+				size_type stride = 1;
 				// loop over dimensions
 				for (int i = _ndim - 1; i >= 0; --i) {
 					// compute linear index
@@ -306,8 +307,29 @@ namespace Xf {
 				return linear;
 			}
 
+			/* subscript for 1D array */
+			template <class I> requires (_ndim == 1)
+			inline constexpr size_type _subscript(I&& index) const {
+				// return linear index
+				return index;
+			}
+
 
 	};
+
+	// NEED TO DEDUCE TYPE OF ARRAY
+	// no time to implement this now
+	// TODO: implement this
+	template <class... A>
+	constexpr xns::array<std::common_type_t<A...>, sizeof...(A)> make_array(A&&... args) {
+		using T = std::common_type_t<A...>;
+
+		xns::array<T, sizeof...(A)> arr = {Xf::forward<A>(args)...};
+
+		// return array
+		return arr;
+	}
+
 
 };
 
