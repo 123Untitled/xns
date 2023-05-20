@@ -25,7 +25,7 @@ Xf::Rect::Rect(Rect&& other) noexcept
 }
 
 /* destructor */
-Xf::Rect::~Rect(void) {
+Xf::Rect::~Rect(void) noexcept {
 	// code here...
 }
 
