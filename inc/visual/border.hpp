@@ -88,7 +88,7 @@ namespace Xf {
 			// -- A L I A S E S -----------------------------------------------
 
 			/* symbol type */
-			using Symbol = Xf::Array<const char*, BORDER_MAX>;
+			using Symbol = xns::array<const char*, BORDER_MAX>;
 
 			/* allocator type */
 			using Allocator = Xf::Allocator<char>;
