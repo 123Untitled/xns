@@ -6,6 +6,7 @@
 #include "allocator.hpp"
 #include "string.hpp"
 #include "vector.hpp"
+#include "literal.hpp"
 
 #include <cstdlib>
 #include <unistd.h>
@@ -13,24 +14,42 @@
 #include <string>
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
+
+
+	// -- F I L E  D E S C R I P T O R  T Y P E S -----------------------------
+
+	struct stdout {
+		/* file descriptor */
+		static constexpr int fd = STDOUT_FILENO;
+	};
+
+	struct stderr {
+		/* file descriptor */
+		static constexpr int fd = STDERR_FILENO;
+	};
+
+	/* is std file descriptor */
+	template <class T>
+	concept is_std_fd = Xf::is_same<T, stdout> || Xf::is_same<T, stderr>;
+
 
 
 	// -- O U T P U T  C L A S S ----------------------------------------------
 
-	class Output final {
+	class output final {
 
 		private:
 
 			// -- P R I V A T E  C O N S T R U C T O R S ----------------------
 
 			/* default constructor */
-			Output(void);
+			output(void);
 
 			/* non-assignable class */
-			NON_ASSIGNABLE(Output);
+			NON_ASSIGNABLE(output);
 
 
 		public:
@@ -38,7 +57,7 @@ namespace Xf {
 			// -- P U B L I C  D E S T R U C T O R S --------------------------
 
 			/* destructor */
-			~Output(void);
+			~output(void);
 
 
 			// -- P U B L I C  S T A T I C  M E T H O D S ---------------------
@@ -52,8 +71,27 @@ namespace Xf {
 			/* write string */
 			static void write(const xns::cstring& str);
 
+			/* write string */
+			template <class T> requires (xns::is_literal<T>)
+			static void write(void) {
+				// call buffer write
+				write(T::data(), T::size());
+			}
+
 			/* render */
-			static void render(const int = STDOUT_FILENO);
+			template <is_std_fd T = xns::stdout>
+			static void render(void) {
+
+				// do nothing if buffer is empty
+				if (_instance._buffer.empty()) { return; }
+
+				// write buffer to file descriptor
+				(void)::write(T::fd, _instance._buffer.pointer(),
+								  _instance._buffer.size());
+
+				// clear buffer
+				_instance._buffer.clear();
+			}
 
 
 
@@ -62,7 +100,7 @@ namespace Xf {
 			// -- P R I V A T E  E N U M S ------------------------------------
 
 			/* buffer size */
-			enum : Size { DEFAULT_BUFFER_SIZE = 1024 };
+			enum : xns::size_t { DEFAULT_BUFFER_SIZE = 1024 };
 
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
@@ -74,7 +112,7 @@ namespace Xf {
 			// -- P R I V A T E  S T A T I C  M E M B E R S -------------------
 
 			/* instance */
-			static Output _instance;
+			static output _instance;
 
 
 	};
@@ -86,112 +124,5 @@ namespace Xf {
 
 
 
-
-// -- B U F F E R  C L A S S --------------------------------------------------
-
-//class Buffer final {
-//
-//	public:
-//
-//		// -- P U B L I C  A L I A S E S --------------------------------------
-//
-//		/* string type */
-//		using BString = Xf::CString;
-//
-//		/* character type */
-//		using CharT = BString::CharT;
-//
-//		/* reference type */
-//		using Reference = CharT&;
-//
-//		/* pointer type */
-//		using Pointer = CharT*;
-//
-//		/* size type */
-//		using Size = BString::Size;
-//
-//		/* allocator type */
-//		using Allocator = Xf::Allocator<CharT>;
-//
-//
-//	private:
-//
-//		// -- P R I V A T E  C O N S T R U C T O R S --------------------------
-//
-//		/* default constructor */
-//		Buffer(void);
-//
-//		/* non-assignable class */
-//		NON_ASSIGNABLE(Buffer);
-//
-//
-//	public:
-//
-//		// -- P U B L I C  D E S T R U C T O R --------------------------------
-//
-//		/* destructor */
-//		~Buffer(void);
-//
-//
-//		// -- S T A T I C  M E T H O D S --------------------------------------
-//
-//		/* write bytes */
-//		static void write(const void* ptr, const Size size);
-//
-//		/* write string */
-//		static void write(const BString& str);
-//
-//
-//
-//
-//		/* draw */
-//		static void draw(const void* ptr, const Size size);
-//
-//		/* render */
-//		static void render(const int);
-//
-//		static void render(void);
-//
-//
-//	private:
-//
-//		// -- P R I V A T E  M E T H O D S ------------------------------------
-//
-//		/* draw */
-//		void _draw(const void* ptr, const Size size);
-//
-//		/* render */
-//		int _render(const int fd = STDOUT_FILENO);
-//
-//		/* get instance */
-//		static Buffer& get_instance(void);
-//
-//
-//
-//		static void extend(const UInt bytes);
-//
-//
-//		// -- P R I V A T E  E N U M S ----------------------------------------
-//
-//		/* buffer size */
-//		enum : Size { DEFAULT_BUFFER_SIZE = 1024 };
-//
-//
-//		// -- P R I V A T E  S T A T I C  M E M B E R S -----------------------
-//
-//		/* singleton instance */
-//		static Buffer _instance;
-//
-//
-//		// -- P R I V A T E  M E M B E R S ------------------------------------
-//
-//		Pointer _buff;
-//		Size    _capacity;
-//		Size    _size;
-//		bool	_exit_render;
-//
-//
-//
-//};
 
 #endif
