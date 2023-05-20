@@ -5,9 +5,10 @@
 #include "base.hpp"
 #include <iostream>
 
-// -- N A M E S P A C E -------------------------------------------------------
 
-namespace Xf {
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
 
 	// -- M I N  M A X --------------------------------------------------------
 
@@ -15,15 +16,15 @@ namespace Xf {
 	template <Xf::integral_c T>
 	consteval auto max(void) {
 		// remove cv
-		using Type = Xf::remove_cv_t<T>;
+		using type = Xf::remove_cv_t<T>;
 		// number of bits in type
-		constexpr Type bits = (sizeof(Type) * 8) - Xf::is_signed_v<Type>;
+		constexpr type bits = (sizeof(type) * 8) - Xf::is_signed_v<type>;
 		// max value of type
-		Type type_max = 0;
+		type type_max = 0;
 		// loop through bits
-		for (Type x = 0; x < bits; ++x) {
+		for (type x = 0; x < bits; ++x) {
 			// add shifted bit to max
-			type_max += (static_cast<Type>(1) << x);
+			type_max += (static_cast<type>(1) << x);
 		} // return max
 		return type_max;
 	}
@@ -42,11 +43,11 @@ namespace Xf {
 	template <Xf::integral_c T>
 	consteval T max_digits(void) {
 		// remove cv
-		using Type = Xf::remove_cv_t<T>;
+		using type = Xf::remove_cv_t<T>;
 		// max value of type
-		Type type_max = Xf::max<Type>();
+		type type_max = xns::max<type>();
 		// number of digits
-		Type digits = 0;
+		type digits = 0;
 		do { // increment digits
 			++digits;
 			// divide max by 10
@@ -59,11 +60,11 @@ namespace Xf {
 	template <Xf::integral_c T>
 	consteval T min_digits(void) {
 		// remove cv
-		using Type = Xf::remove_cv_t<T>;
+		using type = Xf::remove_cv_t<T>;
 		// min value of type
-		Type type_min = Xf::min<Type>();
+		type type_min = xns::min<type>();
 		// number of digits
-		Type digits = 0;
+		type digits = 0;
 		do { // increment digits
 			++digits;
 			// divide max by 10
