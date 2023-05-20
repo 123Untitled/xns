@@ -80,7 +80,7 @@ void Xf::Border::draw(void) {
 	if (_border.empty()) { return; }
 	// draw border
 	//Buffer::draw(_border.pointer(), _border.size());
-	Output::write(_border);
+	xns::output::write(_border);
 }
 
 
