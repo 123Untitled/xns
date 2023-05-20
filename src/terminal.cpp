@@ -19,13 +19,13 @@
 // -- S I N G L E T O N  I N S T A N C E --------------------------------------
 
 /* singleton instance */
-Xf::Term Xf::Term::_instance{};
+xns::terminal xns::terminal::_instance{};
 
 
 // -- C O N S T R U C T O R S -------------------------------------------------
 
 /* private default constructor */
-Xf::Term::Term(void)
+xns::terminal::terminal(void)
 :	_is_raw{false}, _is_origin{false}, _is_setup{false},
 	_origin{setup_terminal()}, _raw{},
  	_width{0}, _height{0} {
@@ -44,11 +44,11 @@ Xf::Term::Term(void)
 	query_terminal_size();
 
 	// set resize signal handler
-	std::signal(SIGWINCH, &Term::terminal_resize_handler);
+	std::signal(SIGWINCH, &terminal::terminal_resize_handler);
 }
 
 /* destructor */
-Xf::Term::~Term(void) {
+xns::terminal::~terminal(void) {
 	// restore terminal settings if raw
 	if (_is_raw) { restore_terminal(); }
 }
@@ -57,13 +57,13 @@ Xf::Term::~Term(void) {
 // -- M E T H O D S -----------------------------------------------------------
 
 /* get singleton instance */
-Xf::Term& Xf::Term::instance(void) {
+xns::terminal& xns::terminal::instance(void) {
 	// return singleton instance
 	return _instance;
 }
 
 /* get terminal settings */
-const Xf::Term::Termios Xf::Term::setup_terminal(void) {
+const xns::terminal::Termios xns::terminal::setup_terminal(void) {
 
 	// termios structure
 	Termios origin;
@@ -79,7 +79,7 @@ const Xf::Term::Termios Xf::Term::setup_terminal(void) {
 }
 
 /* setup raw terminal */
-void Xf::Term::setup_raw(void) {
+void xns::terminal::setup_raw(void) {
 
 	// setup new terminal structure
 	_raw.c_iflag &= ~(	IXON		// disable Ctrl-S and Ctrl-Q
@@ -93,12 +93,12 @@ void Xf::Term::setup_raw(void) {
 
 
 /* flush stdin buffer */
-void Xf::Term::flush(void) {
+void xns::terminal::flush(void) {
 	// [TCIFLUSH] flushes data received but not read.
 	tcflush(STDIN_FILENO, TCIFLUSH);
 }
 
-void Xf::Term::raw_terminal(const VFlag vmin) {
+void xns::terminal::raw_terminal(const VFlag vmin) {
 
 	// check if terminal is setup
 	if (!_instance._is_setup) { return; }
@@ -112,7 +112,7 @@ void Xf::Term::raw_terminal(const VFlag vmin) {
 	}
 }
 
-void Xf::Term::restore_terminal(void) {
+void xns::terminal::restore_terminal(void) {
 
 	// check if terminal is setup
 	if (!_instance._is_setup) { return; }
@@ -124,14 +124,14 @@ void Xf::Term::restore_terminal(void) {
 }
 
 
-void Xf::Term::get_terminal_size(Wsize& width, Wsize& height) {
+void xns::terminal::get_terminal_size(Wsize& width, Wsize& height) {
 	// assign reference parameters
 	width  = _instance._width;
 	height = _instance._height;
 }
 
 /* query terminal size */
-int Xf::Term::query_terminal_size(void) {
+int xns::terminal::query_terminal_size(void) {
 
 	// winsize structure
 	Winsize win;
@@ -150,7 +150,7 @@ int Xf::Term::query_terminal_size(void) {
 
 }
 
-void Xf::Term::terminal_resize_handler(int signum) {
+void xns::terminal::terminal_resize_handler(int signum) {
 	static_cast<void>(signum);
 	// query terminal size
 	if (_instance.query_terminal_size() != -1) {
@@ -191,7 +191,7 @@ void Xf::Term::terminal_resize_handler(int signum) {
 		std::cout << "stderr terminal control current process id: " << tcgid << std::endl;
 	}*/
 
-void Xf::Term::get_process_info(void) {
+void xns::terminal::get_process_info(void) {
 	// get the current process ID
 	const pid_t pid = getpid();
 	std::cout << "current process id: " << pid << std::endl;
@@ -226,7 +226,7 @@ void Xf::Term::get_process_info(void) {
 }
 
 
-int Xf::Term::check_control_term(void) {
+int xns::terminal::check_control_term(void) {
 
 	//char term[L_ctermid];
 	//char *ptr;
