@@ -14,8 +14,10 @@
 #include "random.hpp"
 #include "trie.hpp"
 
+#include "policy.hpp"
 
 #include "safe_enum.hpp"
+#include "literal.hpp"
 
 // curiously recurring template pattern (CRTP) learn
 
@@ -89,16 +91,75 @@ void ffunc(void) {
 	//std::cout << c.size() << std::endl;
 
 
-
 }
 
+template <class T>
+auto alloc() {
+
+	xns::string<typename T::char_t> s{T::data()};
+
+	return s;
+}
+
+
+
+
 int main(int ac, char** av) {
+
+	std::cout << (int)xns::max<char>() << std::endl;
+
+	using toto_t = xns::literal<char, 'h', 'e', 'l', 'l', 'o'>;
+
+	xns::output::write<toto_t>();
+
+	xns::output::render<xns::stderr>();
+
+	return 0;
+
+	auto sstr = alloc<toto_t>();
+
+	std::cout << sstr.pointer() << std::endl;
+	return 0;
+
+
+	toto_t toto{};
+
+	return 0;
+
+	using policy = xns::moveable_t;
+
+	//xns::vector<int, policy> v1{};
+
+	//xns::vector<int, policy> v2{v1};
+
+	auto v3 = xns::make_vector<int, policy>(1, 2, 3);
+
+	for (xns::vector<int, policy>::size x = 0; x < v3.length(); ++x) {
+		std::cout << v3[x] << std::endl;
+	}
+
+	/*
+
+	Toto<policy> t;
+
+	Toto<policy> t2{Xf::move(t)};
+	//Toto<policy> t3{t};
+	*/
+
+
+	return 0;
+
+
+
+
 
 	//using Proto = Xf::PolyMethod<Xf::UniquePointer<B>(void)>;
 	//Xf::PolyMethod<Xf::UniquePointer<B>(void)> pm{f};
 	//invoke<Proto>(pm);
 
+	std::cout << sizeof(void*) << std::endl;
 
+	xns::array a = xns::make_array(1, 2, 3);
 
 	return EXIT_SUCCESS;
 
