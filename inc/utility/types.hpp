@@ -10,16 +10,6 @@
 	//	#include <cstddef>
 	//#endif
 
-// -- X N S  N A M E S P A C E ------------------------------------------------
-
-namespace xns {
-
-	// -- T Y P E S -------------------------------------------------------------
-
-	/* null pointer type */
-	using null = decltype(nullptr);
-
-}
 
 // -- N A M E S P A C E -------------------------------------------------------
 
@@ -68,7 +58,7 @@ using Bool    = bool;
 
 
 template <decltype(sizeof(char)) N>
-using Unsigned =	Xf::conditional_t<(sizeof(unsigned char)      == N), unsigned char,
+using unsigned_t =	Xf::conditional_t<(sizeof(unsigned char)      == N), unsigned char,
 					Xf::conditional_t<(sizeof(unsigned short)     == N), unsigned short,
 					Xf::conditional_t<(sizeof(unsigned int)       == N), unsigned int,
 					Xf::conditional_t<(sizeof(unsigned long)      == N), unsigned long,
@@ -76,24 +66,24 @@ using Unsigned =	Xf::conditional_t<(sizeof(unsigned char)      == N), unsigned c
 					void > > > > >;
 
 template <decltype(sizeof(char)) N>
-using Signed =		Xf::conditional_t<(sizeof(signed char)        == N), signed char,
+using signed_t =	Xf::conditional_t<(sizeof(signed char)        == N), signed char,
 					Xf::conditional_t<(sizeof(signed short)       == N), signed short,
 					Xf::conditional_t<(sizeof(signed int)         == N), signed int,
 					Xf::conditional_t<(sizeof(signed long)        == N), signed long,
 					Xf::conditional_t<(sizeof(signed long long)   == N), signed long long,
 					void > > > > >;
 
-using SInt8  = Signed<1>;
-using UInt8  = Unsigned<1>;
+using SInt8  = signed_t<1>;
+using UInt8  = unsigned_t<1>;
 
-using SInt16 = Signed<2>;
-using UInt16 = Unsigned<2>;
+using SInt16 = signed_t<2>;
+using UInt16 = unsigned_t<2>;
 
-using SInt32 = Signed<4>;
-using UInt32 = Unsigned<4>;
+using SInt32 = signed_t<4>;
+using UInt32 = unsigned_t<4>;
 
-using SInt64 = Signed<8>;
-using UInt64 = Unsigned<8>;
+using SInt64 = signed_t<8>;
+using UInt64 = unsigned_t<8>;
 
 
 // get number of bytes for current architecture
@@ -101,7 +91,7 @@ using UInt64 = Unsigned<8>;
 
 
 
-using SizeT = Unsigned<ARCH_BYTES>;
+using SizeT = unsigned_t<ARCH_BYTES>;
 
 
 
@@ -127,6 +117,26 @@ using Size = UInt64;
 #include <utility>
 
 using TSize = decltype(std::declval<struct winsize>().ws_row);
+
+
+
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
+
+	// -- T Y P E S -------------------------------------------------------------
+
+	/* null pointer type */
+	using null = decltype(nullptr);
+
+	/* architecture bytes */
+	#define ARCH_BYTES (sizeof(void*))
+
+	/* maximum unsigned integer type */
+	using size_t = unsigned_t<ARCH_BYTES>;
+
+}
+
 
 #endif
 
