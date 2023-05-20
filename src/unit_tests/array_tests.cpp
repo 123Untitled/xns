@@ -9,7 +9,7 @@ void test(Xf::IndexSeq<I...> i, Xf::IndexSeq<J...> j) {
 template <class... A>
 auto make(A&&... args) {
 
-	using RType = Xf::Array<Xf::PackType_t<0, A...>, sizeof...(A)>;
+	using RType = xns::array<Xf::PackType_t<0, A...>, sizeof...(A)>;
 
 	return RType{Xf::forward<A>(args)...};
 }
@@ -50,15 +50,15 @@ void UT::array_ut(void) {
 	*/
 
 
-	Array<Array<Type, 3>, 2> arr0 {
+	xns::array<xns::array<Type, 3>, 2> arr0 {
 
-		Array<Type, 3>{
+		xns::array<Type, 3>{
 			Type{1, 1.0f, 'a'},
 			Type{2, 2.0f, 'b'},
 			Type{3, 3.0f, 'c'}
 		},
 
-		Array<Type, 3>{
+			xns::array<Type, 3>{
 			Type{4, 4.0f, 'd'},
 			Type{5, 5.0f, 'e'},
 			Type{6, 6.0f, 'f'}
@@ -71,7 +71,7 @@ void UT::array_ut(void) {
 
 
 
-	Xf::Array<Type, 3, 2> arr {
+	xns::array<Type, 3, 2> arr {
 
 		Type{1, 1.0f, 'a'},
 		Type{2, 2.0f, 'b'},
