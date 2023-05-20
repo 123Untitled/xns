@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 // local includes
+#include "policy.hpp"
 #include "types.hpp"
 #include "move.hpp"
 #include "string_traits.hpp"
@@ -898,9 +899,10 @@ namespace xns {
 			// -- E X T R A C T I O N -----------------------------------------
 
 			/* split */
-			xns::vector<string<char_t>> split(string&& sep) const {
+			template <xns::restrict R = xns::assignable_t>
+			xns::vector<string<char_t>, R> split(string&& sep) const {
 				// vector of strings
-				xns::vector<string<char_t>> vec;
+				xns::vector<string<char_t>, R> vec;
 				// check if string is not null
 				if (_str) {
 					// loop through string characters
@@ -1000,7 +1002,7 @@ namespace xns {
 				// temporary string
 				clear();
 
-				constexpr N size = Xf::max_digits<N>();
+				constexpr N size = xns::max_digits<N>();
 
 				// WARNING: need to verify class
 				// error doesn't checked with this method
@@ -1028,8 +1030,8 @@ namespace xns {
 				// temporary string
 				clear();
 
-				constexpr Size size = Xf::max_digits<N>() + 1; // INFO: +1 for negative sign
-				constexpr N type_min = Xf::min<N>();
+				constexpr Size size = xns::max_digits<N>() + 1; // INFO: +1 for negative sign
+				constexpr N type_min = xns::min<N>();
 				N base = 10;
 
 				// WARNING: need to verify class
@@ -1582,7 +1584,7 @@ namespace xns {
 		// remove const and volatile
 		using Type = Xf::remove_cv_t<T>;
 
-		SizeT digits = Xf::static_digits<Xf::Dec, Type>(number);
+		SizeT digits = xns::static_digits<Xf::Dec, Type>(number);
 
 		xns::StaticText<C, digits> text;
 
@@ -1613,7 +1615,7 @@ namespace xns {
 	// in a scrollable view
 
 	template <Xf::is_char_c T>
-	class Scrollstring {
+	class scroll_string {
 
 		private:
 
@@ -1644,13 +1646,13 @@ namespace xns {
 			// -- P U B L I C  C O N S T R U C T O R S ------------------------
 
 			/* default constructor */
-			Scrollstring(void) noexcept
+			scroll_string(void) noexcept
 			: _str{ }, _view_size{0}, _view_start{0}, _string_cursor{0}, _screen_cursor{0} {
 				// code here...
 			}
 
 			/* destructor */
-			~Scrollstring(void) noexcept = default;
+			~scroll_string(void) noexcept = default;
 
 
 			// -- P U B L I C  S E T T E R S ----------------------------------
@@ -1737,7 +1739,7 @@ namespace xns {
 			// -- P U B L I C  A C C E S S O R S ------------------------------
 
 			/* const pointer */
-			typename xns::string<T>::ConstPointer view_pointer(void) const {
+			typename xns::string<T>::const_pointer view_pointer(void) const {
 				// return constant pointer to first display element
 				return _str.pointer() + _view_start;
 			}
