@@ -4,74 +4,209 @@
 #include "types.hpp"
 #include "macro.hpp"
 #include "array.hpp"
-
-#include <string>
-#include <climits>
-
-#define ZERO_ASCII		48
-#define BASE			10
-
-#define WHITE_SPACE		"\x09\x0a\x0b\x0c\x0d\x20"
+#include "string.hpp"
+#include "literal.hpp"
+#include "safe_enum.hpp"
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
+
 
 	// -- A S C I I  C L A S S ------------------------------------------------
 
-	class Ascii {
+	class ascii {
 
 		public:
 
-			enum Chartype : SizeT {
-
-				SPACE, EXCLAMATION, DOUBLE_QUOTE,
-				HASHTAG, DOLLAR, PERCENT,
-				AMPERSAND, SINGLE_QUOTE,
-				LEFT_PARENTHESIS, RIGHT_PARENTHESIS,
-				ASTERISK, PLUS, COMMA, MINUS,
-				PERIOD, SLASH, NUMBER, COLON,
-				SEMICOLON, LESS, EQUALITY,
-				GREATER, QUESTION, AT, LETTER,
-				LEFT_SQUARE, BACKSLASH, RIGHT_SQUARE,
-				CIRCUMFLEX, UNDERSCORE, ACCENT,
-				LEFT_CURLY, PIPE, RIGHT_CURLY, TILDE
-
-			};
-
-			// -- A L I A S E S -----------------------------------------------
+			// -- T Y P E S ---------------------------------------------------
 
 			/* character type */
-			using CharT = char;
+			using char_t = char;
+
+			/* const pointer type */
+			using const_pointer = const char_t*;
 
 			/* string type */
-			using String = std::string;
+			using string = xns::cstring;
 
 			/* size type */
-			using Size = UInt64;
+			using size_type = xns::size_t;
+
+			/* white space type */
+			using white_space = xns::literal<char_t,    '\x09', '\x0a',
+														'\x0b', '\x0c',
+														'\x0d', '\x20'>;
 
 
+			// -- C O N S T A N T S -------------------------------------------
 
-			static Chartype chartype(const CharT c) {
-				return _array[c - OFFSET];
-			}
+			/* number of printable characters */
+			static constexpr size_type printable = 95;
+
+			/* zero character */
+			static constexpr char_t zero_ascii = 48;
+
+			/* number of characters */
+			static constexpr size_type size = xns::max<char_t>() + 1;
+
+			/* offset to printable characters */
+			static constexpr size_type offset = 32;
+
 
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* non-instanciable class */
-			NON_INSTANCIABLE(Ascii);
+			NON_INSTANCIABLE(ascii);
+
+
+			// -- S T A T I C  M E T H O D S ----------------------------------
+
+			//static char_type get_chartype(const char_t c) {
+			//	return _table[0];
+			//}
 
 		private:
 
-			enum : SizeT {
-				OFFSET      = 32,
-				LOOKUP_SIZE = 95
+
+			struct char_type_def {
+				// integral type
+				using type = size_type; // need a meta function to get unsigned version of a type
+				// enum type
+				enum enum_type : type {
+					SPACE, EXCLAMATION, DOUBLE_QUOTE,
+					HASHTAG, DOLLAR, PERCENT,
+					AMPERSAND, SINGLE_QUOTE,
+					LEFT_PARENTHESIS, RIGHT_PARENTHESIS,
+					ASTERISK, PLUS, COMMA, MINUS,
+					PERIOD, SLASH, NUMBER, COLON,
+					SEMICOLON, LESS, EQUALITY,
+					GREATER, QUESTION, AT, LETTER,
+					LEFT_SQUARE, BACKSLASH, RIGHT_SQUARE,
+					CIRCUMFLEX, UNDERSCORE, ACCENT,
+					LEFT_CURLY, PIPE, RIGHT_CURLY, TILDE,
+					MAX
+				};
 			};
 
-			using Chartable = Xf::Array<Chartype, LOOKUP_SIZE>;
+			using char_type = xns::safe_enum<char_type_def>;
 
-			static Chartable _array;
+
+			// -- P R I V A T E  T Y P E S ------------------------------------
+
+			/* character table type */
+			using char_table = xns::array<char_type, size>;
+
+			/* character info table type */
+			using char_info = xns::array<const_pointer, size>;
+
+
+
+		private:
+
+
+			static constexpr const char_table _table {
+				char_type::LEFT_CURLY,
+				char_type::EXCLAMATION,
+				char_type::DOUBLE_QUOTE,
+				/* ... */
+
+
+			};
+
+
+			static constexpr const char_info _info {
+				"Null character",
+				"Start of Heading",
+				"Start of Text",
+				"End of Text",
+				"End of Transmission",
+				"Enquiry",
+				"Acknowledge",
+				"Bell, Alert",
+				"Backspace",
+				"Horizontal Tab",
+				"Line Feed",
+				"Vertical Tabulation",
+				"Form Feed",
+				"Carriage Return",
+				"Shift Out",
+				"Shift In",
+				"Data Link Escape",
+				"Device Control One (XON)",
+				"Device Control Two",
+				"Device Control Three (XOFF)",
+				"Device Control Four",
+				"Negative Acknowledge",
+				"Synchronous Idle",
+				"End of Transmission Block",
+				"Cancel",
+				"End of medium",
+				"Substitute",
+				"Escape",
+				"File Separator",
+				"Group Separator",
+				"Record Separator",
+				"Unit Separator",
+				"Space",
+				"Exclamation mark",
+				"Double quotes",
+				"Number sign",
+				"Dollar",
+				"Per cent sign",
+				"Ampersand",
+				"Single quote",
+				"Open parenthesis",
+				"Close parenthesis",
+				"Asterisk",
+				"Plus",
+				"Comma",
+				"Hyphen-minus",
+				"Period, dot or full stop",
+				"Slash or divide",
+
+				"Zero", "One", "Two", "Three", "Four", "Five",
+				"Six", "Seven", "Eight", "Nine",
+
+				"Colon",
+				"Semicolon",
+				"Less than",
+				"Equals",
+				"Greater than",
+				"Question mark",
+				"At sign",
+
+				"Uppercase A", "Uppercase B", "Uppercase C", "Uppercase D",
+				"Uppercase E", "Uppercase F", "Uppercase G", "Uppercase H",
+				"Uppercase I", "Uppercase J", "Uppercase K", "Uppercase L",
+				"Uppercase M", "Uppercase N", "Uppercase O", "Uppercase P",
+				"Uppercase Q", "Uppercase R", "Uppercase S", "Uppercase T",
+				"Uppercase U", "Uppercase V", "Uppercase W", "Uppercase X",
+				"Uppercase Y", "Uppercase Z",
+
+				"Opening bracket",
+				"Backslash",
+				"Closing bracket",
+				"Circumflex accent",
+				"Underscore",
+				"Grave accent",
+
+				"Lowercase a", "Lowercase b", "Lowercase c", "Lowercase d",
+				"Lowercase e", "Lowercase f", "Lowercase g", "Lowercase h",
+				"Lowercase i", "Lowercase j", "Lowercase k", "Lowercase l",
+				"Lowercase m", "Lowercase n", "Lowercase o", "Lowercase p",
+				"Lowercase q", "Lowercase r", "Lowercase s", "Lowercase t",
+				"Lowercase u", "Lowercase v", "Lowercase w", "Lowercase x",
+				"Lowercase y", "Lowercase z",
+
+				"Opening brace",
+				"Vertical bar",
+				"Closing brace",
+				"Tilde",
+				"Delete"
+			};
+
 
 	};
 
