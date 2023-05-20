@@ -66,7 +66,7 @@ namespace Xf {
 			using UniqueNode = Xf::UniquePointer<Node>;
 
 			/* lookup table type */
-			using Table = Xf::Array<UniqueNode, LOOKUP_SIZE>;
+			using Table = xns::array<UniqueNode, LOOKUP_SIZE>;
 
 			/* node pointer type */
 			using WeakNode = Xf::WeakPointer<Node>;
