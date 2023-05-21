@@ -25,7 +25,7 @@ MINIMAL_VERSION := 4.2
 
 # compare version
 ifneq ($(MINIMAL_VERSION), $(firstword $(sort $(MAKE_VERSION) $(MINIMAL_VERSION))))
- $(error $(shell echo "Please use \033[1;32mGNU Make 4.2\033[0m or later"))
+ $(error $(shell echo "Please use \033[1;32mGNU Make $(MINIMAL_VERSION)\033[0m or later"))
 endif
 
 
@@ -151,7 +151,7 @@ AR := $(shell which ar)
 ARFLAGS := -rcs
 
 # compiler standard
-STD := -std=c++2b
+STD := -std=gnu++2b
 
 # compiler optimization
 OPT := -O0 -g3
@@ -159,7 +159,7 @@ OPT := -O0 -g3
 # compiler flags
 CXXFLAGS :=	-Wall -Wextra -Werror -Wpedantic \
 			-Wno-unused -Wno-unused-variable -Wno-unused-parameter \
-			-Winline -fno-exceptions -Weffc++
+			-Winline -fno-exceptions -Weffc++ -Wno-gnu-string-literal-operator-template
 
 # linker flags
 LDFLAGS ?=
@@ -194,78 +194,95 @@ override JSNHIR := $(HIR:$(SRCDIR)/%=$(JSNDIR)/%)
 # -- F O R M A T T I N G ------------------------------------------------------
 
 # formatting (erase line, move cursor up, set color)
-override COLOR := "\x1b[1F\x1b[0J\x1b[3;31m"
+override COLOR := "\x1b[3;31m"
+override ERASE := "\x1b[1F\x1b[0J\x1b[3;31m"
 
 # reset formatting
 override RESET := "\x1b[0m"
 override GREP := grep --color=auto '^\w\+'
 
+
 # -- P H O N Y  T A R G E T S -------------------------------------------------
 
 # phony targets
-.PHONY: all clean fclean re ascii obj lib directories test
+.PHONY: all clean fclean re ascii obj exec lib dynamic static
 
+COUNT = 0
 
 # -- M A I N  T A R G E T S ---------------------------------------------------
 
-#all: $(OBJ)
+all:
+	$(MAKE) --silent ascii exec
+	echo $(COLOR)'🚀'$(RESET) "All targets are up to date !";
 
-all: lib test
+# executable target
+exec:		obj $(EXEC) $(COMPILE_COMMANDS)
 
-test: main.cpp
-	$(CCX) $(STD) $(OPT) $(CXXFLAGS) $< $(INCLUDES) -L. -lxfunc -o $(EXEC)
-	file $(EXEC) | $(GREP)
+# library target
+lib:		dynamic static
+
+# dynamic library target
+dynamic:	obj $(DYNAMIC_LIB) $(COMPILE_COMMANDS)
+
+# static library target
+static:		obj $(STATIC_LIB) $(COMPILE_COMMANDS)
 
 
 # -- L I B R A R Y  T A R G E T S ---------------------------------------------
 
-lib: $(DYNAMIC_LIB) $(STATIC_LIB) $(COMPILE_COMMANDS)
-	@echo $(COLOR)'[v]'$(RESET) "All targets are up to date !";
-	file $(STATIC_LIB) $(DYNAMIC_LIB) | $(GREP)
+$(EXEC): $(OBJ)
+	echo $(COLOR)Exec-Link$(RESET) $@;
+	$(CCX) $(LDFLAGS) $(OBJ) -o $@;
+	file $(EXEC) | $(GREP); echo;
 
-$(DYNAMIC_LIB): obj
-	@echo $(COLOR)Dynamic-Link$(RESET) $@;
-	@$(CCX) $(OBJ) $(LDFLAGS) $(DLIB) -o $@;
+$(DYNAMIC_LIB): $(OBJ)
+	echo $(COLOR)Dynamic-Link$(RESET) $@;
+	$(CCX) $(OBJ) $(LDFLAGS) $(DLIB) -o $@;
+	file $(DYNAMIC_LIB) | $(GREP); echo;
 
-$(STATIC_LIB): obj
-	@echo $(COLOR)Static-Link$(RESET) $@;
-	@$(AR) $(ARFLAGS) $@ $(OBJ);
+$(STATIC_LIB): $(OBJ)
+	echo $(COLOR)Static-Link$(RESET) $@;
+	$(AR) $(ARFLAGS) $@ $(OBJ);
+	file $(STATIC_LIB) | $(GREP); echo;
 
 
 # -- C O M P I L A T I O N ----------------------------------------------------
 
+# self call with threads
 obj:
-	@$(MAKE) -s -j$(THREAD) $(OBJ)
+	$(MAKE) --silent -j$(THREAD) $(OBJ)
+	echo $(ERASE)'🫠'$(RESET) "All files compiled.\n";
 
 -include $(DEP)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp Makefile | directories
-	@echo $(COLOR)Compilation$(RESET) $<;
-	@$(CCX) $(STD) $(OPT) $(CXXFLAGS) $(CMPFLAGS) $(DEPFLAGS) $(INCLUDES) -c $< -o $@
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp Makefile | $(OBJHIR) $(DEPHIR) $(JSNHIR)
+	echo $(ERASE)Compilation$(RESET) $<;
+	$(CCX) $(STD) $(OPT) $(CXXFLAGS) $(CMPFLAGS) $(DEPFLAGS) $(INCLUDES) -c $< -o $@
+	echo $< >> make.log;
 
 
 # -- C O M P I L E  C O M M A N D S -------------------------------------------
 
-$(COMPILE_COMMANDS): obj
-	@echo $(COLOR)Compile-Commands$(RESET) $@;
-	@echo "[\n"$$(cat $(JSN) | sed '$$s/,\s*$$//')"\n]" | jq > $@
+$(COMPILE_COMMANDS): $(JSN)
+	echo $(COLOR)'jq >'$(RESET) $@;
+	echo "[\n"$$(cat $(JSN) | sed '$$s/,\s*$$//')"\n]" | jq > $@
+	file $(COMPILE_COMMANDS) | $(GREP); echo;
 
 
 # -- D I R E C T O R I E S  C R E A T I O N -----------------------------------
 
-directories:
-	@$(MKDIR) $(OBJHIR) $(DEPHIR) $(JSNHIR)
-
+$(OBJHIR) $(DEPHIR) $(JSNHIR):
+	$(MKDIR) $@
 
 # -- C L E A N I N G ----------------------------------------------------------
 
 clean:
-	@echo $(COLOR)'[x]'$(RESET) "Cleaned";
-	@$(RM) $(BLDDIR) $(PROJECT).dSYM
+	echo $(COLOR)'[x]'$(RESET) "Cleaned";
+	$(RM) $(BLDDIR) $(PROJECT).dSYM
 
 fclean: clean
-	@echo $(COLOR)'[x]'$(RESET) "Full cleaned";
-	@$(RM) $(EXEC) $(DYNAMIC_LIB) $(STATIC_LIB) $(COMPILE_COMMANDS) .cache
+	echo $(COLOR)'[x]'$(RESET) "Full cleaned";
+	$(RM) $(EXEC) $(DYNAMIC_LIB) $(STATIC_LIB) $(COMPILE_COMMANDS) .cache
 
 
 # -- R E C O M P I L E --------------------------------------------------------
@@ -276,7 +293,7 @@ re: fclean all
 # -- A S C I I  A R T ---------------------------------------------------------
 
 ascii:
-	@echo \
+	echo \
 		$(COLOR) \
 		"   ▁▁▁▁▁▁▁▁  ▁▁▁▁▁▁▁▁  ▁▁▁▁ ▁▁▁  ▁▁▁▁▁▁▁▁	\n" \
 		"  ╱        ╲╱        ╲╱    ╱   ╲╱        ╲	\n" \
