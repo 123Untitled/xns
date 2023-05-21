@@ -122,10 +122,10 @@ RM := rm -rf
 # -- T A R G E T S ------------------------------------------------------------
 
 # project name
-PROJECT = xfunc
+PROJECT = xns
 
 # main executable
-EXEC = $(PROJECT)
+EXEC = $(PROJECT)exec
 
 # dynamic library
 DYNAMIC_LIB = lib$(PROJECT).$(DLIB_EXT)
