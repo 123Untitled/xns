@@ -2,21 +2,36 @@
 #define TYPE_TRAITS_HEADER
 
 #include "types.hpp"
+
 #include "integral_constant.hpp"
+
+#include "conditional.hpp"
+
+#include "identity.hpp"
+
+#include "policy.hpp"
+
 #include "enable_if.hpp"
 
-#include "is_signed.hpp"
-#include "is_integral.hpp"
-#include "is_lvalue_reference.hpp"
 #include "is_same.hpp"
 #include "is_void.hpp"
-
-#include "remove.hpp"
-
-#include "inheritance.hpp"
+#include "is_char.hpp"
+#include "is_signed.hpp"
+#include "is_integral.hpp"
+#include "is_pointer.hpp"
+#include "is_reference.hpp"
 
 #include "move.hpp"
 #include "forward.hpp"
+
+#include "remove.hpp"
+
+#include "integer_sequence.hpp"
+#include "parameter_pack.hpp"
+#include "pack_type.hpp"
+
+#include "inheritance.hpp"
+
 
 // -- N A M E S P A C E -------------------------------------------------------
 
@@ -88,7 +103,7 @@ namespace Xf {
 
 	/* is 8 bit */
 	template <class T>
-	struct is_8bit : Xf::integral_constant<bool, sizeof(T) == 1> {};
+	struct is_8bit : xns::integral_constant<bool, sizeof(T) == 1> {};
 
 	template <class T>
 	inline constexpr bool is_8bit_v = is_8bit<T>::value;
@@ -99,23 +114,23 @@ namespace Xf {
 
 	/* is 16 bit */
 	template <class T>
-	struct is_16bit : Xf::integral_constant<bool, sizeof(T) == 2> {};
+	struct is_16bit : xns::integral_constant<bool, sizeof(T) == 2> {};
 
 	/* is 32 bit */
 	template <class T>
-	struct is_32bit : Xf::integral_constant<bool, sizeof(T) == 4> {};
+	struct is_32bit : xns::integral_constant<bool, sizeof(T) == 4> {};
 
 	/* is 64 bit */
 	template <class T>
-	struct is_64bit : Xf::integral_constant<bool, sizeof(T) == 8> {};
+	struct is_64bit : xns::integral_constant<bool, sizeof(T) == 8> {};
 
 	/* is 128 bit */
 	template <class T>
-	struct is_128bit : Xf::integral_constant<bool, sizeof(T) == 16> {};
+	struct is_128bit : xns::integral_constant<bool, sizeof(T) == 16> {};
 
 	/* is 256 bit */
 	template <class T>
-	struct is_256bit : Xf::integral_constant<bool, sizeof(T) == 32> {};
+	struct is_256bit : xns::integral_constant<bool, sizeof(T) == 32> {};
 
 
 
@@ -128,7 +143,7 @@ namespace Xf {
 
 	// enable for 8 bit type
 	template <typename T>
-	using enable_if_8bit = enable_if_t<is_8bit<T>::value, T>;
+	using enable_if_8bit = xns::enable_if<is_8bit<T>::value, T>;
 
 
 } // end of namespace Xf

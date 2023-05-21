@@ -23,25 +23,22 @@ namespace xns {
 	class array;
 
 
-	/* is array false type */
+	/* false type */
 	template <class T>
-	struct is_array_s                 : xns::false_t { };
+	struct _is_xns_array                      : xns::no  { };
 
-	/* is array true type */
-	template <class T, SizeT... N>
-	struct is_array_s<array<T, N...>> : xns::true_t  { };
+	/* true type */
+	template <class T, xns::size_t... N>
+	struct _is_xns_array<array<T, N...>>      : xns::yes { };
 
 	/* is array for c style arrays */
 	template <class T, xns::size_t N>
-	struct is_array_s<T[N]>           : xns::true_t  { };
-
-	/* is array value */
-	template <class T>
-	constexpr bool is_array_v = is_array_s<T>::value;
+	struct _is_xns_array<T[N]>           : xns::yes  { };
 
 	/* is array concept */
 	template <class T>
-	concept is_array = is_array_v<T>;
+	concept is_xns_array = _is_xns_array<T>::value;
+
 
 
 
@@ -324,7 +321,7 @@ namespace xns {
 	constexpr xns::array<std::common_type_t<A...>, sizeof...(A)> make_array(A&&... args) {
 		using T = std::common_type_t<A...>;
 
-		xns::array<T, sizeof...(A)> arr = {Xf::forward<A>(args)...};
+		xns::array<T, sizeof...(A)> arr = {xns::forward<A>(args)...};
 
 		// return array
 		return arr;

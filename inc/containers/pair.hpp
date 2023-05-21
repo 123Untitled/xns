@@ -67,28 +67,23 @@ namespace Xf {
 
 			/* default constructor */
 			Pair(void)
-			// initializations
 			: _first{}, _second{} { }
 
 			/* copy pair constructor */
 			Pair(FirstConstRef first, SecondConstRef second)
-			// initializations
 			: _first{first}, _second{second} { }
 
 			/* move pair constructor */
 			Pair(FirstMoveRef first, SecondMoveRef second)
-			// initializations
-			: _first{Xf::move(first)}, _second{Xf::move(second)} { }
+			: _first{xns::move(first)}, _second{xns::move(second)} { }
 
 			/* copy constructor */
 			Pair(const Pair& other)
-			// initializations
 			: _first{other._first}, _second{other._second} { }
 
 			/* move constructor */
 			Pair(Pair&& other)
-			// initializations
-			: _first{Xf::move(other._first)}, _second{Xf::move(other._second)} { }
+			: _first{xns::move(other._first)}, _second{xns::move(other._second)} { }
 
 			/* destructor */
 			~Pair(void) { }
@@ -113,9 +108,9 @@ namespace Xf {
 				// check for self assignment
 				if (this != &other) {
 					// move first object
-					_first = Xf::move(other._first);
+					_first = xns::move(other._first);
 					// move second object
-					_second = Xf::move(other._second);
+					_second = xns::move(other._second);
 				} // return self reference
 				return *this;
 			}

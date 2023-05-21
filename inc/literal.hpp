@@ -2,7 +2,7 @@
 #define LITERAL_HEADER
 
 #include "types.hpp"
-#include "string_traits.hpp"
+#include "is_char.hpp"
 #include "macro.hpp"
 
 
@@ -22,7 +22,7 @@ namespace xns {
 		// -- A S S E R T I O N S ---------------------------------------------
 
 		/* require character type */
-		static_assert(Xf::is_char_c<T>, "LITERAL TYPE MUST BE A CHARACTER TYPE");
+		static_assert(xns::is_char<T>, "LITERAL TYPE MUST BE A CHARACTER TYPE");
 
 		/* require non-empty string */
 		static_assert(sizeof...(A) > 0, "LITERAL MUST NOT BE EMPTY");
@@ -95,11 +95,11 @@ namespace xns {
 
 	/* literal false type */
 	template <class T>
-	struct is_literal_s : public xns::false_t {};
+	struct is_literal_s : public xns::no {};
 
 	/* literal true type */
 	template <class T, T... A>
-	struct is_literal_s<xns::literal<T, A...>> : public xns::true_t {};
+	struct is_literal_s<xns::literal<T, A...>> : public xns::yes {};
 
 	/* literal concept */
 	template <class T>

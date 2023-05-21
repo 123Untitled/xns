@@ -8,86 +8,82 @@
 #include "is_same.hpp"
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
 
 
 	// -- I S  I N T E G R A L ------------------------------------------------
 
 	/* is integral */
 	template <class T>
-	struct is_integral :                     public false_t {};
+	struct _is_integral :                     xns::no {};
 
 	/* remove const */
 	template <class T>
-	struct is_integral<const T> :            public is_integral<T> {};
+	struct _is_integral<const T> :            _is_integral<T> {};
 
 	/* remove volatile */
 	template <class T>
-	struct is_integral<volatile T> :         public is_integral<T> {};
+	struct _is_integral<volatile T> :         _is_integral<T> {};
 
 	/* remove cv */
 	template <class T>
-	struct is_integral<volatile const T> :   public is_integral<T> {};
+	struct _is_integral<volatile const T> :   _is_integral<T> {};
+
 
 	template<>
-	struct is_integral<char> :               public true_t {};
+	struct _is_integral<char> :               xns::yes {};
 
 	template<>
-	struct is_integral<signed char> :        public true_t {};
+	struct _is_integral<signed char> :        xns::yes {};
 
 	template<>
-	struct is_integral<unsigned char> :      public true_t {};
+	struct _is_integral<unsigned char> :      xns::yes {};
 
 	template<>
-	struct is_integral<short> :              public true_t {};
+	struct _is_integral<short> :              xns::yes {};
 
 	template<>
-	struct is_integral<unsigned short> :     public true_t {};
+	struct _is_integral<unsigned short> :     xns::yes {};
 
 	template<>
-	struct is_integral<int> :                public true_t {};
+	struct _is_integral<int> :                xns::yes {};
 
 	template<>
-	struct is_integral<unsigned int> :       public true_t {};
+	struct _is_integral<unsigned int> :       xns::yes {};
 
 	template<>
-	struct is_integral<long> :               public true_t {};
+	struct _is_integral<long> :               xns::yes {};
 
 	template<>
-	struct is_integral<unsigned long> :      public true_t {};
+	struct _is_integral<unsigned long> :      xns::yes {};
 
 	template<>
-	struct is_integral<long long> :          public true_t {};
+	struct _is_integral<long long> :          xns::yes {};
 
 	template<>
-	struct is_integral<unsigned long long> : public true_t {};
+	struct _is_integral<unsigned long long> : xns::yes {};
 
 	template<>
-	struct is_integral<char8_t> :            public true_t {};
+	struct _is_integral<char8_t> :            xns::yes {};
 
 	template<>
-	struct is_integral<char16_t> :           public true_t {};
+	struct _is_integral<char16_t> :           xns::yes {};
 
 	template<>
-	struct is_integral<char32_t> :           public true_t {};
+	struct _is_integral<char32_t> :           xns::yes {};
 
 	template<>
-	struct is_integral<wchar_t> :            public true_t {};
+	struct _is_integral<wchar_t> :            xns::yes {};
 
 	template<>
-	struct is_integral<bool> :               public true_t {};
+	struct _is_integral<bool> :               xns::yes {};
 
 
+	/* is integral concept */
 	template <class T>
-	inline constexpr bool is_integral_v = is_integral<T>::value;
-
-	template <class T>
-	concept integral_c = Xf::is_integral_v<T>;
-
-	template <auto N>
-	using Integral = Xf::enable_if_t<Xf::is_integral_v<decltype(N)>, decltype(N)>;
+	concept is_integral = _is_integral<T>::value;
 
 
 
@@ -95,21 +91,15 @@ namespace Xf {
 
 	/* is floating point */
 	template <class T>
-	struct is_floating_point_s
-	: Xf::bool_constant
-	<
-		Xf::is_same<T, Xf::remove_cv_t<T>>     ||
-		Xf::is_same<T, Xf::remove_cv_t<float>> ||
-		Xf::is_same<T, Xf::remove_cv_t<double>>
-	> {};
-
-	/* is floating point value */
-	template <class T>
-	inline constexpr bool is_floating_point = is_floating_point_s<T>::value;
+	struct _is_floating : xns::bool_constant<
+		xns::is_same<T, xns::remove_cv<T>>     ||
+		xns::is_same<T, xns::remove_cv<float>> ||
+		xns::is_same<T, xns::remove_cv<double>>
+	>{};
 
 	/* is floating point concept */
 	template <class T>
-	concept FloatingPoint = Xf::is_floating_point<T>;
+	concept is_floating = _is_floating<T>::value;
 
 }
 

@@ -3,32 +3,28 @@
 
 #include "integral_constant.hpp"
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
 
 
 	// -- I S  V O I D --------------------------------------------------------
 
-	/* is void false type */
+	/* false type */
 	template <class T>
-	struct IsVoid_s : Xf::false_t { };
+	struct _is_void       : xns::no  {};
 
-	/* is void true type */
+	/* true type */
 	template <>
-	struct IsVoid_s<void> : Xf::true_t { };
-
-	/* is void value */
-	template <class T>
-	constexpr bool IsVoid_v = IsVoid_s<T>::value;
+	struct _is_void<void> : xns::yes {};
 
 	/* is void concept */
 	template <class T>
-	concept IsVoid = IsVoid_v<T>;
+	concept is_void = _is_void<T>::value;
 
 	/* is not void concept */
 	template <class T>
-	concept IsNotVoid = !IsVoid_v<T>;
+	concept is_not_void = !is_void<T>;
 
 
 }

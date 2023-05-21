@@ -72,7 +72,7 @@ namespace Xf {
 			/* move value */
 			void push(Value&& value, const Float prob) {
 				// move value and push probability
-				_data.emplace_back(Xf::move(value), prob);
+				_data.emplace_back(xns::move(value), prob);
 				// update sum
 				_sum += prob;
 			}

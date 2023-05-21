@@ -13,7 +13,7 @@ void UT::tuple_ut(void) {
 
 	Type type{1, 2.0, 'c'};
 
-	Tuple<Type, int, float> t3{Xf::move(type), 2, 3.0f};
+	Tuple<Type, int, float> t3{xns::move(type), 2, 3.0f};
 
 	//Tuple<float, char> t02 = t3;
 

@@ -3,32 +3,38 @@
 
 #include "integral_constant.hpp"
 
-// -- N A M E S P A C E -------------------------------------------------------
 
-namespace Xf {
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
 
 
 	// -- I S  P O I N T E R --------------------------------------------------
 
-	/* is pointer false */
+	/* false type */
 	template <class T>
-	struct is_pointer                    : public false_t {};
+	struct _is_pointer                    : xns::no  {};
 
-	/* is pointer true */
+	/* true type */
 	template <class T>
-	struct is_pointer<T*>                : public true_t {};
+	struct _is_pointer<T*>                : xns::yes {};
 
-	/* is const pointer true */
+	/* true type */
 	template <class T>
-	struct is_pointer<const T*>          : public true_t {};
+	struct _is_pointer<const T*>          : xns::yes {};
 
-	/* is volatile pointer true */
+	/* true type */
 	template <class T>
-	struct is_pointer<volatile T*>       : public true_t {};
+	struct _is_pointer<volatile T*>       : xns::yes {};
 
-	/* is const volatile pointer true */
+	/* true type */
 	template <class T>
-	struct is_pointer<const volatile T*> : public true_t {};
+	struct _is_pointer<const volatile T*> : xns::yes {};
+
+
+	/* is pointer concept */
+	template <class T>
+	concept is_pointer = _is_pointer<T>::value;
 
 }
 

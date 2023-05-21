@@ -1,41 +1,41 @@
-#ifndef _FILE_HEADER_
-#define _FILE_HEADER_
+#ifndef FILE_HEADER
+#define FILE_HEADER
 
 #include "string.hpp"
 #include "draw.hpp"
-#include "unique.hpp"
+#include "unique_fd.hpp"
 
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
 
 	// -- F I L E  C L A S S --------------------------------------------------
 
-	class File final {
+	class file final {
 
 		public:
 
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* default constructor */
-			File(void);
+			file(void);
 
 			/* path constructor */
-			File(const xns::cstring&);
+			file(const xns::cstring&);
 
 			/* non-assignable class */
-			NON_ASSIGNABLE(File);
+			NON_ASSIGNABLE(file);
 
 			/* destructor */
-			~File(void);
+			~file(void);
 
 
-			void setFileName(xns::cstring&& name);
+			void file_name(xns::cstring&& name);
 
 			/* open file */
 			void open(void);
@@ -58,10 +58,11 @@ namespace Xf {
 
 			xns::cstring _file;
 			xns::cstring _path;
-			Xf::UniqueFd     _fd;
+			xns::unique_fd     _fd;
 			Stat             _data;
 			bool             _state;
 
+			void operator|(file);
 
 
 	};

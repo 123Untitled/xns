@@ -33,7 +33,8 @@ namespace xns {
 
 	/* is std file descriptor */
 	template <class T>
-	concept is_std_fd = Xf::is_same<T, stdout> || Xf::is_same<T, stderr>;
+	concept is_std_fd =    xns::is_same<T, stdout>
+						|| xns::is_same<T, stderr>;
 
 
 

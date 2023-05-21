@@ -2,30 +2,30 @@
 #define CONDITIONAL_HEADER
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
 
 	// -- C O N D I T I O N A L -----------------------------------------------
 
 	/* conditional */
 	template <bool B, class T, class F>
-	struct conditional;
+	struct _conditional;
 
-	/* conditional for true */
+	/* true specialization */
 	template <class T, class F>
-	struct conditional<true, T, F>       { using type = T; };
+	struct _conditional<true, T, F>       { using type = T; };
 
-	/* conditional for false */
+	/* false specialization */
 	template <class T, class F>
-	struct conditional<false, T, F>      { using type = F; };
+	struct _conditional<false, T, F>      { using type = F; };
 
 	/* conditional type */
 	template <bool B, class T, class F>
-	using conditional_t = typename conditional<B, T, F>::type;
-
+	using conditional = typename _conditional<B, T, F>::type;
 
 }
+
 
 #endif
 

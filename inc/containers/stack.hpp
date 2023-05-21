@@ -206,7 +206,7 @@ namespace Xf {
 				// check if pointer is valid
 				if (!node) { return; }
 				// construct node
-				Allocator::construct(node, Xf::move(value));
+				Allocator::construct(node, xns::move(value));
 				// link node
 				link(node);
 				// increment size
@@ -221,7 +221,7 @@ namespace Xf {
 				// check if pointer is valid
 				if (!node) { return; }
 				// construct node
-				Allocator::construct(node, Xf::forward<A>(arguments)...);
+				Allocator::construct(node, xns::forward<A>(arguments)...);
 				// link node
 				link(node);
 				// increment size
@@ -379,7 +379,7 @@ namespace Xf {
 
 			/* move constructor */
 			Node(Node&& other)
-			: _value(Xf::move(other._value)), _next(Xf::move(other._next)) {
+			: _value(xns::move(other._value)), _next(xns::move(other._next)) {
 				// code here...
 			}
 
@@ -391,14 +391,14 @@ namespace Xf {
 
 			/* value move constructor */
 			Node(MoveReference value) noexcept
-			: _value(Xf::move(value)), _next(nullptr) {
+			: _value(xns::move(value)), _next(nullptr) {
 				// code here...
 			}
 
 			/* value emplace constructor */
 			template <typename... A>
 			Node(A&&... arguments)
-			: _value(Xf::forward<A>(arguments)...), _next(nullptr) {
+			: _value(xns::forward<A>(arguments)...), _next(nullptr) {
 				// code here...
 			}
 

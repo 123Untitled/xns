@@ -18,8 +18,8 @@ void UT::unique_pointer_ut(void) {
 	bool b = Xf::is_base_of_v<Base<int>, Class<int, float, char>>;
 	*/
 
-	bool s1 = Xf::is_base_of_v<Base<int>, Base<int>>;
-	bool s2 = Xf::is_derived_from_v<int, void>;
+	bool s1 = xns::is_base_of_v<Base<int>, Base<int>>;
+	bool s2 = xns::is_derived_from_v<int, void>;
 
 	std::cout << s2 << std::endl;
 

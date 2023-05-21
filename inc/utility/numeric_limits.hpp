@@ -13,10 +13,10 @@ namespace xns {
 	// -- M I N  M A X --------------------------------------------------------
 
 	/* max */
-	template <Xf::integral_c T>
+	template <xns::is_integral T>
 	consteval auto max(void) {
 		// remove cv
-		using type = Xf::remove_cv_t<T>;
+		using type = xns::remove_cv<T>;
 		// number of bits in type
 		constexpr type bits = (sizeof(type) * 8) - Xf::is_signed_v<type>;
 		// max value of type
@@ -31,7 +31,7 @@ namespace xns {
 
 
 	/* min */
-	template <Xf::integral_c T>
+	template <xns::is_integral T>
 	consteval auto min(void) {
 		// inverse all bits
 		return static_cast<T>(~max<T>());
@@ -40,10 +40,10 @@ namespace xns {
 	// -- M A X  D I G I T S --------------------------------------------------
 
 	// max number of digits in a type (base 10)
-	template <Xf::integral_c T>
+	template <xns::is_integral T>
 	consteval T max_digits(void) {
 		// remove cv
-		using type = Xf::remove_cv_t<T>;
+		using type = xns::remove_cv<T>;
 		// max value of type
 		type type_max = xns::max<type>();
 		// number of digits
@@ -57,10 +57,10 @@ namespace xns {
 	}
 
 	// max number of digits in a type (base 10)
-	template <Xf::integral_c T>
+	template <xns::is_integral T>
 	consteval T min_digits(void) {
 		// remove cv
-		using type = Xf::remove_cv_t<T>;
+		using type = xns::remove_cv<T>;
 		// min value of type
 		type type_min = xns::min<type>();
 		// number of digits
@@ -75,10 +75,10 @@ namespace xns {
 
 
 
-	template <Xf::is_base_c B, Xf::integral_c T>
+	template <Xf::is_base_c B, xns::is_integral T>
 	consteval SizeT static_digits(const T number) {
 		// remove const and volatile
-		using Type = Xf::remove_cv_t<T>;
+		using Type = xns::remove_cv<T>;
 		// instance of new type
 		Type num = number;
 		// number of digits

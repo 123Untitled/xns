@@ -1,38 +1,26 @@
 #ifndef FORWARD_HEADER
 #define FORWARD_HEADER
 
-#include "enable_if.hpp"
-#include "remove.hpp"
-#include "is_lvalue_reference.hpp"
-#include "identity.hpp"
+#include "to_reference.hpp"
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
-
-
-	/* forward lvalue helper */
-	template <typename T>
-	using ToLvalue = Xf::remove_reference_t<T>&;
-
-	/* forward rvalue helper */
-	template <typename T>
-	using ToRvalue = Xf::remove_reference_t<T>&&;
+namespace xns {
 
 
 	// -- F O R W A R D -------------------------------------------------------
 
 	// forward lvalues as lvalues
 	template <class T>
-	inline constexpr T&& forward(ToLvalue<T> obj) noexcept {
+	inline constexpr T&& forward(xns::to_lvalue<T> obj) noexcept {
 		// cast to T&(&&) = T&
 		return static_cast<T&&>(obj);
 	}
 
 	// forward rvalues as rvalues
 	template <class T>
-	inline constexpr T&& forward(ToRvalue<T> obj) noexcept {
+	inline constexpr T&& forward(xns::to_rvalue<T> obj) noexcept {
 		// cast to T&&(&&) = T&&
 		return static_cast<T&&>(obj);
 	}

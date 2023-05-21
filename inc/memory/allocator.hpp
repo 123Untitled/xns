@@ -119,7 +119,7 @@ namespace xns {
 						"TYPE IS NOT MOVE CONSTRUCTIBLE");
 
 				// construct object by move
-				new(addrs) value_type{Xf::move(value)};
+				new(addrs) value_type{xns::move(value)};
 			}
 
 			/* forward construct */
@@ -130,7 +130,7 @@ namespace xns {
 						"TYPE IS NOT CONSTRUCTIBLE");
 
 				// construct object by forwarding arguments
-				new(addrs) value_type{Xf::forward<A>(args)...};
+				new(addrs) value_type{xns::forward<A>(args)...};
 			}
 
 

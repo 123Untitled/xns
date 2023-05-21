@@ -1,15 +1,15 @@
-#include "unique.hpp"
+#include "unique_fd.hpp"
 
 // -- C O N S T R U C T O R S ----------------------------------------------
 
 /* default constructor */
-Xf::UniqueFd::UniqueFd(void)
+xns::unique_fd::unique_fd(void)
 : _fd{NULLFD} {
 	// code here...
 }
 
 /* file descriptor constructor */
-Xf::UniqueFd::UniqueFd(Fd fd)
+xns::unique_fd::unique_fd(const fd fd)
 : _fd{fd} {
 
 	// check if fd is not null
@@ -20,18 +20,24 @@ Xf::UniqueFd::UniqueFd(Fd fd)
 			_fd = NULLFD;
 		}
 
+		// i don't understand this
+		/*
+		else {
+			fcntl(_fd, F_SETFD, FD_CLOEXEC);
+		}*/
+
 	}
 }
 
 /* move constructor */
-Xf::UniqueFd::UniqueFd(UniqueFd&& other) noexcept
+xns::unique_fd::unique_fd(unique_fd&& other) noexcept
 : _fd{other._fd} {
 	// set other to null
 	other._fd = NULLFD;
 }
 
 /* destructor */
-Xf::UniqueFd::~UniqueFd(void) {
+xns::unique_fd::~unique_fd(void) {
 	// check if fd is not null
 	if (_fd != NULLFD) {
 		// close file descriptor
@@ -43,7 +49,7 @@ Xf::UniqueFd::~UniqueFd(void) {
 
 // -- O P E R A T O R S -------------------------------------------
 
-Xf::UniqueFd& Xf::UniqueFd::operator=(UniqueFd&& other) noexcept {
+xns::unique_fd& xns::unique_fd::operator=(unique_fd&& other) noexcept {
 
 	// check for self assignment
 	if (this != &other) {
@@ -64,12 +70,12 @@ Xf::UniqueFd& Xf::UniqueFd::operator=(UniqueFd&& other) noexcept {
 }
 
 /* bool operator */
-Xf::UniqueFd::operator bool(void) const {
+xns::unique_fd::operator bool(void) const {
 	return _fd != NULLFD;
 }
 
 /* bool not operator */
-bool Xf::UniqueFd::operator!(void) const {
+bool xns::unique_fd::operator!(void) const {
 	return _fd == NULLFD;
 }
 
@@ -77,23 +83,23 @@ bool Xf::UniqueFd::operator!(void) const {
 // -- M E T H O D S -----------------------------------------------
 
 /* get file descriptor */
-Xf::UniqueFd::Fd Xf::UniqueFd::get(void) const {
+xns::unique_fd::fd xns::unique_fd::get(void) const {
 	return _fd;
 }
 
 /* duplicate */
-Xf::UniqueFd Xf::UniqueFd::duplicate(void) const {
+xns::unique_fd xns::unique_fd::duplicate(void) const {
 	// check if fd is not null
 	if (_fd != NULLFD) {
 		// duplicate file descriptor
-		return UniqueFd{dup(_fd)};
+		return unique_fd{dup(_fd)};
 	}
 	// return null
-	return UniqueFd{};
+	return unique_fd{};
 }
 
 /* duplicate 2 */
-void Xf::UniqueFd::duplicate(UniqueFd& other) const {
+void xns::unique_fd::duplicate(unique_fd& other) const {
 	// check if fd is not null
 	if (_fd != NULLFD) {
 		// duplicate file descriptor
@@ -103,8 +109,8 @@ void Xf::UniqueFd::duplicate(UniqueFd& other) const {
 }
 
 /* make fd */
-Xf::UniqueFd Xf::UniqueFd::make_fd(const Fd fd) {
-	return Xf::UniqueFd{fd};
+xns::unique_fd xns::unique_fd::make_fd(const fd fd) {
+	return xns::unique_fd{fd};
 }
 
 

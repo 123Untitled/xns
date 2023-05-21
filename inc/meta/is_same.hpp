@@ -6,76 +6,47 @@
 #include "remove.hpp"
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
 
 
 	// -- I S  S A M E ---------------------------------------------------------
 
 	/* is same false */
 	template <class T, class U>
-	struct IsSame_s : Xf::false_t {};
+	struct _is_same : xns::no {};
 
 	/* is same true */
 	template <class T>
-	struct IsSame_s<T, T> : Xf::true_t {};
-
-
-	template <class T, class U>
-	static constexpr bool is_same = IsSame_s<T, U>::value;
-
-	template <class T, class... U>
-	static constexpr bool is_all_same = (is_same<T, U> && ...);
+	struct _is_same<T, T> : xns::yes {};
 
 	/* is same concept */
 	template <class T, class U>
-	concept IsSame = is_same<T, U>;
+	concept is_same = _is_same<T, U>::value;
 
-	/* is same concept remove specifier */
-	//template <class T, class U>
-	//concept IsSameRmCvr = is_same<remove_cvr_t<T>, remove_cvr_t<U>>;
-
-	/* is same concept variadic */
-	template <class T, class... U>
-	concept IsAllSame = is_all_same<T, U...>;
-
-	/* is not same */
+	/* is not same concept */
 	template <class T, class U>
-	concept IsNotSame = !is_same<T, U>;
-
-	/* is not same variadic */
-	template <class T, class... U>
-	concept IsNotAllSame = !is_all_same<T, U...>;
-
+	concept is_not_same = !is_same<T, U>;
 
 
 	// -- I S  A L L  S A M E -------------------------------------------------
 
-	/* is all same */
-	//template <typename T, typename...A>
-	//using is_all_same = Xf::bool_constant<(... && is_same_v<T, A>)>;
-
-
-	/* is all same value */
-	//template <typename T, typename...A>
-	//static constexpr bool is_all_same_v = is_all_same<T, A...>::value;
+	// INFO: does i need to remove cvr?
+	// answer: no, because cvr is not part of the type
 
 	/* is all same concept */
-	//template <typename T, typename...A>
-	//concept is_all_same_c = is_all_same_v<T, A...>;
+	template <class T, class... U>
+	concept is_all_same = (is_same<T, U> && ...);
 
-	///* is all different */
-	//template <typename T, typename...A>
-	//concept is_not_all_same = !is_all_same_v<T, A...>;
-
-
+	/* is not all same concept */
+	template <class T, class... U>
+	concept is_not_all_same = !is_all_same<T, U...>;
 
 
-
-
-
-
+	/* is same concept remove specifier */
+	//template <class T, class U>
+	//concept IsSameRmCvr = is_same<remove_cvr_t<T>, remove_cvr_t<U>>;
 
 
 }

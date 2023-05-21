@@ -2,30 +2,31 @@
 #define INTEGRAL_CONSTANT_HEADER
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
+
 
 	// -- I N T E G R A L  C O N S T A N T --------------------------------------
 
 	/* integral constant */
-	template <typename T, T v>
+	template <class T, T V>
 	struct integral_constant {
 
 		/* value type */
-		using value_t = T;
+		using value_type = T;
 
 		/* compile-time value */
-		static constexpr value_t value = v;
+		static constexpr value_type value = V;
 
-		/* inject value into type */
-		using type = integral_constant<T, v>;
+		/* self type */
+		using self = integral_constant<T, V>;
 
 		/* overload type() */
-		constexpr operator value_t() const noexcept { return value; }
+		constexpr operator value_type() const noexcept { return value; }
 
 		/* overload intance() */
-		constexpr value_t operator()() const noexcept { return value; }
+		constexpr value_type operator()() const noexcept { return value; }
 
 	};
 
@@ -37,21 +38,15 @@ namespace Xf {
 	// -- T R U E  T Y P E -----------------------------------------------------
 
 	// true type
-	using true_t = integral_constant<bool, true>;
+	using yes = bool_constant<true>;
 
 
 	// -- F A L S E  T Y P E ---------------------------------------------------
 
 	// false type
-	using false_t = integral_constant<bool, false>;
+	using no = bool_constant<false>;
 
 }
 
-// -- X N S  N A M E S P A C E ------------------------------------------------
-
-namespace xns {
-	using false_t = Xf::false_t;
-	using true_t  = Xf::true_t;
-}
 
 #endif

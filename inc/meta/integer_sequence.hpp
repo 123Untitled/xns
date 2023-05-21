@@ -1,9 +1,9 @@
 #ifndef INTEGER_SEQUENCE_HEADER
 #define INTEGER_SEQUENCE_HEADER
 
-#include <iostream>
-#include "type_traits.hpp"
+#include "is_integral.hpp"
 
+#include <iostream>
 // -- N A M E S P A C E -------------------------------------------------------
 
 namespace Xf {
@@ -14,7 +14,7 @@ namespace Xf {
 	struct IntegerSeq final {
 
 		/* check if T is an integral type */
-		static_assert(Xf::is_integral<T>::value, "not integral type");
+		static_assert(xns::is_integral<T>, "not integral type");
 
 		/* size type */
 		using Size = T;

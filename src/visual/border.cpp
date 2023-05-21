@@ -33,7 +33,7 @@ Xf::Border::Border(const Border& other)
 
 /* move constructor */
 Xf::Border::Border(Border&& other) noexcept
-: _border{Xf::move(other._border)} {
+: _border{xns::move(other._border)} {
 	// code here...
 }
 
@@ -57,7 +57,7 @@ Xf::Border& Xf::Border::operator=(Border&& other) noexcept {
 	// check for self assignment
 	if (this != &other) {
 		// move border
-		_border.operator=(Xf::move(other._border));
+		_border.operator=(xns::move(other._border));
 	} // return self reference
 	return *this;
 }

@@ -58,19 +58,19 @@ using Bool    = bool;
 
 
 template <decltype(sizeof(char)) N>
-using unsigned_t =	Xf::conditional_t<(sizeof(unsigned char)      == N), unsigned char,
-					Xf::conditional_t<(sizeof(unsigned short)     == N), unsigned short,
-					Xf::conditional_t<(sizeof(unsigned int)       == N), unsigned int,
-					Xf::conditional_t<(sizeof(unsigned long)      == N), unsigned long,
-					Xf::conditional_t<(sizeof(unsigned long long) == N), unsigned long long,
+using unsigned_t =	xns::conditional<(sizeof(unsigned char)      == N), unsigned char,
+					xns::conditional<(sizeof(unsigned short)     == N), unsigned short,
+					xns::conditional<(sizeof(unsigned int)       == N), unsigned int,
+					xns::conditional<(sizeof(unsigned long)      == N), unsigned long,
+					xns::conditional<(sizeof(unsigned long long) == N), unsigned long long,
 					void > > > > >;
 
 template <decltype(sizeof(char)) N>
-using signed_t =	Xf::conditional_t<(sizeof(signed char)        == N), signed char,
-					Xf::conditional_t<(sizeof(signed short)       == N), signed short,
-					Xf::conditional_t<(sizeof(signed int)         == N), signed int,
-					Xf::conditional_t<(sizeof(signed long)        == N), signed long,
-					Xf::conditional_t<(sizeof(signed long long)   == N), signed long long,
+using signed_t =	xns::conditional<(sizeof(signed char)        == N), signed char,
+					xns::conditional<(sizeof(signed short)       == N), signed short,
+					xns::conditional<(sizeof(signed int)         == N), signed int,
+					xns::conditional<(sizeof(signed long)        == N), signed long,
+					xns::conditional<(sizeof(signed long long)   == N), signed long long,
 					void > > > > >;
 
 using SInt8  = signed_t<1>;
@@ -99,7 +99,7 @@ using SizeT = unsigned_t<ARCH_BYTES>;
 // compile time get greatest integer type
 template <typename T, typename U>
 struct GetGreatestIntegerType {
-	using Type = Xf::conditional_t<(sizeof(T) > sizeof(U)), T, U>;
+	using Type = xns::conditional<(sizeof(T) > sizeof(U)), T, U>;
 };
 
 template <typename T, typename U>

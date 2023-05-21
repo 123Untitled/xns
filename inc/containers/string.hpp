@@ -10,7 +10,7 @@
 #include "policy.hpp"
 #include "types.hpp"
 #include "move.hpp"
-#include "string_traits.hpp"
+#include "is_char.hpp"
 
 #include "allocator.hpp"
 #include "vector.hpp"
@@ -27,7 +27,7 @@ namespace xns {
 	// -- S T R I N G  C L A S S ----------------------------------------------
 
 	// forward declarations
-	template <Xf::is_char_c T>
+	template <xns::is_char T>
 	class string;
 
 	/* c-string ascii type */
@@ -47,7 +47,7 @@ namespace xns {
 
 
 	/* string class */
-	template <Xf::is_char_c T>
+	template <xns::is_char T>
 	class string {
 
 		public:
@@ -302,7 +302,7 @@ namespace xns {
 
 			/* move assignment operator */
 			string& operator=(string&& other) noexcept {
-				return assign(Xf::move(other));
+				return assign(xns::move(other));
 			}
 
 			/* null-terminated string assignment operator */
@@ -524,7 +524,9 @@ namespace xns {
 				// minimum arguments needed
 				constexpr Size min = 2;
 				// check if all arguments are of type string
-				constexpr bool type = (Xf::IsSame_s<xns::remove_reference<A>, string<char_t>>::value&& ...);
+				constexpr bool type = (xns::is_same<
+											xns::remove_reference<A>,
+											self> && ...); // WARNING NEED TO RECHECK THIS AFTER RECENT CHANGES
 				// check if there are at least two arguments
 				constexpr bool required = sizeof...(A) >= min;
 				// return boolean
@@ -1290,7 +1292,7 @@ namespace xns {
 				return is_uppercase(character) ? character + 0x20 : character;
 			}
 
-			template <Xf::is_char_c U>
+			template <xns::is_char U>
 			friend std::ostream& operator<<(std::ostream& os, const string<U>& string);
 
 	};
@@ -1299,10 +1301,10 @@ namespace xns {
 	// -- <<  O P E R A T O R  ------------------------------------------------
 
 	/* output stream operator */
-	template <Xf::is_char_c T>
+	template <xns::is_char T>
 	std::ostream& operator<<(std::ostream& os, const string<T>& string) {
 
-		if constexpr (Xf::is_same<T, char>) {
+		if constexpr (xns::is_same<T, char>) {
 			// check if string is null
 			if (string._str) {
 				// write string to os
@@ -1322,7 +1324,7 @@ namespace xns {
 	// class to encapsulate a string used for being displayed on a screen
 	// in a scrollable view
 
-	template <Xf::is_char_c T>
+	template <xns::is_char T>
 	class scroll_string {
 
 		private:

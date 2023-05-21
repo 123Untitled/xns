@@ -4,9 +4,10 @@
 #include "integral_constant.hpp"
 #include "remove.hpp"
 
-// -- N A M E S P A C E -------------------------------------------------------
 
-namespace Xf {
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
 
 
 	// -- I S  D E R I V E D  F R O M -----------------------------------------
@@ -17,17 +18,17 @@ namespace Xf {
 		private:
 
 			/* base type */
-			using Base    = Xf::remove_cvr_t<B>;
+			using Base    = xns::remove_cvr<B>;
 
 			/* derived type */
-			using Derived = Xf::remove_cvr_t<D>;
+			using Derived = xns::remove_cvr<D>;
 
 
 			/* test for derived */
-			static consteval auto test(Base*) -> Xf::true_t;
+			static consteval auto test(Base*) -> xns::yes;
 
 			/* test for other */
-			static consteval auto test(...)   -> Xf::false_t;
+			static consteval auto test(...)   -> xns::no;
 
 
 		public:
@@ -41,7 +42,7 @@ namespace Xf {
 	// -- I S  B A S E  O F ---------------------------------------------------
 
 	template <class B, class D>
-	struct is_base_of : Xf::is_derived_from<D, B> {};
+	struct is_base_of : xns::is_derived_from<D, B> {};
 
 
 	// -- H E L P E R S -------------------------------------------------------

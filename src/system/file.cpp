@@ -1,20 +1,20 @@
 #include "file.hpp"
 
-Xf::File::File(void)
+xns::file::file(void)
 : _file{ }, _path{ }, _fd{ }, _data{ }, _state{false} {
 	// code here...
 }
 
 /* path constructor */
-Xf::File::File(const xns::cstring& path)
+xns::file::file(const xns::cstring& path)
 : _file{}, _path{path}, _fd{}, _data{}, _state{false} {
 	// code here...
 }
 
-Xf::File::~File(void) {
+xns::file::~file(void) {
 }
 
-void Xf::File::open(void) {
+void xns::file::open(void) {
 
 	if (_path.empty()) { return; }
 
@@ -25,7 +25,7 @@ void Xf::File::open(void) {
 	if (!S_ISREG(_data.st_mode)) { return; }
 
 	// check error while opening file
-	_fd = Xf::UniqueFd::make_fd(::open(_path.pointer(), O_RDONLY));
+	_fd = xns::unique_fd::make_fd(::open(_path.pointer(), O_RDONLY));
 
 	if (!_fd) { return; }
 
@@ -34,17 +34,17 @@ void Xf::File::open(void) {
 }
 
 /* get path */
-const xns::cstring& Xf::File::path(void) const {
+const xns::cstring& xns::file::path(void) const {
 	// return file path
 	return _path;
 }
 
 
-void Xf::File::setFileName(xns::cstring&& path) {
+void xns::file::file_name(xns::cstring&& path) {
 	//_path = static_cast<String&&>(path);
 }
 
-void Xf::File::content(void) {
+void xns::file::content(void) {
 
 	if (!_state) { return; }
 

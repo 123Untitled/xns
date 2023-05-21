@@ -11,7 +11,7 @@
 #include "function.hpp"
 #include "string.hpp"
 #include "evntype.hpp"
-#include "unique.hpp"
+#include "unique_pointer.hpp"
 #include "stack.hpp"
 #include "debug.hpp"
 
@@ -157,7 +157,7 @@ namespace Xf {
 
 
 			/* optional type */
-			using Optional = Xf::UniquePtr<Size>;
+			using Optional = xns::unique_ptr<Size>;
 
 
 			// -- P R I V A T E  M E T H O D S --------------------------------

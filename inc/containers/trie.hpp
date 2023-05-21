@@ -152,7 +152,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate moved value
-				node->_value = xns::make_shared_pointer<Value>(Xf::move(value));
+				node->_value = xns::make_shared_pointer<Value>(xns::move(value));
 			}
 
 			/* variadic insert */
@@ -161,11 +161,11 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate value
-				node->_value = xns::make_shared_pointer<Value>(Xf::forward<A>(args)...);
+				node->_value = xns::make_shared_pointer<Value>(xns::forward<A>(args)...);
 			}
 
 			/* derived default insert */
-			template <class D> requires (Xf::is_base_of_c<T, D>)
+			template <class D> requires (xns::is_base_of_c<T, D>)
 			void insert(const xns::cstring& key) {
 				// insert key
 				Node* node = _insert(key);
@@ -174,7 +174,7 @@ namespace Xf {
 			}
 
 			/* derived copy insert */
-			template <class D> requires (Xf::is_base_of_c<T, D>)
+			template <class D> requires (xns::is_base_of_c<T, D>)
 			void insert(const xns::cstring& key, const D& value) {
 				// insert key
 				Node* node = _insert(key);
@@ -183,31 +183,31 @@ namespace Xf {
 			}
 
 			/* derived move insert */
-			template <class D> requires (Xf::is_base_of_c<T, D>)
+			template <class D> requires (xns::is_base_of_c<T, D>)
 			void insert(const xns::cstring& key, D&& value) {
 				// insert key
 				Node* node = _insert(key);
 				// allocate moved value
-				node->_value = xns::make_shared_pointer<D>(Xf::move(value));
+				node->_value = xns::make_shared_pointer<D>(xns::move(value));
 			}
 
 			/* derived variadic insert */
-			template <class D, class... A> requires (Xf::is_base_of_c<T, D>)
+			template <class D, class... A> requires (xns::is_base_of_c<T, D>)
 			void insert(const xns::cstring& key, A&&... args) {
 				// insert key
 				Node* node = _insert(key);
 				// allocate value
-				node->_value = xns::make_shared_pointer<D>(Xf::forward<A>(args)...);
+				node->_value = xns::make_shared_pointer<D>(xns::forward<A>(args)...);
 			}
 
 			using KeyVector = xns::vector<xns::cstring>;
 
 
 			/* derived multi insert */
-			template <class D, class... A> requires (Xf::is_base_of_c<T, D>)
+			template <class D, class... A> requires (xns::is_base_of_c<T, D>)
 			void insert(const KeyVector& alias, A&&... args) {
 				// instanciate value
-				Shared value = xns::make_shared_pointer<D>(Xf::forward<A>(args)...);
+				Shared value = xns::make_shared_pointer<D>(xns::forward<A>(args)...);
 				// loop through alias
 				for (KeyVector::size x = 0; x < alias.length(); ++x) {
 					// insert key
@@ -221,7 +221,7 @@ namespace Xf {
 			template <class... A>
 			void insert(const KeyVector& alias, A&&... args) {
 				// instanciate value
-				Shared value = xns::make_shared_pointer<Value>(Xf::forward<A>(args)...);
+				Shared value = xns::make_shared_pointer<Value>(xns::forward<A>(args)...);
 				// loop through alias
 				for (KeyVector::size x = 0; x < alias.length(); ++x) {
 					// insert key

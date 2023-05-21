@@ -61,10 +61,12 @@ void Xf::Event::set_mode(const Evntmode& mode, const Evntopt opt) {
 		// check if mode is forced
 		if (opt == Evntopt::FORCE) {
 			// stack current mode
-			_current.make(mode._idx);
+			_current = xns::make_unique_pointer<Size>(mode._idx);
+			//_current.make(mode._idx);
 			return;
 		} // set next mode
-		_next.make(mode._idx);
+		_next = xns::make_unique_pointer<Size>(mode._idx);
+		//_next.make(mode._idx);
 	}
 }
 
@@ -74,7 +76,7 @@ void Xf::Event::next_mode(void) {
 	// check if there is a mode query
 	if (!_next) { return; }
 	// mode to current mode
-	_current = Xf::move(_next);
+	_current = xns::move(_next);
 
 	// get subscribers index by event type
 	EventVector& subscribers = _modes[*_current]._second[IDX(Evntype::BEGIN)];
@@ -117,10 +119,12 @@ void Xf::Event::stack_mode(const Evntmode& mode, const Evntopt opt) {
 	// check if mode is forced
 	if (opt == Evntopt::FORCE) {
 		// set next mode
-		_current.make(mode._idx);
+		_current = xns::make_unique_pointer<Size>(mode._idx);
+		//_current.make(mode._idx);
 		return;
 	} // set next mode
-	_next.make(mode._idx);
+	_next = xns::make_unique_pointer<Size>(mode._idx);
+	//_next.make(mode._idx);
 }
 
 /* unstack mode */
@@ -142,8 +146,9 @@ void Xf::Event::unstack_mode(void) {
 		return;
 	}
 	//_next.make(*_stack.top());
-	_next.make(_stack.top());
-	_current = Xf::move(_next);
+	//_next.make(_stack.top());
+	_next = xns::make_unique_pointer<Size>(_stack.top());
+	_current = xns::move(_next);
 	//////////////
 
 	// remove mode from stack

@@ -86,7 +86,7 @@ namespace xns {
 			}
 
 			/* derived move constructor */
-			template <class D> requires (Xf::is_base_of_c<T, D>)
+			template <class D> requires (xns::is_base_of_c<T, D>)
 			unique_ptr(unique_ptr<D>&& other) noexcept
 			: _data(other._data) {
 				// invalidate other
@@ -130,7 +130,7 @@ namespace xns {
 			}
 
 			/* derived move assignment */
-			template <class D> requires (Xf::is_base_of_c<T, D>)
+			template <class D> requires (xns::is_base_of_c<T, D>)
 			self& assign(unique_ptr<D>&& other) {
 				// check for self assignment
 				if (this != reinterpret_cast<self*>(&other)) {
@@ -156,14 +156,14 @@ namespace xns {
 			/* self move assignment operator */
 			self& operator=(self&& other) {
 				// return self move assignment
-				return assign(Xf::move(other));
+				return assign(xns::move(other));
 			}
 
 			/* derived move assignment operator */
-			template <class D> requires (Xf::is_base_of_c<T, D>)
+			template <class D> requires (xns::is_base_of_c<T, D>)
 			self& operator=(unique_ptr<D>&& other) {
 				// return derived move assignment
-				return assign(Xf::move(other));
+				return assign(xns::move(other));
 			}
 
 
@@ -275,7 +275,7 @@ namespace xns {
 		// check allocation success
 		if (ptr._data) {
 			// construct object by forwarding arguments
-			unique_ptr<T>::allocator::construct(ptr._data, Xf::forward<A>(args)...);
+			unique_ptr<T>::allocator::construct(ptr._data, xns::forward<A>(args)...);
 		} // return instance
 		return ptr;
 	}

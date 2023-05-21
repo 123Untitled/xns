@@ -3,6 +3,7 @@
 
 #include "allocator.hpp"
 
+#include "identity.hpp"
 #include "types.hpp"
 #include "forward.hpp"
 #include "move.hpp"
@@ -85,7 +86,7 @@ namespace Xf {
 				template <class... U>
 				TupleImpl(U&&... args) requires (sizeof...(U) > 1)
 				// fold expression to initialize tuple elements
-				: Element<IDX, A>{Xf::forward<U>(args)}... {
+				: Element<IDX, A>{xns::forward<U>(args)}... {
 					// code here...
 				}
 
@@ -99,7 +100,7 @@ namespace Xf {
 				/* move constructor */
 				TupleImpl(SelfImpl&& other) noexcept
 				// fold expression to move-initialize tuple elements
-				: Element<IDX, A>{Xf::move(other)}... {
+				: Element<IDX, A>{xns::move(other)}... {
 					// code here...
 				}
 
@@ -124,7 +125,7 @@ namespace Xf {
 				SelfImpl& operator=(SelfImpl&& other) noexcept {
 					// INFO: check for self-assignment is not necessary (see below)
 					// because this check is already done in the Tuple::operator=()
-					((Element<IDX, A>::operator=(Xf::move(other))), ...);
+					((Element<IDX, A>::operator=(xns::move(other))), ...);
 					// return self-reference
 					return *this;
 				}
@@ -162,7 +163,7 @@ namespace Xf {
 			/* variadic constructor */
 			template <class... U> requires (sizeof...(U) > 1)
 			Tuple(U&&... args)
-			: impl{Xf::forward<U>(args)...} {
+			: impl{xns::forward<U>(args)...} {
 				// code here...
 			}
 
@@ -176,13 +177,16 @@ namespace Xf {
 			template <class... U>
 			Tuple(const Tuple<U...>&) {
 				// check if tuple types are the same
-				static_assert(IsSame<Xf::Pack<A...>, Xf::Pack<U...>>,
+
+				// need TO CHECK THIS REIMPLEMENTATION
+				static_assert(xns::is_same< xns::identity_pack<A...>,
+											xns::identity_pack<U...>>,
 							"TUPLE ARE NOT THE SAME !!!");
 			}
 
 			/* move constructor */
 			Tuple(Self&& tuple) noexcept
-			: impl{Xf::move(tuple.impl)} {
+			: impl{xns::move(tuple.impl)} {
 				// code here...
 			}
 
@@ -204,7 +208,7 @@ namespace Xf {
 				// check for self-assignment
 				if (this != &other) {
 					// move data
-					impl = Xf::move(other.impl);
+					impl = xns::move(other.impl);
 				} // return self-reference
 				return *this;
 			}

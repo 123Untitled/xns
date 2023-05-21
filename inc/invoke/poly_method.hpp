@@ -133,7 +133,7 @@ namespace xns {
 			/* [function call operator] */
 			return_type operator()(A&&... arguments) const {
 				// call base method
-				return _base->call(Xf::forward<A>(arguments)...);
+				return _base->call(xns::forward<A>(arguments)...);
 			}
 
 
@@ -142,7 +142,7 @@ namespace xns {
 			/* [call method] */
 			return_type call(A&&... arguments) const {
 				// call base method
-				return _base->call(Xf::forward<A>(arguments)...);
+				return _base->call(xns::forward<A>(arguments)...);
 			}
 
 
@@ -248,7 +248,7 @@ namespace xns {
 				/* [function call operator] */
 				return_type operator()(A&&... arguments) const override {
 					// call method on instance
-					return (_instance->*_method)(Xf::forward<A>(arguments)...);
+					return (_instance->*_method)(xns::forward<A>(arguments)...);
 				}
 
 
@@ -257,7 +257,7 @@ namespace xns {
 				/* [call method] */
 				return_type call(A&&... arguments) const override {
 					// call method on instance
-					return (_instance->*_method)(Xf::forward<A>(arguments)...);
+					return (_instance->*_method)(xns::forward<A>(arguments)...);
 				}
 
 				/* [clone method] */
@@ -335,7 +335,7 @@ namespace xns {
 				/* function call operator */
 				return_type operator()(A&&... arguments) const override {
 					// call function
-					return _function(Xf::forward<A>(arguments)...);
+					return _function(xns::forward<A>(arguments)...);
 				}
 
 
@@ -344,7 +344,7 @@ namespace xns {
 				/* call function */
 				return_type call(A&&... arguments) const override {
 					// call function
-					return _function(Xf::forward<A>(arguments)...);
+					return _function(xns::forward<A>(arguments)...);
 				}
 
 				/* clone function */

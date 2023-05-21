@@ -36,23 +36,23 @@ namespace Xf {
 
 	/* is base false */
 	template <class T>
-	struct is_base      : public Xf::false_t {};
+	struct is_base      : public xns::no {};
 
 	/* is base true */
 	template <>
-	struct is_base<Hex> : public Xf::true_t {};
+	struct is_base<Hex> : public xns::yes {};
 
 	/* is base true */
 	template <>
-	struct is_base<Dec> : public Xf::true_t {};
+	struct is_base<Dec> : public xns::yes {};
 
 	/* is base true */
 	template <>
-	struct is_base<Oct> : public Xf::true_t {};
+	struct is_base<Oct> : public xns::yes {};
 
 	/* is base true */
 	template <>
-	struct is_base<Bin> : public Xf::true_t {};
+	struct is_base<Bin> : public xns::yes {};
 
 
 	/* is base value */

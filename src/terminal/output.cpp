@@ -1,4 +1,4 @@
-#include "buffer.hpp"
+#include "output.hpp"
 
 /* singleton instance */
 xns::output xns::output::_instance = xns::output{};
@@ -29,8 +29,10 @@ void xns::output::write(const char* str, const xns::cstring::size_type size) {
 
 /* write string */
 void xns::output::write(const xns::cstring& str) {
+	//std::cout << "out: " << str.pointer() << std::endl;
 	// append to buffer
 	_instance._buffer.append(str);
+	//std::cout << "buffer: " << _instance._buffer.pointer() << std::endl;
 }
 
 

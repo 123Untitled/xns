@@ -5,6 +5,7 @@
 #include "types.hpp"
 #include "allocator.hpp"
 #include "array.hpp"
+#include "policy.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -13,24 +14,30 @@ namespace xns {
 
 	// -- V E C T O R  C L A S S ----------------------------------------------
 
-	template <typename T>
+	template <class T, xns::restrict R = xns::assignable_t>
 	class vector final {
+
+		ASSERT_RESTRICT(R);
 
 		public:
 
 			// -- F R I E N D S -----------------------------------------------
 
 			/* make vector as friend */
-			template <class U, class... A>
-			friend vector<U> make_vector(A&&... args);
+			template <class U, class S, class... A>
+			friend vector<U, S> make_vector(A&&... args);
+
 
 			// -- A L I A S E S -----------------------------------------------
 
 			/* value type */
 			using value = T;
 
+			/* restrict type */
+			using restrict = R;
+
 			/* self type */
-			using self = vector<value>;
+			using self = vector<value, restrict>;
 
 			/* size type */
 			using size = UInt64;
@@ -51,7 +58,7 @@ namespace xns {
 			using const_pointer = const value*;
 
 			/* allocator type */
-			using allocator = Xf::Allocator<value>;
+			using allocator = xns::allocator<value>;
 
 
 			// -- C O N S T R U C T O R S -------------------------------------
@@ -67,6 +74,7 @@ namespace xns {
 			vector(const self& other)
 			// initializations
 			: vector{} {
+				ASSERT_COPYABLE(R);
 				// reserve other size
 				reserve(other._size);
 				// loop through other vector
@@ -81,6 +89,8 @@ namespace xns {
 			vector(self&& other) noexcept
 			// initializations
 			: _vector{other._vector}, _capacity{other._capacity}, _size{other._size} {
+				ASSERT_MOVEABLE(R);
+
 				// invalidate other vector
 				other.initialize_members();
 			}
@@ -111,6 +121,7 @@ namespace xns {
 
 			/* copy operator */
 			vector& operator=(const self& other) {
+				ASSERT_COPYABLE(R);
 				// check for self-assignment
 				if (this != &other) {
 					// clear vector
@@ -130,6 +141,7 @@ namespace xns {
 
 			/* move operator */
 			vector& operator=(self&& other) noexcept {
+				ASSERT_MOVEABLE(R);
 				// check for self-assignment
 				if (this != &other) {
 					// clear vector
@@ -247,7 +259,7 @@ namespace xns {
 						// loop through vector
 						for (size x = 0; x < _size; ++x) {
 							// move elements
-							tmp[x] = Xf::move(_vector[x]);
+							tmp[x] = xns::move(_vector[x]);
 						} // deallocate memory
 						allocator::deallocate(_vector);
 					} // assign capacity
@@ -282,9 +294,9 @@ namespace xns {
 				} // move elements
 				for (size x = _size; x > pos; --x) {
 					// move element
-					_vector[x] = Xf::move(_vector[x - 1]);
+					_vector[x] = xns::move(_vector[x - 1]);
 				} // construct element
-				allocator::construct(_vector + pos, Xf::forward<Args>(args)...);
+				allocator::construct(_vector + pos, xns::forward<Args>(args)...);
 				// increment size
 				++_size;
 			}
@@ -297,7 +309,19 @@ namespace xns {
 					// double capacity
 					reserve(grow());
 				} // construct element
-				allocator::construct(_vector + _size, Xf::forward<A>(args)...);
+				allocator::construct(_vector + _size, xns::forward<A>(args)...);
+				// increment size
+				++_size;
+			}
+
+			/* push back */
+			void push_back(void) {
+				// check capacity
+				if (!available()) {
+					// double capacity
+					reserve(grow());
+				} // construct element
+				allocator::construct(_vector + _size);
 				// increment size
 				++_size;
 			}
@@ -321,7 +345,7 @@ namespace xns {
 					// double capacity
 					reserve(grow());
 				} // construct element
-				allocator::construct(_vector + _size, Xf::move(value));
+				allocator::construct(_vector + _size, xns::move(value));
 				// increment size
 				++_size;
 			}
@@ -333,7 +357,7 @@ namespace xns {
 					// double capacity
 					reserve(grow());
 				} // construct element
-				allocator::construct(_vector + _size, Xf::move(value));
+				allocator::construct(_vector + _size, xns::move(value));
 				// increment size
 				++_size;
 			}
@@ -396,37 +420,29 @@ namespace xns {
 	// -- F R I E N D  F U N C T I O N S --------------------------------------
 
 	/* make vector */
-	template <class T, class... A>
-	xns::vector<T> make_vector(A&&... args) {
+	template <class T, class R = xns::assignable_t, class... A>
+	xns::vector<T, R> make_vector(A&&... args) {
 
-		using allocator = typename xns::vector<T>::Allocator;
+		using allocator = typename xns::vector<T, R>::allocator;
 
 		// create vector
-		vector<T> vec;
+		xns::vector<T, R> vec;
 
 		// allocate memory
 		vec._vector = allocator::allocate(sizeof...(args));
 
 		// check allocation success
-		if (vec._vector == nullptr) { return vec; }
+		if (vec._vector != nullptr) {
 
-		// assign sizes
-		vec._size = vec._capacity = sizeof...(args);
+			typename vector<T, R>::size x = 0;
 
+			// fold expression to construct by forwarding
+			(allocator::construct(&vec._vector[x++], xns::forward<A>(args)), ...);
 
-		typename vector<T>::Size x = 0;
+			// assign sizes
+			vec._size = vec._capacity = sizeof...(args);
 
-		// fold expression to construct by forwarding
-		(allocator::construct(&vec._vector[x++], Xf::forward<A>(args)), ...);
-
-
-
-
-		// reserve memory
-		//vec.reserve(sizeof...(args));
-		// fold expression to emplace back
-		//(vec.emplace_back(Xf::forward<A>(args)), ...);
-		// return vector
+		}
 		return vec;
 	}
 

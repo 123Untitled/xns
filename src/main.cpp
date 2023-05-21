@@ -1,6 +1,6 @@
 #include "tuple.hpp"
 #include "vector.hpp"
-#include "xfunc.hpp"
+#include "xns.hpp"
 
 #include <array>
 #include <vector>
@@ -21,90 +21,23 @@
 
 // curiously recurring template pattern (CRTP) learn
 
-template <class T>
-class _Base {
-	public:
-		_Base() = default;
-		~_Base() = default;
-};
-
-class _Derived1 : public _Base<_Derived1> {
-	public:
-		_Derived1() = default;
-		~_Derived1() = default;
-};
-
-class _Derived2 : public _Base<_Derived2> {
-	public:
-		_Derived2() = default;
-		~_Derived2() = default;
-};
-
-class B {
-	public:
-		B() = default;
-		virtual ~B() = default;
-		virtual void echo() const = 0;
-};
-
-class D1 : public B {
-	public:
-		D1() = default;
-		~D1() = default;
-		void echo() const override {
-			std::cout << "D1" << std::endl;
-		}
-};
-
-class D2 : public B {
-	public:
-		D2() = default;
-		~D2() = default;
-		void echo() const override {
-			std::cout << "D2" << std::endl;
-		}
-};
-
-template <class T>
-void invoke(const T& t) {
-	Xf::UniquePointer<T> p = Xf::make_unique_pointer<T>(t);
-	//(*p)();
-}
-
-Xf::UniquePointer<B> f() {
-	return Xf::UniquePointer<D1>{};
-}
-
-using color = xns::safe_enum<color_def>;
-
-
-template <class T>
-void ffunc(void) {
-
-	color c{static_cast<color::enum_type>(10000000)};
-	color d{color::RED};
-
-	if (c == d) {
-		std::cout << "equal" << std::endl;
-	}
-
-	//std::cout << c.size() << std::endl;
-
-
-}
-
-template <class T>
-auto alloc() {
-
-	xns::string<typename T::char_t> s{T::data()};
-
-	return s;
-}
-
-
 
 
 int main(int ac, char** av) {
+
+	xns::wstring str9 = L"hello world";
+
+	std::cout << str9 << std::endl;
+
+	for (int i = 0 ; i < 20 ; ++i) {
+		xns::output::write(xns::id::generate());
+		xns::output::write("\n");
+		//std::cout<< xns::id::generate().pointer() << std::endl;
+	}
+	//xns::output::write("hello", 5);
+	xns::output::render<xns::stdout>();
+
+	return 0;
 
 	std::cout << (int)xns::max<char>() << std::endl;
 
@@ -116,15 +49,8 @@ int main(int ac, char** av) {
 
 	return 0;
 
-	auto sstr = alloc<toto_t>();
-
-	std::cout << sstr.pointer() << std::endl;
-	return 0;
 
 
-	toto_t toto{};
-
-	return 0;
 
 	using policy = xns::moveable_t;
 
@@ -193,8 +119,8 @@ int main(int ac, char** av) {
 
 
 
-	Xf::UniquePointer<int> ap;
-	Xf::WeakPointer<int> wp{ap};
+	xns::unique_ptr<int> ap;
+	xns::weak_ptr<int> wp{ap};
 	return EXIT_SUCCESS;
 
 
@@ -233,7 +159,7 @@ int main(int ac, char** av) {
 	return EXIT_SUCCESS;
 
 	for (auto i = 0; i < 10; ++i) {
-		std::cout << Xf::Random::random(10) << std::endl;
+		std::cout << xns::random::random_gen(10) << std::endl;
 	}
 
 }

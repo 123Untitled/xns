@@ -62,7 +62,7 @@ namespace xns {
 
 			/* move constructor */
 			function(self&& other) noexcept
-			: _function{Xf::move(other._function)} {
+			: _function{xns::move(other._function)} {
 				// code here...
 			}
 
@@ -99,7 +99,7 @@ namespace xns {
 			/* move assignment */
 			self& assign(self&& other) noexcept {
 				// move function pointer
-				_function = Xf::move(other._function);
+				_function = xns::move(other._function);
 				// return self reference
 				return *this;
 			}
@@ -129,7 +129,7 @@ namespace xns {
 			/* move assignment operator */
 			self& operator=(self&& other) noexcept {
 				// return assign method
-				return assign(Xf::move(other));
+				return assign(xns::move(other));
 			}
 
 
@@ -168,7 +168,7 @@ namespace xns {
 			/* function call operator */
 			return_type operator()(A&&... arguments) {
 				// call function
-				return _function(Xf::forward<A>(arguments)...);
+				return _function(xns::forward<A>(arguments)...);
 			}
 
 
@@ -177,7 +177,7 @@ namespace xns {
 			/* call */
 			return_type call(A&&... arguments) const {
 				// call function
-				return _function(Xf::forward<A>(arguments)...);
+				return _function(xns::forward<A>(arguments)...);
 			}
 
 			/* reset */

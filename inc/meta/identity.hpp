@@ -3,31 +3,36 @@
 
 #include "types.hpp"
 
-// -- N A M E S P A C E -------------------------------------------------------
 
-namespace Xf {
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
+
 
 	// -- I D E N T I T Y -----------------------------------------------------
 
 	/* identity */
 	template <class T>
-	struct Identity {
+	struct _identity {
 		using type = T;
 	};
 
 	/* identity type */
 	template <class T>
-	using Identity_t = typename Identity<T>::type;
+	using identity = typename _identity<T>::type;
 
+	/* identity parameter pack */
+	template <class... A>
+	struct _identity_pack {
+		using type = _identity_pack<A...>;
+	};
 
-	// -- P A C K  I D E N T I T Y --------------------------------------------
-
-	/* pack identity */
-	template <class...>
-	struct Pack {};
-
+	/* identity parameter pack type */
+	template <class... A>
+	using identity_pack = typename _identity_pack<A...>::type;
 
 
 }
+
 
 #endif

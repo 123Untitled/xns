@@ -88,7 +88,7 @@ namespace xns {
 			}
 
 			/* derived copy constructor */
-			template <class D> requires Xf::is_base_of_c<T, D>
+			template <class D> requires xns::is_base_of_c<T, D>
 			shared_ptr(const shared_ptr<D>& other) noexcept
 			: _data{other._data}, _count{other._count} {
 				// check pointer validity
@@ -107,7 +107,7 @@ namespace xns {
 			}
 
 			/* derived move constructor */
-			template <class D> requires Xf::is_base_of_c<T, D>
+			template <class D> requires xns::is_base_of_c<T, D>
 			shared_ptr(shared_ptr<D>&& other) noexcept
 			: _data{other._data}, _count{other._count} {
 				// invalidate other
@@ -157,7 +157,7 @@ namespace xns {
 			}
 
 			/* derived copy assignment */
-			template <class D> requires Xf::is_base_of_c<T, D>
+			template <class D> requires xns::is_base_of_c<T, D>
 			self& assign(const shared_ptr<D>& other) {
 				// check for self assignment
 				if (this != &other) {
@@ -192,7 +192,7 @@ namespace xns {
 			}
 
 			/* derived move assignment */
-			template <class D> requires Xf::is_base_of_c<T, D>
+			template <class D> requires xns::is_base_of_c<T, D>
 			self& assign(shared_ptr<D>&& other) {
 				// check for self assignment
 				if (this != reinterpret_cast<self*>(&other)) {
@@ -224,7 +224,7 @@ namespace xns {
 			}
 
 			/* derived copy assignment operator */
-			template <class D> requires Xf::is_base_of_c<T, D>
+			template <class D> requires xns::is_base_of_c<T, D>
 			shared_ptr& operator=(const shared_ptr<D>& other) {
 				// return derived copy assignment
 				return assign(other);
@@ -233,14 +233,14 @@ namespace xns {
 			/* self move assignment operator */
 			shared_ptr& operator=(self&& other) {
 				// return self move assignment
-				return assign(Xf::move(other));
+				return assign(xns::move(other));
 			}
 
 			/* derived move assignment operator */
-			template <class D> requires Xf::is_base_of_c<T, D>
+			template <class D> requires xns::is_base_of_c<T, D>
 			shared_ptr& operator=(shared_ptr<D>&& other) {
 				// return derived move assignment
-				return assign(Xf::move(other));
+				return assign(xns::move(other));
 			}
 
 
@@ -374,7 +374,7 @@ namespace xns {
 			// return shared pointer
 			return ptr;
 		} // else construct object by forwarding arguments
-		shared_ptr<T>::allocator::construct(ptr._data, Xf::forward<A>(args)...);
+		shared_ptr<T>::allocator::construct(ptr._data, xns::forward<A>(args)...);
 		// initialize counter
 		*ptr._count = 1;
 		// return shared pointer

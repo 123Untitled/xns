@@ -58,9 +58,9 @@ class Class final : public Base<T> {
 
 		/* move constructor */
 		Class(Class&& other) noexcept
-		:	_value_1{Xf::move(other._value_1)},
-			_value_2{Xf::move(other._value_2)},
-			_value_3{Xf::move(other._value_3)} {
+		:	_value_1{xns::move(other._value_1)},
+			_value_2{xns::move(other._value_2)},
+			_value_3{xns::move(other._value_3)} {
 			debug("class move constructor");
 		}
 
@@ -83,9 +83,9 @@ class Class final : public Base<T> {
 		/* move operator */
 		Class& operator=(Class&& other) noexcept {
 			if (this != &other) {
-				_value_1 = Xf::move(other._value_1);
-				_value_2 = Xf::move(other._value_2);
-				_value_3 = Xf::move(other._value_3);
+				_value_1 = xns::move(other._value_1);
+				_value_2 = xns::move(other._value_2);
+				_value_3 = xns::move(other._value_3);
 			}
 			debug("TEST MOVE ASSIGNMENT");
 			return *this;

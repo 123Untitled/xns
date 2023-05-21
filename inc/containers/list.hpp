@@ -230,14 +230,14 @@ namespace Xf {
 			/* push front */
 			void push_front(MoveReference value) noexcept {
 				// allocate new node and link to front
-				frontLink(new Node(Xf::move(value)));
+				frontLink(new Node(xns::move(value)));
 			}
 
 			/* emplace front */
 			template <typename... Args>
 			void emplace_front(Args&&... args) {
 				// allocate new node and link to front
-				frontLink(new Node(Xf::forward<Args>(args)...));
+				frontLink(new Node(xns::forward<Args>(args)...));
 			}
 
 
@@ -250,14 +250,14 @@ namespace Xf {
 			/* push back */
 			void push_back(MoveReference value) noexcept {
 				// allocate new node and link to back
-				backLink(new Node(Xf::move(value)));
+				backLink(new Node(xns::move(value)));
 			}
 
 			/* emplace back */
 			template <typename... Args>
 			void emplace_back(Args&&... args) {
 				// allocate new node and link to back
-				backLink(new Node(Xf::forward<Args>(args)...));
+				backLink(new Node(xns::forward<Args>(args)...));
 			}
 
 			/* pop front */
@@ -441,7 +441,7 @@ namespace Xf {
 			/* move constructor */
 			Node(Node&& other) noexcept
 			// initializations
-			: _value{Xf::move(other._value)}, _next{other._next}, _prev{other._prev} { }
+			: _value{xns::move(other._value)}, _next{other._next}, _prev{other._prev} { }
 
 			/* value copy constructor */
 			Node(ConstReference value)
@@ -451,13 +451,13 @@ namespace Xf {
 			/* value move constructor */
 			Node(MoveReference value) noexcept
 			// initializations
-			: _value{Xf::move(value)}, _next{nullptr}, _prev{nullptr} { }
+			: _value{xns::move(value)}, _next{nullptr}, _prev{nullptr} { }
 
 			/* value emplace constructor */
 			template <typename... A>
 			Node(A&&... args)
 			// initializations
-			: _value{Xf::forward<A>(args)...}, _next{nullptr}, _prev{nullptr} { }
+			: _value{xns::forward<A>(args)...}, _next{nullptr}, _prev{nullptr} { }
 
 			/* destructor */
 			~Node(void) {

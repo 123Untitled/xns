@@ -11,7 +11,7 @@ auto make(A&&... args) {
 
 	using RType = xns::array<Xf::PackType_t<0, A...>, sizeof...(A)>;
 
-	return RType{Xf::forward<A>(args)...};
+	return RType{xns::forward<A>(args)...};
 }
 
 void UT::array_ut(void) {

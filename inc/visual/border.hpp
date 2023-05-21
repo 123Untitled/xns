@@ -91,7 +91,7 @@ namespace Xf {
 			using Symbol = xns::array<const char*, BORDER_MAX>;
 
 			/* allocator type */
-			using Allocator = Xf::Allocator<char>;
+			using Allocator = xns::allocator<char>;
 
 
 			// -- M E M B E R S -----------------------------------------------
