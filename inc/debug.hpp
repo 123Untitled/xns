@@ -20,7 +20,7 @@ namespace Xf {
 
 			static int initialize(const char* = nullptr);
 
-			static void write(const void*, UInt64 = 0);
+			static void write(const void*, xns::size_t = 0);
 
 			template <typename... A>
 			static void print(const char* msg, A&&... args) {
