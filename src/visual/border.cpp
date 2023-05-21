@@ -2,7 +2,7 @@
 #include "border.hpp"
 
 
-constinit Xf::Border::Symbol Xf::Border::_symb = {
+constinit xns::border::symbol xns::border::_symb = {
 	"\xe2\x94\x80",
 	"\xe2\x94\x82",
 	"\xe2\x95\xad",
@@ -13,37 +13,37 @@ constinit Xf::Border::Symbol Xf::Border::_symb = {
 
 
 /* default constructor */
-Xf::Border::Border(void)
+xns::border::border(void)
 : _border{} {
 	// code here...
 }
 
 /* size and position constructor */
-Xf::Border::Border(const Xf::Rect& rect)
+xns::border::border(const xns::rect& rect)
 : _border{} {
 	// call set method
 	set(rect);
 }
 
 /* copy constructor */
-Xf::Border::Border(const Border& other)
+xns::border::border(const border& other)
 : _border{other._border} {
 	// code here...
 }
 
 /* move constructor */
-Xf::Border::Border(Border&& other) noexcept
+xns::border::border(border&& other) noexcept
 : _border{xns::move(other._border)} {
 	// code here...
 }
 
 /* destructor */
-Xf::Border::~Border(void) {
+xns::border::~border(void) {
 	// code here...
 }
 
 /* copy assignment operator */
-Xf::Border& Xf::Border::operator=(const Border& other) {
+xns::border& xns::border::operator=(const border& other) {
 	// check for self assignment
 	if (this != &other) {
 		// copy border
@@ -53,7 +53,7 @@ Xf::Border& Xf::Border::operator=(const Border& other) {
 }
 
 /* move assignment operator */
-Xf::Border& Xf::Border::operator=(Border&& other) noexcept {
+xns::border& xns::border::operator=(border&& other) noexcept {
 	// check for self assignment
 	if (this != &other) {
 		// move border
@@ -63,19 +63,19 @@ Xf::Border& Xf::Border::operator=(Border&& other) noexcept {
 }
 
 /* bool operator */
-Xf::Border::operator bool(void) const {
+xns::border::operator bool(void) const {
 	// check if border is empty
 	return !_border.empty();
 }
 
 /* bool not operator */
-bool Xf::Border::operator!(void) const {
+bool xns::border::operator!(void) const {
 	// check if border is empty
 	return _border.empty();
 }
 
 /* draw border */
-void Xf::Border::draw(void) {
+void xns::border::draw(void) {
 	// check if border is empty
 	if (_border.empty()) { return; }
 	// draw border
@@ -84,7 +84,7 @@ void Xf::Border::draw(void) {
 }
 
 
-void Xf::Border::set(const Xf::Rect& rect, const Xf::Hexcolor color) {
+void xns::border::set(const xns::rect& rect, const xns::hexcolor color) {
 	// avoid namespace pollution
 	using Esc = Xf::Escape;
 
@@ -93,10 +93,10 @@ void Xf::Border::set(const Xf::Rect& rect, const Xf::Hexcolor color) {
 	// clear previous border
 	_border.clear();
 
-	Xf::Rect::Size x = rect.x;
-	Xf::Rect::Size y = rect.y;
-	Xf::Rect::Size w = rect.w;
-	Xf::Rect::Size h = rect.h;
+	xns::rect::size_type x = rect.x;
+	xns::rect::size_type y = rect.y;
+	xns::rect::size_type w = rect.w;
+	xns::rect::size_type h = rect.h;
 
 
 	_border.append(Esc::hex_color(color));
@@ -106,7 +106,7 @@ void Xf::Border::set(const Xf::Rect& rect, const Xf::Hexcolor color) {
 	// append top left corner
 	_border.append(_symb[CORNER_TL], 3);
 	// append top border
-	for (Size i = 1; i < w - 1; ++i) {
+	for (size_type i = 1; i < w - 1; ++i) {
 		_border.append(_symb[LINE_H], 3);
 	}
 	// append top right corner
@@ -120,15 +120,15 @@ void Xf::Border::set(const Xf::Rect& rect, const Xf::Hexcolor color) {
 	_border.append(_symb[CORNER_BL], 3);
 
 	// append bottom border
-	for (Size i = 1; i < w - 1; ++i) {
+	for (size_type i = 1; i < w - 1; ++i) {
 		_border.append(_symb[LINE_H], 3);
 	}
 	// append bottom right corner
 	_border.append(_symb[CORNER_BR], 3);
 
-	UInt32 y_pos = y + h - 1;
+	size_type y_pos = y + h - 1;
 	// append left vertical border
-	for (Size i = y + 1; i < y_pos; ++i) {
+	for (size_type i = y + 1; i < y_pos; ++i) {
 		// append move position left border
 		//_border.append(Esc::get<Xf::move_position_t>(x, i));
 		_border.append(Esc::move_position(x, i));
@@ -136,9 +136,9 @@ void Xf::Border::set(const Xf::Rect& rect, const Xf::Hexcolor color) {
 		_border.append(_symb[LINE_V], 3);
 	}
 
-	UInt32 x_pos = x + w - 1;
+	size_type x_pos = x + w - 1;
 	// append right vertical border
-	for (Size i = y + 1; i < y_pos; ++i) {
+	for (size_type i = y + 1; i < y_pos; ++i) {
 		// append move position right border
 		//_border.append(Esc::get<Xf::move_position_t>(x_pos, i));
 		_border.append(Esc::move_position(x_pos, i));

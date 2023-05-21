@@ -104,7 +104,7 @@ void xns::terminal::raw_terminal(const VFlag vmin) {
 	if (!_instance._is_setup) { return; }
 
 	// VMIN = Minimum number of characters to read
-	_instance._raw.c_cc[VMIN] = static_cast<UInt8>(vmin);
+	_instance._raw.c_cc[VMIN] = static_cast<xns::ubyte>(vmin);
 
 	// set non-canonical mode
 	if (!tcsetattr(STDIN_FILENO, TCSANOW, &_instance._raw)) {
@@ -250,7 +250,7 @@ int xns::terminal::check_control_term(void) {
 
 	int status = 0;
 
-	for (UInt x : { 0, 1, 2 }) {
+	for (xns::size_t x : { 0, 1, 2 }) {
 		if (!isatty(fds[x])) {
 			status = -1;
 			dprintf(fd, "[%s] is not a tty.\n", descriptor[x]);

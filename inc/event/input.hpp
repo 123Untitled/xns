@@ -48,7 +48,7 @@ namespace Xf {
 			using CharT = xns::cstring::char_t;
 
 			/* readed bytes type */
-			using Readed = SInt64;
+			using signed_type = xns::ssize_t;
 
 			/* size type */
 			using Size = xns::cstring::size_type;
@@ -60,7 +60,7 @@ namespace Xf {
 			static void read_input(void);
 
 			/* read input from stdin */
-			static Readed read_stdin(void);
+			static signed_type read_stdin(void);
 
 			/* dispatch to subscribers */
 			static void dispatch(void);
@@ -75,7 +75,7 @@ namespace Xf {
 
 			static xns::cstring _input;
 			static CharT       _buff[BUFFER_SIZE + 1];
-			static Readed      _readed;
+			static signed_type      _readed;
 			static bool        _is_running;
 
 			static bool        _windowed;

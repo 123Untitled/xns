@@ -232,9 +232,9 @@ xns::cstring Xf::Escape::move_position(TSize x, TSize y) {
 	// ESC[{line};{column}H
 
 	char  escape[ESCAPE_BUFFER_SIZE];
-	UInt32 ite;
+	xns::size_t ite;
 
-	constexpr const UInt32 max = xns::max<TSize>();
+	constexpr const xns::size_t max = xns::max<TSize>();
 
 	x += (x != max);
 	y += (y != max);
@@ -265,17 +265,17 @@ xns::cstring Xf::Escape::move_position(TSize x, TSize y) {
 
 
 /* move direction */
-xns::cstring Xf::Escape::_move_direction(TSize cells, const Char dir) {
+xns::cstring Xf::Escape::_move_direction(TSize cells, const char dir) {
 	// static returned string
 	//static Xf::CString escape;
 	// compile time buffer size
-	constexpr const SizeT size = 3 + xns::max_digits<TSize>();
+	constexpr const xns::size_t size = 3 + xns::max_digits<TSize>();
 
 	// buffer
 	xns::cstring::char_t buffer[size];
 
 	// init iterator to last index
-	SizeT i = size - 1;
+	xns::size_t i = size - 1;
 
 	// direction character
 	buffer[i] = dir;
@@ -305,13 +305,13 @@ const xns::cstring& Xf::Escape::move_x(TSize x) {
 	static xns::cstring escape;
 
 	// compile time buffer size
-	constexpr const UInt64 size = sizeof("\x1b[G")
+	constexpr const xns::size_t size = sizeof("\x1b[G")
 								+ xns::max_digits<TSize>();
 	// buffer
 	xns::cstring::char_t buffer[size];
 
 	// init iterator
-	UInt64 i = size - 1;
+	xns::size_t i = size - 1;
 
 	// increment x if not max
 	x += (x != xns::max<TSize>());
@@ -344,10 +344,10 @@ const xns::cstring& Xf::Escape::move_x(TSize x) {
 
 
 /* hex color */
-xns::cstring Xf::Escape::hex_color(const UInt32 color, const bool fore) {
+xns::cstring Xf::Escape::hex_color(const int color, const bool fore) {
 
 	// declare bytes color
-	UInt8 r, g, b;
+	xns::ubyte r, g, b;
 	// get color layer
 	r = (color >> 16) & 0xFF;
 	g = (color >> 8)  & 0xFF;
@@ -357,22 +357,22 @@ xns::cstring Xf::Escape::hex_color(const UInt32 color, const bool fore) {
 }
 
 /* color rgb */
-xns::cstring Xf::Escape::rgb_color(UInt8 r, UInt8 g, UInt8 b, const bool fore) {
+xns::cstring Xf::Escape::rgb_color(xns::u8 r, xns::u8 g, xns::u8 b, const bool fore) {
 	// static 24bit color escape sequence
-	static UInt8	escape[] = {	'\x1b', '[',
+	static xns::ubyte escape[] = {	'\x1b', '[',
 									' ', '8', ';', '2', ';',
 									'0', '0', '0', ';',
 									'0', '0', '0', ';',
 									'0', '0', '0', 'm', '\0'
 	};
-	constexpr UInt32 r_off = 0x6;
-	constexpr UInt32 g_off = 0xA;
-	constexpr UInt32 b_off = 0xE;
+	constexpr xns::size_t r_off = 0x6;
+	constexpr xns::size_t g_off = 0xA;
+	constexpr xns::size_t b_off = 0xE;
 
 	// foreground / background char
 	escape[2] =  fore == true ? '3' : '4';
 	// integer to ascii
-	for (UInt32 x = 3; x; --x) {
+	for (xns::size_t x = 3; x; --x) {
 		// red integer to ascii
 		escape[x + r_off] = ((r % BASE) ^ ZERO_ASCII);
 		// green integer to ascii

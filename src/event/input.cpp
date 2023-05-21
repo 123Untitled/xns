@@ -3,7 +3,7 @@
 
 // -- S T A T I C  P R I V A T E  M E M B E R S -------------------------------
 
-Xf::Input::Readed Xf::Input::_readed                = 0;
+Xf::Input::signed_type Xf::Input::_readed                = 0;
 Xf::Input::CharT  Xf::Input::_buff[BUFFER_SIZE + 1] = { 0 };
 xns::cstring       Xf::Input::_input                 = "";
 bool              Xf::Input::_is_running            = false;
@@ -87,7 +87,7 @@ void Xf::Input::read_input(void) {
 }
 
 /* read stdin */
-SInt64 Xf::Input::read_stdin(void) {
+Xf::Input::signed_type Xf::Input::read_stdin(void) {
 	// read bytes from stdin
 	_readed = read(STDIN_FILENO, _buff, BUFFER_SIZE);
 	// append null terminator
@@ -135,7 +135,7 @@ void Xf::Input::dispatch(void) {
 	}
 
 	if (_input.length() == 1) {
-		const UInt8 _char = _input[0];
+		const xns::ubyte _char = _input[0];
 		evnt.call_event(static_cast<Ev>(_char));
 	}
 

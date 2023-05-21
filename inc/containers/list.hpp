@@ -31,7 +31,7 @@ namespace Xf {
 			using Self = List<Value>;
 
 			/* size type */
-			using Size = SizeT;
+			using Size = xns::size_t;
 
 			/* reference type */
 			using Reference = Value&;

@@ -40,7 +40,7 @@ namespace xns {
 			using self = vector<value, restrict>;
 
 			/* size type */
-			using size = UInt64;
+			using size = xns::size_t;
 
 			/* reference type */
 			using reference = value&;
@@ -78,7 +78,7 @@ namespace xns {
 				// reserve other size
 				reserve(other._size);
 				// loop through other vector
-				for (Size x = 0; x < other._size; ++x) {
+				for (size x = 0; x < other._size; ++x) {
 					// construct value by copy
 					allocator::construct(_vector + x, other._vector[x]);
 				} // set size
@@ -130,7 +130,7 @@ namespace xns {
 					// reserve other size
 					reserve(other._size);
 					// loop through other vector
-					for (Size x = 0; x < other._size; ++x) {
+					for (size x = 0; x < other._size; ++x) {
 						// construct value by copy
 						allocator::construct(_vector + x, other._vector[x]);
 					} // set size
@@ -237,7 +237,7 @@ namespace xns {
 			}
 
 			/* capacity */
-			Size capacity(void) const {
+			size capacity(void) const {
 				// return capacity
 				return _capacity;
 			}
@@ -249,7 +249,7 @@ namespace xns {
 			}
 
 			/* reserve */
-			void reserve(const Size capacity) {
+			void reserve(const size capacity) {
 				// check capacity
 				if (capacity > _capacity) {
 					// allocate memory
@@ -284,7 +284,7 @@ namespace xns {
 
 			/* emplace */
 			template <typename... Args>
-			void emplace(Size pos, Args&&... args) {
+			void emplace(size pos, Args&&... args) {
 				// check position
 				if (pos > _size) { return; }
 				// check capacity
@@ -387,13 +387,13 @@ namespace xns {
 			}
 
 			/* available */
-			Size available(void) const {
+			size available(void) const {
 				// return available memory
 				return _capacity - _size;
 			}
 
 			/* check capacity */
-			inline Size grow(void) {
+			inline size grow(void) {
 				return (_capacity << 1) + (_capacity == 0);
 			}
 

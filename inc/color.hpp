@@ -3,24 +3,23 @@
 
 #include "types.hpp"
 
-// -- N A M E S P A C E -------------------------------------------------------
 
-namespace Xf {
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-	using Hexcolor = UInt32;
+namespace xns {
+
+	using hexcolor = xns::u32;
 
 	// -- C O L O R  C L A S S ------------------------------------------------
 
-	class Color final {
+	class color final {
 
 		public:
 
 			// -- A L I A S E S -----------------------------------------------
 
-			/* color type */
-			using Type = UInt32;
 
-			enum : Type {
+			enum : hexcolor {
 
 				LOWLIGHT_COLOR		= 0x414868,
 				DARK_GREY_COLOR		= 0x636363,

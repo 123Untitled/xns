@@ -38,7 +38,7 @@ namespace Xf {
 			using WeakValue = xns::weak_ptr<Value>;
 
 			/* size type */
-			using Size = SizeT;
+			using Size = xns::size_t;
 
 
 

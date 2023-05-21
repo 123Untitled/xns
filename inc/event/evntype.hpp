@@ -8,7 +8,7 @@
 namespace Xf {
 
 	/* event */
-	enum class Evntype : UInt8 {
+	enum class Evntype : xns::ubyte {
 		NUL,          // null character (ctrl+space)
 		SOH,          // start of heading (ctrl+a)
 		STX,          // start of text (ctrl+b)

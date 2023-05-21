@@ -4,31 +4,32 @@
 #include "types.hpp"
 #include "integral_constant.hpp"
 
-// -- N A M E S P A C E -------------------------------------------------------
 
-namespace Xf {
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
 
 
 	// -- B A S E -------------------------------------------------------------
 
 	/* hexadecimal base */
 	struct Hex {
-		static constexpr UInt base = 16;
+		static constexpr xns::u8 base = 16;
 	};
 
 	/* decimal base */
 	struct Dec {
-		static constexpr UInt base = 10;
+		static constexpr xns::u8 base = 10;
 	};
 
 	/* octal base */
 	struct Oct {
-		static constexpr UInt base = 8;
+		static constexpr xns::u8 base = 8;
 	};
 
 	/* binary base */
 	struct Bin {
-		static constexpr UInt base = 2;
+		static constexpr xns::u8 base = 2;
 	};
 
 
@@ -61,7 +62,7 @@ namespace Xf {
 
 	/* is base concept */
 	template <class T>
-	concept is_base_c = Xf::is_base_v<T>;
+	concept is_base_c = xns::is_base_v<T>;
 
 
 

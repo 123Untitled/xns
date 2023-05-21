@@ -15,7 +15,7 @@ int Xf::Debug::initialize(const char* tty) {
 	return tmp;
 }
 
-void Xf::Debug::write(const void* data, UInt64 size) {
+void Xf::Debug::write(const void* data, xns::size_t size) {
 	// exit if no data or tty not open
 	if (_tty < 0) { return; }
 	if (!data)    { return; }

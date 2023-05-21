@@ -11,47 +11,48 @@
 
 #include <iostream>
 
-// -- N A M E S P A C E -------------------------------------------------------
 
-namespace Xf {
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
 
 	// -- B O R D E R  C L A S S ----------------------------------------------
 
-	class Border final {
+	class border final {
 
 		public:
 
 			// -- A L I A S E S -----------------------------------------------
 
 			/* size type */
-			using Size = UInt64;
+			using size_type = xns::size_t;
 
 
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* default constructor */
-			Border(void);
+			border(void);
 
 			/* size and position constructor */
-			Border(const Xf::Rect& rect);
+			border(const xns::rect& rect);
 
 			/* copy constructor */
-			Border(const Border& other);
+			border(const border& other);
 
 			/* move constructor */
-			Border(Border&& other) noexcept;
+			border(border&& other) noexcept;
 
 			/* destructor */
-			~Border(void);
+			~border(void);
 
 
 			// -- O P E R A T O R S -------------------------------------------
 
 			/* copy assignment operator */
-			Border& operator=(const Border& other);
+			border& operator=(const border& other);
 
 			/* move assignment operator */
-			Border& operator=(Border&& other) noexcept;
+			border& operator=(border&& other) noexcept;
 
 			/* bool operator */
 			explicit operator bool(void) const;
@@ -66,8 +67,8 @@ namespace Xf {
 			void draw(void);
 
 			/* set size and position */
-			void set(const Xf::Rect& rect,
-					const Xf::Hexcolor color = Xf::Color::GREY_COLOR);
+			void set(const xns::rect& rect,
+					const xns::hexcolor color = xns::color::GREY_COLOR);
 
 			/* set border color */
 			// INFO: not defined yet
@@ -88,10 +89,10 @@ namespace Xf {
 			// -- A L I A S E S -----------------------------------------------
 
 			/* symbol type */
-			using Symbol = xns::array<const char*, BORDER_MAX>;
+			using symbol = xns::array<const char*, BORDER_MAX>;
 
 			/* allocator type */
-			using Allocator = xns::allocator<char>;
+			using allocator = xns::allocator<char>;
 
 
 			// -- M E M B E R S -----------------------------------------------
@@ -103,7 +104,7 @@ namespace Xf {
 			// -- S T A T I C  M E M B E R S ----------------------------------
 
 			/* symbol array */
-			static constinit Symbol _symb;
+			static constinit symbol _symb;
 
 
 

@@ -6,53 +6,55 @@
 
 #define PRECT(rect) std::cout << "Rect(" << rect.x << ", " << rect.y << ", " << rect.w << ", " << rect.h << ")" << std::endl;
 
-// -- N A M E S P A C E -------------------------------------------------------
 
-namespace Xf {
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
 
 	// -- R E C T  S T R U C T ------------------------------------------------
 
-	struct Rect final {
+	struct rect final {
+
 
 		// -- A L I A S E S ---------------------------------------------------
 
 		/* size type */
-		using Size = UInt64;
+		using size_type = xns::size_t;
 
 
 		// -- M E M B E R S ---------------------------------------------------
 
-		Size x, y, w, h;
+		size_type x, y, w, h;
 
 
 		// -- C O N S T R U C T O R S -----------------------------------------
 
 		/* default constructor */
-		Rect(void) noexcept;
+		rect(void) noexcept;
 
 		/* size and position constructor */
-		Rect(   const Size x,
-				const Size y,
-				const Size w,
-				const Size h) noexcept;
+		rect(   const size_type x,
+				const size_type y,
+				const size_type w,
+				const size_type h) noexcept;
 
 		/* copy constructor */
-		Rect(const Rect& other) noexcept;
+		rect(const rect& other) noexcept;
 
 		/* move constructor */
-		Rect(Rect&& other) noexcept;
+		rect(rect&& other) noexcept;
 
 		/* destructor */
-		~Rect(void) noexcept;
+		~rect(void) noexcept;
 
 
 		// -- O P E R A T O R S -----------------------------------------------
 
 		/* copy assignment operator */
-		Rect& operator=(const Rect& other) noexcept;
+		rect& operator=(const rect& other) noexcept;
 
 		/* move assignment operator */
-		Rect& operator=(Rect&& other) noexcept;
+		rect& operator=(rect&& other) noexcept;
 
 		/* bool operator */
 		explicit operator bool(void) const noexcept;
@@ -61,7 +63,7 @@ namespace Xf {
 		bool operator!(void) const noexcept;
 
 		/* equality operator */
-		bool operator==(const Rect& other) const noexcept;
+		bool operator==(const rect& other) const noexcept;
 
 		// -- M E T H O D S ---------------------------------------------------
 

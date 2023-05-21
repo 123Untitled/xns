@@ -61,10 +61,10 @@ namespace xns {
 			using self            = string<char_t>;
 
 			/* size type */
-			using size_type       = UInt64;
+			using size_type       = xns::size_t;
 
 			/* comparison type */
-			using signed_type     = SInt32;
+			using signed_type     = xns::s32;
 
 			/* pointer type */
 			using mutable_pointer = char_t*;
@@ -93,10 +93,10 @@ namespace xns {
 			mutable_pointer _str;
 
 			/* capacity */
-			Size _capacity;
+			size_type _capacity;
 
 			/* size */
-			Size _size;
+			size_type _size;
 
 
 		public:
@@ -110,7 +110,7 @@ namespace xns {
 			}
 
 			/* capacity constructor */
-			explicit string(const Size capacity)
+			explicit string(const size_type capacity)
 			: string{} {
 				std::cout << "capacity constructor" << std::endl;
 				// exit if capacity is zero
@@ -162,7 +162,7 @@ namespace xns {
 			}
 
 			/* fill constructor */
-			explicit string(const char_t character, const Size count)
+			explicit string(const char_t character, const size_type count)
 			: string{} {
 				// exit if count is zero
 				if (!count) { return; }
@@ -214,7 +214,7 @@ namespace xns {
 			}
 
 			/* buffer assignment */
-			string& assign(const_pointer str, const Size size) {
+			string& assign(const_pointer str, const size_type size) {
 
 				// WARNING: need to handle this case !
 				// check if size or pointer is null
@@ -231,7 +231,7 @@ namespace xns {
 				}
 
 				// loop through string
-				for (Size x = 0; x < size; ++x) {
+				for (size_type x = 0; x < size; ++x) {
 					// copy character
 					_str[x] = str[x];
 				}
@@ -242,7 +242,7 @@ namespace xns {
 			}
 
 			/* fill assignment */
-			string& assign(const char_t character, const Size size = 1) {
+			string& assign(const char_t character, const size_type size = 1) {
 
 			}
 
@@ -263,7 +263,7 @@ namespace xns {
 						_capacity = other._size;
 					}
 					// loop through other string
-					for (Size i = 0; i < other._size; ++i) {
+					for (size_type i = 0; i < other._size; ++i) {
 						// copy character
 						_str[i] = other._str[i];
 					}
@@ -388,22 +388,22 @@ namespace xns {
 			}
 
 			/* length */
-			Size length(void) const {
+			size_type length(void) const {
 				return _size;
 			}
 
 			/* size */
-			Size size(void) const {
+			size_type size(void) const {
 				return _size;
 			}
 
 			/* capacity */
-			Size capacity(void) const {
+			size_type capacity(void) const {
 				return _capacity;
 			}
 
 			/* available */
-			Size available(void) const {
+			size_type available(void) const {
 				// INFO: nullchar is not included in available space
 				return _capacity - _size;
 			}
@@ -434,7 +434,7 @@ namespace xns {
 			}
 
 			/* reserve */
-			void reserve(const Size requested) {
+			void reserve(const size_type requested) {
 				// check if size is greater than capacity
 				if (requested > _capacity) {
 					// reallocate memory
@@ -453,7 +453,7 @@ namespace xns {
 			// -- A P P E N D -------------------------------------------------
 
 			/* fill append */
-			string& append(const char_t character, const Size count = 1) {
+			string& append(const char_t character, const size_type count = 1) {
 				// check if there is enough space
 				if (count > available()) {
 					// resize the string
@@ -464,7 +464,7 @@ namespace xns {
 					_str_and_capacity(new_str, _size + count);
 				}
 				// loop through new memory space
-				for (Size x = 0, z = _size; x < count; ++x, ++z) {
+				for (size_type x = 0, z = _size; x < count; ++x, ++z) {
 					// set character
 					_str[z] = character;
 				}
@@ -488,7 +488,7 @@ namespace xns {
 
 
 			/* buffer append */ // WARNING: need to check nullptr
-			string& append(const_pointer str, Size size) {
+			string& append(const_pointer str, size_type size) {
 
 				// check if size or pointer is null
 				if (!size || !str) { return *this; }
@@ -504,7 +504,7 @@ namespace xns {
 				}
 
 				// loop through new memory space
-				for (Size x = 0, z = _size; x < size; ++x, ++z) {
+				for (size_type x = 0, z = _size; x < size; ++x, ++z) {
 					// set character
 					_str[z] = str[x];
 				}
@@ -522,7 +522,7 @@ namespace xns {
 			template <typename... A>
 			static constexpr bool append_selector(void) {
 				// minimum arguments needed
-				constexpr Size min = 2;
+				constexpr size_type min = 2;
 				// check if all arguments are of type string
 				constexpr bool type = (xns::is_same<
 											xns::remove_reference<A>,
@@ -538,7 +538,7 @@ namespace xns {
 			string& append(A&&... strings) requires(append_selector<A...>()) {
 
 				// get the size of the strings
-				Size size = 0;
+				size_type size = 0;
 				((size += strings._size), ...);
 
 				if (!size) { return *this; }
@@ -554,7 +554,7 @@ namespace xns {
 				}
 
 				// loop through new memory space
-				([&]{ for (Size x = 0, z = _size; x < strings._size; ++x, ++z) {
+				([&]{ for (size_type x = 0, z = _size; x < strings._size; ++x, ++z) {
 						// set character
 						_str[z] = strings._str[x];
 					}
@@ -571,13 +571,13 @@ namespace xns {
 			// -- I N S E R T -------------------------------------------------
 
 			/* fill insert */
-			string& insert(Size index, const char_t character, const Size count = 1) {
+			string& insert(size_type index, const char_t character, const size_type count = 1) {
 				// check count is not null
 				if (!count) { return *this; }
 
 				index = index > _size ? _size : index;
 
-				Size required = _size + count;
+				size_type required = _size + count;
 
 				// check if there is enough space
 				if (count > available()) {
@@ -589,17 +589,17 @@ namespace xns {
 					_str_and_capacity(new_str, required);
 				}
 
-				Size range = _size - index;
+				size_type range = _size - index;
 
 				// loop through new memory space and shift characters
-				for (Size x = 0, z = _size - 1; x < range; ++x, --z) {
+				for (size_type x = 0, z = _size - 1; x < range; ++x, --z) {
 					// set character
 					_str[z + count] = _str[z];
 				}
 
-				Size to = index + count;
+				size_type to = index + count;
 				// loop through new memory space and set characters
-				for (Size x = index; x < to; ++x) {
+				for (size_type x = index; x < to; ++x) {
 					// set character
 					_str[x] = character;
 				}
@@ -612,7 +612,7 @@ namespace xns {
 
 
 			/* buffer insert */
-			string& insert(Size index, const_pointer str, const Size size) {
+			string& insert(size_type index, const_pointer str, const size_type size) {
 				// WARNING: not implemented
 
 				// check if size or pointer is null
@@ -621,7 +621,7 @@ namespace xns {
 				// check if index is valid
 				index = index > _size ? _size : index;
 
-				Size required = _size + size;
+				size_type required = _size + size;
 
 				// check if there is enough space
 				if (size > available()) {
@@ -633,17 +633,17 @@ namespace xns {
 					_str_and_capacity(new_str, required);
 				}
 
-				Size range = _size - index;
+				size_type range = _size - index;
 
 				// loop through new memory space and shift characters
-				for (Size x = 0, z = _size - 1; x < range; ++x, --z) {
+				for (size_type x = 0, z = _size - 1; x < range; ++x, --z) {
 					// set character
 					_str[z + size] = _str[z];
 				}
 
-				Size to = index + size;
+				size_type to = index + size;
 				// loop through new memory space and set characters
-				for (Size x = index, z = 0; x < to; ++x, ++z) {
+				for (size_type x = index, z = 0; x < to; ++x, ++z) {
 					// set character
 					_str[x] = str[z];
 				}
@@ -655,13 +655,13 @@ namespace xns {
 			}
 
 			/* string insert */
-			string& insert(const Size index, const string& str) {
+			string& insert(const size_type index, const string& str) {
 				// call buffer insert
 				return insert(index, str._str, str._size);
 			}
 
 			/* null-terminated string insert */
-			string& insert(const Size index, const_pointer str) {
+			string& insert(const size_type index, const_pointer str) {
 				// call buffer insert with size
 				return insert(index, str, string::get_len(str));
 			}
@@ -671,11 +671,11 @@ namespace xns {
 			// -- E R A S E ---------------------------------------------------
 
 			/* erase character */
-			string& erase(const Size index) {
+			string& erase(const size_type index) {
 				// check if index is valid and string is not null
 				if (index < _size && _str != nullptr) {
 					// loop through string
-					for (Size x = index; x < _size; ++x) {
+					for (size_type x = index; x < _size; ++x) {
 						// shift characters
 						_str[x] = _str[x + 1];
 					} // decrement size
@@ -685,13 +685,13 @@ namespace xns {
 			}
 
 			/* erase range */
-			string& erase(const Size start, const Size end) {
+			string& erase(const size_type start, const size_type end) {
 				// check if index is valid and string is not null
 				if (start <= end && end < _size && _str != nullptr) {
 
-					const Size shift = (end - start) + 1;
+					const size_type shift = (end - start) + 1;
 					// loop through string
-					for (Size x = start,
+					for (size_type x = start,
 							  z = shift + x; z < _size; ++x, ++z) {
 						// shift characters
 						_str[x] = _str[z];
@@ -709,7 +709,7 @@ namespace xns {
 				// check if string is not null
 				if (_str != nullptr) {
 					// convert to uppercase
-					for (Size x = 0; x < _size; ++x) {
+					for (size_type x = 0; x < _size; ++x) {
 						_str[x] = string::to_uppercase(_str[x]);
 					}
 				}
@@ -720,7 +720,7 @@ namespace xns {
 				// check if string is not null
 				if (_str != nullptr) {
 					// convert to lowercase
-					for (Size x = 0; x < _size; ++x) {
+					for (size_type x = 0; x < _size; ++x) {
 						_str[x] = string::to_lowercase(_str[x]);
 					}
 				}
@@ -731,9 +731,9 @@ namespace xns {
 				// exit if string is null
 				if (_str == nullptr) { return; }
 				// offset
-				Size offset = 0;
+				size_type offset = 0;
 				// loop through string
-				for (Size x = 0; x < _size; ++x) {
+				for (size_type x = 0; x < _size; ++x) {
 					// check if character is not of type
 					if (is_type(_str[x]) != keep) { ++offset; }
 					// shift characters
@@ -748,7 +748,7 @@ namespace xns {
 				// check if string is not null
 				if (_str != nullptr && _size) {
 					// reverse string
-					for (Size x = 0, z = _size - 1; x < z; ++x, --z) {
+					for (size_type x = 0, z = _size - 1; x < z; ++x, --z) {
 						// swap characters
 						char_t tmp = _str[x];
 						_str[x] = _str[z];
@@ -758,8 +758,8 @@ namespace xns {
 			}
 
 			void pull_repeat(void) {
-				//Size x = 0;
-				//Size z = 0;
+				//size_type x = 0;
+				//size_type z = 0;
 
 				//if (_str) {
 				//	while (z + x < _size) {
@@ -780,13 +780,13 @@ namespace xns {
 
 				if (!_str) { return; }
 
-				UInt8* ptr = reinterpret_cast<UInt8*>(_str);
+				xns::u8* ptr = reinterpret_cast<xns::u8*>(_str);
 				// initialize new size
-				Size length = _size;
+				size_type length = _size;
 
 				_size = 0;
 				// loop through string characters
-				for (Size z = 0, x = 0; x < length; ++x) {
+				for (size_type z = 0, x = 0; x < length; ++x) {
 					// check if character has been seen
 					if (seen[ptr[x]]) { continue; }
 					// set character as seen
@@ -807,8 +807,8 @@ namespace xns {
 
 				//UInt8* ptr = reinterpret_cast<UInt8*>(_str);
 
-				//Size x = _size;
-				//Size z = x;
+				//size_type x = _size;
+				//size_type z = x;
 
 				//while (x--) {
 				//	if (seen[ptr[x]]) { continue; }
@@ -827,11 +827,11 @@ namespace xns {
 			// -- S E A R C H I N G -------------------------------------------
 
 			/* next word */
-			Size next_word(const Size index) const {
+			size_type next_word(const size_type index) const {
 				// idle if nullptr or index exceed length
 				if (_str != nullptr && index < _size) {
 
-					Size x = index;
+					size_type x = index;
 					// skip printable characters
 					while (is_printable(_str[x])) { ++x; }
 					// skip whitespace characters
@@ -845,11 +845,11 @@ namespace xns {
 			}
 
 			/* previous word */ // INFO: not well implemented
-			Size previous_word(const Size index) const {
+			size_type previous_word(const size_type index) const {
 				// idle if nullptr or index exceed length
 				if (_str != nullptr && index < _size) {
 
-					Size x = index;
+					size_type x = index;
 					// skip whitespace characters
 					while (x != 0 && string::is_whitespace(_str[x])) { --x; }
 					// skip printable characters
@@ -861,11 +861,11 @@ namespace xns {
 			}
 
 			/* next character */
-			Size next_character(const Size index, const char_t character) const {
+			size_type next_character(const size_type index, const char_t character) const {
 				// idle if nullptr or index exceed length
 				if (_str != nullptr && index < _size) {
 					// loop through string
-					for (Size x = index; x < _size; ++x) {
+					for (size_type x = index; x < _size; ++x) {
 						// return index if character is found
 						if (_str[x] == character) { return x; }
 					}
@@ -874,11 +874,11 @@ namespace xns {
 			}
 
 			/* previous character */
-			Size previous_character(const Size index, const char_t character) const {
+			size_type previous_character(const size_type index, const char_t character) const {
 				// idle if nullptr or index exceed length
 				if (_str != nullptr && index < _size) {
 					// loop through string
-					for (Size x = index; x != 0; --x) {
+					for (size_type x = index; x != 0; --x) {
 						// return index if character is found
 						if (_str[x] == character) return x;
 					}
@@ -891,7 +891,7 @@ namespace xns {
 				// return false if string is null or empty
 				if (!_str || !_size) { return false; } // WARNING: functor is not checked
 				// loop through string
-				for (Size x = 0; x < _size; ++x) {
+				for (size_type x = 0; x < _size; ++x) {
 					// return false if character is not of type
 					if (!is_type(_str[x])) { return false; }
 				} // return true if all characters are of type
@@ -908,7 +908,7 @@ namespace xns {
 				// check if string is not null
 				if (_str) {
 					// loop through string characters
-					for (Size z = 0, x = 0; _str[x]; x += z, z = 0) {
+					for (size_type z = 0, x = 0; _str[x]; x += z, z = 0) {
 						// skip separator characters
 						while (is_charset(_str[x], sep._str)) { ++x; }
 						// count non-separator characters
@@ -927,7 +927,7 @@ namespace xns {
 				xns::vector<string<char_t>> vec;
 
 				if (_str) {
-					UInt32 z, x = 0;
+					size_type z, x = 0;
 					// loop through string characters
 					while (_str[x]) {
 						z = 0;
@@ -976,13 +976,13 @@ namespace xns {
 			}
 
 			/* string size compare */
-			signed compare(const string& str, const Size size) const {
+			signed compare(const string& str, const size_type size) const {
 				// call null-terminated string size compare
 				return compare(str._str, size);
 			}
 
 			/* null-terminated string size compare */
-			signed compare(const_pointer str2, Size size) const {
+			signed compare(const_pointer str2, size_type size) const {
 				// temporary pointers
 				const_pointer str1 = _str;
 				// compare nullptr-ness
@@ -1011,7 +1011,7 @@ namespace xns {
 				reserve(size);
 
 				// convert number to string
-				Size x = 0;
+				size_type x = 0;
 				// loop through number
 				do {
 					_str[x] = (number % 10) + '0';
@@ -1032,7 +1032,7 @@ namespace xns {
 				// temporary string
 				clear();
 
-				constexpr Size size = xns::max_digits<N>() + 1; // INFO: +1 for negative sign
+				constexpr size_type size = xns::max_digits<N>() + 1; // INFO: +1 for negative sign
 				constexpr N type_min = xns::min<N>();
 				N base = 10;
 
@@ -1041,7 +1041,7 @@ namespace xns {
 				reserve(size);
 				bool negative = false;
 
-				Size x = 0;
+				size_type x = 0;
 				// check negative
 				if (number < 0) {
 					// set negative flag
@@ -1082,12 +1082,12 @@ namespace xns {
 				_str = nullptr; _size = 0; _capacity = 0;
 			}
 
-			void _size_and_terminator(const Size size) {
+			void _size_and_terminator(const size_type size) {
 				// set terminator
 				_str[_size = size] = 0;
 			}
 
-			void _str_and_capacity(mutable_pointer str, const Size capacity) {
+			void _str_and_capacity(mutable_pointer str, const size_type capacity) {
 				// set capacity
 				_capacity = capacity;
 				// set pointer
@@ -1095,14 +1095,14 @@ namespace xns {
 			}
 
 			/* set members */
-			void _set_members(char_t* str, const Size size, const Size capacity) {
+			void _set_members(char_t* str, const size_type size, const size_type capacity) {
 				// set members
 				_str = str; _size = size; _capacity = capacity;
 			}
 
 
 			/* allocate members */
-			void _unsafe_allocate(const Size capacity) {
+			void _unsafe_allocate(const size_type capacity) {
 				// check requested capacity
 				if (!capacity) { return; }
 				// allocate memory
@@ -1112,13 +1112,13 @@ namespace xns {
 			}
 
 			/* realloc */
-			mutable_pointer _realloc(const Size requested) {
+			mutable_pointer _realloc(const size_type requested) {
 				// reallocate memory
 				return allocator::realloc(_str, requested + 1);
 			}
 
 			/* allocate other */
-			mutable_pointer _allocate(const Size capacity) const {
+			mutable_pointer _allocate(const size_type capacity) const {
 				// check requested capacity
 				if (!capacity) { return nullptr; }
 				// allocate memory
@@ -1136,32 +1136,32 @@ namespace xns {
 
 
 			/* reallocate */
-			void reallocate(const Size capacity);
+			void reallocate(const size_type capacity);
 
 
 
 			/* unsafe copy */
-			void _unsafe_copy(mutable_pointer dst, const_pointer src, const Size size) {
+			void _unsafe_copy(mutable_pointer dst, const_pointer src, const size_type size) {
 				// loop through source
-				for (Size x = 0; x < size; ++x) {
+				for (size_type x = 0; x < size; ++x) {
 					// copy character to dst
 					dst[x] = src[x];
 				}
 			}
 
 			/* unsafe fill */
-			void _unsafe_fill(mutable_pointer dst, const char_t character, const Size size) {
+			void _unsafe_fill(mutable_pointer dst, const char_t character, const size_type size) {
 				// loop through dst
-				for (Size x = 0; x < size; ++x) {
+				for (size_type x = 0; x < size; ++x) {
 					// set each character to character
 					dst[x] = character;
 				}
 			}
 
 			/* unsafe bzero */
-			void _unsafe_bzero(mutable_pointer dst, const Size size) {
+			void _unsafe_bzero(mutable_pointer dst, const size_type size) {
 				// loop through dst
-				for (Size x = 0; x < size; ++x) {
+				for (size_type x = 0; x < size; ++x) {
 					// set each character to null
 					dst[x] = 0;
 				}
@@ -1196,11 +1196,11 @@ namespace xns {
 			// -- P U B L I C  S T A T I C  M E T H O D S ---------------------
 
 			/* get len */
-			static constexpr Size get_len(const_pointer str) {
+			static constexpr size_type get_len(const_pointer str) {
 				// check if str is null
 				if (!str) { return 0; }
 				// loop through str
-				for (Size x = 0; ; ++x) {
+				for (size_type x = 0; ; ++x) {
 					// check if null
 					if (!str[x]) { return x; }
 				}
@@ -1329,25 +1329,30 @@ namespace xns {
 
 		private:
 
+			// -- T Y P E S ---------------------------------------------------
+
+			/* size type */
+			using size_type = typename xns::string<T>::size_type;
+
 			// -- M E M B E R S -----------------------------------------------
 
 			/* string */
 			xns::string<T> _str;
 
 			/* view size */
-			Size _view_size; // size of view
+			size_type _view_size; // size of view
 
 			/* start position */
-			Size _view_start; // offset from start of string
+			size_type _view_start; // offset from start of string
 
 			/* view position */
-			Size _string_cursor; // position in string
+			size_type _string_cursor; // position in string
 
 			/* view position */
-			Size _screen_cursor; // position in view
+			size_type _screen_cursor; // position in view
 
 			/* scroll offset */
-			Size _scrolloff; // vim-like scroll offset (half of view size)
+			size_type _scrolloff; // vim-like scroll offset (half of view size)
 
 
 
@@ -1368,7 +1373,7 @@ namespace xns {
 			// -- P U B L I C  S E T T E R S ----------------------------------
 
 			/* set view size */
-			void set_view_width(const Size width) noexcept {
+			void set_view_width(const size_type width) noexcept {
 				// set view size and scroll offset (half of view size)
 				_scrolloff = (_view_size = width) / 2;
 			}
@@ -1455,7 +1460,7 @@ namespace xns {
 			}
 
 			/* view size */
-			Size view_size(void) const {
+			size_type view_size(void) const {
 				// check if string is smaller than view size
 				if (_str.length() < _view_size) {
 					// return string length
@@ -1465,7 +1470,7 @@ namespace xns {
 			}
 
 			/* get screen cursor position */
-			Size cursor_position(void) const {
+			size_type cursor_position(void) const {
 				// return screen cursor position
 				return _screen_cursor;
 			}

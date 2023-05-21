@@ -72,7 +72,7 @@ namespace xns {
 			}
 
 			/* nullptr constructor */
-			shared_ptr(Xf::Nullptr) noexcept
+			shared_ptr(xns::null) noexcept
 			: shared_ptr{ } {
 				// code here...
 			}
@@ -132,7 +132,7 @@ namespace xns {
 			// -- P U B L I C  A S S I G N M E N T ----------------------------
 
 			/* nullptr assignment */
-			self& assign(Xf::Nullptr) {
+			self& assign(xns::null) {
 				// clean up
 				reset();
 				// return self reference
@@ -212,7 +212,7 @@ namespace xns {
 			// -- P U B L I C  A S S I G N M E N T  O P E R A T O R S ---------
 
 			/* nullptr assignment operator */
-			self& operator=(Xf::Nullptr) {
+			self& operator=(xns::null) {
 				// return nullptr assignment
 				return assign(nullptr);
 			}
@@ -301,13 +301,13 @@ namespace xns {
 			}
 
 			/* nullptr equality operator */
-			bool operator==(Xf::Nullptr) const noexcept {
+			bool operator==(xns::null) const noexcept {
 				// return pointer invalidity
 				return _data == nullptr;
 			}
 
 			/* nullptr inequality operator */
-			bool operator!=(Xf::Nullptr) const noexcept {
+			bool operator!=(xns::null) const noexcept {
 				// return pointer validity
 				return _data != nullptr;
 			}

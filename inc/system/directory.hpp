@@ -53,7 +53,7 @@ enum Typeindex {
 
 struct Typentity {
 	const char*	_label;
-	UInt64		_size;
+	xns::size_t		_size;
 	Typeindex	_index;
 };
 
@@ -109,7 +109,7 @@ class Directory final {
 	static bool isSlashTerminated(const String& path);
 	static bool isRelative(const String& path);
 
-	static Typeindex getTypentity(const SInt32 type);
+	static Typeindex getTypentity(const xns::s32 type);
 
 	const char* getDirectoryPath(void) const;
 
@@ -123,7 +123,7 @@ class Directory final {
 
 	void getDirectoryContent(void);
 
-	UInt32 getFilesNumber(void) const;
+	xns::u32 getFilesNumber(void) const;
 
 	const char* getNextFilePath(void) const;
 

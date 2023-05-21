@@ -75,14 +75,14 @@ namespace xns {
 
 
 
-	template <Xf::is_base_c B, xns::is_integral T>
-	consteval SizeT static_digits(const T number) {
+	template <xns::is_base_c B, xns::is_integral T>
+	consteval xns::size_t static_digits(const T number) {
 		// remove const and volatile
 		using Type = xns::remove_cv<T>;
 		// instance of new type
 		Type num = number;
 		// number of digits
-		SizeT digits = 0; // number < 0;
+		xns::size_t digits = 0; // number < 0;
 		// increment digits
 		do { ++digits;
 			// divide num by base

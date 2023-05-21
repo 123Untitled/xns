@@ -104,7 +104,7 @@ int main(int ac, char** av) {
 		auto weak = trie.find(v[x]);
 		if (weak != nullptr) {
 			std::cout.write(weak->pointer(), weak->size()) << std::endl;
-			std::cout << (Size)weak->pointer() << std::endl;
+			std::cout << (xns::size_t)weak->pointer() << std::endl;
 		}
 		else {
 			std::cout << "not found" << std::endl;

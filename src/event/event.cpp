@@ -61,11 +61,11 @@ void Xf::Event::set_mode(const Evntmode& mode, const Evntopt opt) {
 		// check if mode is forced
 		if (opt == Evntopt::FORCE) {
 			// stack current mode
-			_current = xns::make_unique_pointer<Size>(mode._idx);
+			_current = xns::make_unique_pointer<xns::size_t>(mode._idx);
 			//_current.make(mode._idx);
 			return;
 		} // set next mode
-		_next = xns::make_unique_pointer<Size>(mode._idx);
+		_next = xns::make_unique_pointer<xns::size_t>(mode._idx);
 		//_next.make(mode._idx);
 	}
 }
@@ -81,7 +81,7 @@ void Xf::Event::next_mode(void) {
 	// get subscribers index by event type
 	EventVector& subscribers = _modes[*_current]._second[IDX(Evntype::BEGIN)];
 	// loop through all observers
-	for (Size x = 0; x < subscribers.length(); ++x) {
+	for (xns::size_t x = 0; x < subscribers.length(); ++x) {
 		// call subscriber
 		subscribers[x].call();
 	}
@@ -119,11 +119,11 @@ void Xf::Event::stack_mode(const Evntmode& mode, const Evntopt opt) {
 	// check if mode is forced
 	if (opt == Evntopt::FORCE) {
 		// set next mode
-		_current = xns::make_unique_pointer<Size>(mode._idx);
+		_current = xns::make_unique_pointer<xns::size_t>(mode._idx);
 		//_current.make(mode._idx);
 		return;
 	} // set next mode
-	_next = xns::make_unique_pointer<Size>(mode._idx);
+	_next = xns::make_unique_pointer<xns::size_t>(mode._idx);
 	//_next.make(mode._idx);
 }
 
@@ -147,7 +147,7 @@ void Xf::Event::unstack_mode(void) {
 	}
 	//_next.make(*_stack.top());
 	//_next.make(_stack.top());
-	_next = xns::make_unique_pointer<Size>(_stack.top());
+	_next = xns::make_unique_pointer<xns::size_t>(_stack.top());
 	_current = xns::move(_next);
 	//////////////
 
@@ -164,7 +164,7 @@ void Xf::Event::call_event(const Evntype type) {
 	// get subscribers index by event type
 	EventVector& subscribers = _modes[*_current]._second[IDX(type)];
 	// loop through all observers
-	for (Size x = 0; x < subscribers.length(); ++x) {
+	for (xns::size_t x = 0; x < subscribers.length(); ++x) {
 		// call subscriber
 		subscribers[x].call();
 	}
@@ -177,7 +177,7 @@ void Xf::Event::call_input(const xns::cstring& input) {
 	// get subscribers
 	InputVector& subscribers = _modes[*_current]._first;
 	// loop through all observers
-	for (Size x = 0; x < subscribers.length(); ++x) {
+	for (xns::size_t x = 0; x < subscribers.length(); ++x) {
 		// call subscriber
 		subscribers[x].call(input);
 	}
@@ -219,7 +219,7 @@ void Xf::Event::_subscribe(const Evntmode& mode, InputFunction function) {
 
 
 /* index private constructor */
-Xf::Evntmode::Evntmode(const Size idx)
+Xf::Evntmode::Evntmode(const xns::size_t idx)
 : _idx{idx}, _state{true} {
 	// code here...
 }

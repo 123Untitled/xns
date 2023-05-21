@@ -45,7 +45,7 @@ namespace xns {
 			}
 
 			/* nullptr constructor */
-			method(Xf::Nullptr) noexcept
+			method(xns::null) noexcept
 			: _method{nullptr} {
 				// code here...
 			}
@@ -75,7 +75,7 @@ namespace xns {
 			// -- P U B L I C  A S S I G N M E N T ----------------------------
 
 			/* nullptr assignment */
-			self& assign(Xf::Nullptr) noexcept {
+			self& assign(xns::null) noexcept {
 				// set method pointer to null
 				_method = nullptr;
 				// return self reference
@@ -110,7 +110,7 @@ namespace xns {
 			// -- P U B L I C  A S S I G N M E N T  O P E R A T O R S ---------
 
 			/* nullptr assignment operator */
-			self& operator=(Xf::Nullptr) noexcept {
+			self& operator=(xns::null) noexcept {
 				// return nullptr assignment
 				return assign(nullptr);
 			}

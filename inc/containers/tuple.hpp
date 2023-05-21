@@ -37,7 +37,7 @@ namespace Xf {
 			using Self = Tuple<A...>;
 
 			/* size type */
-			using Size = SizeT;
+			using size_type = xns::size_t;
 
 
 
@@ -45,7 +45,7 @@ namespace Xf {
 
 			// -- T U P L E  E L E M E N T  S T R U C T -----------------------
 
-			template <SizeT IDX, class Value>
+			template <size_type IDX, class Value>
 			struct Element {
 
 				// -- M E M B E R S -------------------------------------------
@@ -63,7 +63,7 @@ namespace Xf {
 			struct TupleImpl;
 
 			/* specialization for index sequence */
-			template <Size... IDX>
+			template <size_type... IDX>
 			struct TupleImpl<Xf::IndexSeq<IDX...>> final : public Element<IDX, A>... {
 
 
@@ -143,7 +143,7 @@ namespace Xf {
 			using Impl = TupleImpl<Seq>;
 
 			/* indexed type */
-			template <Size IDX>
+			template <size_type IDX>
 			using Indexed = Xf::PackType_t<IDX, A...>;
 
 
@@ -217,14 +217,14 @@ namespace Xf {
 			// -- P U B L I C  A C C E S S O R S ------------------------------
 
 			/* get tuple element */
-			template <Size IDX, class T = Indexed<IDX>>
+			template <size_type IDX, class T = Indexed<IDX>>
 			auto& get(void) {
 				// return a reference to the tuple element
 				return impl.Element<IDX, T>::value;
 			}
 
 			/* get constant tuple element */
-			template <Size IDX, class T = Indexed<IDX>>
+			template <size_type IDX, class T = Indexed<IDX>>
 			const auto& get(void) const {
 				// return a constant reference to the tuple element
 				return impl.Element<IDX, T>::value;
@@ -234,7 +234,7 @@ namespace Xf {
 
 
 
-			template <SizeT... IDX>
+			template <size_type... IDX>
 			void _iterate(Xf::IndexSeq<IDX...>) {
 				using namespace std;
 				((cout << impl.Element<IDX, A>::value << "\n"), ...);

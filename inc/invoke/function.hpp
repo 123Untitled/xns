@@ -43,7 +43,7 @@ namespace xns {
 			}
 
 			/* nullptr constructor */
-			function(Xf::Nullptr) noexcept
+			function(xns::null) noexcept
 			: _function{nullptr} {
 				// code here...
 			}

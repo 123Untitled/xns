@@ -54,7 +54,7 @@ void xns::file::content(void) {
 
 	_file.reserve(size);
 
-	if (_file.capacity() != (UInt64)size) {
+	if (_file.capacity() != (xns::size_t)size) {
 		std::cout << "RESERVE FAILED" << std::endl;
 		_state = false;
 		return;

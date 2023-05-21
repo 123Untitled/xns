@@ -24,7 +24,7 @@ namespace Xf {
 			using Value = T;
 
 			/* size type */
-			using Size = UInt64;
+			using Size = xns::size_t;
 
 			/* reference type */
 			using Reference = Value&;

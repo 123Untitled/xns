@@ -302,13 +302,13 @@ namespace xns {
 			// -- P U B L I C  B O O L E A N S  O P E R A T O R S -------------
 
 			/* boolean operator */
-			operator Bool(void) const noexcept {
+			operator bool(void) const noexcept {
 				// return pointer validity
 				return _data != nullptr;
 			}
 
 			/* not operator */
-			Bool operator!(void) const noexcept {
+			bool operator!(void) const noexcept {
 				// return pointer invalidity
 				return _data == nullptr;
 			}
@@ -317,25 +317,25 @@ namespace xns {
 			// -- P U B L I C  C O M P A R I S O N  O P E R A T O R S ---------
 
 			/* equality operator */
-			Bool operator==(const self& other) const noexcept {
+			bool operator==(const self& other) const noexcept {
 				// return pointer equality
 				return _data == other._data;
 			}
 
 			/* inequality operator */
-			Bool operator!=(const self& other) const noexcept {
+			bool operator!=(const self& other) const noexcept {
 				// return pointer inequality
 				return _data != other._data;
 			}
 
 			/* null equality operator */
-			Bool operator==(xns::null) const noexcept {
+			bool operator==(xns::null) const noexcept {
 				// return pointer invalidity
 				return _data == nullptr;
 			}
 
 			/* null inequality operator */
-			Bool operator!=(xns::null) const noexcept {
+			bool operator!=(xns::null) const noexcept {
 				// return pointer validity
 				return _data != nullptr;
 			}

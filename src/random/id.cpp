@@ -4,7 +4,7 @@ xns::id::string xns::id::generate(void) {
 
 	string id{};
 
-	UInt16 rnd;
+	xns::u16 rnd;
 
 	char_t buffer[4];
 

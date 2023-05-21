@@ -43,8 +43,8 @@ void Directory::simplify(String& path) {
 	std::list<String> lst;
 
 	String	directory;
-	UInt64	size = path.length();
-	for (UInt64 x = 0; x < size; x++) {
+	xns::size_t	size = path.length();
+	for (xns::size_t x = 0; x < size; x++) {
 		directory.clear();
 		while (x < size && path[x] != C_SLASH)
 			directory.push_back(path[x++]);
@@ -69,7 +69,7 @@ void Directory::deallocation(void) {
 }
 
 void Directory::clearDirectory(void) {
-	for (UInt64 x = 0; x < TYPE_N; x++)
+	for (xns::size_t x = 0; x < TYPE_N; x++)
 		_content[x].clear();
 }
 
@@ -150,9 +150,9 @@ const List<DirEntity>& Directory::getContent(const Typeindex type) const {
 	return (_content[type]);
 }
 
-UInt32 Directory::getFilesNumber(void) const {
-	UInt64 size = 0;
-	for (UInt64 x = 0; x < TYPE_N; x++)
+unsigned Directory::getFilesNumber(void) const {
+	unsigned long size = 0;
+	for (unsigned long x = 0; x < TYPE_N; x++)
 		size += _content[x].size();
 	return (size);
 }
@@ -193,7 +193,7 @@ const char* Directory::getNextFilePath(void) const {
 
 void tt() {
 	Typentity types[TYPE_N];
-	for (UInt64 x = 0; x < TYPE_N; x++) {
+	for (unsigned long x = 0; x < TYPE_N; x++) {
 		types[x]._label = _labels[x];
 		types[x]._size = sizeof(_labels[x]);
 		types[x]._index = static_cast<Typeindex>(x);
@@ -208,7 +208,7 @@ void tt() {
 	};
 }
 
-Typeindex Directory::getTypentity(const SInt32 type) {
+Typeindex Directory::getTypentity(const int type) {
 	switch (type) {
 		case DT_REG:		return (T_REG);
 		case DT_DIR:		return (T_DIR);

@@ -157,7 +157,7 @@ namespace Xf {
 
 
 			/* optional type */
-			using Optional = xns::unique_ptr<Size>;
+			using Optional = xns::unique_ptr<xns::size_t>;
 
 
 			// -- P R I V A T E  M E T H O D S --------------------------------
@@ -189,7 +189,7 @@ namespace Xf {
 			Optional _next;
 
 			/* mode index stack */
-			Xf::Stack<Size> _stack;
+			Xf::Stack<xns::size_t> _stack;
 			//Xf::Stack<Optional> _stack;
 
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------
@@ -219,7 +219,7 @@ namespace Xf {
 			Evntmode(void) = delete;
 
 			/* index constructor */
-			Evntmode(const Size idx);
+			Evntmode(const xns::size_t idx);
 
 			/* non-copyable */
 			NON_COPYABLE(Evntmode);
@@ -231,7 +231,7 @@ namespace Xf {
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
 			/* mode index */
-			Size _idx;
+			xns::size_t _idx;
 
 			/* state */
 			bool _state;
@@ -257,7 +257,7 @@ namespace Xf {
 			// -- A C C E S S O R S -------------------------------------------
 
 			/* get mode index */
-			inline Size idx(void) const { return _idx; }
+			inline xns::size_t idx(void) const { return _idx; }
 
 
 			// -- P U B L I C  M E T H O D S ----------------------------------

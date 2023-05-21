@@ -22,7 +22,7 @@ namespace Xf {
 
 	struct Esctype_def {
 
-		enum Type : UInt {
+		enum Type : xns::size_t {
 			/* move */
 			MOVE_HOME,
 			/* erase */
@@ -54,7 +54,7 @@ namespace Xf {
 			Type get(void) const { return value; }
 	};
 
-		enum Esctype : SizeT {
+		enum Esctype : xns::size_t {
 			/* move */
 			MOVE_HOME,
 			/* erase */
@@ -199,16 +199,16 @@ namespace Xf {
 		private:
 
 			/* move direction */
-			static xns::cstring _move_direction(TSize, const Char);
+			static xns::cstring _move_direction(TSize, const char);
 
 
 		public:
 
-			/* hex color */
-			static xns::cstring hex_color(const UInt32, const bool = true);
+			/* hex color */ // WARN, add hexcolor type to prototype
+			static xns::cstring hex_color(const int, const bool = true);
 
 			/* rgb color */
-			static xns::cstring rgb_color(UInt8, UInt8, UInt8, const bool = true);
+			static xns::cstring rgb_color(xns::u8, xns::u8, xns::u8, const bool = true);
 
 
 

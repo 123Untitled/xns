@@ -26,13 +26,13 @@ namespace Xf {
 			using Value = T;
 
 			/* tuple type */
-			using Tuple = Xf::Tuple<Value, Float>;
+			using Tuple = Xf::Tuple<Value, float>;
 
 			/* vector type */
 			using vector = xns::vector<Tuple>;
 
 			/* size type */
-			using size = typename vector::size;
+			using size_type = typename vector::size;
 
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
@@ -41,7 +41,7 @@ namespace Xf {
 			vector _data;
 
 			/* sum */
-			Float _sum;
+			float _sum;
 
 
 		public:
@@ -54,7 +54,7 @@ namespace Xf {
 			}
 
 			/* capacity constructor */
-			Probability(const Size size) {
+			Probability(const size_type size) {
 				_data.reserve(size);
 			}
 
@@ -62,7 +62,7 @@ namespace Xf {
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* push value */
-			void push(const Value& value, const Float prob) {
+			void push(const Value& value, const float prob) {
 				// push value and probability
 				_data.emplace_back(value, prob);
 				// update sum
@@ -70,7 +70,7 @@ namespace Xf {
 			}
 
 			/* move value */
-			void push(Value&& value, const Float prob) {
+			void push(Value&& value, const float prob) {
 				// move value and push probability
 				_data.emplace_back(xns::move(value), prob);
 				// update sum
@@ -78,11 +78,11 @@ namespace Xf {
 			}
 
 			/* pop value */
-			void pop(const Size index) {
+			void pop(const size_type index) {
 				// check index
 				if (index >= _data.size()) { return; }
 				// update sum
-				_sum -= _data[index].template get<Float>();
+				_sum -= _data[index].template get<float>();
 				// pop value
 				// _data.erase(index);
 			}
@@ -94,14 +94,14 @@ namespace Xf {
 				// set random seed
 				std::srand(std::time(NULL) / getpid());
 				// get random number
-				const Float random = std::rand() % (UInt32)_sum;
+				const float random = std::rand() % (size_type)_sum;
 				// get probability
-				Float prob = 0.0;
-				Size x = 0;
+				float prob = 0.0;
+				size_type x = 0;
 				// loop through data
-				for (Size s = _data.size(); x < s; ++x) {
+				for (size_type s = _data.size(); x < s; ++x) {
 					// add probability
-					prob += _data[x].template get<Float>();
+					prob += _data[x].template get<float>();
 					// check probability
 					if (prob >= random) { break; }
 				}
