@@ -8,7 +8,7 @@
 #include "types.hpp"
 #include "ascii.hpp"
 #include "macro.hpp"
-#include "buffer.hpp"
+#include "output.hpp"
 
 /* standard includes */
 #include <string>

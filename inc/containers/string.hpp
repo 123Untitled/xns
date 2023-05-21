@@ -34,7 +34,7 @@ namespace xns {
 	using cstring   = string<char>;
 
 	/* wide string type */
-	using WString   = string<wchar_t>;
+	using wstring   = string<wchar_t>;
 
 	/* utf-8 string type */
 	using string8   = string<char8_t>;
@@ -55,34 +55,34 @@ namespace xns {
 			// -- T Y P E S ---------------------------------------------------
 
 			/* character type */
-			using char_t = Xf::remove_cv_t<T>;
+			using char_t          = xns::remove_cv<T>;
 
 			/* self type */
-			using self = string<char_t>;
+			using self            = string<char_t>;
 
 			/* size type */
-			using size_type = UInt64;
+			using size_type       = UInt64;
 
 			/* comparison type */
-			using signed_type = SInt32;
+			using signed_type     = SInt32;
 
 			/* pointer type */
-			using mut_pointer = char_t*;
+			using mutable_pointer = char_t*;
 
 			/* reference type */
-			using reference = char_t&;
+			using reference       = char_t&;
 
 			/* move reference type */
-			using move_ref = char_t&&;
+			using move_reference  = char_t&&;
 
 			/* const reference type */
-			using const_ref = const char_t&;
+			using const_reference = const char_t&;
 
 			/* const pointer type */
-			using const_pointer = const char_t*;
+			using const_pointer   = const char_t*;
 
 			/* allocator type */
-			using allocator = Xf::Allocator<char_t>;
+			using allocator       = xns::allocator<char_t>;
 
 
 		private:
@@ -90,7 +90,7 @@ namespace xns {
 			// -- M E M B E R S -----------------------------------------------
 
 			/* pointer */
-			mut_pointer _str;
+			mutable_pointer _str;
 
 			/* capacity */
 			Size _capacity;
@@ -206,7 +206,7 @@ namespace xns {
 
 
 
-			// -- A S S I G N -----------------------------------------------------
+			// -- A S S I G N -------------------------------------------------
 
 			/* null-terminated string assignment */
 			string& assign(const_pointer str) {
@@ -223,7 +223,7 @@ namespace xns {
 				// check if capacity is sufficient
 				if (_capacity < size) {
 					// resize the string
-					mut_pointer tmp = _realloc(size);
+					mutable_pointer tmp = _realloc(size);
 					// check if reallocation failed
 					if (tmp == nullptr) { return *this; }
 					// update members
@@ -342,7 +342,7 @@ namespace xns {
 			}
 
 			/* const subscript operator */
-			const_ref operator[](const size_type index) const {
+			const_reference operator[](const size_type index) const {
 				return _str[index];
 			}
 
@@ -409,7 +409,7 @@ namespace xns {
 			}
 
 			/* pointer */
-			mut_pointer pointer(void) {
+			mutable_pointer pointer(void) {
 				return _str;
 			}
 
@@ -438,7 +438,7 @@ namespace xns {
 				// check if size is greater than capacity
 				if (requested > _capacity) {
 					// reallocate memory
-					mut_pointer new_str = allocator::realloc(_str, requested + 1);
+					mutable_pointer new_str = allocator::realloc(_str, requested + 1);
 					// check if reallocation failed
 					if (new_str == nullptr) { return; }
 					// set new pointer
@@ -457,7 +457,7 @@ namespace xns {
 				// check if there is enough space
 				if (count > available()) {
 					// resize the string
-					mut_pointer new_str = _realloc(_size + count);
+					mutable_pointer new_str = _realloc(_size + count);
 					// check if reallocation failed
 					if (new_str == nullptr) { return *this; }
 					// update data
@@ -496,7 +496,7 @@ namespace xns {
 				// check if there is enough space
 				if (size > available()) {
 					// resize the string
-					mut_pointer new_str = _realloc(_size + size);
+					mutable_pointer new_str = _realloc(_size + size);
 					// check if reallocation failed
 					if (new_str == nullptr) { return *this; }
 					// update data
@@ -524,7 +524,7 @@ namespace xns {
 				// minimum arguments needed
 				constexpr Size min = 2;
 				// check if all arguments are of type string
-				constexpr bool type = (Xf::IsSame_s<Xf::remove_reference_t<A>, string<char_t>>::value&& ...);
+				constexpr bool type = (Xf::IsSame_s<xns::remove_reference<A>, string<char_t>>::value&& ...);
 				// check if there are at least two arguments
 				constexpr bool required = sizeof...(A) >= min;
 				// return boolean
@@ -544,7 +544,7 @@ namespace xns {
 				// check if there is enough space
 				if (size > available()) {
 					// resize the string
-					mut_pointer new_str = _realloc(_size + size);
+					mutable_pointer new_str = _realloc(_size + size);
 					// check if reallocation failed
 					if (new_str == nullptr) { return *this; }
 					// update data
@@ -580,7 +580,7 @@ namespace xns {
 				// check if there is enough space
 				if (count > available()) {
 					// resize the string
-					mut_pointer new_str = _realloc(required);
+					mutable_pointer new_str = _realloc(required);
 					// check if reallocation failed
 					if (new_str == nullptr) { return *this; }
 					// update data
@@ -624,7 +624,7 @@ namespace xns {
 				// check if there is enough space
 				if (size > available()) {
 					// resize the string
-					mut_pointer new_str = _realloc(required);
+					mutable_pointer new_str = _realloc(required);
 					// check if reallocation failed
 					if (new_str == nullptr) { return *this; }
 					// update data
@@ -1085,7 +1085,7 @@ namespace xns {
 				_str[_size = size] = 0;
 			}
 
-			void _str_and_capacity(mut_pointer str, const Size capacity) {
+			void _str_and_capacity(mutable_pointer str, const Size capacity) {
 				// set capacity
 				_capacity = capacity;
 				// set pointer
@@ -1110,13 +1110,13 @@ namespace xns {
 			}
 
 			/* realloc */
-			mut_pointer _realloc(const Size requested) {
+			mutable_pointer _realloc(const Size requested) {
 				// reallocate memory
 				return allocator::realloc(_str, requested + 1);
 			}
 
 			/* allocate other */
-			mut_pointer _allocate(const Size capacity) const {
+			mutable_pointer _allocate(const Size capacity) const {
 				// check requested capacity
 				if (!capacity) { return nullptr; }
 				// allocate memory
@@ -1139,7 +1139,7 @@ namespace xns {
 
 
 			/* unsafe copy */
-			void _unsafe_copy(mut_pointer dst, const_pointer src, const Size size) {
+			void _unsafe_copy(mutable_pointer dst, const_pointer src, const Size size) {
 				// loop through source
 				for (Size x = 0; x < size; ++x) {
 					// copy character to dst
@@ -1148,7 +1148,7 @@ namespace xns {
 			}
 
 			/* unsafe fill */
-			void _unsafe_fill(mut_pointer dst, const char_t character, const Size size) {
+			void _unsafe_fill(mutable_pointer dst, const char_t character, const Size size) {
 				// loop through dst
 				for (Size x = 0; x < size; ++x) {
 					// set each character to character
@@ -1157,7 +1157,7 @@ namespace xns {
 			}
 
 			/* unsafe bzero */
-			void _unsafe_bzero(mut_pointer dst, const Size size) {
+			void _unsafe_bzero(mutable_pointer dst, const Size size) {
 				// loop through dst
 				for (Size x = 0; x < size; ++x) {
 					// set each character to null
@@ -1301,312 +1301,20 @@ namespace xns {
 	/* output stream operator */
 	template <Xf::is_char_c T>
 	std::ostream& operator<<(std::ostream& os, const string<T>& string) {
-		// check if string is null
-		if (string._str) {
-			// write string to os
-			os.write(string._str, string._size);
+
+		if constexpr (Xf::is_same<T, char>) {
+			// check if string is null
+			if (string._str) {
+				// write string to os
+				os.write(string._str, string._size);
+			}
+			else { os.write("nullptr", 7); }
+			return os;
 		}
-		else { os.write("nullptr", 7); }
+		os << "cannot output string of type: " << typeid(T).name();
 		return os;
 	}
 
-
-
-	// -- S T A T I C  T E X T  C L A S S -------------------------------------
-
-	/* forward declaration */
-	template <Xf::is_char_c T, typename xns::string<T>::size_type N>
-	class StaticText;
-
-	/* c-string ascii type */
-	template <typename xns::string<char>::size_type N>
-	using CText = StaticText<char, N>;
-
-	/* wide string type */
-	template <typename xns::string<wchar_t>::size_type N>
-	using WText = StaticText<wchar_t, N>;
-
-	/* utf-8 string type */
-	template <typename xns::string<char8_t>::size_type N>
-	using Text8 = StaticText<char8_t, N>;
-
-	/* utf-16 string type */
-	template <typename xns::string<char8_t>::size_type N>
-	using Text16 = StaticText<char16_t, N>;
-
-	/* utf-32 string type */
-	template <typename xns::string<char8_t>::size_type N>
-	using Text32 = StaticText<char32_t, N>;
-
-
-	// -- D E D U C T I O N  G U I D E S --------------------------------------
-
-	/* null terminated string deduction guide */
-	template <typename T>
-	StaticText(const T* s)
-		-> StaticText<T, sizeof(s) - 1>;
-
-	/* null terminated string deduction guide */
-	/*template <typename T, typename Xf::string<T>::Size N>
-	StaticText(const T (&)[N])
-		-> StaticText<T, N>;*/
-
-	/* buffer string deduction guide */
-	template <typename T, typename xns::string<T>::size_type N>
-	StaticText(const T (&)[N], typename xns::string<T>::size_type)
-		-> StaticText<T, N - 1>;
-
-
-
-	/* copy constructor deduction guide */
-	//template <typename T, typename Xf::string<T>::Size N>
-	//StaticText(const StaticText<T, N>&)
-		//-> StaticText<T, N>;
-
-	/* default constructor deduction guide */
-	//StaticText(void) -> StaticText<char, 3>;
-
-
-
-	/* static text class */
-	template <Xf::is_char_c T, typename xns::string<T>::size_type N>
-	class StaticText {
-
-		public:
-
-			// -- A L I A S E S -----------------------------------------------
-
-			/* character type */
-			using char_t         = Xf::remove_cv_t<T>;
-
-			/* size type */
-			using Size          = typename xns::string<char_t>::Size;
-
-			/* comparison type */
-			using Signed        = typename xns::string<char_t>::Signed;
-
-			/* pointer type */
-			using Pointer       = typename xns::string<char_t>::Pointer;
-
-			/* reference type */
-			using Reference     = typename xns::string<char_t>::Reference;
-
-			/* move reference type */
-			using MoveReference = typename xns::string<char_t>::MoveReference;
-
-			/* const reference type */
-			using ConstRef      = typename xns::string<char_t>::ConstRef;
-
-			/* const pointer type */
-			using ConstPointer  = typename xns::string<char_t>::ConstPointer;
-
-
-		private:
-
-			// -- M E M B E R S -----------------------------------------------
-
-			/* pointer */
-			char_t _str[N + 1];
-
-
-		public:
-
-			// -- C O N S T R U C T O R S -------------------------------------
-
-			/* default constructor */
-			consteval StaticText(void) noexcept {
-				// code here...
-				for (Size x = 0; x <= N; ++x) {
-					_str[x] = '\0';
-				}
-			}
-
-			/* null-terminated string constructor */ // INFO: this handle array
-			consteval StaticText(ConstPointer str) noexcept {
-
-				for (Size x = 0; x < N; ++x) {
-					_str[x] = str[x];
-				}
-				_str[N] = '\0';
-			}
-
-
-			/*
-			constexpr StaticText(const char_t str[N]) noexcept {
-
-				for (Size x = 0; x < N; ++x) {
-					_str[x] = str[x];
-				}
-				_str[N] = '\0';
-			}*/
-
-			/* buffer string constructor */
-			consteval StaticText(ConstPointer str, Size size) noexcept {
-
-				Size x = 0;
-				for (;x < size && x < N; ++x) {
-					_str[x] = str[x];
-				}
-				_str[x] = '\0';
-			}
-
-			/* fill constructor */
-			consteval StaticText(const char_t character, Size size) noexcept {
-
-				Size x = 0;
-				for (;x < size && x < N; ++x) {
-					_str[x] = character;
-				}
-				_str[x] = '\0';
-			}
-
-			/* copy constructor */
-			consteval StaticText(const StaticText& other) noexcept {
-
-				/*
-				for (Size x = 0; x < N; ++x) {
-					_str[x] = other._str[x];
-				}
-				_str[N] = '\0';
-				*/
-			}
-
-			/* move constructor */
-			consteval StaticText(StaticText&& other) noexcept {
-
-				/*
-				for (Size x = 0; x < N; ++x) {
-					_str[x] = other._str[x];
-				}
-				_str[N] = '\0';
-				*/
-			}
-
-
-			// -- S U B S C R I P T  O P E R A T O R S ------------------------
-
-			/* subscript operator */
-			consteval Reference operator[](const Size index) noexcept {
-				return _str[index];
-			}
-
-			/* const subscript operator */
-			consteval ConstRef operator[](const Size index) const noexcept {
-				return _str[index];
-			}
-
-
-			// -- A C C E S S O R S -------------------------------------------
-
-			/* empty */
-			consteval bool empty(void) const noexcept {
-				// return true if empty
-				return *_str == 0;
-			}
-
-			/* not empty */
-			consteval bool not_empty(void) const noexcept {
-				// return true if not empty
-				return *_str != 0;
-			}
-
-			/* length */
-			consteval Size length(void) const noexcept {
-				for (Size x = 0; x < N; ++x) {
-					if (_str[x] == '\0') {
-						return x;
-					}
-				} return N;
-			}
-
-			/* size */
-			consteval Size size(void) const noexcept {
-				// return size
-				return length();
-			}
-
-			/* capacity */
-			consteval Size capacity(void) const noexcept {
-				// return capacity
-				return N;
-			}
-
-			/* available */
-			consteval Size available(void) const noexcept {
-				// return available space
-				return N - length();
-			}
-
-			/* pointer */
-			consteval Pointer pointer(void) {
-				// return pointer to first element
-				return _str;
-			}
-
-			/* const pointer */
-			consteval ConstPointer pointer(void) const {
-				// return constant pointer to first element
-				return _str;
-			}
-
-
-			consteval void set_size(const Size size) noexcept {
-				if (size <= N) {
-					_str[size] = '\0';
-				}
-			}
-
-			consteval void reverse(void) noexcept {
-
-				Size x = 0;
-				Size y = length() - 1;
-
-				while (x < y) {
-					char_t temp = _str[x];
-					_str[x] = _str[y];
-					_str[y] = temp;
-					++x;
-					--y;
-				}
-			}
-
-			// -- S T A T I C  F U N C T I O N S ------------------------------
-
-
-
-
-	};
-
-	/* number to static text */
-	template <Xf::is_char_c C = char, Xf::integral_c T>
-	consteval auto to_text(const T number) {
-
-		// remove const and volatile
-		using Type = Xf::remove_cv_t<T>;
-
-		SizeT digits = xns::static_digits<Xf::Dec, Type>(number);
-
-		xns::StaticText<C, digits> text;
-
-		Type num = number;
-
-		SizeT x = 0;
-
-		do {
-			text[x] = number % 10 + '0';
-			number /= 10;
-			++x;
-		} while (number);
-
-		text.set_size(x);
-		text.reverse();
-
-		return text;
-	}
-
-	/* deduction guide */
-	//template <Xf::is_char_c C, Xf::integral_c T, T N>
-	//to_text(void) -> to_text<C, T, N>(void);
 
 
 	// -- S C R O L L A B L E  S T R I N G ------------------------------------
@@ -1865,10 +1573,6 @@ namespace xns {
 				}
 
 			}
-
-
-
-
 
 	};
 
