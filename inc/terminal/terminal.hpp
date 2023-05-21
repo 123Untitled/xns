@@ -19,9 +19,9 @@
 #include "event.hpp"
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
 
 	enum class VFlag : bool {
 		NON_BLOCKING = 0,
@@ -31,7 +31,7 @@ namespace Xf {
 
 	// -- T E R M  C L A S S --------------------------------------------------
 
-	class Term final {
+	class terminal final {
 
 		public:
 
@@ -44,19 +44,19 @@ namespace Xf {
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* non-assignable class */
-			NON_ASSIGNABLE(Term);
+			NON_ASSIGNABLE(terminal);
 
 			/* destructor */
-			~Term(void);
+			~terminal(void);
 
 
 			// -- M E T H O D S -----------------------------------------------
 
 			/* get singleton instance */
-			static Term& instance(void);
+			static terminal& instance(void);
 
 			/* set raw terminal */
-			static void raw_terminal(const VFlag vmin = Xf::VFlag::BLOCKING);
+			static void raw_terminal(const VFlag vmin = xns::VFlag::BLOCKING);
 
 			/* restore original terminal */
 			static void restore_terminal(void);
@@ -91,7 +91,7 @@ namespace Xf {
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* private default constructor */
-			Term(void);
+			terminal(void);
 
 
 			// -- M E T H O D S -----------------------------------------------
@@ -115,7 +115,7 @@ namespace Xf {
 			// -- M E M B E R S -----------------------------------------------
 
 			/* singleton instance */
-			static Term _instance;
+			static terminal _instance;
 
 			// raw terminal flag
 			bool _is_raw;

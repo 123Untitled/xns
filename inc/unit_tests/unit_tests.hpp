@@ -6,7 +6,7 @@
 #include <chrono>
 #include <climits>
 
-#include "xfunc.hpp"
+#include "xns.hpp"
 #include "testclass.hpp"
 
 #define START_UT(msg) std::cout << "STARTING UNIT TEST: \x1b[33m" << msg << "\x1b[0m" << std::endl;

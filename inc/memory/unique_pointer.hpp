@@ -7,84 +7,79 @@
 #include "is_same.hpp"
 
 
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-// -- N A M E S P A C E -------------------------------------------------------
-
-namespace Xf {
-
-	/* WeakPointer forward declaration */
-	//template <class T>
-	//class WeakPointer;
+namespace xns {
 
 
 	// -- U N I Q U E  P O I N T E R  C L A S S -------------------------------
 
 	template <class T>
-	class UniquePointer final {
+	class unique_ptr final {
 
 		public:
 
 			// -- P U B L I C  A L I A S E S ----------------------------------
 
 			/* value type */
-			using Value     = T;
+			using value_type      = T;
 
 			/* self type */
-			using Self      = UniquePointer<Value>;
+			using self            = unique_ptr<value_type>;
 
 			/* reference type */
-			using Reference = Value&;
+			using reference       = value_type&;
 
 			/* move reference type */
-			using MoveRef   = Value&&;
+			using move_reference  = value_type&&;
 
 			/* pointer type */
-			using Pointer   = Value*;
+			using mutable_pointer = value_type*;
 
 			/* const reference type */
-			using ConstRef  = const Value&;
+			using const_reference = const value_type&;
 
 			/* const pointer type */
-			using ConstPtr  = const Value*;
+			using const_pointer   = const value_type*;
 
 			/* allocator type */
-			using Allocator = Xf::Allocator<Value>;
+			using allocator       = xns::allocator<value_type>;
 
 
 			// -- F R I E N D S -----------------------------------------------
 
 			/* weak pointer as friend */
 			template <class>
-			friend class WeakPointer;
+			friend class weak_ptr;
 
 			/* derived types as friend */
 			template <class>
-			friend class UniquePointer;
+			friend class unique_ptr;
 
 			/* make unique pointer as friend */
 			template <class U, class... A>
-			friend UniquePointer<U> make_unique_pointer(A&&... args);
+			friend unique_ptr<U> make_unique_pointer(A&&... args);
 
 
 			// -- P U B L I C  C O N S T R U C T O R S ------------------------
 
 			/* default constructor */
-			UniquePointer(void) noexcept
+			unique_ptr(void) noexcept
 			: _data{nullptr} {
 				// code here...
 			}
 
 			/* nullptr constructor */
-			UniquePointer(Xf::Nullptr) noexcept
-			: UniquePointer{ } {
+			unique_ptr(xns::null) noexcept
+			: unique_ptr{ } {
 				// code here...
 			}
 
 			/* non-copyable class */
-			NON_COPYABLE(UniquePointer);
+			NON_COPYABLE(unique_ptr);
 
 			/* self move constructor */
-			UniquePointer(Self&& other) noexcept
+			unique_ptr(self&& other) noexcept
 			: _data(other._data) {
 				// invalidate other
 				other._data = nullptr;
@@ -92,20 +87,20 @@ namespace Xf {
 
 			/* derived move constructor */
 			template <class D> requires (Xf::is_base_of_c<T, D>)
-			UniquePointer(UniquePointer<D>&& other) noexcept
+			unique_ptr(unique_ptr<D>&& other) noexcept
 			: _data(other._data) {
 				// invalidate other
 				other._data = nullptr;
 			}
 
 			/* destructor */
-			~UniquePointer(void) {
+			~unique_ptr(void) {
 				// check pointer validity
 				if (_data != nullptr) {
 					// destroy object
-					Allocator::destroy(_data);
+					allocator::destroy(_data);
 					// deallocate memory
-					Allocator::deallocate(_data);
+					allocator::deallocate(_data);
 				}
 			}
 
@@ -113,7 +108,7 @@ namespace Xf {
 			// -- P U B L I C  A S S I G N M E N T ----------------------------
 
 			/* nullptr assignment */
-			Self& assign(Xf::Nullptr) {
+			self& assign(xns::null) {
 				// clean up
 				reset();
 				// return self reference
@@ -121,11 +116,11 @@ namespace Xf {
 			}
 
 			/* self move assignment */
-			Self& assign(Self&& other) {
+			self& assign(self&& other) {
 				// check for self assignment
 				if (this != &other) {
 					// deallocate memory
-					this->~UniquePointer();
+					this->~unique_ptr();
 					// initialize pointer
 					_data = other._data;
 					// invalidate other
@@ -136,11 +131,11 @@ namespace Xf {
 
 			/* derived move assignment */
 			template <class D> requires (Xf::is_base_of_c<T, D>)
-			Self& assign(UniquePointer<D>&& other) {
+			self& assign(unique_ptr<D>&& other) {
 				// check for self assignment
-				if (this != reinterpret_cast<Self*>(&other)) {
+				if (this != reinterpret_cast<self*>(&other)) {
 					// deallocate memory
-					this->~UniquePointer();
+					this->~unique_ptr();
 					// initialize pointer
 					_data = other._data;
 					// invalidate other
@@ -153,20 +148,20 @@ namespace Xf {
 			// -- P U B L I C  A S S I G N M E N T  O P E R A T O R S ---------
 
 			/* nullptr assignment operator */
-			Self& operator=(Xf::Nullptr) {
+			self& operator=(xns::null) {
 				// return nullptr assignment
 				return assign(nullptr);
 			}
 
 			/* self move assignment operator */
-			Self& operator=(Self&& other) {
+			self& operator=(self&& other) {
 				// return self move assignment
 				return assign(Xf::move(other));
 			}
 
 			/* derived move assignment operator */
 			template <class D> requires (Xf::is_base_of_c<T, D>)
-			Self& operator=(UniquePointer<D>&& other) {
+			self& operator=(unique_ptr<D>&& other) {
 				// return derived move assignment
 				return assign(Xf::move(other));
 			}
@@ -175,25 +170,25 @@ namespace Xf {
 			// -- P U B L I C  A C C E S S O R S  O P E R A T O R S -----------
 
 			/* dereference operator */
-			Reference operator*(void) {
+			reference operator*(void) {
 				// return reference
 				return *_data;
 			}
 
 			/* const dereference operator */
-			ConstRef operator*(void) const {
+			const_reference operator*(void) const {
 				// return const reference
 				return *_data;
 			}
 
 			/* arrow operator */
-			Pointer operator->(void) {
+			mutable_pointer operator->(void) {
 				// return pointer
 				return _data;
 			}
 
 			/* const arrow operator */
-			ConstPtr operator->(void) const {
+			const_pointer operator->(void) const {
 				// return const pointer
 				return _data;
 			}
@@ -217,25 +212,25 @@ namespace Xf {
 			// -- P U B L I C  C O M P A R I S O N  O P E R A T O R S ---------
 
 			/* equality operator */
-			bool operator==(const Self& other) const noexcept {
+			bool operator==(const self& other) const noexcept {
 				// return pointer equality
 				return _data == other._data;
 			}
 
 			/* inequality operator */
-			bool operator!=(const Self& other) const noexcept {
+			bool operator!=(const self& other) const noexcept {
 				// return pointer inequality
 				return _data != other._data;
 			}
 
 			/* nullptr equality operator */
-			bool operator==(Xf::Nullptr) const noexcept {
+			bool operator==(xns::null) const noexcept {
 				// return pointer invalidity
 				return _data == nullptr;
 			}
 
 			/* nullptr inequality operator */
-			bool operator!=(Xf::Nullptr) const noexcept {
+			bool operator!=(xns::null) const noexcept {
 				// return pointer validity
 				return _data != nullptr;
 			}
@@ -248,9 +243,9 @@ namespace Xf {
 				// check pointer validity
 				if (_data != nullptr) {
 					// destroy object
-					Allocator::destroy(_data);
+					allocator::destroy(_data);
 					// deallocate memory
-					Allocator::deallocate(_data);
+					allocator::deallocate(_data);
 					// invalidate pointer
 					_data = nullptr;
 				}
@@ -262,7 +257,7 @@ namespace Xf {
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
 			/* data */
-			Pointer _data;
+			mutable_pointer _data;
 
 
 	};
@@ -272,15 +267,15 @@ namespace Xf {
 
 	/* make unique pointer */
 	template <class T, class... A>
-	UniquePointer<T> make_unique_pointer(A&&... args) {
+	unique_ptr<T> make_unique_pointer(A&&... args) {
 		// instantiate unique pointer
-		UniquePointer<T> ptr;
+		unique_ptr<T> ptr;
 		// allocate memory
-		ptr._data = UniquePointer<T>::Allocator::allocate();
+		ptr._data = unique_ptr<T>::allocator::allocate();
 		// check allocation success
 		if (ptr._data) {
 			// construct object by forwarding arguments
-			UniquePointer<T>::Allocator::construct(ptr._data, Xf::forward<A>(args)...);
+			unique_ptr<T>::allocator::construct(ptr._data, Xf::forward<A>(args)...);
 		} // return instance
 		return ptr;
 	}

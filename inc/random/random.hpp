@@ -8,28 +8,27 @@
 #include "types.hpp"
 #include "macro.hpp"
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
 
 
 	// -- R A N D O M  C L A S S ----------------------------------------------
 
-	class Random final {
+	class random final {
 
 		public:
 
-			// -- P U B L I C  A L I A S E S ----------------------------------
+			// -- T Y P E S ---------------------------------------------------
 
 			/* size type */
-			using Size = SizeT;
+			using size_type = xns::size_t;
 
 
-			// -- P U B L I C  S T A T I C  M E M B E R S ---------------------
+			// -- S T A T I C  M E T H O D S ----------------------------------
 
 			/* random integer */
-			static Size random(const Size range);
-
+			static size_type random_gen(const size_type range);
 
 
 		private:
@@ -37,19 +36,19 @@ namespace Xf {
 			// -- P R I V A T E  C O N S T R U C T O R S ----------------------
 
 			/* default constructor */
-			Random(void);
+			random(void);
 
 			/* non-assignable class */
-			NON_ASSIGNABLE(Random);
+			NON_ASSIGNABLE(random);
 
 			/* destructor */
-			~Random(void);
+			~random(void);
 
 
 			// -- P R I V A T E  S T A T I C  M E M B E R S -------------------
 
 			/* instance */
-			static Random _instance;
+			static random _instance;
 
 
 	};

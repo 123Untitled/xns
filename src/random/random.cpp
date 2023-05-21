@@ -1,24 +1,21 @@
 #include "random.hpp"
 
-
 /* singleton instance */
-Xf::Random Xf::Random::_instance;
+xns::random xns::random::_instance = xns::random{};
 
 /* default constructor */
-Xf::Random::Random(void) {
+xns::random::random(void) {
 	// seed initialization
 	std::srand(std::time(NULL) / getpid());
 }
 
 /* destructor */
-Xf::Random::~Random(void) {
+xns::random::~random(void) {
 	// code here...
 }
 
 /* random integer */
-Xf::Random::Size Xf::Random::random(const Size range) {
-	// get instance
-	Random& instance = _instance;
-
+xns::random::size_type xns::random::random_gen(const size_type range) {
+	// return random integer
 	return !range ? 0 : std::rand() % range;
 }

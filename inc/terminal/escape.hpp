@@ -7,7 +7,7 @@
 
 #include "types.hpp"
 #include "color.hpp"
-#include "buffer.hpp"
+#include "output.hpp"
 #include "macro.hpp"
 #include "array.hpp"
 #include "string.hpp"
@@ -102,7 +102,7 @@ namespace Xf {
 			using ConstRef = const Value&;
 
 			/* array type */
-			using EscArray = Xf::Array<Value, IDX(Esctype::ESCTYPE_MAX)>;
+			using EscArray = xns::array<Value, IDX(Esctype::ESCTYPE_MAX)>;
 
 
 

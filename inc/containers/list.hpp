@@ -49,7 +49,7 @@ namespace Xf {
 			using ConstPointer = const Value*;
 
 			/* allocator type */
-			using Allocator = Xf::Allocator<Value>;
+			using Allocator = xns::allocator<Value>;
 
 
 			// -- C O N S T R U C T O R S -------------------------------------

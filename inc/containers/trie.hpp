@@ -35,7 +35,7 @@ namespace Xf {
 			using Self = Trie<Value>;
 
 			/* weak value type */
-			using WeakValue = Xf::WeakPointer<Value>;
+			using WeakValue = xns::weak_ptr<Value>;
 
 			/* size type */
 			using Size = SizeT;
@@ -63,16 +63,16 @@ namespace Xf {
 			// -- P R I V A T E  A L I A S E S --------------------------------
 
 			/* unique node type */
-			using UniqueNode = Xf::UniquePointer<Node>;
+			using UniqueNode = xns::unique_ptr<Node>;
 
 			/* lookup table type */
 			using Table = xns::array<UniqueNode, LOOKUP_SIZE>;
 
 			/* node pointer type */
-			using WeakNode = Xf::WeakPointer<Node>;
+			using WeakNode = xns::weak_ptr<Node>;
 
 			/* value pointer type */
-			using Shared = Xf::SharedPointer<Value>;
+			using Shared = xns::shared_ptr<Value>;
 
 
 
@@ -136,7 +136,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate default value
-				node->_value = Xf::make_shared_pointer<Value>();
+				node->_value = xns::make_shared_pointer<Value>();
 			}
 
 			/* copy insert */
@@ -144,7 +144,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate copied value
-				node->_value = Xf::make_shared_pointer<Value>(value);
+				node->_value = xns::make_shared_pointer<Value>(value);
 			}
 
 			/* move insert */
@@ -152,7 +152,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate moved value
-				node->_value = Xf::make_shared_pointer<Value>(Xf::move(value));
+				node->_value = xns::make_shared_pointer<Value>(Xf::move(value));
 			}
 
 			/* variadic insert */
@@ -161,7 +161,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate value
-				node->_value = Xf::make_shared_pointer<Value>(Xf::forward<A>(args)...);
+				node->_value = xns::make_shared_pointer<Value>(Xf::forward<A>(args)...);
 			}
 
 			/* derived default insert */
@@ -170,7 +170,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate default value
-				node->_value = Xf::make_shared_pointer<D>();
+				node->_value = xns::make_shared_pointer<D>();
 			}
 
 			/* derived copy insert */
@@ -179,7 +179,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate copied value
-				node->_value = Xf::make_shared_pointer<D>(value);
+				node->_value = xns::make_shared_pointer<D>(value);
 			}
 
 			/* derived move insert */
@@ -188,7 +188,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate moved value
-				node->_value = Xf::make_shared_pointer<D>(Xf::move(value));
+				node->_value = xns::make_shared_pointer<D>(Xf::move(value));
 			}
 
 			/* derived variadic insert */
@@ -197,7 +197,7 @@ namespace Xf {
 				// insert key
 				Node* node = _insert(key);
 				// allocate value
-				node->_value = Xf::make_shared_pointer<D>(Xf::forward<A>(args)...);
+				node->_value = xns::make_shared_pointer<D>(Xf::forward<A>(args)...);
 			}
 
 			using KeyVector = xns::vector<xns::cstring>;
@@ -207,7 +207,7 @@ namespace Xf {
 			template <class D, class... A> requires (Xf::is_base_of_c<T, D>)
 			void insert(const KeyVector& alias, A&&... args) {
 				// instanciate value
-				Shared value = Xf::make_shared_pointer<D>(Xf::forward<A>(args)...);
+				Shared value = xns::make_shared_pointer<D>(Xf::forward<A>(args)...);
 				// loop through alias
 				for (KeyVector::size x = 0; x < alias.length(); ++x) {
 					// insert key
@@ -221,7 +221,7 @@ namespace Xf {
 			template <class... A>
 			void insert(const KeyVector& alias, A&&... args) {
 				// instanciate value
-				Shared value = Xf::make_shared_pointer<Value>(Xf::forward<A>(args)...);
+				Shared value = xns::make_shared_pointer<Value>(Xf::forward<A>(args)...);
 				// loop through alias
 				for (KeyVector::size x = 0; x < alias.length(); ++x) {
 					// insert key
@@ -268,7 +268,7 @@ namespace Xf {
 					// check indexed node validity
 					if (node->_table.at(index) == nullptr) {
 						// make new node
-						node->_table.at(index) = Xf::make_unique_pointer<Node>();
+						node->_table.at(index) = xns::make_unique_pointer<Node>();
 					} // move to node
 					node = &(*node->_table.at(index));
 				} // return node

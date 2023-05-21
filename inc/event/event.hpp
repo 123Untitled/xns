@@ -146,7 +146,7 @@ namespace Xf {
 			using EventVector = xns::vector<xns::poly_method<void(void)>>;
 
 			/* event array type */
-			using EventArray = Array<EventVector, IDX(Evntype::EVNT_MAX)>;
+			using EventArray = xns::array<EventVector, IDX(Evntype::EVNT_MAX)>;
 
 
 			/* mode type */

@@ -7,65 +7,73 @@
 #include "forward.hpp"
 #include "move.hpp"
 #include <cstdlib>
+#include "numeric_limits.hpp"
+#include "policy.hpp"
 
-// -- N A M E S P A C E -------------------------------------------------------
 
-namespace Xf {
+
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
 
 
 	// -- A L L O C A T O R  C L A S S ----------------------------------------
 
-	template <typename T>
-	class Allocator final {
+	template <class T>
+	class allocator final {
 
 		public:
 
-			// -- A L I A S E S -----------------------------------------------
+			// -- T Y P E S ---------------------------------------------------
 
 			/* value type */
-			using Value = T;
+			using value_type      = T;
+
+			/* self type */
+			using self            = allocator<value_type>;
 
 			/* size type */
-			using Size = UInt64;
+			using size_type       = xns::size_t;
 
 			/* reference type */
-			using Reference = T&;
+			using reference       = T&;
 
 			/* const reference type */
-			using ConstReference = const T&;
+			using const_reference = const T&;
 
 			/* move reference type */
-			using MoveReference = T&&;
+			using move_reference  = T&&;
 
 			/* pointer type */
-			using Pointer = T*;
+			using mutable_pointer = T*;
 
 			/* const pointer type */
-			using ConstPointer = const T*;
+			using const_pointer   = const T*;
 
 
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* non-instantiable class */
-			NON_INSTANCIABLE(Allocator);
+			NON_INSTANCIABLE(allocator);
+
 
 
 			// -- A L L O C A T I O N -----------------------------------------
 
 			/* allocate */
-			static Pointer allocate(const Size size = 1) {
+			static mutable_pointer allocate(const size_type size = 1) {
 				// allocate memory
-				return static_cast<Pointer>(std::malloc(size * sizeof(Value)));
+				return static_cast<mutable_pointer>(std::malloc(size * sizeof(value_type)));
 			}
 
 			/* realloc */
-			static Pointer realloc(Pointer addrs, const Size size = 1) {
+			static mutable_pointer realloc(mutable_pointer addrs, const size_type size = 1) {
 				// reallocate memory
-				return static_cast<Pointer>(std::realloc(addrs, size * sizeof(Value)));
+				return static_cast<mutable_pointer>(std::realloc(addrs, size * sizeof(value_type)));
 			}
 
 			/* deallocate */
-			static void deallocate(Pointer pointer) {
+			static void deallocate(mutable_pointer pointer) {
 				// deallocate memory
 				std::free(pointer);
 			}
@@ -74,56 +82,65 @@ namespace Xf {
 			// -- A C C E S S O R S -------------------------------------------
 
 			/* address */
-			static Pointer address(Reference value) {
+			static mutable_pointer address(reference value) {
 				// return address
 				return &value;
 			}
 
 			/* const address */
-			static ConstPointer address(ConstReference value) {
-				// return address
+			static const_pointer address(const_reference value) {
+				// return constant address
 				return &value;
 			}
 
 			/* max size */
-			static Size max_size(void) {
+			inline static consteval size_type max_size(void) {
 				// return max size
-				return std::numeric_limits<Size>::max() / sizeof(Value);
+				return xns::max<size_type>() / sizeof(value_type);
 			}
 
 
 			// -- C O N S T R U C T -------------------------------------------
 
 			/* copy construct */
-			static void construct(Pointer addrs, ConstReference value) {
+			static void construct(mutable_pointer addrs, const_reference value) {
+
+				static_assert(xns::is_copy_constructible<value_type>,
+						"TYPE IS NOT COPY CONSTRUCTIBLE");
+
 				// construct object by copy
-				new(addrs) Value{value};
+				new(addrs) value_type{value};
 			}
 
 			/* move construct */
-			static void construct(Pointer addrs, MoveReference value) {
+			static void construct(mutable_pointer addrs, move_reference value) {
+
+				static_assert(xns::is_move_constructible<value_type>,
+						"TYPE IS NOT MOVE CONSTRUCTIBLE");
+
 				// construct object by move
-				new(addrs) Value{Xf::move(value)};
+				new(addrs) value_type{Xf::move(value)};
 			}
 
 			/* forward construct */
-			template <typename... Args>
-			static void construct(Pointer addrs, Args&&... args) {
+			template <class... A>
+			static void construct(mutable_pointer addrs, A&&... args) {
+
+				static_assert(xns::is_constructible<value_type, A...>,
+						"TYPE IS NOT CONSTRUCTIBLE");
+
 				// construct object by forwarding arguments
-				new(addrs) Value{Xf::forward<Args>(args)...};
+				new(addrs) value_type{Xf::forward<A>(args)...};
 			}
 
 
 			// -- D E S T R U C T ---------------------------------------------
 
 			/* destroy */
-			static void destroy(Pointer addrs) {
+			static void destroy(mutable_pointer addrs) {
 				// call object destructor
-				addrs->~Value();
+				addrs->~value_type();
 			}
-
-
-
 
 	};
 

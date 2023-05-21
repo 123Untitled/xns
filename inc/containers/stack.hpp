@@ -54,7 +54,7 @@ namespace Xf {
 			using NodePointer = Node*;
 
 			/* allocator type */
-			using Allocator = Xf::Allocator<Xf::Stack<T>::Node>;
+			using Allocator = xns::allocator<Xf::Stack<T>::Node>;
 
 
 		public:

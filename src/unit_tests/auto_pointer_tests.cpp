@@ -2,7 +2,7 @@
 #include "unit_tests.hpp"
 
 template <class T>
-using AutoP = Xf::UniquePointer<T>;
+using AutoP = xns::unique_ptr<T>;
 
 #define OWN Xf
 #define own Xf
@@ -12,7 +12,7 @@ void f(...) {}
 
 void UT::unique_pointer_ut(void) {
 
-	using namespace Xf;
+	using namespace xns;
 	/*
 	bool d = Xf::is_derived_from_v<Class<int, float, char>, Base<int>>;
 	bool b = Xf::is_base_of_v<Base<int>, Class<int, float, char>>;
@@ -33,23 +33,23 @@ void UT::unique_pointer_ut(void) {
 
 	//AutoP<B> p3{Xf::move(p1)};
 
-	AutoP<Derived> p1 = make_unique_pointer<Derived>(123, 99.9f, 'X');
+	AutoP<Derived> p1 = xns::make_unique_pointer<Derived>(123, 99.9f, 'X');
 	if (!p1) {
 		std::cout << "null" << std::endl;
 	}
 
 	AutoP<Base> p3;
 
-	Xf::UniquePointer<Derived> p2;
+	xns::unique_ptr<Derived> p2;
 
 
 
 
-	own::UniquePointer<int> ptr_int = own::make_unique_pointer<int>(123);
+	xns::unique_ptr<int> ptr_int = xns::make_unique_pointer<int>(123);
 
-	xns::vector<own::UniquePointer<int>> vec;
+	xns::vector<xns::unique_ptr<int>> vec;
 
-	vec.push_back(Xf::make_unique_pointer<int>(123));
+	vec.push_back(xns::make_unique_pointer<int>(123));
 
 	//Xf::AutoPointer<void> v{};
 

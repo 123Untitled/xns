@@ -7,7 +7,7 @@
 #include "array.hpp"
 #include "string.hpp"
 #include "escape.hpp"
-#include "buffer.hpp"
+#include "output.hpp"
 
 #include <unistd.h>
 

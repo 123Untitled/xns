@@ -58,7 +58,7 @@
 /* terminal */
 #include "terminal.hpp"
 #include "escape.hpp"
-#include "buffer.hpp"
+#include "output.hpp"
 
 
 #include "exec.hpp"

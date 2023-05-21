@@ -45,7 +45,13 @@ namespace Xf {
 	// false type
 	using false_t = integral_constant<bool, false>;
 
+}
 
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
+	using false_t = Xf::false_t;
+	using true_t  = Xf::true_t;
 }
 
 #endif
