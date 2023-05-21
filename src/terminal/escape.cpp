@@ -152,25 +152,25 @@ const xns::cstring& Xf::Escape::cursor_block(void) {
 
 
 /* move left */
-xns::cstring Xf::Escape::move_left(const TSize cells) {
+xns::cstring Xf::Escape::move_left(const xns::term_size cells) {
 	// return escape sequence
 	return _move_direction(cells, 'D');
 }
 
 /* move right */
-xns::cstring Xf::Escape::move_right(const TSize cells) {
+xns::cstring Xf::Escape::move_right(const xns::term_size cells) {
 	// return escape sequence
 	return _move_direction(cells, 'C');
 }
 
 /* move up */
-xns::cstring Xf::Escape::move_up(const TSize cells) {
+xns::cstring Xf::Escape::move_up(const xns::term_size cells) {
 	// return escape sequence
 	return _move_direction(cells, 'A');
 }
 
 /* move down */
-xns::cstring Xf::Escape::move_down(const TSize cells) {
+xns::cstring Xf::Escape::move_down(const xns::term_size cells) {
 	// return escape sequence
 	return _move_direction(cells, 'B');
 }
@@ -191,9 +191,9 @@ xns::cstring Xf::Escape::move_down(const TSize cells) {
 #define BACKGROUND				false
 
 
-bool Xf::Escape::request_position(TSize& x, TSize& y) {
+bool Xf::Escape::request_position(xns::term_size& x, xns::term_size& y) {
 
-	TSize* num     = &y;
+	xns::term_size* num     = &y;
 	bool    bracket = false;
 	char    c       = 0;
 
@@ -228,13 +228,13 @@ bool Xf::Escape::request_position(TSize& x, TSize& y) {
 
 
 /* get move position */
-xns::cstring Xf::Escape::move_position(TSize x, TSize y) {
+xns::cstring Xf::Escape::move_position(xns::term_size x, xns::term_size y) {
 	// ESC[{line};{column}H
 
 	char  escape[ESCAPE_BUFFER_SIZE];
 	xns::size_t ite;
 
-	constexpr const xns::size_t max = xns::max<TSize>();
+	constexpr const xns::size_t max = xns::max<xns::term_size>();
 
 	x += (x != max);
 	y += (y != max);
@@ -265,11 +265,11 @@ xns::cstring Xf::Escape::move_position(TSize x, TSize y) {
 
 
 /* move direction */
-xns::cstring Xf::Escape::_move_direction(TSize cells, const char dir) {
+xns::cstring Xf::Escape::_move_direction(xns::term_size cells, const char dir) {
 	// static returned string
 	//static Xf::CString escape;
 	// compile time buffer size
-	constexpr const xns::size_t size = 3 + xns::max_digits<TSize>();
+	constexpr const xns::size_t size = 3 + xns::max_digits<xns::term_size>();
 
 	// buffer
 	xns::cstring::char_t buffer[size];
@@ -299,14 +299,14 @@ xns::cstring Xf::Escape::_move_direction(TSize cells, const char dir) {
 
 
 /* move x position */
-const xns::cstring& Xf::Escape::move_x(TSize x) {
+const xns::cstring& Xf::Escape::move_x(xns::term_size x) {
 
 	// static returned string
 	static xns::cstring escape;
 
 	// compile time buffer size
 	constexpr const xns::size_t size = sizeof("\x1b[G")
-								+ xns::max_digits<TSize>();
+								+ xns::max_digits<xns::term_size>();
 	// buffer
 	xns::cstring::char_t buffer[size];
 
@@ -314,7 +314,7 @@ const xns::cstring& Xf::Escape::move_x(TSize x) {
 	xns::size_t i = size - 1;
 
 	// increment x if not max
-	x += (x != xns::max<TSize>());
+	x += (x != xns::max<xns::term_size>());
 
 	// last character
 	buffer[i] = 'G';
