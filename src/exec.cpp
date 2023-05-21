@@ -22,7 +22,7 @@ Exec::List<Exec::String> Exec::setupPaths(void) {
 	// check paths ptr
 	if (paths) {
 		// iterate over characters
-		for (UInt64 x = 0, len = 0; paths[x]; x += len) {
+		for (xns::size_t x = 0, len = 0; paths[x]; x += len) {
 			// skip delimiter ':'
 			while (paths[x] == DELIMITER) x++;
 			// initialize path len
@@ -68,8 +68,8 @@ void Exec::getExecPath(const char* exec) {
 
 void Exec::simpleExecution(const char** args, char** env) {
 
-	SInt32 state = 0;
-	SInt32 child = fork();
+	int state = 0;
+	int child = fork();
 
 	if (!child) {
 		execve(_execPath, const_cast<char*const*>(args), env);
@@ -83,11 +83,11 @@ void Exec::simpleExecution(const char** args, char** env) {
 
 const char* Exec::execution(const char** args) {
 
-	SInt32 stdinput = dup(STDIN_FILENO);
-	SInt32 state = 0;
-	SInt32 tube[2];
+	int stdinput = dup(STDIN_FILENO);
+	int state = 0;
+	int tube[2];
 	pipe(tube);
-	SInt32 child = fork();
+	int child = fork();
 	if (!child) {
 		dup2(tube[1], STDOUT_FILENO);
 		close(tube[0]);
@@ -113,7 +113,7 @@ const char* Exec::execution(const char** args) {
 const char* Exec::readOutput(void) {
 	static char		buff[1024];
 	static String	output;
-	static SInt64	readed;
+	static long	readed;
 
 	output.clear();
 	while ((readed = read(0, buff, 1024)) > 0)
