@@ -1,6 +1,6 @@
 
 # ignore executables
-xfunc
+xnsexec
 
 # ignore build directory
 _bld/
