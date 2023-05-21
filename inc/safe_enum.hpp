@@ -143,14 +143,5 @@ namespace xns {
 
 }
 
-struct color_def {
-	using type = UInt;
-	enum enum_type : type {
-		BLACK, RED, GREEN, MAX
-	};
-};
-
-
-
 
 #endif
