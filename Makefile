@@ -258,7 +258,6 @@ obj:
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp Makefile | $(OBJHIR) $(DEPHIR) $(JSNHIR)
 	echo $(ERASE)Compilation$(RESET) $<;
 	$(CCX) $(STD) $(OPT) $(CXXFLAGS) $(CMPFLAGS) $(DEPFLAGS) $(INCLUDES) -c $< -o $@
-	echo $< >> make.log;
 
 
 # -- C O M P I L E  C O M M A N D S -------------------------------------------
