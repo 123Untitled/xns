@@ -175,31 +175,31 @@ namespace Xf {
 			// -- S P E C I A L  E S C A P E  S E Q U E N C E S ---------------
 
 			/* request position */
-			static bool request_position(TSize&, TSize&);
+			static bool request_position(xns::term_size&, xns::term_size&);
 
 
 			/* move position */
-			static xns::cstring move_position(TSize, TSize);
+			static xns::cstring move_position(xns::term_size, xns::term_size);
 
 			/* move x position */
-			static const xns::cstring& move_x(TSize);
+			static const xns::cstring& move_x(xns::term_size);
 
 			/* move left */
-			static xns::cstring move_left(const TSize = 1);
+			static xns::cstring move_left(const xns::term_size = 1);
 
 			/* move right */
-			static xns::cstring move_right(const TSize = 1);
+			static xns::cstring move_right(const xns::term_size = 1);
 
 			/* move up */
-			static xns::cstring move_up(const TSize = 1);
+			static xns::cstring move_up(const xns::term_size = 1);
 
 			/* move down */
-			static xns::cstring move_down(const TSize = 1);
+			static xns::cstring move_down(const xns::term_size = 1);
 
 		private:
 
 			/* move direction */
-			static xns::cstring _move_direction(TSize, const char);
+			static xns::cstring _move_direction(xns::term_size, const char);
 
 
 		public:
