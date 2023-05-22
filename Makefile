@@ -55,6 +55,8 @@ override MAKEFLAGS += --warn-undefined-variables --no-builtin-rules
 
 # -- O P E R A T I N G  S Y S T E M -------------------------------------------
 
+
+
 # Detect operating system
 override OS := $(shell uname -s)
 
@@ -173,6 +175,12 @@ CMPFLAGS = -MJ $(JSNDIR)/$*.json
 # include flags
 INCLUDES := $(addprefix -I,$(HDRDIR))
 
+DEF ?=
+
+DEFINES := $(addprefix -D,$(DEF))
+
+
+
 
 
 # pattern substitution for object files
@@ -202,18 +210,29 @@ override RESET := "\x1b[0m"
 override GREP := grep --color=auto '^\w\+'
 
 
+# -- B U I L D  M O D E -------------------------------------------------------
+
+# build mode
+override MODE ?= debug
+
+
 # -- P H O N Y  T A R G E T S -------------------------------------------------
 
 # phony targets
-.PHONY: all clean fclean re ascii obj exec lib dynamic static
+.PHONY: all clean fclean re ascii obj exec lib dynamic static debug development change
 
-COUNT = 0
 
 # -- M A I N  T A R G E T S ---------------------------------------------------
 
-all:
-	$(MAKE) --silent ascii exec
+all: development
 	echo $(COLOR)'🚀'$(RESET) "All targets are up to date !";
+
+development:
+	$(MAKE) --silent ascii exec
+
+debug:
+	$(MAKE) --silent ascii exec DEF='XNS_UT META_UT'
+
 
 # executable target
 exec:		obj $(EXEC) $(COMPILE_COMMANDS)
@@ -257,7 +276,7 @@ obj:
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp Makefile | $(OBJHIR) $(DEPHIR) $(JSNHIR)
 	echo $(ERASE)Compilation$(RESET) $<;
-	$(CCX) $(STD) $(OPT) $(CXXFLAGS) $(CMPFLAGS) $(DEPFLAGS) $(INCLUDES) -c $< -o $@
+	$(CCX) $(STD) $(OPT) $(CXXFLAGS) $(DEFINES) $(CMPFLAGS) $(DEPFLAGS) $(INCLUDES) -c $< -o $@
 
 
 # -- C O M P I L E  C O M M A N D S -------------------------------------------
@@ -287,6 +306,16 @@ fclean: clean
 # -- R E C O M P I L E --------------------------------------------------------
 
 re: fclean all
+
+
+# -- C H A N G E  T A R G E T -------------------------------------------------
+
+# rule to change the build mode (debug, development, release)
+# usage: make change MODE=release
+# use sed to change the line in the Makefile (all: debug, development, release)
+
+change:
+	sed -i 's/all:.*$$/all: $(MODE)/' Makefile
 
 
 # -- A S C I I  A R T ---------------------------------------------------------
