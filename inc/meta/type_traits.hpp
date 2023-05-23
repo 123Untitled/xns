@@ -15,6 +15,8 @@
 
 #include "is_same.hpp"
 #include "is_void.hpp"
+#include "is_null.hpp"
+#include "is_array.hpp"
 #include "is_char.hpp"
 #include "is_signed.hpp"
 #include "is_integral.hpp"
