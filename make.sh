@@ -1,44 +1,48 @@
 #!/bin/zsh
 
 # This script is used to compile the project.
-# Makefile forever, but not really lol.
+# Makefile forever, but $not really lol.
 
 
 
 # -- C O L O R  S E T T I N G S -----------------------------------------------
 
+# escape
+esc='\x1b'
+
 # main color
-color='\x1b[32m'
-color2='\x1b[33m'
-error='\x1b[31m'
-reset='\x1b[0m'
-erase='\x1b[1F\x1b[0J'
+color=$esc'[32m'
+C1=$esc'[32m'
+color2=$esc'[33m'
+error=$esc'[31m'
+reset=$esc'[0m'
+R=$esc'[0m'
+erase=$esc'[1F'$esc'[0J'
 
 
-# -- S C R I P T  S E T T I N G S ---------------------------------------------
-
-# get make.sh absolute path
-abspath=$(cd $(dirname $0); pwd -P) # maybe -P is not wanted !!!
-
-# script name
-this=$(basename $0)
+yes=0
+no=1
 
 
-echo 'abspath: >'$abspath
-echo 'this: >'$this
+# -- S C R I P T  P A T H  S E T T I N G S ------------------------------------
 
-# -- B A N N E R --------------------------------------------------------------
+# get absolute directory of script
+abspath=$(cd ${0%/*}; pwd)
 
-echo $color;
-echo		"   ▁▁▁▁▁▁▁▁  ▁▁▁▁▁▁▁▁  ▁▁▁▁ ▁▁▁  ▁▁▁▁▁▁▁▁ ";
-echo		"  ╱        ╲╱        ╲╱    ╱   ╲╱        ╲";
-echo		" ╱         ╱         ╱         ╱         ╱";
-echo		"╱         ╱         ╱        ▁╱       ▁▁╱ ";
-echo		"╲▁▁╱▁▁╱▁▁╱╲▁▁▁╱▁▁▁▁╱╲▁▁▁▁╱▁▁▁╱╲▁▁▁▁▁▁▁▁╱\n";
-echo $color"$this"$reset 'launching\n';
+# get dirname of script
+rootname=${abspath##*/}
+
+# get absolute path of script
+script=$abspath/${0##*/}
+
+# basename of the script without using basename command
+scriptname=${0##*/}
 
 
-#exit 0
+
+
+
+
 
 # -- O P E R A T I N G  S Y S T E M -------------------------------------------
 
@@ -64,30 +68,42 @@ function check_os {
 
 check_os
 
-
-
-# required programs
-required_commands=('clang++', 'mkdir', 'rm', 'find', 'basename', 'dirname', 'cd', 'pwd', 'jq', 'sed', 'cat', 'bat', 'vared')
-
-# check if all required commands are installed
-function check_command {
-	if ! [[ -x "$(command -v $1)" ]]; then
-		echo $color$1$reset "is not installed."
-		exit 1;
-	else
-		echo $color$1$reset "is installed."
-	fi
+function goodby {
+	echo $error'Aborded.'$reset
+	exit 1
 }
 
 
-# check if bat is installed
-if [[ -x "$(command -v bat)" ]]; then
-	# bat is installed
-	visualizer='bat'
-else
-	# bat is not installed
-	visualizer='cat'
-fi
+# check if all required commands are installed
+function cmd_exists {
+	[[ -n $(command -v $1) ]] && return $yes || return $no
+}
+
+
+function required {
+	# required programs
+	local commands=('clang++'
+					'ar'
+					'mkdir'
+					'rm'
+					'cd'
+					'pwd'
+					'sed'
+					'cat'
+					'bat'
+					'vared')
+	# loop through all required commands
+	for cmd in $commands; do
+		if ! cmd_exists $cmd; then
+			echo $error'Error:'$reset 'required program' \
+					$color$cmd$reset 'is not installed.'
+			exit 1
+		fi
+	done
+	return $yes
+}
+
+
 
 
 
@@ -114,7 +130,7 @@ if [[ -z $BUILD_MODE ]]; then
 	echo '\n🥕 Set a build mode in' $color'.env'$reset 'file [active, debug, release]'
 
 	while (true); do
-		vared -p '   change it now: ' -c build_mode;
+		vared -c  -p '   change it now: ' -c build_mode;
 		if [[ $build_mode == 'active' || $build_mode == 'debug' || $build_mode == 'release' ]]; then
 			break;
 		else
@@ -134,14 +150,8 @@ fi
 # source directory
 srcdir=$abspath/'src'
 
-# check if srcdir exists
-[[ -d $srcdir ]] || echo No $color'src'$reset directory found. || exit 1
-
 # include directory
 incdir=$abspath/'inc'
-
-# check if incdir exists
-[[ -d $incdir ]] || echo No $color'inc'$reset directory found. || exit 1
 
 # build directory
 blddir=$abspath/'_bld'
@@ -159,23 +169,37 @@ jsndir=$blddir/'_jsn'
 cachedir=$abspath/'.cache'
 
 
+# check if srcdir exists
+if [[ ! -d $srcdir ]]; then
+	echo 'No' $C1$rootname'/'${srcdir##*/}$R 'directory found.';
+	exit 1
+fi
+
+# check if incdir exists
+if [[ ! -d $incdir ]]; then
+	echo 'No' $C1$rootname'/'${incdir##*/}$R 'directory found.';
+	exit 1
+fi
+
 
 
 # -- S O U R C E  F I L E S ---------------------------------------------------
 
 
 # get source files
-src=($(find $srcdir -type f -name '*.cpp'))
+src=($srcdir/**/*.'cpp'(.N))
 
 # check for any source file ?
 if [[ ${#src[@]} -eq 0 ]]; then
-	echo 'No source files found in'\
-		$color$(basename $srcdir)$reset 'directory.'
+	# get base name of srcdir + parent directory
+	local folder=$rootname/${srcdir##*/}
+	echo 'No source files found in' $color$folder$reset 'directory.'
 	exit 1
 fi
 
+
 # get all directories hierarchy in incdir
-inc=($(find $incdir -type d))
+inc=($incdir/**/*(/N) $incdir)
 
 # insert -I prefix to each directory
 inc=("${inc[@]/#/-I}")
@@ -193,9 +217,6 @@ obj=()
 
 # json array
 jsn=()
-
-yes=0
-no=1
 
 
 # -- T A R G E T S ------------------------------------------------------------
@@ -222,7 +243,8 @@ logfile=$abspath/'compile.log'
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-cxx='g++'
+#cxx='clang++'
+cxx='/opt/homebrew/Cellar/llvm/16.0.4/bin/clang++'
 
 # archiver
 archiver='ar'
@@ -261,13 +283,23 @@ defines=()
 ldflags=''
 
 
+# memory checker
+memcheck='valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes'
+
+# memory checker flags
+memflags=''
+
+
 
 
 # -- I M P L E M E N T A T I O N ----------------------------------------------
 
 function descript {
-	local cible=$(basename $1)
-	file $cible | grep --color=always $cible
+	local cible=$1
+	local resume=$(file $cible)
+
+	local regex='.*: (.*)'
+	[[ $resume =~ $regex ]] && echo $color'[+]'$reset ${cible##*/} '|' ${match[1]}
 }
 
 
@@ -321,12 +353,12 @@ function make_compdb {
 
 function get_objects {
 	# get all object files
-	obj=($(find $objdir -type f -name '*.o'))
+	obj=($objdir/**/*.'o'(.N))
 }
 
 function get_jsons {
 	# get all json files
-	jsn=($(find $jsndir -type f -name '*.json'))
+	jsn=($jsndir/**/*.'json'(.N))
 }
 
 
@@ -336,21 +368,21 @@ function is_missing {
 	# get target file
 	local file=$1
 	# file exists ?
-	[[ ! -e $file ]] && return yes || return no
+	[[ ! -e $file ]] && return $yes || return $no
 }
 
 function dir_exists {
 	# get target directory
 	local dir=$1
 	# directory exists ?
-	[[ -d $dir ]] && return yes || return no
+	[[ -d $dir ]] && return $yes || return $no
 }
 
 function is_there_any_files {
 	# get all arguments
 	local files=($@)
 	# is there any files ?
-	[[ ${#files[@]} -gt 0 ]] && return yes || return no
+	[[ ${#files[@]} -gt 0 ]] && return $yes || return $no
 }
 
 
@@ -362,9 +394,9 @@ function is_link_required {
 	# loop over object files
 	for file in $required; do
 		# check if this script is modified
-		[[ $file -nt $target ]] && return yes
+		[[ $file -nt $target ]] && return $yes
 	done
-	return no
+	return $no
 
 }
 
@@ -376,8 +408,8 @@ function check_dependency {
 	local obj=$1
 	local dep=$2
 	# check if object or dependency file is missing
-	if is_missing $dep && return yes
-	if is_missing $obj && return yes
+	if is_missing $dep && return $yes
+	if is_missing $obj && return $yes
 	# get file content
 	local content=$(<$dep)
 	# split content into array
@@ -387,10 +419,10 @@ function check_dependency {
 		# ignore '\' and file name ending with ':'
 		if ! [[ $x == "\\" ]] && ! [[ $x == *":" ]]; then
 			# check if dependency is modified
-			[[ $x -nt $obj ]] && return yes
+			[[ $x -nt $obj ]] && return $yes
 		fi
 	done
-	return no
+	return $no
 }
 
 
@@ -401,7 +433,7 @@ function make_compile {
 	local  dep=$3
 	local  jsn=$4
 
-	local smpl=$(basename $file)
+	local smpl=${file##*/}
 
 	# big compilation line !!!
 	$cxx $std $opt $debug $cxxflags $defines -MJ $jsn -MT $obj -MMD -MF $dep $inc -c $file -o $obj 2>> $logfile
@@ -409,11 +441,15 @@ function make_compile {
 	# check if compilation failed
 	if [[ $? -ne 0 ]]; then
 		# print error message
-		echo $error'[x]'$reset "Compilation failed for $smpl"
+		#echo $error'[x]'$reset "Compilation failed for $smpl"
+		echo -n $error'[x]'$reset
 		exit 1
 	fi
-	# print success message
-	echo $color'[+]'$reset "Compiled $smpl"
+	# print success message and remove file extension
+	#echo $color'[✓]'$reset "Compiled" $smpl
+	echo -n $color'[✓]'$reset
+
+
 	exit 0
 
 
@@ -433,27 +469,38 @@ separator+=$reset
 
 function error_colorizer {
 
+	# check log file
+	if [[ ! -e $logfile ]]; then
+		# print error message
+		echo $error':('$reset 'log file is gone somewhere...'
+		exit 1
+	fi
+
+	# fill an array of lines
+	local lines=(${(f)"$(<$logfile)"})
+
+	#for l in $lines; do
+	#	echo 'line:' $l'\n'
+	#done
+	#exit 1
 
 
 	# loop over lines
-	while IFS= read -r line; do
+	for line in $lines; do
 
 
 		# regex pattern to match: "In file included from ..."
 		if [[ $line =~ "^In file included from" ]]; then
-			# skip line
 			continue
 		fi
 
 		# regex pattern to match: "x errors generated."
 		if [[ $line =~ "^[0-9]+ errors? generated.$" ]]; then
-			# skip line
 			continue
 		fi
 
 		# match symbol '^~~~~~'
 		if [[ $line =~ "^ *~*\^~* *$" ]]; then
-			# skip line
 			continue
 		fi
 
@@ -474,14 +521,14 @@ function error_colorizer {
 
 				echo $separator
 				# get file name
-				local file=$(basename ${match[1]})
+				local file=${match[1]##*/}
 				# get line number
 				local y=${match[2]}
 				# get column number
 				local x=${match[3]}
 
 				# print file name
-				echo '['$color$file$reset']' '['$color$y$reset'] ['$color$x$reset']'
+				echo -n '['$color$file$reset']' '['$color$y$reset'] ['$color$x$reset'] '
 
 
 			# match for "note:" or "warning:" or "error:"
@@ -510,12 +557,18 @@ function error_colorizer {
 }
 
 
+function memory {
+
+
+
+
+}
+
+
 
 function compile {
 	# create build directories
 	mkdir -p $blddir $objdir $depdir $jsndir
-	# reset log file
-	rm -f $logfile
 	# declare compiled files counter
 	local -i compiled=0
 	# array of pids
@@ -523,7 +576,7 @@ function compile {
 	# loop over source files
 	for file in $src; do
 		# get file name without path and extension
-		local base=${$(basename $file)%.*}
+		local base=${${file##*/}%.*}
 		# add object file extension
 		local obj=$objdir/$base'.o'
 		# add dependency file extension
@@ -531,7 +584,15 @@ function compile {
 		# add json file extension
 		local jsn=$jsndir/$base'.json'
 		# check if source file is modified
-		if check_dependency $obj $dep || [[ $this -nt $obj ]]; then
+		if check_dependency $obj $dep || [[ $script -nt $obj ]]; then
+
+			# check for first iteration
+			if [[ $compiled -eq 0 ]]; then
+				# print version
+				$cxx --version; echo;
+				# print separator
+				echo $separator
+			fi
 			# compile source file
 			(make_compile $file $obj $dep $jsn $compiled) &
 			# add pid to array
@@ -550,17 +611,18 @@ function compile {
 		if [[ $? -ne 0 ]]; then
 			# wait for all compilation to finish
 			wait
-			echo "\n$color$this$reset: error, compilation failed.\n"
-			#$visualizer $logfile
-			#echo '\n'
-			cat $logfile | error_colorizer
+			echo "\n\n$color$scriptname$reset: error, compilation failed.\n"
+			error_colorizer
 			exit 1
 		fi
 	done
 
 
-	echo "\x1b[1F\x1b[0J"
-	echo 🫠 $compiled "files compiled.\n"
+	#echo "\x1b[1F\x1b[0J"
+	echo '\n\n'🫠 $compiled "files compiled."
+
+				# print separator
+				echo $separator
 
 }
 
@@ -604,6 +666,22 @@ function linkage {
 
 
 function main {
+
+	# -- B A N N E R --------------------------------------------------------------
+
+	echo $color;
+	echo		"   ▁▁▁▁▁▁▁▁  ▁▁▁▁▁▁▁▁  ▁▁▁▁ ▁▁▁  ▁▁▁▁▁▁▁▁ ";
+	echo		"  ╱        ╲╱        ╲╱    ╱   ╲╱        ╲";
+	echo		" ╱         ╱         ╱         ╱         ╱";
+	echo		"╱         ╱         ╱        ▁╱       ▁▁╱ ";
+	echo		"╲▁▁╱▁▁╱▁▁╱╲▁▁▁╱▁▁▁▁╱╲▁▁▁▁╱▁▁▁╱╲▁▁▁▁▁▁▁▁╱\n";
+	echo $color"$scriptname"$reset 'launching' '['$color$project$reset']' 'build\n'
+
+
+	check_os
+	required
+	#init variable
+	#required
 
 	if [[ $target == 'run' ]]; then
 		compile
