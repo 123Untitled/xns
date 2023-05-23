@@ -95,15 +95,22 @@ namespace xns {
 
 	/* literal false type */
 	template <class T>
-	struct is_literal_s : public xns::no {};
+	struct _is_literal : xns::no {};
 
 	/* literal true type */
 	template <class T, T... A>
-	struct is_literal_s<xns::literal<T, A...>> : public xns::yes {};
+	struct _is_literal<xns::literal<T, A...>> : xns::yes {};
 
 	/* literal concept */
 	template <class T>
-	concept is_literal = is_literal_s<T>::value;
+	concept is_literal = _is_literal<T>::value;
+
+
+	// -- L I T E R A L  C H A R A C T E R  T Y P E ---------------------------
+
+	/* literal character type */
+	template <class T>
+	using literal_char = typename T::char_t;
 
 
 
@@ -125,6 +132,10 @@ consteval xns::literal<T, A...> operator ""_to_literal(void) {
 
 /* macro helper to get a literal type */
 #define literal(text) decltype(make_literal(text))
+
+
+
+
 
 
 
