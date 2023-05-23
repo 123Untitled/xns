@@ -9,34 +9,49 @@
 namespace xns {
 
 
+	// -- D E T A I L ---------------------------------------------------------
+
+	namespace impl {
+
+		/* is lvalue reference */
+		template <class T>
+		struct is_lvalue_reference      : public xns::no  {};
+
+		/* specialisation */
+		template <class T>
+		struct is_lvalue_reference<T&>  : public xns::yes {};
+
+		/* is rvalue reference */
+		template <class T>
+		struct is_rvalue_reference      : public xns::no  {};
+
+		/* specialisation */
+		template <class T>
+		struct is_rvalue_reference<T&&> : public xns::yes {};
+
+	}
+
+
 	// -- I S  L V A L U E  R E F E R E N C E ---------------------------------
 
-	/* false type */
+	/* is lvalue concept */
 	template <class T>
-	struct _is_lvalue      : xns::no {};
+	concept is_lvalue = impl::is_lvalue_reference<T>::value;
 
-	/* true type */
+
+	// -- I S  R V A L U E  R E F E R E N C E ---------------------------------
+
+	/* is rvalue concept */
 	template <class T>
-	struct _is_lvalue<T&>  : xns::yes {};
+	concept is_rvalue = impl::is_rvalue_reference<T>::value;
 
-	/* is lvalue reference concept */
+
+	// -- I S  R E F E R E N C E ----------------------------------------------
+
+	/* is reference concept */
 	template <class T>
-	concept is_lvalue = _is_lvalue<T>::value;
+	concept is_reference = is_lvalue<T> || is_rvalue<T>;
 
-
-	// -- I S  R V A L U E  R E F E R E N C E ------------------------------------
-
-	/* false type */
-	template <class T>
-	struct _is_rvalue      : xns::no {};
-
-	/* true type */
-	template <class T>
-	struct _is_rvalue<T&&> : xns::yes {};
-
-	/* is rvalue reference concept */
-	template <class T>
-	concept is_rvalue = _is_rvalue<T>::value;
 
 }
 
