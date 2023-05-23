@@ -20,6 +20,9 @@ xfunc.dSYM/
 # ignore all compile_commands.json files recursively
 **/compile_commands.json
 
+# ignore all .log files recursively
+**/*.log
+
 # ignore all .cache files recursively
 **/.cache
 
