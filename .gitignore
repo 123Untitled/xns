@@ -5,6 +5,9 @@ xnsexec
 # ignore build directory
 _bld/
 
+# ignore .env files
+.env
+
 # ignore all .a files recursively
 **/*.a
 
