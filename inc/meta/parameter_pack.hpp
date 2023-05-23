@@ -5,9 +5,11 @@
 #include "pack_type.hpp"
 #include "integer_sequence.hpp"
 
-// -- N A M E S P A C E -------------------------------------------------------
+// not RENAMED !!!
 
-namespace Xf {
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
 
 	template <class RType, size_t Ip, size_t Ij, class... A>
 	struct Get_impl {
@@ -35,9 +37,9 @@ namespace Xf {
 
 
 	template <size_t IDX, class... A>
-	PackType_t<IDX, A&...>& get(A&... args) {
+	auto get(A&... args) -> xns::pack_type<IDX, A&...>& {
 
-		return Get_impl<PackType_t<IDX, A...>, // type at index
+		return Get_impl<pack_type<IDX, A...>, // type at index
 						IDX,                   // index
 						0,                   // index J
 						A...                 // pack types
@@ -47,18 +49,18 @@ namespace Xf {
 
 
 
-	template <class RType, size_t... INDX, class... A>
-	RType pack_extract_imp(IndexSeq<INDX...>i, A&... args) {
+	template <class RType, xns::size_t... INDX, class... A>
+	RType pack_extract_imp(xns::index_seq<INDX...>i, A&... args) {
 		//debug_sequence(i); // REMOVE i
 		//return RType{};
 		// extract the pack recursively
 		return RType{get<INDX>(args...)...}; //TADA
 	}
 
-	template <class RType, size_t BEGIN, size_t END, class... A>
+	template <class RType, xns::size_t BEGIN, xns::size_t END, class... A>
 	RType pack_extract(A&... args) {
 		// create index range
-		make_index_range<BEGIN, END> indxs; // ???
+		xns::make_index_range<BEGIN, END> indxs; // ???
 		// call implementation to extract the pack
 		return pack_extract_imp<RType>(indxs, args...);
 	}
