@@ -5,7 +5,7 @@
 void UT::tuple_ut(void) {
 
 	START_UT("tuple");
-	using namespace Xf;
+	using namespace xns;
 
 
 
@@ -13,11 +13,11 @@ void UT::tuple_ut(void) {
 
 	Type type{1, 2.0, 'c'};
 
-	Tuple<Type, int, float> t3{xns::move(type), 2, 3.0f};
+	tuple<Type, int, float> t3{xns::move(type), 2, 3.0f};
 
 	//Tuple<float, char> t02 = t3;
 
-	t3.iterate();
+	//t3.iterate();
 
 	//Tuple<Type, int, float> t4 = {2, 3.0f, 'c'};
 
