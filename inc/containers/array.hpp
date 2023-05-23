@@ -95,7 +95,7 @@ namespace xns {
 			//static_assert(!IsArray<T>,        "USE MULTIPLE DIMENSIONS INSTEAD -> Array<T, 3, 3, 3>");
 
 			/* check if T is not void */
-			static_assert(xns::is_not_void<T>,       "VOID IS NOT ALLOWED");
+			static_assert(!xns::is_void<T>,       "VOID IS NOT ALLOWED");
 
 			/* check if there is at least one dimension */
 			static_assert(_ndim > 0,          "NEED AT LEAST ONE DIMENSION");
