@@ -1,28 +1,37 @@
 #ifndef PACK_TYPE_HEADER
 #define PACK_TYPE_HEADER
 
-#include <type_traits>
+#include "types.hpp"
 
-// -- N A M E S P A C E -------------------------------------------------------
 
-namespace Xf {
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
+
 
 	// -- P A C K T Y P E -----------------------------------------------------
 
-	template <size_t IDX, class... A>
-	class PackType final {
+	template <xns::size_t IDX, class... A>
+	class _pack_type final {
+
+		// -- A S S E R T I O N S ---------------------------------------------
+
+		/* check if pack is not empty */
+		static_assert(sizeof...(A) > 0, "WTF DUDE, THE PACK IS EMPTY!");
+
+		/* check if index is valid */
+		static_assert(IDX < sizeof...(A), "INDEX OUT OF RANGE DUDE! STOP DRUGS!");
+
 
 		private:
 
-			/* check if pack is not empty */
-			static_assert(sizeof...(A) > 0, "WTF DUDE, THE PACK IS EMPTY!");
-
-			/* check if index is valid */
-			static_assert(IDX < sizeof...(A), "INDEX OUT OF RANGE DUDE! STOP DRUGS!");
+			// -- C O N S T A N T S -------------------------------------------
 
 			/* size */
-			static constexpr size_t SIZE = sizeof...(A);
+			static constexpr xns::size_t _size = sizeof...(A);
 
+
+			// -- I M P L E M E N T A T I O N ---------------------------------
 
 			/* forward declaration */
 			template <size_t N, class... T>
@@ -40,21 +49,27 @@ namespace Xf {
 				using Type = typename impl<N + 1, T...>::Type;
 			};
 
+
 		public:
+
+			// -- T Y P E S ---------------------------------------------------
 
 			/* type of the element at index IDX */
 			using Type = typename impl<0, A...>::Type;
 
+
+			// -- A C C E S S O R S -------------------------------------------
+
 			/* size accessor */
-			static inline constexpr size_t size(void) noexcept {
-				return SIZE;
+			static inline constexpr xns::size_t size(void) noexcept {
+				return _size;
 			}
 
 	};
 
-	/* alias to PackType type */
-	template <size_t IDX, class... A>
-	using PackType_t = typename PackType<IDX, A...>::Type;
+	/* helper alias */
+	template <xns::size_t IDX, class... A>
+	using pack_type = typename _pack_type<IDX, A...>::Type;
 
 }
 
