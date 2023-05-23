@@ -12,6 +12,17 @@ reset='\x1b[0m'
 erase='\x1b[1F\x1b[0J'
 
 
+# -- S C R I P T  S E T T I N G S ---------------------------------------------
+
+# get make.sh absolute path
+abspath=$(cd $(dirname $0); pwd -P) # maybe -P is not wanted !!!
+
+# script name
+this=$(basename $0)
+
+# .env file
+env=$abspath/'.env'
+
 
 # -- B A N N E R --------------------------------------------------------------
 
@@ -21,9 +32,10 @@ echo		"  ╱        ╲╱        ╲╱    ╱   ╲╱        ╲";
 echo		" ╱         ╱         ╱         ╱         ╱";
 echo		"╱         ╱         ╱        ▁╱       ▁▁╱ ";
 echo		"╲▁▁╱▁▁╱▁▁╱╲▁▁▁╱▁▁▁▁╱╲▁▁▁▁╱▁▁▁╱╲▁▁▁▁▁▁▁▁╱\n";
-echo $color"$0"$reset 'launching\n';
+echo $color"$this"$reset 'launching\n';
 
 
+#exit 0
 
 # -- O P E R A T I N G  S Y S T E M -------------------------------------------
 
@@ -66,15 +78,17 @@ function check_command {
 
 
 
+
+
 # check if all required commands are installed
 #for cmd in $required_commands; do
 #	check_command $cmd
 #done
 
 # check for .env file
-if [ -f .env ]; then
+if [ -f $end ]; then # !!!!!!!!!!!!1
 	# load .env file
-	source .env
+	source $env
 else
 	# create .env file
 	echo 'Create a' $color'.env'$reset 'file'
@@ -103,34 +117,47 @@ fi
 # -- D I R E C T O R I E S ----------------------------------------------------
 
 # source directory
-srcdir='src'
+srcdir=$abspath/'src'
+
+# check if srcdir exists
+[[ -d $srcdir ]] || echo No $color'src'$reset directory found. || exit 1
 
 # include directory
-incdir='inc'
+incdir=$abspath/'inc'
+
+# check if incdir exists
+[[ -d $incdir ]] || echo No $color'inc'$reset directory found. || exit 1
 
 # build directory
-blddir='_bld'
+blddir=$abspath/'build'
 
 # object directory
-objdir=$blddir/'_obj'
+objdir=$abspath/$blddir/'_obj'
 
 # dependency directory
-depdir=$blddir/'_dep'
+depdir=$abspath/$blddir/'_dep'
 
 # json directory
-jsndir=$blddir/'_jsn'
+jsndir=$abspath/$blddir/'_jsn'
 
 # cache directory
-cachedir='.cache'
+cachedir=$abspath/'.cache'
+
+
 
 
 # -- S O U R C E  F I L E S ---------------------------------------------------
 
+
 # get source files
 src=($(find $srcdir -type f -name '*.cpp'))
 
-# get header files
-hdr=($(find $incdir -type f -name '*.hpp'))
+# check for any source file ?
+if [[ ${#src[@]} -eq 0 ]]; then
+	echo 'No source files found in'\
+		$color$(basename $srcdir)$reset 'directory.'
+	exit 1
+fi
 
 # get all directories hierarchy in incdir
 inc=($(find $incdir -type d))
@@ -138,8 +165,7 @@ inc=($(find $incdir -type d))
 # insert -I prefix to each directory
 inc=("${inc[@]/#/-I}")
 
-# this script
-this=$0
+
 
 # arguments
 args=$@
@@ -163,16 +189,16 @@ no=1
 project='xns'
 
 # target executable
-executable=$project'exec'
+executable=$abspath/$project'exec'
 
 # target dynamic library
-dynamic='lib'$project.$dext
+dynamic=$abspath/'lib'$project.$dext
 
 # target static library
-static='lib'$project.'a'
+static=$abspath/'lib'$project.'a'
 
 # compilation database
-compdb='compile_commands.json'
+compdb=$abspath/'compile_commands.json'
 
 
 
@@ -234,7 +260,7 @@ function make_fclean {
 	# remove build and cache directory
 	rm -rf $blddir $cachedir
 	# remove all targets
-	rm -f $executable $dynamic $static $compdb
+	rm -f $executable $dynamic $static $compdb '.env'
 	# print full cleaned message
 	echo $color'[x]'$reset "Full cleaned\n";
 }
@@ -281,11 +307,21 @@ function get_jsons {
 	jsn=($(find $jsndir -type f -name '*.json'))
 }
 
+
+# -- U T I L I T I E S  F U N C T I O N S -------------------------------------
+
 function is_missing {
 	# get target file
 	local file=$1
 	# file exists ?
 	[[ ! -e $file ]] && return yes || return no
+}
+
+function dir_exists {
+	# get target directory
+	local dir=$1
+	# directory exists ?
+	[[ -d $dir ]] && return yes || return no
 }
 
 function is_there_any_files {
@@ -294,6 +330,7 @@ function is_there_any_files {
 	# is there any files ?
 	[[ ${#files[@]} -gt 0 ]] && return yes || return no
 }
+
 
 function is_link_required {
 	# get first argument
@@ -449,7 +486,7 @@ function main {
 		make_fclean
 
 	elif [[ $target == 're' ]]; then
-		make_fclean
+		make_clean
 		compile
 		database
 		linkage
