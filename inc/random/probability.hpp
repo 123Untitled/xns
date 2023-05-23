@@ -23,13 +23,13 @@ namespace Xf {
 			// -- P R I V A T E  A L I A S E S --------------------------------
 
 			/* value type */
-			using Value = T;
+			using value_type = T;
 
 			/* tuple type */
-			using Tuple = Xf::Tuple<Value, float>;
+			using tuple = xns::tuple<value_type, float>;
 
 			/* vector type */
-			using vector = xns::vector<Tuple>;
+			using vector = xns::vector<tuple>;
 
 			/* size type */
 			using size_type = typename vector::size;
@@ -62,7 +62,7 @@ namespace Xf {
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* push value */
-			void push(const Value& value, const float prob) {
+			void push(const value_type& value, const float prob) {
 				// push value and probability
 				_data.emplace_back(value, prob);
 				// update sum
@@ -70,7 +70,7 @@ namespace Xf {
 			}
 
 			/* move value */
-			void push(Value&& value, const float prob) {
+			void push(value_type&& value, const float prob) {
 				// move value and push probability
 				_data.emplace_back(xns::move(value), prob);
 				// update sum
@@ -90,7 +90,7 @@ namespace Xf {
 
 
 			/* launch */
-			const Value& launch(void) const {
+			const value_type& launch(void) const {
 				// set random seed
 				std::srand(std::time(NULL) / getpid());
 				// get random number
@@ -106,7 +106,7 @@ namespace Xf {
 					if (prob >= random) { break; }
 				}
 				// return probability value
-				return _data[x].template get<Value>();
+				return _data[x].template get<value_type>();
 			}
 
 

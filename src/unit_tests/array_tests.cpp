@@ -1,15 +1,15 @@
 #include "unit_tests.hpp"
 
 template <size_t... I, size_t... J>
-void test(Xf::IndexSeq<I...> i, Xf::IndexSeq<J...> j) {
-	Xf::debug_sequence(i);
-	Xf::debug_sequence(j);
+void test(xns::index_seq<I...> i, xns::index_seq<J...> j) {
+	xns::debug_sequence(i);
+	xns::debug_sequence(j);
 }
 
 template <class... A>
 auto make(A&&... args) {
 
-	using RType = xns::array<Xf::PackType_t<0, A...>, sizeof...(A)>;
+	using RType = xns::array<xns::pack_type<0, A...>, sizeof...(A)>;
 
 	return RType{xns::forward<A>(args)...};
 }
