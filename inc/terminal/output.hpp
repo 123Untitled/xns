@@ -3,15 +3,10 @@
 
 #include "macro.hpp"
 #include "types.hpp"
-#include "allocator.hpp"
 #include "string.hpp"
-#include "vector.hpp"
 #include "literal.hpp"
 
-#include <cstdlib>
 #include <unistd.h>
-#include <iostream>
-#include <string>
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
