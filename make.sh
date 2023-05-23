@@ -4,10 +4,13 @@
 # Makefile forever, but not really lol.
 
 
+
 # -- C O L O R  S E T T I N G S -----------------------------------------------
 
 # main color
 color='\x1b[32m'
+color2='\x1b[33m'
+error='\x1b[31m'
 reset='\x1b[0m'
 erase='\x1b[1F\x1b[0J'
 
@@ -20,9 +23,9 @@ abspath=$(cd $(dirname $0); pwd -P) # maybe -P is not wanted !!!
 # script name
 this=$(basename $0)
 
-# .env file
-env=$abspath/'.env'
 
+echo 'abspath: >'$abspath
+echo 'this: >'$this
 
 # -- B A N N E R --------------------------------------------------------------
 
@@ -64,11 +67,11 @@ check_os
 
 
 # required programs
-required_commands=(clang++ mkdir rm find basename jq sed)
+required_commands=('clang++', 'mkdir', 'rm', 'find', 'basename', 'dirname', 'cd', 'pwd', 'jq', 'sed', 'cat', 'bat', 'vared')
 
 # check if all required commands are installed
 function check_command {
-	if ! [ -x "$(command -v $1)" ]; then
+	if ! [[ -x "$(command -v $1)" ]]; then
 		echo $color$1$reset "is not installed."
 		exit 1;
 	else
@@ -76,6 +79,15 @@ function check_command {
 	fi
 }
 
+
+# check if bat is installed
+if [[ -x "$(command -v bat)" ]]; then
+	# bat is installed
+	visualizer='bat'
+else
+	# bat is not installed
+	visualizer='cat'
+fi
 
 
 
@@ -85,29 +97,32 @@ function check_command {
 #	check_command $cmd
 #done
 
+# .env file
+env=$abspath/'.env'
+
 # check for .env file
-if [ -f $end ]; then # !!!!!!!!!!!!1
-	# load .env file
-	source $env
-else
+if [[ ! -f $env ]]; then
 	# create .env file
 	echo 'Create a' $color'.env'$reset 'file'
-	echo 'BUILD_MODE=' > .env
-	source .env
+	echo 'BUILD_MODE=' > $env
 fi
 
+# load .env file
+source $env
+
 if [[ -z $BUILD_MODE ]]; then
-	echo '\n🥕 Set a build mode in' $color'.env'$reset 'file [debug, development or release]';
-	#vared -p '   change it now: ' -c build_mode;
+	echo '\n🥕 Set a build mode in' $color'.env'$reset 'file [active, debug, release]'
+
 	while (true); do
 		vared -p '   change it now: ' -c build_mode;
-		if [[ $build_mode == 'debug' || $build_mode == 'development' || $build_mode == 'release' ]]; then
+		if [[ $build_mode == 'active' || $build_mode == 'debug' || $build_mode == 'release' ]]; then
 			break;
 		else
 			echo 'invalid build mode'
 		fi
 	done
-	sed -i '' 's/BUILD_MODE=.*/BUILD_MODE='$build_mode'/g' .env;
+
+	sed -i '' 's/BUILD_MODE=.*/BUILD_MODE='$build_mode'/g' $env
 	echo "🍌 Build mode changed to '$build_mode'."
 	exit 0
 fi
@@ -129,16 +144,16 @@ incdir=$abspath/'inc'
 [[ -d $incdir ]] || echo No $color'inc'$reset directory found. || exit 1
 
 # build directory
-blddir=$abspath/'build'
+blddir=$abspath/'_bld'
 
 # object directory
-objdir=$abspath/$blddir/'_obj'
+objdir=$blddir/'_obj'
 
 # dependency directory
-depdir=$abspath/$blddir/'_dep'
+depdir=$blddir/'_dep'
 
 # json directory
-jsndir=$abspath/$blddir/'_jsn'
+jsndir=$blddir/'_jsn'
 
 # cache directory
 cachedir=$abspath/'.cache'
@@ -167,8 +182,8 @@ inc=("${inc[@]/#/-I}")
 
 
 
-# arguments
-args=$@
+# get arguments from command line
+args=(${@:2})
 
 # target
 target=$1
@@ -200,12 +215,14 @@ static=$abspath/'lib'$project.'a'
 # compilation database
 compdb=$abspath/'compile_commands.json'
 
+# log file
+logfile=$abspath/'compile.log'
 
 
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-cxx='clang++'
+cxx='g++'
 
 # archiver
 archiver='ar'
@@ -248,6 +265,11 @@ ldflags=''
 
 # -- I M P L E M E N T A T I O N ----------------------------------------------
 
+function descript {
+	local cible=$(basename $1)
+	file $cible | grep --color=always $cible
+}
+
 
 function make_clean {
 	# remove build directory
@@ -260,32 +282,32 @@ function make_fclean {
 	# remove build and cache directory
 	rm -rf $blddir $cachedir
 	# remove all targets
-	rm -f $executable $dynamic $static $compdb '.env'
+	rm -f $executable $dynamic $static $compdb $env $logfile
 	# print full cleaned message
 	echo $color'[x]'$reset "Full cleaned\n";
 }
 
 function make_executable {
 	# link executable
-	$linker $obj -o $executable $ldflags
+	$linker $obj -o $executable $ldflags || exit 1
 	# check if linking succeeded
-	file $executable | grep --color=always $executable
+	descript $executable
 	echo;
 }
 
 function make_dynamic {
 	# link dynamic library
-	$linker $obj $dlib -o $dynamic $ldflags
+	$linker $obj $dlib -o $dynamic $ldflags || exit 1
 	# check if linking succeeded
-	file $dynamic | grep --color=always $dynamic
+	descript $dynamic
 	echo;
 }
 
 function make_static {
 	# link static library
-	$archiver $arflags $static $obj
+	$archiver $arflags $static $obj || exit 1
 	# check if linking succeeded
-	file $static | grep --color=always $static
+	descript $static
 	echo;
 }
 
@@ -293,7 +315,7 @@ function make_compdb {
 	# generate compilation database
 	echo "[\n"$(cat $jsn | sed '$s/,\s*$//')"\n]" | jq > $compdb
 	# check if compilation database succeeded
-	file $compdb | grep --color=always $compdb
+	descript $compdb
 	echo;
 }
 
@@ -372,9 +394,128 @@ function check_dependency {
 }
 
 
+function make_compile {
+
+	local file=$1
+	local  obj=$2
+	local  dep=$3
+	local  jsn=$4
+
+	local smpl=$(basename $file)
+
+	# big compilation line !!!
+	$cxx $std $opt $debug $cxxflags $defines -MJ $jsn -MT $obj -MMD -MF $dep $inc -c $file -o $obj 2>> $logfile
+
+	# check if compilation failed
+	if [[ $? -ne 0 ]]; then
+		# print error message
+		echo $error'[x]'$reset "Compilation failed for $smpl"
+		exit 1
+	fi
+	# print success message
+	echo $color'[+]'$reset "Compiled $smpl"
+	exit 0
+
+
+}
+# generate separator
+separator='\x1b[90m'
+
+
+# loop over columns
+for x in $(seq $COLUMNS); do
+	# add separator
+	separator+='─'
+done
+
+separator+=$reset
+
+
+function error_colorizer {
+
+
+
+	# loop over lines
+	while IFS= read -r line; do
+
+
+		# regex pattern to match: "In file included from ..."
+		if [[ $line =~ "^In file included from" ]]; then
+			# skip line
+			continue
+		fi
+
+		# regex pattern to match: "x errors generated."
+		if [[ $line =~ "^[0-9]+ errors? generated.$" ]]; then
+			# skip line
+			continue
+		fi
+
+		# match symbol '^~~~~~'
+		if [[ $line =~ "^ *~*\^~* *$" ]]; then
+			# skip line
+			continue
+		fi
+
+
+
+
+		# white space split
+		local words=(${=line})
+
+		# loop over words
+		for word in "${words[@]}"; do
+
+			# regex pattern
+			local location="^(.*):([0-9]+):([0-9]+):"
+
+			# check if word match pattern
+			if [[ $word =~ $location ]]; then
+
+				echo $separator
+				# get file name
+				local file=$(basename ${match[1]})
+				# get line number
+				local y=${match[2]}
+				# get column number
+				local x=${match[3]}
+
+				# print file name
+				echo '['$color$file$reset']' '['$color$y$reset'] ['$color$x$reset']'
+
+
+			# match for "note:" or "warning:" or "error:"
+			local hint="^(note:|warning:|error:)$"
+			#elif [[ $word =~ $pattern ]]; then
+			elif [[ $word =~ $hint ]]; then
+				# print error
+				echo -n $error$word$reset' '
+
+
+			else
+				# print word
+				echo -n $word' '
+			fi
+
+
+		done
+		echo '\n'
+
+	done
+
+	# patter to match:
+	# /Users/untitled/Desktop/code/main_projects/SEQterm/lib/xns/src/main.cpp:43:1:
+
+
+}
+
+
+
 function compile {
 	# create build directories
 	mkdir -p $blddir $objdir $depdir $jsndir
+	# reset log file
+	rm -f $logfile
 	# declare compiled files counter
 	local -i compiled=0
 	# array of pids
@@ -391,33 +532,36 @@ function compile {
 		local jsn=$jsndir/$base'.json'
 		# check if source file is modified
 		if check_dependency $obj $dep || [[ $this -nt $obj ]]; then
-			# erase line except first iteration
-			[[ $compiled -gt 0 ]] && echo $erase
-			# print message
-			echo -n $file $color'compiling...'$reset
 			# compile source file
-			clang++ $std $cxxflags $defines -MJ $jsn -MT $obj -MMD -MF $dep $inc -c $file -o $obj &
-			# increment compiled files counter
-			((++compiled))
+			(make_compile $file $obj $dep $jsn $compiled) &
 			# add pid to array
 			pids+=($!)
+			# increment compiled files counter
+			((++compiled))
 
 		fi
 	done
+	#wait
 
 	# wait for all compilation to finish
 	for pid in "${pids[@]}"; do
 		wait $pid
 		# Vérifier le code de retour du processus
 		if [[ $? -ne 0 ]]; then
+			# wait for all compilation to finish
 			wait
-			echo "$color$this$reset: error, compilation failed."
+			echo "\n$color$this$reset: error, compilation failed.\n"
+			#$visualizer $logfile
+			#echo '\n'
+			cat $logfile | error_colorizer
 			exit 1
 		fi
 	done
 
+
 	echo "\x1b[1F\x1b[0J"
 	echo 🫠 $compiled "files compiled.\n"
+
 }
 
 
@@ -443,43 +587,32 @@ function database {
 
 function linkage {
 
+	local final=$1
+	local magic=$2
+
 	get_objects
 
 	is_there_any_files $obj || return 1
 
-	# handle executable target
-	if [[ $target == 'exec' ]] || [[ -z $target ]] || [[ $target == 're' ]]; then
-		# is there an executable ?
-		if is_missing $executable || is_link_required $executable $obj; then
-			make_executable
-		fi
-
-	# handle dynamic library target
-	elif [[ $target == 'dynamic' ]]; then
-		# is there a dynamic library ?
-		if is_missing $dynamic || is_link_required $dynamic $obj; then
-			make_dynamic
-		fi
-
-	# handle static library target
-	elif [[ $target == 'static' ]]; then
-		# is there a static library ?
-		if is_missing $static || is_link_required $static $obj; then
-			make_static
-		fi
+	# handle target
+	if is_missing $final || is_link_required $final $obj; then
+		$magic # !!!
 	fi
-
-	#echo "$(EMOJI) [$(BUILD_MODE)] All targets are up to date !";
-	echo "All targets are up to date !";
 
 }
 
 
+
 function main {
 
+	if [[ $target == 'run' ]]; then
+		compile
+		database
+		linkage $executable make_executable
+		$executable
+		exit 0
 
-
-	if [[ $target == 'clean' ]]; then
+	elif [[ $target == 'clean' ]]; then
 		make_clean
 
 	elif [[ $target == 'fclean' ]]; then
@@ -489,32 +622,37 @@ function main {
 		make_clean
 		compile
 		database
-		linkage
+		linkage $executable make_executable
 
 	elif [[ $target == 'exec' ]] || [[ -z $target ]]; then
 		compile
 		database
-		linkage
+		linkage $executable make_executable
 
 	elif [[ $target == 'dynamic' ]]; then
 		compile
 		database
-		linkage
+		linkage $dynamic make_dynamic
 
 	elif [[ $target == 'static' ]]; then
 		compile
 		database
-		linkage
+		linkage $static make_static
 
 	else
 		echo 'Unknown target:' $color$target$reset
 		exit 1
 	fi
 
+
+
+	echo "💫 [$BUILD_MODE] All targets are up to date !";
+
 }
 
 
 main
+
 
 
 
