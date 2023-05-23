@@ -21,6 +21,11 @@ namespace xns {
 	/* null pointer type */
 	using null = decltype(nullptr);
 
+	/* void type */
+//	template <class...>
+//	using void_t = void;
+
+
 	/* architecture bytes */
 	#define ARCH_BYTES (sizeof(void*))
 
