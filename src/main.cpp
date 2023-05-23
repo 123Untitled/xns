@@ -19,15 +19,58 @@
 #include "safe_enum.hpp"
 #include "literal.hpp"
 
+#include "path.hpp"
 // curiously recurring template pattern (CRTP) learn
 
 
+template <class T>
+struct type_name {
 
+		static constexpr const char* name(void) {
+
+			if constexpr (xns::is_same<T, int>) {
+				return "int";
+			}
+			if constexpr (xns::is_same<T, float>) {
+				return "float";
+			}
+
+				return "unknown";
+		}
+};
+
+
+
+#if !defined(XNS_UT)
 int main(int ac, char** av) {
 
-	xns::wstring str9 = L"hello world";
 
-	std::cout << str9 << std::endl;
+	//UT::meta_ut();
+	//using unix_pp = xns::tuple<literal("/"), literal(".."), literal(".")>;
+
+	//auto p0 = xns::make_path<unix_pp>("h/e/l/l/o");
+
+	//auto p = xns::make_path<literal("/ "), literal(".."), literal(".")>("// well / hello / there /");
+
+
+	return 0;
+
+
+	//using t = path("/", "..", ".");
+
+	/*
+	using unix_path = xns::path<literal("/"), literal(".."), literal(".")>;
+
+	unix_path p = xns::make_path<
+		literal("/"),
+		literal(".."),
+		literal(".")>("h/e/l/l/o");
+
+	unix_path p2 = xns::make_path("h/e/l/l/o");
+	*/
+
+	return 0;
+
 
 	for (int i = 0 ; i < 20 ; ++i) {
 		xns::output::write(xns::id::generate());
@@ -163,6 +206,7 @@ int main(int ac, char** av) {
 	}
 
 }
+#endif
 
 
 
