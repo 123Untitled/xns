@@ -9,11 +9,12 @@
 #include "xns.hpp"
 #include "testclass.hpp"
 
-#define START_UT(msg) std::cout << "STARTING UNIT TEST: \x1b[33m" << msg << "\x1b[0m" << std::endl;
+#define START_UT(msg) std::cout << "\n\nSTARTING UNIT TEST: \x1b[33m" << msg << "\x1b[0m\n" << std::endl;
 
 namespace UT {
 
 
+	bool meta_ut(void);
 
 	void tuple_ut(void);
 
