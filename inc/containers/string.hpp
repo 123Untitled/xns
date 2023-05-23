@@ -18,7 +18,6 @@
 #include "numeric_limits.hpp"
 
 
-
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
@@ -1316,6 +1315,18 @@ namespace xns {
 		os << "cannot output string of type: " << typeid(T).name();
 		return os;
 	}
+
+	/* deduction guide for string{const char_t*} */
+
+	template <xns::is_char T>
+	string(const T*) -> string<T>;
+
+
+
+
+
+
+
 
 
 
