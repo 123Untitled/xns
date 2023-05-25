@@ -243,6 +243,7 @@ namespace xns {
 			/* fill assignment */
 			string& assign(const char_t character, const size_type size = 1) {
 
+				return *this;
 			}
 
 			// WARNING: need to rework this with realloc
