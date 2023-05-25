@@ -1,7 +1,9 @@
 #!/bin/zsh
 
 # This script is used to compile the project.
-# Makefile forever, but $not really lol.
+# Makefile forever, but not really lol.
+
+version='4'
 
 
 
@@ -11,13 +13,13 @@
 esc='\x1b'
 
 # main color
-color=$esc'[32m'
-C1=$esc'[32m'
+ color=$esc'[32m'
+	C1=$esc'[32m'
 color2=$esc'[33m'
-error=$esc'[31m'
-reset=$esc'[0m'
-R=$esc'[0m'
-erase=$esc'[1F'$esc'[0J'
+ error=$esc'[31m'
+ reset=$esc'[0m'
+     R=$esc'[0m'
+ erase=$esc'[1F'$esc'[0J'
 
 
 yes=0
@@ -37,7 +39,6 @@ script=$abspath/${0##*/}
 
 # basename of the script without using basename command
 scriptname=${0##*/}
-
 
 
 
@@ -68,50 +69,37 @@ function check_os {
 
 check_os
 
-function goodby {
-	echo $error'Aborded.'$reset
-	exit 1
-}
 
 
-# check if all required commands are installed
-function cmd_exists {
-	[[ -n $(command -v $1) ]] && return $yes || return $no
-}
 
+
+# -- R E Q U I R E D  P R O G R A M S -----------------------------------------
 
 function required {
 	# required programs
-	local commands=('clang++'
-					'ar'
+	local commands=('clang++' 'ar'
 					'mkdir'
-					'rm'
-					'cd'
-					'pwd'
-					'sed'
-					'cat'
-					'bat'
+					'rm' 'cd' 'pwd'
+					'sed' 'cat' 'file'
 					'vared')
 	# loop through all required commands
 	for cmd in $commands; do
-		if ! cmd_exists $cmd; then
-			echo $error'Error:'$reset 'required program' \
-					$color$cmd$reset 'is not installed.'
+		# check if command is installed
+		if [[ -z "$(command -v $cmd)" ]]; then
+			# print error message
+			echo '\n'$error'Error:'$reset 'required program' \
+				$color''$cmd''$reset 'is not installed.'
+			# exit script
 			exit 1
 		fi
 	done
-	return $yes
 }
 
 
+required
 
 
 
-
-# check if all required commands are installed
-#for cmd in $required_commands; do
-#	check_command $cmd
-#done
 
 # .env file
 env=$abspath/'.env'
@@ -164,6 +152,9 @@ depdir=$blddir/'_dep'
 
 # json directory
 jsndir=$blddir/'_jsn'
+
+# compile log directory
+cmpdir=$blddir/'_log'
 
 # cache directory
 cachedir=$abspath/'.cache'
@@ -236,14 +227,12 @@ static=$abspath/'lib'$project.'a'
 # compilation database
 compdb=$abspath/'compile_commands.json'
 
-# log file
-logfile=$abspath/'compile.log'
 
 
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-#cxx='clang++'
+#cxx='g++'
 cxx='/opt/homebrew/Cellar/llvm/16.0.4/bin/clang++'
 
 # archiver
@@ -299,7 +288,8 @@ function descript {
 	local resume=$(file $cible)
 
 	local regex='.*: (.*)'
-	[[ $resume =~ $regex ]] && echo $color'[+]'$reset ${cible##*/} '|' ${match[1]}
+	[[ $resume =~ $regex ]] && \
+		echo $color'[+]'$reset ${cible##*/} '|' ${match[1]}'\n'
 }
 
 
@@ -324,7 +314,6 @@ function make_executable {
 	$linker $obj -o $executable $ldflags || exit 1
 	# check if linking succeeded
 	descript $executable
-	echo;
 }
 
 function make_dynamic {
@@ -332,7 +321,6 @@ function make_dynamic {
 	$linker $obj $dlib -o $dynamic $ldflags || exit 1
 	# check if linking succeeded
 	descript $dynamic
-	echo;
 }
 
 function make_static {
@@ -340,15 +328,12 @@ function make_static {
 	$archiver $arflags $static $obj || exit 1
 	# check if linking succeeded
 	descript $static
-	echo;
 }
 
 function make_compdb {
-	# generate compilation database
 	echo "[\n"$(cat $jsn | sed '$s/,\s*$//')"\n]" | jq > $compdb
 	# check if compilation database succeeded
 	descript $compdb
-	echo;
 }
 
 function get_objects {
@@ -432,147 +417,40 @@ function make_compile {
 	local  obj=$2
 	local  dep=$3
 	local  jsn=$4
-
-	local smpl=${file##*/}
+	local  cmp=$5
 
 	# big compilation line !!!
-	$cxx $std $opt $debug $cxxflags $defines -MJ $jsn -MT $obj -MMD -MF $dep $inc -c $file -o $obj 2>> $logfile
+	$cxx $std $opt $debug $cxxflags $defines -MJ $jsn -MT $obj -MMD -MF $dep $inc -c $file -o $obj 2> $cmp
 
 	# check if compilation failed
 	if [[ $? -ne 0 ]]; then
-		# print error message
-		#echo $error'[x]'$reset "Compilation failed for $smpl"
 		echo -n $error'[x]'$reset
 		exit 1
 	fi
-	# print success message and remove file extension
-	#echo $color'[✓]'$reset "Compiled" $smpl
 	echo -n $color'[✓]'$reset
-
-
 	exit 0
-
-
 }
+
 # generate separator
 separator='\x1b[90m'
-
-
 # loop over columns
 for x in $(seq $COLUMNS); do
 	# add separator
 	separator+='─'
-done
-
+done # reset color
 separator+=$reset
-
-
-function error_colorizer {
-
-	# check log file
-	if [[ ! -e $logfile ]]; then
-		# print error message
-		echo $error':('$reset 'log file is gone somewhere...'
-		exit 1
-	fi
-
-	# fill an array of lines
-	local lines=(${(f)"$(<$logfile)"})
-
-	#for l in $lines; do
-	#	echo 'line:' $l'\n'
-	#done
-	#exit 1
-
-
-	# loop over lines
-	for line in $lines; do
-
-
-		# regex pattern to match: "In file included from ..."
-		if [[ $line =~ "^In file included from" ]]; then
-			continue
-		fi
-
-		# regex pattern to match: "x errors generated."
-		if [[ $line =~ "^[0-9]+ errors? generated.$" ]]; then
-			continue
-		fi
-
-		# match symbol '^~~~~~'
-		if [[ $line =~ "^ *~*\^~* *$" ]]; then
-			continue
-		fi
-
-
-
-
-		# white space split
-		local words=(${=line})
-
-		# loop over words
-		for word in "${words[@]}"; do
-
-			# regex pattern
-			local location="^(.*):([0-9]+):([0-9]+):"
-
-			# check if word match pattern
-			if [[ $word =~ $location ]]; then
-
-				echo $separator
-				# get file name
-				local file=${match[1]##*/}
-				# get line number
-				local y=${match[2]}
-				# get column number
-				local x=${match[3]}
-
-				# print file name
-				echo -n '['$color$file$reset']' '['$color$y$reset'] ['$color$x$reset'] '
-
-
-			# match for "note:" or "warning:" or "error:"
-			local hint="^(note:|warning:|error:)$"
-			#elif [[ $word =~ $pattern ]]; then
-			elif [[ $word =~ $hint ]]; then
-				# print error
-				echo -n $error$word$reset' '
-
-
-			else
-				# print word
-				echo -n $word' '
-			fi
-
-
-		done
-		echo '\n'
-
-	done
-
-	# patter to match:
-	# /Users/untitled/Desktop/code/main_projects/SEQterm/lib/xns/src/main.cpp:43:1:
-
-
-}
-
-
-function memory {
-
-
-
-
-}
 
 
 
 function compile {
+
 	# create build directories
-	mkdir -p $blddir $objdir $depdir $jsndir
+	mkdir -p $blddir $objdir $depdir $jsndir $cmpdir
 	# declare compiled files counter
 	local -i compiled=0
 	# array of pids
 	pids=()
+
 	# loop over source files
 	for file in $src; do
 		# get file name without path and extension
@@ -583,18 +461,19 @@ function compile {
 		local dep=$depdir/$base'.d'
 		# add json file extension
 		local jsn=$jsndir/$base'.json'
+		# add compiler log file extension
+		local cmp=$cmpdir/$base'.log'
+
+
 		# check if source file is modified
 		if check_dependency $obj $dep || [[ $script -nt $obj ]]; then
 
-			# check for first iteration
+			# compiler version
 			if [[ $compiled -eq 0 ]]; then
-				# print version
-				$cxx --version; echo;
-				# print separator
-				echo $separator
+				echo $separator; $cxx --version; echo $separator
 			fi
 			# compile source file
-			(make_compile $file $obj $dep $jsn $compiled) &
+			(make_compile $file $obj $dep $jsn $cmp) &
 			# add pid to array
 			pids+=($!)
 			# increment compiled files counter
@@ -602,27 +481,46 @@ function compile {
 
 		fi
 	done
-	#wait
 
-	# wait for all compilation to finish
+	# loop over pids
 	for pid in "${pids[@]}"; do
+		# wait for pid
 		wait $pid
-		# Vérifier le code de retour du processus
+		# check if compilation failed
 		if [[ $? -ne 0 ]]; then
-			# wait for all compilation to finish
+			#pkill -P $$ # kill all child processes
 			wait
-			echo "\n\n$color$scriptname$reset: error, compilation failed.\n"
-			error_colorizer
+			echo "\n\n🔥 compilation failed."
+
+			# check clang-filter executable exists
+			if [[ ! -x "clang-filter" ]]; then
+				git clone 'git@github.com:123Untitled/build_system.git' 'build_system'
+				if [[ $? -ne 0 ]]; then
+					echo $error':('$reset 'failed to clone build_system repository.'
+					exit 1
+				fi
+				(cd 'build_system'/'clang-filter' && make && cp 'clang-filter' '../../')
+				if [[ $? -ne 0 ]]; then
+					echo $error':('$reset 'failed to compile clang-filter.'
+					exit 1
+				fi
+				rm -rf 'build_system'
+			fi
+
+			./clang-filter < $cmpdir/*.log
 			exit 1
 		fi
 	done
 
+	if [[ $compiled -eq 0 ]]; then
+		echo $separator
+		echo $color'[✓]'$reset "Nothing to compile."
+	else
+		echo '\n\n'🫠 $compiled "files compiled."
+	fi
 
-	#echo "\x1b[1F\x1b[0J"
-	echo '\n\n'🫠 $compiled "files compiled."
-
-				# print separator
-				echo $separator
+	# print separator
+	echo $separator
 
 }
 
@@ -637,7 +535,7 @@ function database {
 
 	get_jsons
 
-	is_there_any_files $jsn || return 1
+	is_there_any_files $jsn || exit 1
 
 	# handle compilation database
 	if is_missing $compdb || is_link_required $compdb $jsn; then
@@ -654,7 +552,7 @@ function linkage {
 
 	get_objects
 
-	is_there_any_files $obj || return 1
+	is_there_any_files $obj || exit 1
 
 	# handle target
 	if is_missing $final || is_link_required $final $obj; then
@@ -663,10 +561,9 @@ function linkage {
 
 }
 
+function header {
 
-
-function main {
-
+	local thing=${1##*/}
 	# -- B A N N E R --------------------------------------------------------------
 
 	echo $color;
@@ -675,66 +572,161 @@ function main {
 	echo		" ╱         ╱         ╱         ╱         ╱";
 	echo		"╱         ╱         ╱        ▁╱       ▁▁╱ ";
 	echo		"╲▁▁╱▁▁╱▁▁╱╲▁▁▁╱▁▁▁▁╱╲▁▁▁▁╱▁▁▁╱╲▁▁▁▁▁▁▁▁╱\n";
-	echo $color"$scriptname"$reset 'launching' '['$color$project$reset']' 'build\n'
+	echo $color"$scriptname"$reset 'launching' '['$color$thing$reset']' 'build'
+}
 
+
+function change_version {
+	# remove dots
+	update=${version//./}
+	# convert to decimal
+	update=$((16#$update))
+	# increment
+	update=$(($update+1))
+	# convert to hex
+	update=$(printf '%x' $update)
+	# reset version
+	version=''
+	# loop through all digits to insert dots
+	for (( i=0; i < ${#update}; ++i )); do
+		version+=${update:$i:1}'.'
+	done
+	# remove last dot
+	version=${version%?}
+	# replace version line in this script
+	sed -i '' "s/^version='[0-9A-Fa-f.]*[0-9A-Fa-f]'/version='$version'/g" $script
+	echo '\nVersion changed to' $color$version$reset'\n'
+	return 0
+}
+
+
+function commit {
+	echo;
+	# repository
+	local repo='git@github.com:123Untitled/-build-system-.git'
+	# directory
+	local gitdir='build-system'
+	# check repository folder existance
+	if [[ -d $gitdir ]]; then
+		echo $color''$gitdir''$reset' repository already exists.'
+		exit 1
+	fi
+	# clone repository
+	git clone $repo $gitdir
+	# check if repository was cloned
+	if [[ $? -ne 0 ]]; then
+		echo $color''$gitdir''$reset' repository cloning failed.'
+		exit 1
+	fi
+	# change version
+	change_version && \
+	# move into repo
+	cd $gitdir && \
+	# copy script to repository
+	cp '..'/$scriptname '.' && \
+	# add script to repository
+	git add $scriptname && \
+	# get commit message
+	vared -p 'commit message: ' -c commit_msg && \
+	# new line
+	echo && \
+	# commit and push script to repository
+	git commit -m "$commit_msg" && git push
+	# check if commit was successful
+	if [[ $? -ne 0 ]]; then
+		echo $color''$scriptname''$reset' script commit failed.'
+		exit 1
+	fi
+	# move back
+	cd ..
+	# remove repository
+	rm -rf $gitdir
+	# print success message
+	echo '\n'$color''$scriptname''$reset' script pushed to '$color''$gitdir''$reset' repository.\n'
+}
+
+
+
+
+
+# main function
+function main {
 
 	check_os
 	required
 	#init variable
 	#required
 
-	if [[ $target == 'run' ]]; then
+
+	# executable
+	if [[ $target == 'exec' ]] || [[ -z $target ]]; then
+		header $executable
+		compile
+		database
+		linkage $executable make_executable
+
+	# dynamic library
+	elif [[ $target == 'dynamic' ]]; then
+		header $dynamic
+		compile
+		database
+		linkage $dynamic make_dynamic
+
+	# static library
+	elif [[ $target == 'static' ]]; then
+		header $static
+		compile
+		database
+		linkage $static make_static
+
+	# build and run
+	elif [[ $target == 'run' ]]; then
+		header "run"
 		compile
 		database
 		linkage $executable make_executable
 		$executable
 		exit 0
 
+	# clean
 	elif [[ $target == 'clean' ]]; then
+		header "clean"
 		make_clean
 
+	# full clean
 	elif [[ $target == 'fclean' ]]; then
+		header "fclean"
 		make_fclean
 
+	# rebuild
 	elif [[ $target == 're' ]]; then
+		header "re"
 		make_clean
 		compile
 		database
 		linkage $executable make_executable
 
-	elif [[ $target == 'exec' ]] || [[ -z $target ]]; then
-		compile
-		database
-		linkage $executable make_executable
+	# script commit
+	elif [[ $target == 'commit' ]]; then
+		header "commit"
+		commit
+		exit 0
 
-	elif [[ $target == 'dynamic' ]]; then
-		compile
-		database
-		linkage $dynamic make_dynamic
-
-	elif [[ $target == 'static' ]]; then
-		compile
-		database
-		linkage $static make_static
-
+	# unknown target
 	else
+		header "???"
+		echo $separator
 		echo 'Unknown target:' $color$target$reset
 		exit 1
 	fi
 
-
-
-	echo "💫 [$BUILD_MODE] All targets are up to date !";
+	echo '💫' "[$BUILD_MODE]" 'All targets are up to date !';
 
 }
 
 
-main
 
+# call main function
+main; exit 0
 
-
-
-
-
-exit 0
 
