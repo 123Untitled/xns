@@ -16,38 +16,47 @@
 #define PDELAY		40000
 
 
-// -- D R A W  C L A S S ------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-class Draw final {
-
-	public:
-
-		// -- C O N S T R U C T O R S -----------------------------------------
-
-		/* non-instanciable class */
-		NON_INSTANCIABLE(Draw);
+namespace xns {
 
 
+	// -- D R A W  C L A S S --------------------------------------------------
+
+	class draw final {
+
+		public:
+
+			// -- C O N S T R U C T O R S -----------------------------------------
+
+			/* non-instanciable class */
+			NON_INSTANCIABLE(draw);
 
 
-	//static void drawLine(const UInt x, const UInt y, const void *ptr, const UInt size);
+			/* draw line */
+			static void draw_line(const xns::u32, const xns::u32, const void*, const xns::u32);
 
-	/* draw string */
-	//static void draw_string(const UInt x, const UInt y, const std::string& str);
+			/* draw string */
+			static void draw_string(const xns::u32, const xns::u32, const xns::cstring&);
 
-	//static void vertivalDraw(const UInt x, UInt y, const void *ptr, const UInt size, UInt line);
+			/* vertical draw */
+			static void vertival_draw(const xns::u32 x, xns::u32 y, const void *ptr, const xns::u32 size, xns::u32 line);
 
-	//static void clearLine(UInt32 posX, UInt32 posY, UInt32 size);
+			/* clear line */
+			static void clear_line(const xns::u32, const xns::u32, const xns::u32);
 
-	//static void drawInteger(UInt number);
+			/* draw integer */
+			static void draw_integer(const xns::u32);
 
-	//static int drawStringNl(const Str& string);
+			static int drawStringNl(const xns::cstring& string);
 
-	//static void animateDraw(const Str& string);
-	//static void animateDrawNl(const Str& string);
-	//static void animateDraw(const Str& string, const UInt32 colorIn, const UInt32 colorOut);
+			static void animateDraw(const xns::cstring& string);
+			static void animateDrawNl(const xns::cstring& string);
+			static void animateDraw(const xns::cstring& string, const xns::u32 colorIn, const xns::u32 colorOut);
 
-};
+	};
 
+
+}
 
 #endif

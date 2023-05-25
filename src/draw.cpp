@@ -1,61 +1,62 @@
 #include "draw.hpp"
 
-//void Draw::clearLine(unsigned posX, unsigned posY, unsigned size) {
-//	UInt8	*clear = new UInt8[size];
-//	UInt32 i = 0;
-//	while (i < size) {
-//		clear[i] = ' ';
-//		i++;
-//	}
-//	//Escape::move_position(posX, posY);
-//	write(STDOUT_FILENO, clear, size);
-//	delete[] clear;
+void xns::draw::clear_line(const xns::u32 posX, const xns::u32 posY, const xns::u32 size) {
+	xns::ubyte	*clear = new xns::ubyte[size];
+	xns::u32 i = 0;
+	while (i < size) {
+		clear[i] = ' ';
+		i++;
+	}
+	//Escape::move_position(posX, posY);
+	write(STDOUT_FILENO, clear, size);
+	delete[] clear;
+}
+
+
+/* drawLine */
+//void Draw::drawLine(const xns::u32 x, const xns::u32 y, const void *ptr, const xns::u32 size) {
+	//Escape::move_position(x, y);
+	//Buffer::draw(ptr, size);
 //}
-//
-//
-///* drawLine */
-////void Draw::drawLine(const UInt x, const UInt y, const void *ptr, const UInt size) {
-//	//Escape::move_position(x, y);
-//	//Buffer::draw(ptr, size);
-////}
-//
-///* draw string */
-//void Draw::draw_string(const UInt x, const UInt y, const std::string& str) {
-//	// move to position
-//	//Escape::move_position(x, y);
-//	// draw string
-//	//Buffer::draw(str.data(), str.size());
-//}
-//
-///* vertivalDraw */
-//void Draw::vertivalDraw(const UInt x, UInt y, const void *ptr, const UInt size, UInt line) {
-//	while (line) {
-//		//Escape::move_position(x, y);
-//		//Buffer::draw(ptr, size);
-//		--line;
-//		++y;
-//	}
-//}
-//
-//void Draw::drawInteger(UInt number) {
-//
-//	constexpr UInt BUFFSIZE = 64;
-//
-//	static char seq[BUFFSIZE];
-//
-//	char* ptr = &(seq[BUFFSIZE]);
-//
-//	while (number) {
-//
-//		std::cout << "loop" << std::endl;
-//		*(--ptr) = (number % 10) + '0';
-//		number /= 10;
-//	}
-//	UInt size = (seq + BUFFSIZE) - ptr;
-//	//Buffer::draw(ptr, size);
-//
-//
-//}
+
+/* draw string */
+void xns::draw::draw_string(const xns::u32 x, const xns::u32 y, const xns::cstring& str) {
+	// move to position
+	//Escape::move_position(x, y);
+	// draw string
+	//Buffer::draw(str.data(), str.size());
+}
+
+/* vertivalDraw */
+void xns::draw::vertival_draw(const xns::u32 x, xns::u32 y, const void* ptr, const xns::u32 size, xns::u32 line) {
+	(void)y;
+	while (line) {
+		//Escape::move_position(x, y);
+		//Buffer::draw(ptr, size);
+		--line;
+		++y;
+	}
+}
+
+void xns::draw::draw_integer(xns::u32 number) {
+
+	constexpr xns::u32 BUFFSIZE = 64;
+
+	static char seq[BUFFSIZE];
+
+	char* ptr = &(seq[BUFFSIZE]);
+
+	while (number) {
+
+		std::cout << "loop" << std::endl;
+		*(--ptr) = (number % 10) + '0';
+		number /= 10;
+	}
+	xns::u32 size = (seq + BUFFSIZE) - ptr;
+	//Buffer::draw(ptr, size);
+
+
+}
 
 
 /* int Draw::drawStringNl(const Str& string) {
@@ -69,7 +70,7 @@
 	animateDraw(string, RED_COLOR, GREY_COLOR);
 	write(STDOUT_FILENO, "\n", 1); }*/
 
-/* void Draw::animateDraw(const Str& id, const UInt32 colorIn, const UInt32 colorOut) {
+/* void Draw::animateDraw(const Str& id, const xns::u32 colorIn, const xns::u32 colorOut) {
 	if (id.getLen() > 30) {
 		drawString(id);
 		return;
@@ -85,11 +86,11 @@
 			// run loop again
 			continue;
 		} // else speed print calculation
-		UInt32 dl = PDELAY / (*ptr - 32);
+		xns::u32 dl = PDELAY / (*ptr - 32);
 		// enable color
 		//setColor(colorIn, FOREGROUND);
 		// iterate until target character
-		for (UInt8 x = '\x20'; x != *ptr;) {
+		for (xns::ubyte x = '\x20'; x != *ptr;) {
 			// print stages
 			write(STDOUT_FILENO, &(++x), 1);
 			// wait delay
