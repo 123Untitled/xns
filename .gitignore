@@ -1,5 +1,5 @@
 
-# ignore executables
+# ignore executable
 xnsexec
 
 # ignore build directory
