@@ -1,8 +1,6 @@
 #ifndef MYLIB_HEADER
 #define MYLIB_HEADER
 
-/* unit testing */
-#include "unit_tests.hpp"
 
 /* utilities */
 #include "types.hpp"
@@ -12,11 +10,11 @@
 /* file-system */
 #include "directory.hpp"
 #include "file.hpp"
+#include "path.hpp"
 
 
 /* meta-programming */
-#include "is_integral.hpp"
-#include "conditional.hpp"
+#include "type_traits.hpp"
 
 /* containers */
 #include "string.hpp"
@@ -25,6 +23,7 @@
 #include "stack.hpp"
 #include "array.hpp"
 #include "tuple.hpp"
+#include "trie.hpp"
 
 
 /* invoke */
@@ -34,10 +33,13 @@
 
 
 /* random */
+#include "random.hpp"
 #include "probability.hpp"
 #include "id.hpp"
 
 
+#include "literal.hpp"
+#include "safe_enum.hpp"
 
 /* error handling */
 #include "debug.hpp"
