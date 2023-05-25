@@ -1,5 +1,3 @@
-#include "tuple.hpp"
-#include "vector.hpp"
 #include "xns.hpp"
 
 #include <array>
@@ -11,16 +9,8 @@
 #include <stack>
 #include <any>
 
-#include "random.hpp"
-#include "trie.hpp"
 
-#include "policy.hpp"
 
-#include "safe_enum.hpp"
-#include "literal.hpp"
-
-#include "path.hpp"
-// curiously recurring template pattern (CRTP) learn
 
 
 template <class T>
@@ -39,48 +29,48 @@ struct type_name {
 		}
 };
 
+void funcc(void);
+
+class TT {
+
+	public:
+
+		TT(void) {
+			std::cout << "TT::TT()" << std::endl;
+		}
+
+		~TT(void) {
+			std::cout << "TT::~TT()" << std::endl;
+		}
+
+		NON_ASSIGNABLE(TT);
+};
+
+void func(void);
 
 
 #if !defined(XNS_UT)
 int main(int ac, char** av) {
 
-
-	//UT::meta_ut();
-	//using unix_pp = xns::tuple<literal("/"), literal(".."), literal(".")>;
+	func();
+	using unix_pp = xns::tuple<literal("/"), literal(".."), literal(".")>;
 
 	//auto p0 = xns::make_path<unix_pp>("h/e/l/l/o");
-
-	//auto p = xns::make_path<literal("/ "), literal(".."), literal(".")>("// well / hello / there /");
-
-
-	return 0;
-
-
+	//	auto p = xns::make_path<literal("/ "), literal(".."), literal(".")>("// well / hello / there /");
 	//using t = path("/", "..", ".");
 
-	/*
+
 	using unix_path = xns::path<literal("/"), literal(".."), literal(".")>;
 
-	unix_path p = xns::make_path<
-		literal("/"),
+	//unix_path p = xns::make_path<
+	/*	literal("/"),
 		literal(".."),
-		literal(".")>("h/e/l/l/o");
+		literal(".")>("h/e/l/l/o");*/
 
-	unix_path p2 = xns::make_path("h/e/l/l/o");
-	*/
+	//unix_path p2 = xns::make_path("h/e/l/l/o");
 
-	return 0;
+	return EXIT_SUCCESS;
 
-
-	for (int i = 0 ; i < 20 ; ++i) {
-		xns::output::write(xns::id::generate());
-		xns::output::write("\n");
-		//std::cout<< xns::id::generate().pointer() << std::endl;
-	}
-	//xns::output::write("hello", 5);
-	xns::output::render<xns::stdout>();
-
-	return 0;
 
 	std::cout << (int)xns::max<char>() << std::endl;
 
@@ -201,9 +191,6 @@ int main(int ac, char** av) {
 
 	return EXIT_SUCCESS;
 
-	for (auto i = 0; i < 10; ++i) {
-		std::cout << xns::random::random_gen(10) << std::endl;
-	}
 
 }
 #endif
