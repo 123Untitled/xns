@@ -35,14 +35,14 @@ Xf::Event Xf::Event::_instance;
 /* add mode */
 Xf::Evntmode Xf::Event::new_mode(void) {
 	_modes.emplace_back(Mode{ });
-	Xf::Debug::print("new mode: %d\n", _modes.length() - 1);
+	Xf::Debug::print("new mode: %d\n", _modes.size() - 1);
 	if (_modes.empty()) {
 		// error
 		Evntmode mode{0};
 		mode._state = false;
 		return mode;
 	}
-	return Evntmode{_modes.length() - 1};
+	return Evntmode{_modes.size() - 1};
 }
 
 /* remove mode */
@@ -81,7 +81,7 @@ void Xf::Event::next_mode(void) {
 	// get subscribers index by event type
 	EventVector& subscribers = _modes[*_current]._second[IDX(Evntype::BEGIN)];
 	// loop through all observers
-	for (xns::size_t x = 0; x < subscribers.length(); ++x) {
+	for (xns::size_t x = 0; x < subscribers.size(); ++x) {
 		// call subscriber
 		subscribers[x].call();
 	}
@@ -164,7 +164,7 @@ void Xf::Event::call_event(const Evntype type) {
 	// get subscribers index by event type
 	EventVector& subscribers = _modes[*_current]._second[IDX(type)];
 	// loop through all observers
-	for (xns::size_t x = 0; x < subscribers.length(); ++x) {
+	for (xns::size_t x = 0; x < subscribers.size(); ++x) {
 		// call subscriber
 		subscribers[x].call();
 	}
@@ -177,7 +177,7 @@ void Xf::Event::call_input(const xns::cstring& input) {
 	// get subscribers
 	InputVector& subscribers = _modes[*_current]._first;
 	// loop through all observers
-	for (xns::size_t x = 0; x < subscribers.length(); ++x) {
+	for (xns::size_t x = 0; x < subscribers.size(); ++x) {
 		// call subscriber
 		subscribers[x].call(input);
 	}
