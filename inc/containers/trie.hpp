@@ -209,7 +209,7 @@ namespace Xf {
 				// instanciate value
 				Shared value = xns::make_shared_pointer<D>(xns::forward<A>(args)...);
 				// loop through alias
-				for (KeyVector::size x = 0; x < alias.length(); ++x) {
+				for (KeyVector::size_type x = 0; x < alias.size(); ++x) {
 					// insert key
 					Node* node = _insert(alias[x]);
 					// allocate value
@@ -223,7 +223,7 @@ namespace Xf {
 				// instanciate value
 				Shared value = xns::make_shared_pointer<Value>(xns::forward<A>(args)...);
 				// loop through alias
-				for (KeyVector::size x = 0; x < alias.length(); ++x) {
+				for (KeyVector::size_type x = 0; x < alias.size(); ++x) {
 					// insert key
 					Node* node = _insert(alias[x]);
 					// allocate value
