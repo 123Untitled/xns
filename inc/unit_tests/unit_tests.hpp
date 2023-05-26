@@ -13,6 +13,7 @@
 
 namespace UT {
 
+	bool path_ut(void);
 
 	bool meta_ut(void);
 
