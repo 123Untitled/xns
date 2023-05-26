@@ -49,7 +49,7 @@ void UT::unique_pointer_ut(void) {
 
 	xns::vector<xns::unique_ptr<int>> vec;
 
-	vec.push_back(xns::make_unique_pointer<int>(123));
+	vec.move_back(xns::make_unique_pointer<int>(123));
 
 	//Xf::AutoPointer<void> v{};
 
