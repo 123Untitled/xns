@@ -8,6 +8,19 @@
 #include "policy.hpp"
 
 
+
+// -- I S  C O M P A R A B L E ------------------------------------------------
+
+template <class T, class U>
+concept is_comparable = requires(T t, U u) {
+	{ t == u }; { t != u };
+	{ t <= u }; { t >= u };
+	{ t < u };  { t > u };
+};
+
+
+
+
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
@@ -40,7 +53,7 @@ namespace xns {
 			using self = vector<value, restrict>;
 
 			/* size type */
-			using size = xns::size_t;
+			using size_type = xns::size_t;
 
 			/* reference type */
 			using reference = value&;
@@ -78,7 +91,7 @@ namespace xns {
 				// reserve other size
 				reserve(other._size);
 				// loop through other vector
-				for (size x = 0; x < other._size; ++x) {
+				for (size_type x = 0; x < other._size; ++x) {
 					// construct value by copy
 					allocator::construct(_vector + x, other._vector[x]);
 				} // set size
@@ -130,7 +143,7 @@ namespace xns {
 					// reserve other size
 					reserve(other._size);
 					// loop through other vector
-					for (size x = 0; x < other._size; ++x) {
+					for (size_type x = 0; x < other._size; ++x) {
 						// construct value by copy
 						allocator::construct(_vector + x, other._vector[x]);
 					} // set size
@@ -159,25 +172,25 @@ namespace xns {
 			}
 
 			/* subscript operator */
-			reference operator[](const size index) {
+			reference operator[](const size_type index) {
 				// return reference
 				return _vector[index];
 			}
 
 			/* const subscript operator */
-			const_reference operator[](const size index) const {
+			const_reference operator[](const size_type index) const {
 				// return reference
 				return _vector[index];
 			}
 
 			/* at */
-			reference at(const size index) {
+			reference at(const size_type index) {
 				// return reference
 				return _vector[index];
 			}
 
 			/* const at */
-			const_reference at(const size index) const {
+			const_reference at(const size_type index) const {
 				// return reference
 				return _vector[index];
 			}
@@ -231,25 +244,25 @@ namespace xns {
 			}
 
 			/* size */
-			size length(void) const {
+			size_type size(void) const {
 				// return size
 				return _size;
 			}
 
 			/* capacity */
-			size capacity(void) const {
+			size_type capacity(void) const {
 				// return capacity
 				return _capacity;
 			}
 
 			/* max size */
-			size max_size(void) const {
+			size_type max_size(void) const {
 				// return max size
 				return allocator::max_size();
 			}
 
 			/* reserve */
-			void reserve(const size capacity) {
+			void reserve(const size_type capacity) {
 				// check capacity
 				if (capacity > _capacity) {
 					// allocate memory
@@ -257,7 +270,7 @@ namespace xns {
 					// check pointer
 					if (_vector != nullptr) {
 						// loop through vector
-						for (size x = 0; x < _size; ++x) {
+						for (size_type x = 0; x < _size; ++x) {
 							// move elements
 							tmp[x] = xns::move(_vector[x]);
 						} // deallocate memory
@@ -275,7 +288,7 @@ namespace xns {
 			/* clear */
 			void clear(void) {
 				// loop through vector
-				for (size x = 0; x < _size; ++x) {
+				for (size_type x = 0; x < _size; ++x) {
 					// destroy object
 					allocator::destroy(_vector + x);
 				} // reset size
@@ -284,7 +297,7 @@ namespace xns {
 
 			/* emplace */
 			template <typename... Args>
-			void emplace(size pos, Args&&... args) {
+			void emplace(size_type pos, Args&&... args) {
 				// check position
 				if (pos > _size) { return; }
 				// check capacity
@@ -292,7 +305,7 @@ namespace xns {
 					// double capacity
 					reserve(grow());
 				} // move elements
-				for (size x = _size; x > pos; --x) {
+				for (size_type x = _size; x > pos; --x) {
 					// move element
 					_vector[x] = xns::move(_vector[x - 1]);
 				} // construct element
@@ -327,25 +340,13 @@ namespace xns {
 			}
 
 			/* copy push back */
-			void push_back(const value& value) {
+			void copy_back(const value& value) {
 				// check capacity
 				if (!available()) {
 					// double capacity
 					reserve(grow());
 				} // construct element
 				allocator::construct(_vector + _size, value);
-				// increment size
-				++_size;
-			}
-
-			/* move push back */ // WARNING: this will be deprecated
-			void push_back(value&& value) {
-				// check capacity
-				if (!available()) {
-					// double capacity
-					reserve(grow());
-				} // construct element
-				allocator::construct(_vector + _size, xns::move(value));
 				// increment size
 				++_size;
 			}
@@ -372,6 +373,48 @@ namespace xns {
 				--_size;
 			}
 
+
+			// -- E R A S E ---------------------------------------------------
+
+			/* erase */
+			void erase(const size_type pos) {
+				// check position
+				if (pos >= _size) { return; }
+				// move elements
+				for (size_type x = pos; x < (_size - 1); ++x) {
+					// move element
+					_vector[x] = xns::move(_vector[x + 1]);
+				} // decrement size
+				--_size;
+				// destroy last element
+				allocator::destroy(_vector + _size);
+			}
+
+
+
+			/* filter */ //requires is_comparable<U, value>
+			/* remove all elements that match the given value */
+			template <class... A>
+			void filter(const A&... compare) {
+				// z is the index of the next element to move
+				size_type z = 0;
+				// loop over vector
+				for (size_type x = 0; x < _size; ++x) {
+					// loop over arguments to compare
+					if (((_vector[x] != compare) && ...)) {
+						// if no match, maybe move, check shift
+						if (z != x) {
+							// move element
+							_vector[z] = xns::move(_vector[x]);
+						} // increment z
+						++z;
+					}
+				} // finaly, destroy elements and decrement size
+				while (z < _size) { allocator::destroy(_vector + --_size); }
+			}
+
+
+
 		private:
 
 			// -- P R I V A T E  M E T H O D S --------------------------------
@@ -387,13 +430,13 @@ namespace xns {
 			}
 
 			/* available */
-			size available(void) const {
+			size_type available(void) const {
 				// return available memory
 				return _capacity - _size;
 			}
 
 			/* check capacity */
-			inline size grow(void) {
+			inline size_type grow(void) {
 				return (_capacity << 1) + (_capacity == 0);
 			}
 
@@ -407,10 +450,10 @@ namespace xns {
 			pointer _vector;
 
 			/* capacity */
-			size _capacity;
+			size_type _capacity;
 
 			/* size */
-			size _size;
+			size_type _size;
 
 
 
@@ -434,7 +477,7 @@ namespace xns {
 		// check allocation success
 		if (vec._vector != nullptr) {
 
-			typename vector<T, R>::size x = 0;
+			typename vector<T, R>::size_type x = 0;
 
 			// fold expression to construct by forwarding
 			(allocator::construct(&vec._vector[x++], xns::forward<A>(args)), ...);
