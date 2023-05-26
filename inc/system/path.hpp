@@ -1,11 +1,13 @@
 #ifndef PATH_HEADER
 #define PATH_HEADER
 
+#include "output.hpp"
 #include "types.hpp"
 #include "string.hpp"
 #include "vector.hpp"
 #include "literal.hpp"
 #include "safe_enum.hpp"
+#include "tuple.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -21,6 +23,7 @@ namespace xns {
 		enum enum_type : type {
 			ABSOLUTE,
 			RELATIVE,
+			UNDEFINED,
 			MAX
 		};
 	};
@@ -29,23 +32,28 @@ namespace xns {
 	using path_type = xns::safe_enum<path_type_def>;
 
 
-	template <class S, class P, class C>
-	concept common_char = xns::is_all_same< xns::literal_char<S>,
-											xns::literal_char<P>,
-											xns::literal_char<C>>;
-
-
-
 	// -- P A T H  C L A S S --------------------------------------------------
 
-	template <xns::is_literal S, xns::is_literal P, xns::is_literal C>
 	class path {
 
+		private:
 
-		// -- A S S E R T I O N S ---------------------------------------------
+			// -- P R I V A T E  E N U M S ------------------------------------
 
-		/* require common character type */
-		static_assert(xns::common_char<S, P, C>, "LITERALS MUST HAVE THE SAME CHARACTER TYPE");
+			/* segment type */
+			struct segment_type_def {
+				// integral type
+				using type = xns::u8;
+				// enum type
+				enum enum_type : type {
+					PARENT,
+					ENTITY,
+					MAX
+				};
+			};
+
+			/* segment type */
+			using segment_type = xns::safe_enum<segment_type_def>;
 
 
 		public:
@@ -53,37 +61,28 @@ namespace xns {
 			// -- T Y P E S ---------------------------------------------------
 
 			/* character type */
-			using char_t = xns::literal_char<S>;
+			using char_t = char;
 
-			/* segment type */
-			using segment = xns::string<char_t>;
+			/* string type */
+			using string = xns::string<char_t>;
+
+			/* segment2 type */
+			using segment = xns::tuple<xns::string<char_t>, segment_type>;
 
 			/* segment list type */
-			using segment_list = xns::vector<segment, xns::moveable_t>;
+			using segment_list = xns::vector<segment>;
 
 			/* size type */
-			using size_type = typename segment_list::size;
-
-
-			// -- F R I E N D S -----------------------------------------------
-
-			/* make template arguments friends */
-			template <xns::is_literal T, xns::is_literal U, xns::is_literal V>
-			friend class path;
-
-			/* make path a friend */
-			template <xns::is_literal T, xns::is_literal U, xns::is_literal V>
-			friend auto make_path(const xns::string<literal_char<T>>&) -> xns::path<T, U, V>;
-
-			/* make path overloads friends */
-			template <class T, class U>
-			friend auto make_path(const xns::string<U>&);
+			using size_type = typename segment_list::size_type;
 
 
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* default constructor */
-			path(void) { }
+			path(void);
+
+			/* path constructor */
+			path(const string&);
 
 			/* non-copyable class */
 			NON_COPYABLE(path);
@@ -95,14 +94,57 @@ namespace xns {
 			~path(void) = default;
 
 
-			// -- M O V E  O P E R A T O R S ----------------------------------
+			// -- A S S I G N M E N T -----------------------------------------
+
+			/* path assignment */
+			path& assign(const string&);
+
+			/* move assignment */
+			path& assign(path&&) noexcept;
+
+
+			// -- A S S I G N M E N T  O P E R A T O R S ----------------------
+
+			/* path assignment operator */
+			path& operator=(const string&);
 
 			/* move assignment operator */
 			path& operator=(path&&) noexcept;
 
-			using test = void (*)(void);
+
+			// -- S E G M E N T  A C C E S S O R S ----------------------------
+
+			/* get segment */
+			const segment& operator[](const size_type) const;
+
+
+			// -- A C C E S S O R S -------------------------------------------
+
+			/* segment count */
+			size_type count(void) const;
+
 
 		private:
+
+
+			// -- P R I V A T E  E N U M S ------------------------------------
+
+			/* enum for character types */
+			enum {
+				EOS = 0x00, // end of string
+				SEP = 0x2f, // separator
+				CUR = 0x2e, // current directory
+				PAR = 0x2e2e // parent directory
+			};
+
+
+
+			// -- P R I V A T E  M E T H O D S --------------------------------
+
+			/* resolve path */
+			void resolve(const string&);
+
+
 
 			// -- M E M B E R S -----------------------------------------------
 
@@ -113,51 +155,7 @@ namespace xns {
 			path_type _type;
 
 
-
 	};
-
-
-
-
-	// -- F R I E N D  F U N C T I O N S --------------------------------------
-
-	/* make path */
-	template <class T>
-	auto make_path(const xns::string<char>& input) {
-
-		using S = decltype(T{}.template get<0>());
-		using P = decltype(T{}.template get<1>());
-		using C = decltype(T{}.template get<2>());
-
-		xns::path<S, P, C> path;
-		path._segments = input.template split<xns::moveable_t> (S::data());
-
-		for (unsigned i = 0; i < path._segments.length(); ++i) {
-			std::cout << path._segments[i] << std::endl;
-		}
-
-
-
-	}
-
-
-	/* make path */
-	/*template <xns::is_literal S, xns::is_literal P, xns::is_literal C>
-	auto make_path(const xns::string<literal_char<S>>& input) -> xns::path<S, P, C> {
-
-		xns::path<S, P, C> path;
-		path._segments = input.template split<xns::moveable_t> (S::data());
-
-		for (unsigned i = 0; i < path._segments.length(); ++i) {
-			std::cout << path._segments[i] << std::endl;
-		}
-
-		return path;
-
-
-	}*/
-
-
 
 
 
