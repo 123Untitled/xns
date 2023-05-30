@@ -83,7 +83,7 @@ namespace xns {
 			/* unique pointer constructor */
 			template <class D>
 			weak_ptr(const xns::unique_ptr<D>& unique) noexcept
-			requires (xns::is_base_of_c<T, D>)
+			requires (xns::is_derived_from<D, value_type>)
 			: _data{unique._data} {
 				// code here...
 			}
@@ -91,7 +91,7 @@ namespace xns {
 			/* shared pointer constructor */
 			template <class D>
 			weak_ptr(const xns::shared_ptr<D>& shared) noexcept
-			requires (xns::is_base_of_c<T, D>)
+			requires (xns::is_derived_from<D, value_type>)
 			: _data{shared._data} {
 				// code here...
 			}
@@ -105,7 +105,7 @@ namespace xns {
 			/* derived copy constructor */
 			template <class D>
 			weak_ptr(const weak_ptr<D>& other) noexcept
-			requires (xns::is_base_of_c<T, D>)
+			requires (xns::is_derived_from<D, value_type>)
 			: _data{other._data} {
 				// code here...
 			}
@@ -120,7 +120,7 @@ namespace xns {
 			/* derived move constructor */
 			template <class D>
 			weak_ptr(weak_ptr<D>&& other) noexcept
-			requires (xns::is_base_of_c<T, D>)
+			requires (xns::is_derived_from<D, value_type>)
 			: _data{other._data} {
 				// invalidate other
 				other._data = nullptr;
@@ -159,7 +159,7 @@ namespace xns {
 			/* derived copy assignment */
 			template <class D>
 			self& assign(const weak_ptr<D>& other) noexcept
-			requires (xns::is_base_of_c<T, D>) {
+			requires (xns::is_derived_from<D, value_type>) {
 				// assign other data
 				_data = other._data;
 				// return self reference
@@ -181,7 +181,7 @@ namespace xns {
 			/* derived move assignment */
 			template <class D>
 			self& assign(weak_ptr<D>&& other) noexcept
-			requires (xns::is_base_of_c<T, D>) {
+			requires (xns::is_derived_from<D, value_type>) {
 				// check for self assignment
 				if (this != &other) {
 					// assign other data
@@ -195,7 +195,7 @@ namespace xns {
 			/* unique pointer assignment */
 			template <class D>
 			self& assign(const xns::unique_ptr<D>& ptr) noexcept
-			requires (xns::is_base_of_c<T, D>) {
+			requires (xns::is_derived_from<D, value_type>) {
 				// assign pointer
 				_data = ptr._data;
 				// return self reference
@@ -205,7 +205,7 @@ namespace xns {
 			/* shared pointer assignment */
 			template <class D>
 			self& assign(const xns::shared_ptr<D>& ptr) noexcept
-			requires (xns::is_base_of_c<T, D>) {
+			requires (xns::is_derived_from<D, value_type>) {
 				// assign pointer
 				_data = ptr._data;
 				// return self reference
@@ -236,7 +236,7 @@ namespace xns {
 			/* derived copy assignment operator */
 			template <class D>
 			self& operator=(const weak_ptr<D>& other) noexcept
-			requires (xns::is_base_of_c<T, D>) {
+			requires (xns::is_derived_from<D, value_type>) {
 				// return derived copy assignment
 				return assign(other);
 			}
@@ -250,7 +250,7 @@ namespace xns {
 			/* derived move assignment operator */
 			template <class D>
 			self& operator=(weak_ptr<D>&& other) noexcept
-			requires (xns::is_base_of_c<T, D>) {
+			requires (xns::is_derived_from<D, value_type>) {
 				// return derived move assignment
 				return assign(xns::move(other));
 			}
@@ -258,7 +258,7 @@ namespace xns {
 			/* unique pointer assignment operator */
 			template <class D>
 			self& operator=(const xns::unique_ptr<D>& ptr) noexcept
-			requires (xns::is_base_of_c<T, D>) {
+			requires (xns::is_derived_from<D, value_type>) {
 				// return unique pointer assignment
 				return assign(ptr);
 			}
@@ -266,7 +266,7 @@ namespace xns {
 			/* shared pointer assignment operator */
 			template <class D>
 			self& operator=(const xns::shared_ptr<D>& ptr) noexcept
-			requires (xns::is_base_of_c<T, D>) {
+			requires (xns::is_derived_from<D, value_type>) {
 				// return shared pointer assignment
 				return assign(ptr);
 			}
