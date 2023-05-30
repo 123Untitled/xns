@@ -1,7 +1,8 @@
 #ifndef IS_ARRAY_HEADER
 #define IS_ARRAY_HEADER
 
-#include "has_type.hpp"
+#include "integral_constant.hpp"
+#include "types.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
