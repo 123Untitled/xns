@@ -2,7 +2,7 @@
 #define IS_INTEGRAL_HEADER
 
 #include "types.hpp"
-#include "has_type.hpp"
+#include "is_one_of.hpp"
 #include "remove.hpp"
 
 
@@ -15,7 +15,7 @@ namespace xns {
 
 	/* is integral concept */
 	template <class T>
-	concept is_integral = has_type<xns::remove_cv<T>,
+	concept is_integral = xns::is_one_of<xns::remove_cv<T>,
 
 		bool, char, short, int, long, long long,
 		char8_t, wchar_t, char32_t, char16_t,
