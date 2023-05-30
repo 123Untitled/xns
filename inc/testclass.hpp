@@ -112,4 +112,65 @@ class Class final : public Base<T> {
 
 };
 
+
+// -- T E S T  N A M E S P A C E ----------------------------------------------
+
+namespace tests {
+
+
+	// -- B A S E  C L A S S --------------------------------------------------
+
+	class base {
+
+		public:
+
+			// -- constructors ------------------------------------------------
+
+			/* virtual destructor */
+			virtual ~base(void) { /* empty */ }
+
+
+			// -- virtual methods ---------------------------------------------
+
+			/* echo */
+			virtual void echo(void) const {
+				std::cout << "echo base" << std::endl;
+			}
+
+	};
+
+
+	// -- D E R I V E D  C L A S S --------------------------------------------
+
+	class derived final : public base {
+
+		public:
+
+			// -- constructors ------------------------------------------------
+
+			/* default constructor */
+			derived(void) = default;
+
+			/* destructor */
+			~derived(void) override = default;
+
+
+			// -- override methods --------------------------------------------
+
+			/* echo */
+			void echo(void) const override {
+				std::cout << "echo derived" << std::endl;
+			}
+
+
+	};
+
+
+
+}
+
+
+
+
+
 #endif
