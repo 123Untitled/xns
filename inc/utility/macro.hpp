@@ -59,7 +59,7 @@
 
 #define RESET "\x1b[0m"
 
-#define newline std::cout.write("\n", 1);
+//#define newline std::cout.write("\n", 1);
 
 #define _DBG(msg) std::cout << YELLOW << msg << RESET << " : " << __PRETTY_FUNCTION__ << std::endl;
 
