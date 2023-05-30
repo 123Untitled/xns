@@ -87,7 +87,7 @@ namespace xns {
 			using self         = path<string_type>;
 
 			/* character type */
-			using char_t       = string_type::char_t;
+			using char_t       = typename string_type::char_t;
 
 			/* segment2 type */
 			using segment      = xns::tuple<string_type, segment_type>;
