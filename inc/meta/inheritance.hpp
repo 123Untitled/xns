@@ -26,11 +26,11 @@ namespace xns {
 				using derived = xns::remove_cvr<D>;
 
 
-				/* test for derived */
-				static consteval auto test(base*) -> xns::yes;
+				/* test for derived */ // INFO: constevel doesn't compile on linux
+				static constexpr auto test(base*) -> xns::yes;
 
-				/* test for other */
-				static consteval auto test(...)   -> xns::no;
+				/* test for other */ // INFO: constevel doesn't compile on linux
+				static constexpr auto test(...)   -> xns::no;
 
 
 			public:
