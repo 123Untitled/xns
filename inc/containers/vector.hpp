@@ -139,6 +139,7 @@ namespace xns {
 				if (this != &other) {
 					// clear vector
 					clear();
+					allocator::deallocate(_vector);
 					// !!!!!!! NOTE : optimize this one
 					// reserve other size
 					reserve(other._size);
@@ -159,6 +160,7 @@ namespace xns {
 				if (this != &other) {
 					// clear vector
 					clear();
+					allocator::deallocate(_vector);
 					// move other vector
 					_vector = other._vector;
 					// move other capacity
@@ -272,7 +274,8 @@ namespace xns {
 						// loop through vector
 						for (size_type x = 0; x < _size; ++x) {
 							// move elements
-							tmp[x] = xns::move(_vector[x]);
+							allocator::construct(tmp + x, xns::move(_vector[x]));
+							allocator::destroy(_vector + x);
 						} // deallocate memory
 						allocator::deallocate(_vector);
 					} // assign capacity
@@ -437,7 +440,7 @@ namespace xns {
 
 			/* check capacity */
 			inline size_type grow(void) {
-				return (_capacity << 1) + (_capacity == 0);
+				return (_capacity * 2) + (_capacity == 0);
 			}
 
 			/* destroy */
@@ -472,7 +475,7 @@ namespace xns {
 		xns::vector<T, R> vec;
 
 		// allocate memory
-		vec._vector = allocator::allocate(sizeof...(args));
+		vec._vector = allocator::allocate(sizeof...(A));
 
 		// check allocation success
 		if (vec._vector != nullptr) {
