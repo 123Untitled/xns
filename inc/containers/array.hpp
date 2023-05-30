@@ -8,6 +8,7 @@
 #include "integer_sequence.hpp"
 #include "pack_type.hpp"
 #include "parameter_pack.hpp"
+#include "common_type.hpp"
 
 #include <iostream>
 
@@ -313,6 +314,10 @@ namespace xns {
 
 
 	};
+
+	template <class... A>
+	array(A...) -> array<xns::common_type_t<A...>, sizeof...(A)>;
+
 
 	// NEED TO DEDUCE TYPE OF ARRAY
 	// no time to implement this now
