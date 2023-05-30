@@ -13,7 +13,7 @@
 namespace xns {
 
 	template <class... A>
-	consteval void print(const char* format, A... args) {
+	constexpr void print(const char* format, A... args) {
 		xns::size_t x = 0;
 		while (format[x]) {
 
