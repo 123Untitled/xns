@@ -156,7 +156,9 @@ namespace xns {
 
 			/* null-terminated string constructor */
 			string(const_pointer str)
-			: string{} {
+			//: string{} {
+			: _str{nullptr}, _capacity{0}, _size{0} {
+				std::cout << "c-string constructor\n" << std::endl;
 				// exit if string is null or empty
 				if ((_size = get_len(str)) == 0) { return; }
 				// set capacity
@@ -284,6 +286,7 @@ namespace xns {
 				return *this;
 			}
 
+
 			// WARNING: need to rework this with realloc
 			/* copy assignment */
 			string& assign(const string& other) {
@@ -312,15 +315,16 @@ namespace xns {
 			}
 
 			/* move assignment */
-			string& assign(string&& other) noexcept {
+			self& assign(self&& other) noexcept {
+				std::cout << "move string" << std::endl;
 				// check for self-assignment
 				if (this != &other) {
 					// deallocate memory
 					if (_str) { allocator::deallocate(_str); }
 					// move members
-					_str = other._str;
+					_str      = other._str;
 					_capacity = other._capacity;
-					_size = other._size;
+					_size     = other._size;
 					// invalidate other
 					other._initialize_members();
 				}
@@ -1693,7 +1697,7 @@ namespace xns {
 			using self            = basic_string_view<char_t>;
 
 			/* size type */
-			using size_type       = xns::string<char_t>::size_type;
+			using size_type       = typename xns::string<char_t>::size_type;
 
 			/* reference type */
 			using reference       = char_t&;
