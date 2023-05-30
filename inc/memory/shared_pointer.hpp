@@ -88,7 +88,7 @@ namespace xns {
 			}
 
 			/* derived copy constructor */
-			template <class D> requires xns::is_base_of_c<T, D>
+			template <class D> requires xns::is_derived_from<D, value_type>
 			shared_ptr(const shared_ptr<D>& other) noexcept
 			: _data{other._data}, _count{other._count} {
 				// check pointer validity
@@ -107,7 +107,7 @@ namespace xns {
 			}
 
 			/* derived move constructor */
-			template <class D> requires xns::is_base_of_c<T, D>
+			template <class D> requires xns::is_derived_from<D, value_type>
 			shared_ptr(shared_ptr<D>&& other) noexcept
 			: _data{other._data}, _count{other._count} {
 				// invalidate other
@@ -157,7 +157,7 @@ namespace xns {
 			}
 
 			/* derived copy assignment */
-			template <class D> requires xns::is_base_of_c<T, D>
+			template <class D> requires xns::is_derived_from<D, value_type>
 			self& assign(const shared_ptr<D>& other) {
 				// check for self assignment
 				if (this != &other) {
@@ -192,7 +192,7 @@ namespace xns {
 			}
 
 			/* derived move assignment */
-			template <class D> requires xns::is_base_of_c<T, D>
+			template <class D> requires xns::is_derived_from<D, value_type>
 			self& assign(shared_ptr<D>&& other) {
 				// check for self assignment
 				if (this != reinterpret_cast<self*>(&other)) {
@@ -224,7 +224,7 @@ namespace xns {
 			}
 
 			/* derived copy assignment operator */
-			template <class D> requires xns::is_base_of_c<T, D>
+			template <class D> requires xns::is_derived_from<D, value_type>
 			shared_ptr& operator=(const shared_ptr<D>& other) {
 				// return derived copy assignment
 				return assign(other);
@@ -237,7 +237,7 @@ namespace xns {
 			}
 
 			/* derived move assignment operator */
-			template <class D> requires xns::is_base_of_c<T, D>
+			template <class D> requires xns::is_derived_from<D, value_type>
 			shared_ptr& operator=(shared_ptr<D>&& other) {
 				// return derived move assignment
 				return assign(xns::move(other));

@@ -86,7 +86,7 @@ namespace xns {
 			}
 
 			/* derived move constructor */
-			template <class D> requires (xns::is_base_of_c<T, D>)
+			template <class D> requires (xns::is_derived_from<D, value_type>)
 			unique_ptr(unique_ptr<D>&& other) noexcept
 			: _data(other._data) {
 				// invalidate other
@@ -130,7 +130,7 @@ namespace xns {
 			}
 
 			/* derived move assignment */
-			template <class D> requires (xns::is_base_of_c<T, D>)
+			template <class D> requires (xns::is_derived_from<D, value_type>)
 			self& assign(unique_ptr<D>&& other) {
 				// check for self assignment
 				if (this != reinterpret_cast<self*>(&other)) {
@@ -160,7 +160,7 @@ namespace xns {
 			}
 
 			/* derived move assignment operator */
-			template <class D> requires (xns::is_base_of_c<T, D>)
+			template <class D> requires (xns::is_derived_from<D, value_type>)
 			self& operator=(unique_ptr<D>&& other) {
 				// return derived move assignment
 				return assign(xns::move(other));
@@ -251,6 +251,26 @@ namespace xns {
 				}
 			}
 
+			/* base reference cast */
+			template <class B>
+			unique_ptr<B>& as(void) {
+				static_assert(xns::is_base_of<B, value_type>, "WOOO, THIS CAST IS NOT ALLOWED");
+				// return casted reference
+				return reinterpret_cast<unique_ptr<B>&>(*this);
+			}
+
+			/* base const reference cast */
+			template <class B>
+			const unique_ptr<B>& as(void) const {
+				static_assert(xns::is_base_of<B, value_type>, "WOOO, THIS CAST IS NOT ALLOWED");
+				// return casted const reference
+				return reinterpret_cast<const unique_ptr<B>&>(*this);
+			}
+
+			// is this secure?
+			// answer: no, it is not secure
+			// why? because it is possible to cast a unique_ptr<T> to a unique_ptr<U>
+			// where U is not derived from T, and then call this method
 
 		private:
 
