@@ -189,7 +189,7 @@ namespace Xf {
 			Optional _next;
 
 			/* mode index stack */
-			Xf::Stack<xns::size_t> _stack;
+			xns::stack<xns::size_t> _stack;
 			//Xf::Stack<Optional> _stack;
 
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------
