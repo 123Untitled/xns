@@ -7,15 +7,20 @@
 // 3. it is constexpr
 
 #include "string.hpp"
+#include "types.hpp"
 
 
 namespace xns {
 
 	template <class... A>
-	void printf(const char* format, A... args) {
+	consteval void print(const char* format, A... args) {
+		xns::size_t x = 0;
+		while (format[x]) {
 
+			++x;
+
+		}
 	}
-
 
 }
 
