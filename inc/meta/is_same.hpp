@@ -44,6 +44,11 @@ namespace xns {
 	concept is_not_all_same = !is_all_same<T, U...>;
 
 
+
+
+
+
+
 	/* is same concept remove specifier */
 	//template <class T, class U>
 	//concept IsSameRmCvr = is_same<remove_cvr_t<T>, remove_cvr_t<U>>;
