@@ -4,6 +4,7 @@
 #include "integral_constant.hpp"
 #include "is_same.hpp"
 
+
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
@@ -14,16 +15,16 @@ namespace xns {
 	namespace impl {
 
 		template <class T, class... A>
-		struct has_type : public xns::bool_constant<(xns::is_same<T, A> || ...)> {};
+		struct is_one_of : public xns::bool_constant<(xns::is_same<T, A> || ...)> {};
 
 	}
 
 
-	// -- H A S  T Y P E ------------------------------------------------------
+	// -- I S  O N E  O F -----------------------------------------------------
 
 	/* has type concept */
 	template <class T, class... A>
-	concept has_type = impl::has_type<T, A...>::value;
+	concept is_one_of = impl::is_one_of<T, A...>::value;
 
 }
 
