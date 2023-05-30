@@ -15,6 +15,12 @@ xns::output::~output(void) {
 	// code here...
 }
 
+/* new line */
+void xns::output::newline(void) {
+	// append to buffer
+	_instance._buffer += '\n';
+}
+
 /* write unknown bytes */
 void xns::output::write(const char* str) {
 	// append to buffer
