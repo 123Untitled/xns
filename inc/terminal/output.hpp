@@ -58,6 +58,9 @@ namespace xns {
 
 			// -- P U B L I C  S T A T I C  M E T H O D S ---------------------
 
+			/* new line */
+			static void newline(void);
+
 			/* write unknown bytes */
 			static void write(const char* str);
 
