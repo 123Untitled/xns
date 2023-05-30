@@ -20,8 +20,14 @@
 #include "is_char.hpp"
 #include "is_signed.hpp"
 #include "is_integral.hpp"
+#include "is_floating.hpp"
+#include "is_arithmetic.hpp"
+#include "is_scalar.hpp"
 #include "is_pointer.hpp"
+#include "is_member_pointer.hpp"
 #include "is_reference.hpp"
+
+#include "is_one_of.hpp"
 
 #include "move.hpp"
 #include "forward.hpp"
