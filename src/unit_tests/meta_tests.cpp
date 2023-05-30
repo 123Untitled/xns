@@ -28,6 +28,46 @@ void test(const bool result, const char* msg) {
 bool UT::meta_ut(void) {
 
 
+	START_UT("is_derived_from");
+
+	tests::base base;
+
+	tests::derived derived;
+
+	test<true >(is_derived_from<tests::derived, tests::base>, "derived -> base");
+	test<false>(is_derived_from<tests::base,    tests::derived>, "base -> derived");
+	test<true>(is_derived_from<tests::base,    tests::base>, "base -> base");
+	test<true>(is_derived_from<tests::derived, tests::derived>, "derived -> derived");
+
+	// std version
+
+	test<true >(std::derived_from<tests::derived, tests::base>, "derived -> base");
+	test<false>(std::derived_from<tests::base,    tests::derived>, "base -> derived");
+	test<true>(std::derived_from<tests::base,    tests::base>, "base -> base");
+	test<true>(std::derived_from<tests::derived, tests::derived>, "derived -> derived");
+
+
+	START_UT("is_base_of");
+
+	test<true >(is_base_of<tests::base,    tests::derived>, "base -> derived");
+	test<false>(is_base_of<tests::derived, tests::base>, "derived -> base");
+	test<true >(is_base_of<tests::base,    tests::base>, "base -> base");
+	test<true >(is_base_of<tests::derived, tests::derived>, "derived -> derived");
+
+	// std version
+
+	test<true >(std::is_base_of_v<tests::base,    tests::derived>, "base -> derived");
+	test<false>(std::is_base_of_v<tests::derived, tests::base>, "derived -> base");
+	test<true >(std::is_base_of_v<tests::base,    tests::base>, "base -> base");
+	test<true >(std::is_base_of_v<tests::derived, tests::derived>, "derived -> derived");
+
+	return true;
+
+
+
+
+
+
 	START_UT("is_integral");
 
 
