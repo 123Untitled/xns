@@ -10,58 +10,50 @@
 namespace xns {
 
 
-	// -- I S  D E R I V E D  F R O M -----------------------------------------
+	// -- D E T A I L ---------------------------------------------------------
 
-	template <class D, class B>
-	struct is_derived_from {
+	namespace impl {
 
-		private:
+		template <class D, class B>
+		struct is_derived_from {
 
-			/* base type */
-			using Base    = xns::remove_cvr<B>;
+			private:
 
-			/* derived type */
-			using Derived = xns::remove_cvr<D>;
+				/* base type */
+				using base    = xns::remove_cvr<B>;
 
-
-			/* test for derived */
-			static consteval auto test(Base*) -> xns::yes;
-
-			/* test for other */
-			static consteval auto test(...)   -> xns::no;
+				/* derived type */
+				using derived = xns::remove_cvr<D>;
 
 
-		public:
+				/* test for derived */
+				static consteval auto test(base*) -> xns::yes;
 
-			/* value */
-			static constexpr bool value = decltype(test(static_cast<Derived*>(nullptr)))::value;
-
-	};
+				/* test for other */
+				static consteval auto test(...)   -> xns::no;
 
 
-	// -- I S  B A S E  O F ---------------------------------------------------
+			public:
 
-	template <class B, class D>
-	struct is_base_of : xns::is_derived_from<D, B> {};
+				/* value */
+				static constexpr bool value = decltype(test(static_cast<derived*>(nullptr)))::value;
+
+		};
+
+	}
 
 
 	// -- H E L P E R S -------------------------------------------------------
 
-	/* is derived from value */
-	template <class D, class B>
-	static constexpr bool is_derived_from_v = is_derived_from<D, B>::value;
-
-	/* is base of value */
-	template <class B, class D>
-	static constexpr bool is_base_of_v = is_base_of<B, D>::value;
 
 	/* is derived from concept */
 	template <class D, class B>
-	concept is_derived_from_c = is_derived_from_v<D, B>;
+	concept is_derived_from = impl::is_derived_from<D, B>::value;
 
 	/* is base of concept */
 	template <class B, class D>
-	concept is_base_of_c = is_base_of_v<B, D>;
+	concept is_base_of = impl::is_derived_from<D, B>::value;
+
 
 
 
