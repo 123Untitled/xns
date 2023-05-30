@@ -19,9 +19,9 @@ namespace xns {
 		/* string type */
 		using string_type   = xns::remove_cvr<S>;
 		/* size type */
-		using size_type     = string_type::size_type;
+		using size_type     = typename string_type::size_type;
 		/* character type */
-		using char_t        = string_type::char_t;
+		using char_t        = typename string_type::char_t;
 		/* const pointer */
 		using const_pointer = typename string_type::const_pointer;
 
