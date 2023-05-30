@@ -1,7 +1,7 @@
 #ifndef IS_FLOATING_HEADER
 #define IS_FLOATING_HEADER
 
-#include "has_type.hpp"
+#include "is_one_of.hpp"
 #include "remove.hpp"
 
 
@@ -14,7 +14,7 @@ namespace xns {
 
 	/* is floating concept */
 	template <class T>
-	concept is_floating = has_type<xns::remove_cv<T>, float, double, long double>;
+	concept is_floating = xns::is_one_of<xns::remove_cv<T>, float, double, long double>;
 
 
 }
