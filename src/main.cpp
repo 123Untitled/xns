@@ -13,6 +13,7 @@
 
 #include "variant.hpp"
 
+#include "queue.hpp"
 
 #include "map.hpp"
 #include "print.hpp"
@@ -122,7 +123,35 @@ struct c3 {
 
 #if !defined(XNS_UT)
 
+class tototo {
+
+	public:
+		tototo(void) = delete;
+		tototo(int) {
+		}
+};
+
 int main(int ac, char** av) {
+
+	xns::queue<tototo> aaa;
+	aaa.emplace_enqueue(2);
+
+
+	xns::queue<xns::cstring> q;
+
+	q.emplace_enqueue("hello");
+	q.copy_enqueue("world");
+	q.move_enqueue("!");
+
+	while (q.empty() == false) {
+		const auto& s = q.next();
+		std::cout << s << std::endl;
+		q.dequeue();
+	}
+
+
+	return 0;
+
 
 	xns::safe_union<int*, xns::u32*> u0;
 
