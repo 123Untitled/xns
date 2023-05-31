@@ -156,9 +156,7 @@ namespace xns {
 
 			/* null-terminated string constructor */
 			string(const_pointer str)
-			//: string{} {
-			: _str{nullptr}, _capacity{0}, _size{0} {
-				std::cout << "c-string constructor\n" << std::endl;
+			: string{} {
 				// exit if string is null or empty
 				if ((_size = get_len(str)) == 0) { return; }
 				// set capacity
