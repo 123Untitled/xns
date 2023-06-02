@@ -103,7 +103,7 @@ namespace xns {
 				// loop over other queue
 				while (node != nullptr) {
 					// enqueue copy of value
-					copy_enqueue(node->value);
+					enqueue(node->value);
 					// move to next node
 					node = node->next;
 				}
@@ -216,7 +216,7 @@ namespace xns {
 			// -- modifiers ---------------------------------------------------
 
 			/* enqueue copied element */
-			void copy_enqueue(const_reference value) noexcept {
+			void enqueue(const_reference value) noexcept {
 				// create new node
 				node_pointer node = _new_node();
 				// check pointer
@@ -230,7 +230,7 @@ namespace xns {
 			}
 
 			/* enqueue moved element */
-			void move_enqueue(move_reference value) noexcept {
+			void enqueue(move_reference value) noexcept {
 				// create new node
 				node_pointer node = _new_node();
 				// check pointer
@@ -245,7 +245,7 @@ namespace xns {
 
 			/* enqueue in-place constructed element */
 			template <class... A>
-			void emplace_enqueue(A&&... args) noexcept {
+			void enqueue(A&&... args) noexcept {
 				// create new node
 				node_pointer node = _new_node();
 				// check pointer
@@ -293,7 +293,7 @@ namespace xns {
 				if (_storage) {
 					// unlink from storage
 						node = _storage;
-					_storage = _storage->next;
+					_storage = node->next;
 				// else allocate new node
 				} else { node = allocator::allocate(); }
 				// return node
