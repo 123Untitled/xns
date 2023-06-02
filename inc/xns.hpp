@@ -24,6 +24,11 @@
 #include "array.hpp"
 #include "tuple.hpp"
 #include "trie.hpp"
+#include "map.hpp"
+#include "tree.hpp"
+#include "any.hpp"
+#include "variant.hpp"
+#include "queue.hpp"
 
 
 /* invoke */
@@ -63,10 +68,12 @@
 #include "output.hpp"
 
 
+#include "atoi.hpp"
 #include "exec.hpp"
 #include "color.hpp"
 #include "window.hpp"
 #include "border.hpp"
+#include "print.hpp"
 
 
 #endif
