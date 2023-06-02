@@ -1,5 +1,5 @@
-#ifndef STRING_TRAITS_HEADER
-#define STRING_TRAITS_HEADER
+#ifndef IS_CHAR_HEADER
+#define IS_CHAR_HEADER
 
 #include "integral_constant.hpp"
 #include "remove.hpp"
