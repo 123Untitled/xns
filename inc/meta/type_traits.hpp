@@ -9,6 +9,7 @@
 
 #include "identity.hpp"
 
+
 #include "policy.hpp"
 
 #include "enable_if.hpp"
@@ -27,7 +28,10 @@
 #include "is_member_pointer.hpp"
 #include "is_reference.hpp"
 
+#include "is_all_unique.hpp"
 #include "is_one_of.hpp"
+
+#include "index_of.hpp"
 
 #include "move.hpp"
 #include "forward.hpp"
