@@ -30,6 +30,9 @@ namespace xns {
 			/* random integer */
 			static size_type random_gen(const size_type range);
 
+			/* random boolean */
+			static bool random_bool(void);
+
 
 		private:
 
