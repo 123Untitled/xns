@@ -63,7 +63,8 @@ namespace xns {
 		// -- friends ---------------------------------------------------------
 
 		/* tree as friend */
-		friend class tree<T>;
+		template <class>
+		friend class tree;
 
 		/* self type as friend */
 		template <class, traversal_order, bool>
@@ -91,6 +92,9 @@ namespace xns {
 
 			/* self type */
 			using self            = bst_iterator<T, O, C>;
+
+			/* size type */
+			using size_type       = typename xns::tree<T>::size_type;
 
 			/* node pointer type */
 			using node_pointer    = typename xns::tree<T>::node_pointer;
@@ -421,6 +425,123 @@ namespace xns {
 				// return value pointer
 				return &_node->_value;
 			}
+
+
+			// -- node methods ------------------------------------------------
+
+			/* has left child */
+			inline bool has_left(void) const noexcept {
+				// return if node has left child
+				return _node->_left != nullptr;
+			}
+
+			/* has right child */
+			inline bool has_right(void) const noexcept {
+				// return if node has right child
+				return _node->_right != nullptr;
+			}
+
+			/* has children */
+			inline bool has_child(void) const noexcept {
+				// return if node has children
+				return _node->_left != nullptr || _node->_right != nullptr;
+			}
+
+			/* has parent */
+			inline bool has_parent(void) const noexcept {
+				// return if node has parent
+				return _node->_parent != nullptr;
+			}
+
+			/* is left child */
+			inline bool is_left(void) const noexcept {
+				// return if node is left child
+				return _node->_parent != nullptr && _node->_parent->_left == _node;
+			}
+
+			/* is right child */
+			inline bool is_right(void) const noexcept {
+				// return if node is right child
+				return _node->_parent != nullptr && _node->_parent->_right == _node;
+			}
+
+			/* is root */
+			inline bool is_root(void) const noexcept {
+				// return if node has no parent
+				return _node->_parent == nullptr;
+			}
+
+			/* is disconnected */
+			inline bool is_disconnected(void) const noexcept {
+				// return if node is disconnected
+				return _node->_parent == nullptr && _node->_left == nullptr && _node->_right == nullptr;
+			}
+
+			/* is leaf */
+			inline bool is_leaf(void) const noexcept {
+				// return if node has no children
+				return _node->_left == nullptr && _node->_right == nullptr;
+			}
+
+			/* is unary */
+			inline bool is_unary(void) const noexcept {
+				// return if only one child is null
+				return (_node->_left == nullptr) != (_node->_right == nullptr);
+			}
+
+			/* is endpoint */
+			inline bool is_endpoint(void) const noexcept {
+				// return if node is in extremity
+				return is_leaf() || is_unary();
+			}
+
+
+			// -- node access -------------------------------------------------
+
+			/* address of node */
+			inline node_pointer addrs(void) const noexcept {
+				// return node
+				return _node;
+			}
+
+			/* parent node */
+			inline node_pointer parent(void) const noexcept {
+				// return node
+				return _node->_parent;
+			}
+
+			/* left node */
+			inline node_pointer left(void) const noexcept {
+				// return node
+				return _node->_left;
+			}
+
+			/* right node */
+			inline node_pointer right(void) const noexcept {
+				// return node
+				return _node->_right;
+			}
+
+			/* depth */
+			inline size_type depth(void) const noexcept {
+				// return depth
+				return _node->_depth;
+			}
+
+			/* level */
+			inline size_type level(void) const noexcept {
+				// return level
+				return _node->_level;
+			}
+
+			/* x position */
+			inline size_type xpos(void) const noexcept {
+				// return position
+				return _node->_pos;
+			}
+
+
+
 
 
 		private:
