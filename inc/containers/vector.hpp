@@ -285,6 +285,14 @@ namespace xns {
 				}
 			}
 
+			// -- iteration ---------------------------------------------------
+
+			/* start */
+			size_type start(void) const {
+				// return start
+				return 0;
+			}
+
 
 			// -- M O D I F I E R S -------------------------------------------
 
