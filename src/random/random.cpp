@@ -19,3 +19,9 @@ xns::random::size_type xns::random::random_gen(const size_type range) {
 	// return random integer
 	return !range ? 0 : std::rand() % range;
 }
+
+/* random boolean */
+bool xns::random::random_bool(void) {
+	// return random boolean
+	return std::rand() % 2;
+}
