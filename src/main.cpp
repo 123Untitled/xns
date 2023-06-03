@@ -15,129 +15,142 @@
 #if !defined(XNS_UT)
 
 
+xns::size_t tpsc(const char& c) {
+	return 1;
+}
+
+xns::cstring tpvc(const char& c) {
+	std::cout << "value: " << c << std::endl;
+	xns::cstring s(&c, 1);
+	std::cout << "cstring: " << s.pointer() << std::endl;
+	return xns::cstring(&c, 1);
+}
+
+
+void generate_tree(const xns::size_t size) {
+	// check size
+	if (!size) { return; }
+	// create tree
+	xns::tree<char> ast;
+	// vector of node pointers
+	xns::vector<xns::tree<char>::node*> nodes;
+	// reserve space for nodes
+	nodes.reserve(size);
+	// loop to allocate nodes
+	for (auto i = nodes.start(); i < size; ++i) {
+		char c = xns::random::random_gen(94 - 33) + 33;
+		nodes.copy_back(ast.new_node(c));
+	}
+	// set root node
+	ast.root(nodes[0]);
+	// alias to node
+	using node = xns::tree<char>::node;
+
+	node* current = nodes[0];
+
+	for (auto i = nodes.start() + 1; i < size; ++i) {
+		do {
+			if (xns::random::random_bool()) {
+
+				if (current->left())  { current = current->left();  }
+
+				else { current->set_left(nodes[i]); break; }
+			}
+			else {
+				if (current->right()) { current = current->right(); }
+
+				else { current->set_right(nodes[i]); break; }
+			}
+		} while (true);
+
+		// reset current to root
+		current = nodes[0];
+	}
+
+
+	ast.print(tpsc, tpvc);
+
+}
 
 
 
 
 int main(int ac, char** av) {
 
-	xns::tree<const int> __tree;
-	//auto ii = __tree.pre_order_begin();
-	xns::tree<const int>::pre_order_iterator _iii = __tree.pre_order_begin();
-	//xns::tree<const int>::const_pre_order_iterator _iii{iiii};
-
-
-
-
-	while (_iii != __tree.end()) {
-		std::cout << "here" << std::endl;
-		const int& ptr = *_iii;
-
-		std::cout << *_iii << std::endl;
-		++_iii;
-	}
-
-		//const int ptr = *_iii;
-
-
+	xns::terminal::raw_terminal();
 
 	using node = xns::tree<char>::node;
 
-	xns::tree<char> ast;
-
-
-
-
-	node* node0 = ast.new_node('a');
-	node* node1 = ast.new_node('b');
-	node* node2 = ast.new_node('c');
-	node* node3 = ast.new_node('d');
-	node* node4 = ast.new_node('e');
-	node* node5 = ast.new_node('f');
-	node* node6 = ast.new_node('g');
-	node* node7 = ast.new_node('h');
-	node* node8 = ast.new_node('i');
-	node* node9 = ast.new_node('j');
-
-
-	node0->left(node1);
-	node0->right(node2);
-
-	node1->left(node3);
-	node1->right(node4);
-
-	node2->left(node5);
-	node2->right(node6);
-
-	node3->left(node7);
-	node3->right(node8);
-
-	node4->left(node9);
-
-
-const char* tree = R"(
-            a
-         /     \
-        b       c
-      /   \   /   \
-     d     e f     g
-    / \   /
-   h   i j
-)";
-
-
-
-	ast.root(node0);
-
-	auto it = ast.pre_order_begin();
-
-	std::cout << tree << std::endl;
-
-	//xns::cstring newick = ast.newick(node0);
-	//xns::cstring dot = ast.dot(node0);
-
-	//std::cout << newick.pointer() << std::endl;
-	//std::cout << dot.pointer() << std::endl;
-
-
-	xns::tree<int>::size_type depth = 0;
-	xns::tree<int>::size_type level = 0;
-
-	const xns::tree<int>::size_type max_depth = ast.depth();
-
-	xns::tree<int>::size_type max = 0;
-
-	while (it != ast.end()) {
-
-		// get max number of children in a branch
-		depth = ast.depth(it);
-		max = ast.max_line(it);
-		level = ast.level(it);
-
-		// check if we are on a new level
-		//if (level != ast.level(it)) {
-		//	level = ast.level(it);
-			std::cout << std::endl << std::endl;
-		//}
-		//std::cout << std::endl << std::endl;
-
-
-		// compute number of spaces to print
-		const xns::tree<int>::size_type spaces = level * 10;
-
-		// print spaces
-		for (xns::tree<int>::size_type i = 0; i < spaces; ++i) { std::cout << " "; }
-
-		std::cout << *it;
-		std::cout << "[\x1b[32m" << ast.max_line(it) << "\x1b[0m]";
-		std::cout << "[\x1b[34m" << ast.level(it) << "\x1b[0m]";
-		std::cout << "[\x1b[33m" << ast.depth(it) << "\x1b[0m]";
-
-		++it;
-
+	while (true) {
+		generate_tree(xns::random::random_gen(30) + 3);
+		char c; int r = read(0, &c, 1);
+		if (r != 1 || c == 'q') { break; }
 	}
 
-	std::cout << std::endl << std::endl;
+	xns::terminal::restore_terminal();
+	return EXIT_SUCCESS;
+
+//	const char* tree = R"(
+//            a
+//         /     \
+//        b       c
+//      /   \   /   \
+//     d     e f     g
+//    / \   /
+//   h   i j
+//	)";
+	//std::cout << tree << std::endl;
+
+
+
+	//auto it = ast.pre_order_begin();
+
+
+	////xns::cstring newick = ast.newick(node0);
+	////xns::cstring dot = ast.dot(node0);
+
+	////std::cout << newick.pointer() << std::endl;
+	////std::cout << dot.pointer() << std::endl;
+
+
+	//xns::tree<int>::size_type depth = 0;
+	//xns::tree<int>::size_type level = 0;
+
+	//const xns::tree<int>::size_type max_depth = ast.depth();
+
+	//xns::tree<int>::size_type max = 0;
+
+	//while (it != ast.end()) {
+
+	//	// get max number of children in a branch
+	//	depth = ast.depth(it);
+	//	max = ast.max_width(it);
+	//	level = ast.level(it);
+
+	//	// check if we are on a new level
+	//	//if (level != ast.level(it)) {
+	//	//	level = ast.level(it);
+	//		std::cout << std::endl << std::endl;
+	//	//}
+	//	//std::cout << std::endl << std::endl;
+
+
+	//	// compute number of spaces to print
+	//	const xns::tree<int>::size_type spaces = level * 10;
+
+	//	// print spaces
+	//	for (xns::tree<int>::size_type i = 0; i < spaces; ++i) { std::cout << " "; }
+
+	//	std::cout << *it;
+	//	std::cout << "[\x1b[32m" << ast.max_width(it) << "\x1b[0m]";
+	//	std::cout << "[\x1b[34m" << ast.level(it) << "\x1b[0m]";
+	//	std::cout << "[\x1b[33m" << ast.depth(it) << "\x1b[0m]";
+
+	//	++it;
+
+	//}
+
+	//std::cout << std::endl << std::endl;
 
 
 
