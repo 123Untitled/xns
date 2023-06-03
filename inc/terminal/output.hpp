@@ -67,6 +67,13 @@ namespace xns {
 			/* write bytes */
 			static void write(const char* str, const xns::cstring::size_type size);
 
+			/* write character */
+			template <xns::is_char T>
+			static void write(const T& ch) {
+				// call buffer write
+				write(&ch, sizeof(T));
+			}
+
 			/* write string */
 			static void write(const xns::cstring& str);
 
