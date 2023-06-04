@@ -866,11 +866,17 @@ namespace xns {
 			enum : xns::u8 { HL, VL, TL, TR, BL, BR, BB, MAX };
 
 			/* horizontal line */
-			static constexpr const xns::array<xns::string_view, MAX> _branch = {
-				"\xe2\x94\x80", "\xe2\x94\x82", "\xe2\x95\xad",
-				"\xe2\x95\xae", "\xe2\x95\xb0", "\xe2\x95\xaf",
-				"\xe2\x94\xb4"
+			static constexpr const xns::array<char32_t, MAX> _branch = {
+				U'\u2500', // HL
+				U'\u2502', // VL
+				U'\u256D', // TL
+				U'\u256E', // TR
+				U'\u2570', // BL
+				U'\u256F', // BR
+				U'\u2534'  // BB
 			};
+
+			// HL char32_t(0x2500) // horizontal line
 
 			// unicode code points
 			// HL: "\u2500"
@@ -940,7 +946,7 @@ namespace xns {
 				// loop until end
 				while (it != nullptr) {
 
-					std::cout << "level: " << it._node->_level << std::endl;
+					//std::cout << "level: " << it._node->_level << std::endl;
 
 					if (it.is_left()) {
 
@@ -981,7 +987,11 @@ namespace xns {
 				xns::size_t max = smax + smin;
 
 				// matrix
-				xns::vector<xns::cstring> matrix;
+				//xns::vector<xns::cstring> matrix;
+				xns::string32 unicode;
+
+
+				xns::vector<xns::string32> matrix;
 
 				// root start at level 0, so add 1
 				++level;
@@ -998,14 +1008,17 @@ namespace xns {
 				level *= Y_OFFSET;
 				max *= X_OFFSET;
 
-				std::cout << "level: " << level << "\n";
-				std::cout << "max: " << max << "\n";
+				//std::cout << "level: " << level << "\n";
+				//std::cout << "max: " << max << "\n";
+
+
+				level -= (Y_OFFSET - 1);
 
 				matrix.reserve(level);
 
 				// fill matrix with spaces
 				for (size_type y = 0; y < level; ++y) {
-					matrix.emplace_back(' ', max);
+					matrix.emplace_back(U' ', max);
 				}
 
 				const_bfs_iterator it4{_tree._root};
@@ -1014,7 +1027,7 @@ namespace xns {
 				size_type x = 0, y = 0, lx = 0, ly = 0, rx = 0, ry = 0;
 
 				for (; it4 != nullptr; ++it4) {
-					std::cout << "filling matrix\n";
+					//std::cout << "filling matrix\n";
 
 					// get node position
 					x = (it4.xpos() + smin) * X_OFFSET;
@@ -1029,14 +1042,16 @@ namespace xns {
 						lx = (it4.left()->xpos() + smin) * X_OFFSET;
 						ly = it4.left()->level()         * Y_OFFSET;
 
-						// draw line
+						// draw horizontal line
 						for (size_type i = lx + 1; i < x + 1; ++i) {
-							matrix[y + 1][i] = '_';
+							matrix[y + 1][i] = _branch[HL];
 						}
-						// draw line
+						// draw vertical line
 						for (size_type i = y + 2; i < ly; ++i) {
-							matrix[i][lx] = '|';
+							matrix[i][lx] = _branch[VL];
 						}
+						// draw left corner
+						matrix[y + 1][lx] = _branch[TL];
 					}
 
 					if (it4.has_right()) {
@@ -1045,18 +1060,29 @@ namespace xns {
 						rx = (it4.right()->xpos() + smin) * X_OFFSET;
 						ry = it4.right()->level()         * Y_OFFSET;
 
-						// draw line
+						// draw horizontal line
 						for (size_type i = x + 1; i < rx; ++i) {
-							matrix[y + 1][i] = '_';
+							matrix[y + 1][i] = _branch[HL];
 						}
-						// draw line
+						// draw vertical line
 						for (size_type i = y + 2; i < ry; ++i) {
-							matrix[i][rx] = '|';
+							matrix[i][rx] = _branch[VL];
 						}
+						// draw right corner
+						matrix[y + 1][rx] = _branch[TR];
 					}
 
 					if (it4.has_child()) {
-						matrix[y + 1][x] = '|';
+
+						if (it4.is_binary()) {
+							matrix[y + 1][x] = _branch[BB];
+						}
+						else if (it4.has_left()) {
+							matrix[y + 1][x] = _branch[BR];
+						}
+						else if (it4.has_right()) {
+							matrix[y + 1][x] = _branch[BL];
+						}
 					}
 
 					/*
@@ -1081,11 +1107,30 @@ namespace xns {
 
 					xns::cstring value = _vcall.call(it4._node->_value);
 
-					matrix[y][x] = value[0];
+					if (value.size()) {
+						size_type size = value.size();
+						size_type offset = size / 2;
+						//std::cout << "size: " << size << "\n";
+						if (x > offset) {
+							for (size_type i = 0; i < size; ++i) {
+								matrix[y][x - offset + i] = value[i];
+							}
+						}
+						else {
+							for (size_type i = 0; i < size; ++i) {
+								matrix[y][i] = value[i];
+							}
+						}
+
+					}
+					else {
+						matrix[y][x] = '_';
+					}
 				}
 
 
-				std::cout << "printing matrix\n";
+				//std::cout << "printing matrix\n";
+
 
 
 				//xns::output::write(Xf::Escape::erase_screen());
