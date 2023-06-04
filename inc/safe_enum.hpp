@@ -25,7 +25,7 @@ namespace xns {
 	// -- S A F E  E N U M  C L A S S -----------------------------------------
 
 	template <class E>
-	class safe_enum : public E {
+	class safe_enum final : public E {
 
 
 		// -- R E Q U I R E M E N T S -----------------------------------------
