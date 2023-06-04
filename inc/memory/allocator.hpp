@@ -2,11 +2,13 @@
 #define ALLOCATOR_HEADER
 
 #include <limits>
+#include <cstdlib>
+
 #include "types.hpp"
 #include "macro.hpp"
 #include "forward.hpp"
+#include "exceptions.hpp"
 #include "move.hpp"
-#include <cstdlib>
 #include "numeric_limits.hpp"
 #include "policy.hpp"
 
@@ -63,13 +65,21 @@ namespace xns {
 			/* allocate */
 			static mutable_pointer allocate(const size_type size = 1) {
 				// allocate memory
-				return static_cast<mutable_pointer>(std::malloc(size * sizeof(value_type)));
+				mutable_pointer ptr = static_cast<mutable_pointer>(std::malloc(size * sizeof(value_type)));
+				// check failed allocation
+				if (!ptr) { throw xns::exception(-2, "FAILED TO ALLOCATE MEMORY"); }
+				// return pointer
+				return ptr;
 			}
 
 			/* realloc */
 			static mutable_pointer realloc(mutable_pointer addrs, const size_type size = 1) {
 				// reallocate memory
-				return static_cast<mutable_pointer>(std::realloc(addrs, size * sizeof(value_type)));
+				mutable_pointer ptr = static_cast<mutable_pointer>(std::realloc(addrs, size * sizeof(value_type)));
+				// check failed reallocation
+				if (!ptr) { throw xns::exception(-2, "FAILED TO REALLOCATE MEMORY"); }
+				// return pointer
+				return ptr;
 			}
 
 			/* deallocate */
