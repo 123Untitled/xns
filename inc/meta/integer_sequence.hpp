@@ -37,7 +37,7 @@ namespace xns {
 		// -- A C C E S S O R S -----------------------------------------------
 
 		/* size accessor */
-		static inline constexpr type size(void) noexcept {
+		static inline consteval type size(void) noexcept {
 			return sizeof...(N);
 		}
 
