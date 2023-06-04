@@ -11,26 +11,33 @@ namespace xns {
 
 	// -- I D E N T I T Y -----------------------------------------------------
 
-	/* identity */
-	template <class T>
-	struct _identity {
-		using type = T;
-	};
+	// -- detail --------------------------------------------------------------
+
+	namespace impl {
+
+
+		/* identity */
+		template <class T>
+		struct identity {
+			using type = T;
+		};
+
+		/* identity parameter pack */
+		template <class... A>
+		struct identity_pack {
+			using type = identity_pack<A...>;
+		};
+
+	}
+
 
 	/* identity type */
 	template <class T>
-	using identity = typename _identity<T>::type;
-
-
-	/* identity parameter pack */
-	template <class... A>
-	struct _identity_pack {
-		using type = _identity_pack<A...>;
-	};
+	using identity = typename impl::identity<T>::type;
 
 	/* identity parameter pack type */
 	template <class... A>
-	using identity_pack = typename _identity_pack<A...>::type;
+	using identity_pack = typename impl::identity_pack<A...>::type;
 
 
 }
