@@ -5,8 +5,8 @@
 #include "macro.hpp"
 #include "array.hpp"
 #include "string.hpp"
-#include "literal.hpp"
 #include "safe_enum.hpp"
+#include "literal_map.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -29,15 +29,10 @@ namespace xns {
 			using const_pointer = const char_t*;
 
 			/* string type */
-			using string = xns::cstring;
+			using string = xns::string;
 
 			/* size type */
 			using size_type = xns::size_t;
-
-			/* white space type */
-			using white_space = xns::literal<char_t,    '\x09', '\x0a',
-														'\x0b', '\x0c',
-														'\x0d', '\x20'>;
 
 
 			// -- C O N S T A N T S -------------------------------------------
@@ -69,6 +64,25 @@ namespace xns {
 
 		private:
 
+			/* whitespace map */ // 'space', 'tab', 'line feed', 'vertical tab', 'form feed', 'carriage return'
+			static constexpr xns::literal_map<char,
+							 "space",
+							 "tab",
+							 "line feed",
+							 "vertical tab",
+							 "form feed",
+							 "carriage return"> _whitespaces {
+								 ' ', '\t', '\n', '\v', '\f', '\r'
+
+							 };
+
+			template <class T>
+			void test(void) {
+
+				std::cout << _whitespaces.get<"space">() << std::endl;
+
+
+			}
 
 			struct char_type_def {
 				// integral type
