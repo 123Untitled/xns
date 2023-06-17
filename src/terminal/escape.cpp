@@ -2,7 +2,10 @@
 
 #define ESC "\x1b"
 
-const Xf::Escape::EscArray Xf::Escape::_escapes = {
+
+// WARNING NEED TO SET CONSTEXPR V
+
+const xns::escape::esc_array xns::escape::_escapes = {
 
 	/* move home */
 	ESC"[H",
@@ -48,7 +51,7 @@ const Xf::Escape::EscArray Xf::Escape::_escapes = {
 
 
 /* move home */
-const xns::cstring& Xf::Escape::move_home(void) {
+const xns::escape::string& xns::escape::move_home(void) {
 	// return escape sequence
 	return _escapes[Esctype::MOVE_HOME];
 }
@@ -56,95 +59,95 @@ const xns::cstring& Xf::Escape::move_home(void) {
 
 
 /* erase screen */
-const xns::cstring& Xf::Escape::erase_screen(void) {
+const xns::escape::string& xns::escape::erase_screen(void) {
 	// return escape sequence
 	return _escapes[Esctype::ERASE_SCREEN];
 }
 
 /* erase line */
-const xns::cstring& Xf::Escape::erase_line(void) {
+const xns::escape::string& xns::escape::erase_line(void) {
 	// return escape sequence
 	return _escapes[Esctype::ERASE_LINE];
 }
 
 /* erase to end of line */
-const xns::cstring& Xf::Escape::erase_to_end(void) {
+const xns::escape::string& xns::escape::erase_to_end(void) {
 	// return escape sequence
 	return _escapes[Esctype::ERASE_TO_END];
 }
 
 /* erase from start of line */
-const xns::cstring& Xf::Escape::erase_from_start(void) {
+const xns::escape::string& xns::escape::erase_from_start(void) {
 	// return escape sequence
 	return _escapes[Esctype::ERASE_FROM_START];
 }
 
 
 /* enter screen */
-const xns::cstring& Xf::Escape::enter_screen(void) {
+const xns::escape::string& xns::escape::enter_screen(void) {
 	// return escape sequence
 	return _escapes[Esctype::ENTER_SCREEN];
 }
 
 /* exit screen */
-const xns::cstring& Xf::Escape::exit_screen(void) {
+const xns::escape::string& xns::escape::exit_screen(void) {
 	// return escape sequence
 	return _escapes[Esctype::EXIT_SCREEN];
 }
 
 /* save screen */
-const xns::cstring& Xf::Escape::save_screen(void) {
+const xns::escape::string& xns::escape::save_screen(void) {
 	// return escape sequence
 	return _escapes[Esctype::SAVE_SCREEN];
 }
 
 /* restore screen */
-const xns::cstring& Xf::Escape::restore_screen(void) {
+const xns::escape::string& xns::escape::restore_screen(void) {
 	// return escape sequence
 	return _escapes[Esctype::RESTORE_SCREEN];
 }
 
 
 /* reset style */
-const xns::cstring& Xf::Escape::reset_style(void) {
+const xns::escape::string& xns::escape::reset_style(void) {
 	// return escape sequence
 	return _escapes[Esctype::RESET_STYLE];
 }
 
 
 /* show cursor */
-const xns::cstring& Xf::Escape::show_cursor(void) {
+const xns::escape::string& xns::escape::show_cursor(void) {
 	// return escape sequence
 	return _escapes[Esctype::SHOW_CURSOR];
 }
 
 /* hide cursor */
-const xns::cstring& Xf::Escape::hide_cursor(void) {
+const xns::escape::string& xns::escape::hide_cursor(void) {
 	// return escape sequence
 	return _escapes[Esctype::HIDE_CURSOR];
 }
 
 /* request position */
-const xns::cstring& Xf::Escape::request_position(void) {
+const xns::escape::string& xns::escape::request_position(void) {
 	// return escape sequence
 	return _escapes[Esctype::REQUEST_POSITION];
 }
 
 
 /* cursor beam */
-const xns::cstring& Xf::Escape::cursor_beam(void) {
+const xns::escape::string& xns::escape::cursor_beam(void) {
 	// return escape sequence
 	return _escapes[Esctype::CURSOR_BEAM];
 }
 
 /* cursor underline */
-const xns::cstring& Xf::Escape::cursor_underline(void) {
+const xns::escape::string& xns::escape::cursor_underline(void) {
 	// return escape sequence
 	return _escapes[Esctype::CURSOR_UNDERLINE];
 }
 
 /* cursor block */
-const xns::cstring& Xf::Escape::cursor_block(void) {
+const xns::escape::string& xns::escape::cursor_block(void) {
 	// return escape sequence
 	return _escapes[Esctype::CURSOR_BLOCK];
 }
@@ -152,25 +155,25 @@ const xns::cstring& Xf::Escape::cursor_block(void) {
 
 
 /* move left */
-xns::cstring Xf::Escape::move_left(const xns::term_size cells) {
+xns::escape::string xns::escape::move_left(const term_size cells) {
 	// return escape sequence
 	return _move_direction(cells, 'D');
 }
 
 /* move right */
-xns::cstring Xf::Escape::move_right(const xns::term_size cells) {
+xns::escape::string xns::escape::move_right(const term_size cells) {
 	// return escape sequence
 	return _move_direction(cells, 'C');
 }
 
 /* move up */
-xns::cstring Xf::Escape::move_up(const xns::term_size cells) {
+xns::escape::string xns::escape::move_up(const term_size cells) {
 	// return escape sequence
 	return _move_direction(cells, 'A');
 }
 
 /* move down */
-xns::cstring Xf::Escape::move_down(const xns::term_size cells) {
+xns::escape::string xns::escape::move_down(const term_size cells) {
 	// return escape sequence
 	return _move_direction(cells, 'B');
 }
@@ -191,13 +194,16 @@ xns::cstring Xf::Escape::move_down(const xns::term_size cells) {
 #define BACKGROUND				false
 
 
-bool Xf::Escape::request_position(xns::term_size& x, xns::term_size& y) {
+bool xns::escape::request_position(term_size& x, term_size& y) {
 
-	xns::term_size* num     = &y;
-	bool    bracket = false;
-	char    c       = 0;
+	term_size* num     = &y;
+	bool       bracket = false;
+	xns::ubyte     c       = 0;
 
-	const xns::cstring& esc = _escapes[IDX(Esctype::REQUEST_POSITION)];
+	constexpr xns::ubyte base = 10;
+	constexpr xns::ubyte zero = 48;
+
+	const string& esc = _escapes[IDX(Esctype::REQUEST_POSITION)];
 
 	write(STDOUT_FILENO, esc.pointer(), esc.size());
 	x = y = 0;
@@ -206,8 +212,18 @@ bool Xf::Escape::request_position(xns::term_size& x, xns::term_size& y) {
 		// check bracket sequence
 		if (bracket) {
 			// convert character to integer
-			if ((c ^ 48) < 10)
-				*num = (*num * 10) + (c - 48);
+			if ((c ^ 48) < base) {
+
+				term_size digit = c - zero;
+
+				// check overflow
+				term_size tmp = (xns::max<term_size>() - digit) / base;
+
+				if (*num > tmp) return false;
+
+				*num = (*num * base) + digit;
+
+			}
 			// check separator character
 			else if (c == ';') num = &x;
 		} // check control character
@@ -228,10 +244,10 @@ bool Xf::Escape::request_position(xns::term_size& x, xns::term_size& y) {
 
 
 /* get move position */
-xns::cstring Xf::Escape::move_position(xns::term_size x, xns::term_size y) {
+xns::escape::string xns::escape::move_position(term_size x, term_size y) {
 	// ESC[{line};{column}H
 
-	char  escape[ESCAPE_BUFFER_SIZE];
+	char_t  escape[ESCAPE_BUFFER_SIZE];
 	xns::size_t ite;
 
 	constexpr const xns::size_t max = xns::max<xns::term_size>();
@@ -259,20 +275,20 @@ xns::cstring Xf::Escape::move_position(xns::term_size x, xns::term_size y) {
 	escape[--ite] = '\x1b';
 
 	// append escape sequence to buffer
-	return xns::cstring(&escape[ite], ESCAPE_BUFFER_SIZE - ite);
+	return xns::string(&escape[ite], ESCAPE_BUFFER_SIZE - ite);
 }
 
 
 
 /* move direction */
-xns::cstring Xf::Escape::_move_direction(xns::term_size cells, const char dir) {
+xns::escape::string xns::escape::_move_direction(term_size cells, const char_t dir) {
 	// static returned string
 	//static Xf::CString escape;
 	// compile time buffer size
 	constexpr const xns::size_t size = 3 + xns::max_digits<xns::term_size>();
 
 	// buffer
-	xns::cstring::char_t buffer[size];
+	char_t buffer[size];
 
 	// init iterator to last index
 	xns::size_t i = size - 1;
@@ -292,23 +308,23 @@ xns::cstring Xf::Escape::_move_direction(xns::term_size cells, const char dir) {
 	buffer[--i] = '\x1b';
 
 	// append escape sequence to buffer
-	return xns::cstring(&buffer[i], size - i);
+	return xns::string(&buffer[i], size - i);
 }
 
 
 
 
 /* move x position */
-const xns::cstring& Xf::Escape::move_x(xns::term_size x) {
+const xns::escape::string& xns::escape::move_x(term_size x) {
 
 	// static returned string
-	static xns::cstring escape;
+	static string escape;
 
 	// compile time buffer size
 	constexpr const xns::size_t size = sizeof("\x1b[G")
 								+ xns::max_digits<xns::term_size>();
 	// buffer
-	xns::cstring::char_t buffer[size];
+	char_t buffer[size];
 
 	// init iterator
 	xns::size_t i = size - 1;
@@ -344,7 +360,7 @@ const xns::cstring& Xf::Escape::move_x(xns::term_size x) {
 
 
 /* hex color */
-xns::cstring Xf::Escape::hex_color(const int color, const bool fore) {
+xns::escape::string xns::escape::hex_color(const xns::hexcolor color, const bool fore) {
 
 	// declare bytes color
 	xns::ubyte r, g, b;
@@ -357,7 +373,7 @@ xns::cstring Xf::Escape::hex_color(const int color, const bool fore) {
 }
 
 /* color rgb */
-xns::cstring Xf::Escape::rgb_color(xns::u8 r, xns::u8 g, xns::u8 b, const bool fore) {
+xns::escape::string xns::escape::rgb_color(xns::u8 r, xns::u8 g, xns::u8 b, const bool fore) {
 	// static 24bit color escape sequence
 	static xns::ubyte escape[] = {	'\x1b', '[',
 									' ', '8', ';', '2', ';',
@@ -382,7 +398,7 @@ xns::cstring Xf::Escape::rgb_color(xns::u8 r, xns::u8 g, xns::u8 b, const bool f
 		// remove last digit
 		r /= BASE; g /= BASE; b /= BASE;
 	} // append escape sequence to buffer
-	return xns::cstring((char*)escape, 19);
+	return xns::string((char*)escape, 19);
 }
 
 
