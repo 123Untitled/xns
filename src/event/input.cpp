@@ -3,24 +3,32 @@
 
 // -- S T A T I C  P R I V A T E  M E M B E R S -------------------------------
 
-Xf::Input::signed_type Xf::Input::_readed                = 0;
-Xf::Input::CharT  Xf::Input::_buff[BUFFER_SIZE + 1] = { 0 };
-xns::cstring       Xf::Input::_input                 = "";
-bool              Xf::Input::_is_running            = false;
+/* readed bytes */
+xns::input::signed_type xns::input::_readed{0};
 
-bool              Xf::Input::_windowed              = false;
+/* buffer */
+xns::input::char_t xns::input::_buff[BUFFER_SIZE + 1]{'\0'};
+
+/* input string */
+xns::input::string xns::input::_input{""};
+
+/* running flag */
+bool xns::input::_is_running{false};
+
+/* windowed mode */
+bool xns::input::_windowed{false};
 
 
 // -- S T A T I C  P U B L I C  M E T H O D S ---------------------------------
 
 /* parameters */
-void Xf::Input::parameters(const bool windowed) {
+void xns::input::parameters(const bool windowed) {
 	// set windowed mode
 	_windowed = windowed;
 }
 
 /* input loop */
-void Xf::Input::start_loop(void) {
+void xns::input::start_loop(void) {
 
 	// get event instance
 	Xf::Event& evnt = Xf::Event::instance();
@@ -49,7 +57,7 @@ void Xf::Input::start_loop(void) {
 }
 
 /* stop input loop */
-void Xf::Input::stop_loop(void) {
+void xns::input::stop_loop(void) {
 	// unset running flag
 	_is_running = false;
 }
@@ -58,7 +66,7 @@ void Xf::Input::stop_loop(void) {
 // -- S T A T I C  P R I V A T E  M E T H O D S -------------------------------
 
 /* read input while available */
-void Xf::Input::read_input(void) {
+void xns::input::read_input(void) {
 
 	// reset previous readed bytes
 	_input.clear();
@@ -67,7 +75,7 @@ void Xf::Input::read_input(void) {
 	if (read_stdin() > 0) {
 
 		// append buffer to the string
-		_input.append(_buff, _readed);
+		_input.append(_buff, static_cast<size_type>(_readed));
 
 		// buffer is full, loop over reading
 		if (_readed == BUFFER_SIZE) {
@@ -76,7 +84,7 @@ void Xf::Input::read_input(void) {
 			// read stdin again
 			while (read_stdin() > 0) {
 				// append buffer to the string
-				_input.append(_buff, _readed);
+				_input.append(_buff, static_cast<size_type>(_readed));
 			}
 
 			// back to blocking read
@@ -87,7 +95,7 @@ void Xf::Input::read_input(void) {
 }
 
 /* read stdin */
-Xf::Input::signed_type Xf::Input::read_stdin(void) {
+xns::input::signed_type xns::input::read_stdin(void) {
 	// read bytes from stdin
 	_readed = read(STDIN_FILENO, _buff, BUFFER_SIZE);
 	// append null terminator
@@ -97,7 +105,7 @@ Xf::Input::signed_type Xf::Input::read_stdin(void) {
 }
 
 
-void Xf::Input::dispatch(void) {
+void xns::input::dispatch(void) {
 
 	if (_input.empty()) { return; }
 
@@ -107,7 +115,7 @@ void Xf::Input::dispatch(void) {
 	using Ev = Xf::Evntype;
 
 	// filter extended ascii codes
-	_input.filter(xns::cstring::is_multibyte, false);
+	_input.filter(xns::string::is_multibyte, false);
 
 
 	if (_input.length() == 3 && _input[0] == 0x1b) {
@@ -135,12 +143,12 @@ void Xf::Input::dispatch(void) {
 	}
 
 	if (_input.length() == 1) {
-		const xns::ubyte _char = _input[0];
+		const xns::ubyte _char = (xns::ubyte)_input[0]; // NEED TO FIX CONVERSION
 		evnt.call_event(static_cast<Ev>(_char));
 	}
 
 	// filter control characters
-	_input.filter(xns::cstring::is_control, false);
+	_input.filter(xns::string::is_control, false);
 
 	evnt.call_input(_input);
 }
