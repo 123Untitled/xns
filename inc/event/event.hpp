@@ -66,10 +66,10 @@ namespace Xf {
 
 			/* input prototype */
 			template <typename C>
-			using InputMethod = void(C::*)(const xns::cstring&);
+			using InputMethod = void(C::*)(const xns::string&);
 
 			/* input function prototype */
-			using InputFunction = void(*)(const xns::cstring&);
+			using InputFunction = void(*)(const xns::string&);
 
 
 
@@ -132,7 +132,7 @@ namespace Xf {
 			void call_event(const Evntype);
 
 			/* call all input subscribers */
-			void call_input(const xns::cstring&);
+			void call_input(const xns::string&);
 
 
 		private:
@@ -140,7 +140,7 @@ namespace Xf {
 			// -- P R I V A T E  A L I A S E S --------------------------------
 
 			/* input vector type */
-			using InputVector = xns::vector<xns::poly_method<void(const xns::cstring&)>>;
+			using InputVector = xns::vector<xns::poly_method<void(const xns::string&)>>;
 
 			/* event vector type */
 			using EventVector = xns::vector<xns::poly_method<void(void)>>;
@@ -150,7 +150,7 @@ namespace Xf {
 
 
 			/* mode type */
-			using Mode = Pair<InputVector, EventArray>;
+			using Mode = xns::pair<InputVector, EventArray>;
 
 			/* mode list type */
 			using Modelist = xns::vector<Mode>;
