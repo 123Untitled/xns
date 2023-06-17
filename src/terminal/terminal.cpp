@@ -81,13 +81,22 @@ const xns::terminal::Termios xns::terminal::setup_terminal(void) {
 /* setup raw terminal */
 void xns::terminal::setup_raw(void) {
 
+	// get flag type
+	using iflag = decltype(_raw.c_iflag);
+	using lflag = decltype(_raw.c_lflag);
+
+
 	// setup new terminal structure
-	_raw.c_iflag &= ~(	IXON		// disable Ctrl-S and Ctrl-Q
-					|	ICRNL);		// disable Ctrl-M
-	_raw.c_lflag &= ~(	ECHO		// disable echo
-					|	ICANON		// non-canonical mode
-					|	ISIG		// disable Ctrl-C and Ctrl-Z
-					|	IEXTEN);	// disable Ctrl-V and Ctrl-O
+	_raw.c_iflag &= ~static_cast<iflag>(  IXON   // disable Ctrl-S and Ctrl-Q
+										| ICRNL  // disable Ctrl-M
+	);
+
+	_raw.c_lflag &= ~static_cast<lflag>(  ECHO   // disable echo
+										| ICANON // non-canonical mode
+										| ISIG   // disable Ctrl-C and Ctrl-Z
+										| IEXTEN // disable Ctrl-V and Ctrl-O
+	);
+
 	_raw.c_cc[VTIME] = 0;
 }
 
@@ -250,7 +259,7 @@ int xns::terminal::check_control_term(void) {
 
 	int status = 0;
 
-	for (xns::size_t x : { 0, 1, 2 }) {
+	for (xns::size_t x : { 0U, 1U, 2U }) {
 		if (!isatty(fds[x])) {
 			status = -1;
 			dprintf(fd, "[%s] is not a tty.\n", descriptor[x]);
@@ -264,7 +273,7 @@ int xns::terminal::check_control_term(void) {
 	}
 
 	close(fd);
-	return (status);
+	return status;
 
 	//std::cout << "terminal control session id: " << npid << std::endl;
 	//std::cout << "current pid: " << pid << std::endl;
