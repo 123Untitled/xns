@@ -29,6 +29,9 @@ namespace UT {
 
 	void array_ut(void);
 
+	void environment_ut(void);
+
+	void duration_ut(void);
 
 };
 
