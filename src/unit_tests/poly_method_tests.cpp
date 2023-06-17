@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"poly_method">(void) {
+	bool UT::unit_tests<"poly_method">(void) {
 		// start unit test
 		START_UT("poly_method");
 		// code here...

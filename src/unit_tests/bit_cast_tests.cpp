@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"bit_cast">(void) {
+	bool UT::unit_tests<"bit_cast">(void) {
 		// start unit test
 		START_UT("bit_cast");
 		// code here...

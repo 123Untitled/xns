@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"common_type">(void) {
+	bool UT::unit_tests<"common_type">(void) {
 		// start unit test
 		START_UT("common_type");
 		// code here...

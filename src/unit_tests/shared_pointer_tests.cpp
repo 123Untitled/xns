@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"shared_pointer">(void) {
+	bool UT::unit_tests<"shared_pointer">(void) {
 		// start unit test
 		START_UT("shared_pointer");
 		// code here...

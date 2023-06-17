@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"is_array">(void) {
+	bool UT::unit_tests<"is_array">(void) {
 		// start unit test
 		START_UT("is_array");
 		// code here...

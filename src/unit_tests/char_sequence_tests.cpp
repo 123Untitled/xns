@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"char_sequence">(void) {
+	bool UT::unit_tests<"char_sequence">(void) {
 		// start unit test
 		START_UT("char_sequence");
 		// code here...

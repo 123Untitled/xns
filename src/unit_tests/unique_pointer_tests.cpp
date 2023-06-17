@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"unique_pointer">(void) {
+	bool UT::unit_tests<"unique_pointer">(void) {
 		// start unit test
 		START_UT("unique_pointer");
 		// code here...

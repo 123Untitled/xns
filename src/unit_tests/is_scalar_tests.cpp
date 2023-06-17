@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"is_scalar">(void) {
+	bool UT::unit_tests<"is_scalar">(void) {
 		// start unit test
 		START_UT("is_scalar");
 		// code here...

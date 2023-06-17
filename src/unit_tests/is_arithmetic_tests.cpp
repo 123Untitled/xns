@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"is_arithmetic">(void) {
+	bool UT::unit_tests<"is_arithmetic">(void) {
 		// start unit test
 		START_UT("is_arithmetic");
 		// code here...

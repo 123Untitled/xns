@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"fixed">(void) {
+	bool UT::unit_tests<"fixed">(void) {
 		// start unit test
 		START_UT("fixed");
 		// code here...

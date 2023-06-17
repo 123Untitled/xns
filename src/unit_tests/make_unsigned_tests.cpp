@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"make_unsigned">(void) {
+	bool UT::unit_tests<"make_unsigned">(void) {
 		// start unit test
 		START_UT("make_unsigned");
 		// code here...

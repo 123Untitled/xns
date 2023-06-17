@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"string_literal">(void) {
+	bool UT::unit_tests<"string_literal">(void) {
 		// start unit test
 		START_UT("string_literal");
 		// code here...

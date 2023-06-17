@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"safe_enum">(void) {
+	bool UT::unit_tests<"safe_enum">(void) {
 		// start unit test
 		START_UT("safe_enum");
 		// code here...

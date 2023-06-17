@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"inheritance">(void) {
+	bool UT::unit_tests<"inheritance">(void) {
 		// start unit test
 		START_UT("inheritance");
 		// code here...

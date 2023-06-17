@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"weak_pointer">(void) {
+	bool UT::unit_tests<"weak_pointer">(void) {
 		// start unit test
 		START_UT("weak_pointer");
 		// code here...

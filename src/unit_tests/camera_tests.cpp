@@ -2,7 +2,7 @@
 
 	/* unit test */
 	template <>
-	bool unit_test<"camera">(void) {
+	bool UT::unit_tests<"camera">(void) {
 		// start unit test
 		START_UT("camera");
 		// code here...
