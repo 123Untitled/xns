@@ -19,7 +19,7 @@ xns::border::border(void)
 }
 
 /* size and position constructor */
-xns::border::border(const xns::rect& rect)
+xns::border::border(const rect& rect)
 : _border{} {
 	// call set method
 	set(rect);
@@ -84,29 +84,29 @@ void xns::border::draw(void) {
 }
 
 
-void xns::border::set(const xns::rect& rect, const xns::hexcolor color) {
+void xns::border::set(const rect& rect, const xns::hexcolor color) {
 	// avoid namespace pollution
-	using Esc = Xf::Escape;
+	using esc = xns::escape;
 
 	if (rect.empty()) { _DBG("empty rect in border set method"); return;}
 
 	// clear previous border
 	_border.clear();
 
-	xns::rect::size_type x = rect.x;
-	xns::rect::size_type y = rect.y;
-	xns::rect::size_type w = rect.w;
-	xns::rect::size_type h = rect.h;
+	auto x = rect.x;
+	auto y = rect.y;
+	auto w = rect.w;
+	auto h = rect.h;
 
 
-	_border.append(Esc::hex_color(color));
+	_border.append(esc::hex_color(color));
 
 	// append move position top left corner
-	_border.append(Esc::move_position(x, y));
+	_border.append(esc::move_position(x, y));
 	// append top left corner
 	_border.append(_symb[CORNER_TL], 3);
 	// append top border
-	for (size_type i = 1; i < w - 1; ++i) {
+	for (term_size i = 1; i < w - 1; ++i) {
 		_border.append(_symb[LINE_H], 3);
 	}
 	// append top right corner
@@ -114,39 +114,39 @@ void xns::border::set(const xns::rect& rect, const xns::hexcolor color) {
 
 	// append move position bottom left corner
 	//_border.append(Esc::get<Xf::move_position_t>(x, y + h - 1));
-	_border.append(Esc::move_position(x, y + h - 1));
+	_border.append(esc::move_position(x, y + h - 1));
 
 	// append bottom left corner
 	_border.append(_symb[CORNER_BL], 3);
 
 	// append bottom border
-	for (size_type i = 1; i < w - 1; ++i) {
+	for (term_size i = 1; i < w - 1; ++i) {
 		_border.append(_symb[LINE_H], 3);
 	}
 	// append bottom right corner
 	_border.append(_symb[CORNER_BR], 3);
 
-	size_type y_pos = y + h - 1;
+	term_size y_pos = y + h - 1;
 	// append left vertical border
-	for (size_type i = y + 1; i < y_pos; ++i) {
+	for (term_size i = y + 1; i < y_pos; ++i) {
 		// append move position left border
 		//_border.append(Esc::get<Xf::move_position_t>(x, i));
-		_border.append(Esc::move_position(x, i));
+		_border.append(esc::move_position(x, i));
 		// append left vertical border
 		_border.append(_symb[LINE_V], 3);
 	}
 
-	size_type x_pos = x + w - 1;
+	term_size x_pos = x + w - 1;
 	// append right vertical border
-	for (size_type i = y + 1; i < y_pos; ++i) {
+	for (term_size i = y + 1; i < y_pos; ++i) {
 		// append move position right border
 		//_border.append(Esc::get<Xf::move_position_t>(x_pos, i));
-		_border.append(Esc::move_position(x_pos, i));
+		_border.append(esc::move_position(x_pos, i));
 		// append right vertical border
 		_border.append(_symb[LINE_V], 3);
 	}
 
-	_border.append(Esc::reset_style());
+	_border.append(esc::reset_style());
 }
 
 
