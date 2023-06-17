@@ -6,7 +6,7 @@ xns::file::file(void)
 }
 
 /* path constructor */
-xns::file::file(const xns::cstring& path)
+xns::file::file(const xns::string& path)
 : _file{}, _path{path}, _fd{}, _data{}, _state{false} {
 	// code here...
 }
@@ -34,13 +34,13 @@ void xns::file::open(void) {
 }
 
 /* get path */
-const xns::cstring& xns::file::path(void) const {
+const xns::string& xns::file::path(void) const {
 	// return file path
 	return _path;
 }
 
 
-void xns::file::file_name(xns::cstring&& path) {
+void xns::file::file_name(xns::string&& path) {
 	//_path = static_cast<String&&>(path);
 }
 
@@ -52,7 +52,11 @@ void xns::file::content(void) {
 
 	off_t size = _data.st_size;
 
-	_file.reserve(size);
+	if (size <= 0) { return; }
+
+	xns::size_t usize = static_cast<xns::size_t>(size);
+
+	_file.reserve(usize);
 
 	if (_file.capacity() != (xns::size_t)size) {
 		std::cout << "RESERVE FAILED" << std::endl;
@@ -61,7 +65,7 @@ void xns::file::content(void) {
 	}
 
 	// WARNING: need to set size in String class !!!
-	if (read(_fd.get(), _file.pointer(), size) != size) {
+	if (read(_fd.get(), _file.pointer(), usize) != size) {
 		_state = false;
 		return;
 	}
@@ -69,6 +73,6 @@ void xns::file::content(void) {
 	std::cout << "FILE CORRECTLY READED" << std::endl;
 	std::cout << "size: " << size << std::endl;
 
-	write(1, _file.pointer(), size);
+	write(1, _file.pointer(), usize);
 
 }
