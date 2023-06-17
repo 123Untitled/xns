@@ -5,8 +5,10 @@ xns::random xns::random::_instance = xns::random{};
 
 /* default constructor */
 xns::random::random(void) {
+	unsigned int time = static_cast<unsigned int>(std::time(NULL));
+	unsigned int pid = static_cast<unsigned int>(getpid());
 	// seed initialization
-	std::srand(std::time(NULL) / getpid());
+	std::srand(time / pid);
 }
 
 /* destructor */
@@ -17,7 +19,7 @@ xns::random::~random(void) {
 /* random integer */
 xns::random::size_type xns::random::random_gen(const size_type range) {
 	// return random integer
-	return !range ? 0 : std::rand() % range;
+	return !range ? 0 : static_cast<size_type>(std::rand()) % range;
 }
 
 /* random boolean */

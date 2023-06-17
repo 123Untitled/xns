@@ -1,10 +1,10 @@
 #include "id.hpp"
 
-xns::id::string xns::id::generate(void) {
+xns::string xns::id::generate(void) {
 
 	string id{};
 
-	xns::u16 rnd;
+	xns::size_t rnd;
 
 	char_t buffer[4];
 
