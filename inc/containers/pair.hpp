@@ -4,95 +4,69 @@
 #include "move.hpp"
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
 
-	// -- P A I R  C L A S S ----------------------------------------------------
 
-	template <typename T1, typename T2>
-	struct Pair final {
+	// -- P A I R -------------------------------------------------------------
+
+	template <class T, class U>
+	struct pair final {
 
 		public:
 
-			// -- A L I A S E S -----------------------------------------------
+			// -- public types ------------------------------------------------
+
+			/* self type */
+			using self = pair<T, U>;
 
 			/* first type */
-			using First = T1;
-
-			/* first reference type */
-			using FirstRef = First&;
-
-			/* first const reference type */
-			using FirstConstRef = const First&;
-
-			/* first move reference type */
-			using FirstMoveRef = First&&;
-
-			/* first pointer type */
-			using FirstPtr = First*;
-
-			/* first const pointer type */
-			using FirstConstPtr = const First*;
+			using first = T;
 
 			/* second type */
-			using Second = T2;
-
-			/* second reference type */
-			using SecondRef = Second&;
-
-			/* second const reference type */
-			using SecondConstRef = const Second&;
-
-			/* second move reference type */
-			using SecondMoveRef = Second&&;
-
-			/* second pointer type */
-			using SecondPtr = Second*;
-
-			/* second const pointer type */
-			using SecondConstPtr = const Second*;
+			using second = U;
 
 
-			// -- P U B L I C  M E M B E R S ----------------------------------
+			// -- public members ----------------------------------------------
 
 			/* first object */
-			First _first;
+			first _first;
 
 			/* second object */
-			Second _second;
+			second _second;
 
 
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* default constructor */
-			Pair(void)
+			pair(void)
 			: _first{}, _second{} { }
 
 			/* copy pair constructor */
-			Pair(FirstConstRef first, SecondConstRef second)
+			pair(const first& first, const second& second)
 			: _first{first}, _second{second} { }
 
 			/* move pair constructor */
-			Pair(FirstMoveRef first, SecondMoveRef second)
+			pair(first&& first, second&& second)
 			: _first{xns::move(first)}, _second{xns::move(second)} { }
 
 			/* copy constructor */
-			Pair(const Pair& other)
+			pair(const self& other)
 			: _first{other._first}, _second{other._second} { }
 
 			/* move constructor */
-			Pair(Pair&& other)
+			pair(self&& other)
 			: _first{xns::move(other._first)}, _second{xns::move(other._second)} { }
 
 			/* destructor */
-			~Pair(void) { }
+			~pair(void) { }
 
 
 			// -- O P E R A T O R S -------------------------------------------
 
 			/* copy operator */
-			Pair& operator=(const Pair& other) {
+			self& operator=(const self& other) {
 				// check for self assignment
 				if (this != &other) {
 					// copy first object
@@ -104,7 +78,7 @@ namespace Xf {
 			}
 
 			/* move operator */
-			Pair& operator=(Pair&& other) {
+			self& operator=(self&& other) {
 				// check for self assignment
 				if (this != &other) {
 					// move first object
