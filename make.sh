@@ -232,7 +232,7 @@ compdb=$abspath/'compile_commands.json'
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-#cxx='g++'
+#cxx='clang++'
 cxx='/opt/homebrew/Cellar/llvm/16.0.4/bin/clang++'
 
 # archiver
@@ -256,8 +256,10 @@ debug='-g3'
 # cxx flags
 cxxflags=('-Wall' '-Wextra' '-Werror' '-Wpedantic'\
 		'-Wno-unused' '-Wno-unused-variable' '-Wno-unused-parameter'\
-		'-Winline' '-fno-exceptions' '-Weffc++'\
-		'-Wno-gnu-string-literal-operator-template')
+		'-Winline' '-Weffc++'\
+		'-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing' '-Wshadow')
+		#'-Wno-gnu-string-literal-operator-template')
+		#'-fno-exceptions'
 
 # defines
 defines=()
