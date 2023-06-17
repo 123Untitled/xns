@@ -28,17 +28,31 @@ void xns::output::write(const char* str) {
 }
 
 /* write bytes */
-void xns::output::write(const char* str, const xns::cstring::size_type size) {
+void xns::output::write(const char* str, const xns::size_t size) {
 	// append to buffer
 	_instance._buffer.append(str, size);
 }
 
 /* write string */
-void xns::output::write(const xns::cstring& str) {
-	//std::cout << "out: " << str.pointer() << std::endl;
+void xns::output::write(const xns::string& str) {
 	// append to buffer
 	_instance._buffer.append(str);
-	//std::cout << "buffer: " << _instance._buffer.pointer() << std::endl;
 }
+
+/* write string32 */
+void xns::output::write(const xns::string32& str) {
+	// append to buffer
+	_instance._buffer.append(xns::char32_to<char>(str));
+}
+
+
+
+
+
+
+
+
+
+
 
 
