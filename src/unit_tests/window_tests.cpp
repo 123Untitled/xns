@@ -1,8 +1,8 @@
 #include "unit_tests.hpp"
 
-static void exit(void) { Xf::Input::stop_loop(); }
+static void exit(void) { xns::input::stop_loop(); }
 static void render(void) { xns::output::render(); }
-static void press_enter(void) { Xf::Debug::print("enter\n"); }
+static void press_enter(void) { xns::debug::print("enter\n"); }
 
 static Xf::Evntmode build_events(void) {
 
@@ -34,5 +34,5 @@ void UT::window_ut(void) {
 	//WindowManager::new_split<Xf::vsplit_t>();
 	//WindowManager win;
 
-	Xf::Input::start_loop();
+	xns::input::start_loop();
 }
