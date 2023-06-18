@@ -22,13 +22,13 @@
 namespace xns {
 
 
-	// -- T U P L E  C L A S S ------------------------------------------------
+	// -- T U P L E -----------------------------------------------------------
 
 	template <class... A>
 	class tuple final {
 
 
-		// -- A S S E R T I O N S ---------------------------------------------
+		// -- assertions ------------------------------------------------------
 
 		/* check number of elements */
 		static_assert(sizeof...(A) > 1, "TUPLE MUST HAVE AT LEAST 2 ELEMENTS!");
@@ -151,7 +151,7 @@ namespace xns {
 
 			/* indexed type */
 			template <size_type IDX>
-			using Indexed = xns::pack_type<IDX, A...>;
+			using indexed = xns::pack_type<IDX, A...>;
 
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
@@ -188,12 +188,13 @@ namespace xns {
 				// need TO CHECK THIS REIMPLEMENTATION
 				static_assert(xns::is_same< xns::identity_pack<A...>,
 											xns::identity_pack<U...>>,
-							"TUPLE ARE NOT THE SAME !!!");
+							"): CAN'T CONSTRUCT TUPLE FROM DIFFERENT TYPES! :(");
 			}
 
 			/* move constructor */
 			constexpr tuple(self&& tuple) noexcept
 			: _impl{xns::move(tuple._impl)} {
+				std::cout << "move constructor" << std::endl;
 				// code here...
 			}
 
@@ -224,64 +225,57 @@ namespace xns {
 			// -- P U B L I C  A C C E S S O R S ------------------------------
 
 			/* get tuple element */
-			template <size_type IDX, class T = Indexed<IDX>>
+			template <size_type IDX>
 			constexpr auto& get(void) {
+				// check if index is in range
+				static_assert(IDX < num_elements, "): INDEX OUT OF RANGE! :(");
 				// return a reference to the tuple element
-				return _impl.element<IDX, T>::value;
+				return _impl.element<IDX, indexed<IDX>>::value;
 			}
 
 			/* get constant tuple element */
-			template <size_type IDX, class T = Indexed<IDX>>
+			template <size_type IDX>
 			constexpr const auto& get(void) const {
+				// check if index is in range
+				static_assert(IDX < num_elements, "): INDEX OUT OF RANGE! :(");
 				// return a constant reference to the tuple element
-				return _impl.element<IDX, T>::value;
+				return _impl.element<IDX, indexed<IDX>>::value;
+			}
+
+			/* get tuple size */
+			constexpr size_type size(void) const {
+				// return the tuple size
+				return num_elements;
+			}
+
+
+			// -- setters -----------------------------------------------------
+
+			/* set tuple element by copy */
+			template <size_type IDX>
+			constexpr void set(const indexed<IDX>& value) {
+				// set tuple element
+				_impl.element<IDX, indexed<IDX>>::value = value;
+			}
+
+			/* set tuple element by move */
+			template <size_type IDX>
+			constexpr void set(indexed<IDX>&& value) {
+				// set tuple element
+				_impl.element<IDX, indexed<IDX>>::value = xns::move(value);
 			}
 
 
 
+		// -- friends ---------------------------------------------------------
 
+		/* get tuple element as friend */
+		template <xns::size_t, class... U>
+		friend constexpr auto& get(tuple<U...>&);
 
-			//template <size_type... IDX>
-			//constexpr void _iterate(xns::index_seq<IDX...>) {
-			//	using namespace std;
-			//	((cout << _impl.element<IDX, A>::value << "\n"), ...);
-			//}
-
-			//template <size_type... IDX, class R, class... U>
-			//constexpr void _iterate(xns::index_seq<IDX...>, xns::function<R(U...)>&& f) {
-			//	((f(_impl.element<IDX, A>::value)), ...);
-			//}
-
-			/* iterate by calling a template function on each tuple element */
-			template <size_type... IDX, class F>
-			constexpr void _iterate(xns::index_seq<IDX...>, F&& f) {
-				((f(_impl.element<IDX, A>::value)), ...);
-			}
-			// is it okey ??
-			// answer: yes, it is okey
-
-			//constexpr void iterate(void) {
-			//	_iterate(sequence{});
-			//}
-
-			/* the calling function must be a template function */
-			template <class F>
-			constexpr void iterate(F&& f) {
-				//_iterate(sequence{}, xns::forward<f>);
-				_iterate(sequence{}, [&f](auto&&... args) {
-					f(xns::forward<decltype(args)>(args)...);
-				});
-			}
-
-			//template <class R, class... U>
-			//constexpr void iterate(xns::function<R(U...)>&& f) {
-			//	_iterate(sequence{}, xns::forward<f>);
-			//}
-
-
-
-
-
+		/* get constant tuple element as friend */
+		template <xns::size_t, class... U>
+		friend constexpr const auto& get(const tuple<U...>&);
 
 
 	};
@@ -291,9 +285,23 @@ namespace xns {
 	tuple(A&&...) -> tuple<A...>;
 
 
+	/* get tuple element */
+	template <xns::size_t IDX, class... A>
+	constexpr auto& get(tuple<A...>& tuple) {
+		// check if index is in range
+		static_assert(IDX < sizeof...(A), "): INDEX OUT OF RANGE! :(");
+		// return a reference to the tuple element
+		return tuple._impl.template element<IDX, typename xns::tuple<A...>::template indexed<IDX>>::value;
+	}
 
-
-
+	/* get constant tuple element */
+	template <xns::size_t IDX, class... A>
+	constexpr const auto& get(const tuple<A...>& tuple) {
+		// check if index is in range
+		static_assert(IDX < sizeof...(A), "): INDEX OUT OF RANGE! :(");
+		// return a constant reference to the tuple element
+		return tuple._impl.template element<IDX, typename xns::tuple<A...>::template indexed<IDX>>::value;
+	}
 
 
 }
