@@ -44,7 +44,7 @@ namespace xns {
 			static constexpr char_t zero_ascii = 48;
 
 			/* number of characters */
-			static constexpr size_type size = xns::max<char_t>() + 1;
+			static constexpr size_type size = xns::limits::max<char_t>() + 1;
 
 			/* offset to printable characters */
 			static constexpr size_type offset = 32;
