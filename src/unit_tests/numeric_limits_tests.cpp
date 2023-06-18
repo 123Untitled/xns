@@ -1,5 +1,13 @@
 #include "unit_tests.hpp"
 #include "numeric_limits.hpp"
+#include "base.hpp"
+
+
+template <class... A>
+void limits(const A&... args) {
+	((std::cout << args << "\n"), ...);
+}
+
 
 template <>
 bool UT::unit_tests<"numeric_limits">(void) {
@@ -7,40 +15,78 @@ bool UT::unit_tests<"numeric_limits">(void) {
 	// avoid namespace pollution
 	using namespace std;
 
-	//cout << "bool MIN:                " << Xf::min<bool>() << endl;
-	//cout << "bool MAX:                " << Xf::max<bool>() << endl;
-	cout << "char8_t MIN:             " << (long long)xns::min<char8_t>() << endl;
-	cout << "char8_t MAX:             " << (long long)xns::max<char8_t>() << endl;
-	cout << "char16_t MIN:            " << (long long)xns::min<char16_t>() << endl;
-	cout << "char16_t MAX:            " << (long long)xns::max<char16_t>() << endl;
-	cout << "char32_t MIN:            " << (long long)xns::min<char32_t>() << endl;
-	cout << "char32_t MAX:            " << (long long)xns::max<char32_t>() << endl;
-	cout << "wchar_t MIN:             " << (long long)xns::min<wchar_t>() << endl;
-	cout << "wchar_t MAX:             " << (long long)xns::max<wchar_t>() << endl;
-	cout << "char MIN:                " << (long long)xns::min<char>() << endl;
-	cout << "char MAX:                " << (long long)xns::max<char>() << endl;
-	cout << "short MIN:               " << (long long)xns::min<short>() << endl;
-	cout << "short MAX:               " << (long long)xns::max<short>() << endl;
-	cout << "int MIN:                 " << (long long)xns::min<int>() << endl;
-	cout << "int MAX:                 " << (long long)xns::max<int>() << endl;
-	cout << "long MIN:                " << (long long)xns::min<long>() << endl;
-	cout << "long MAX:                " << (long long)xns::max<long>() << endl;
-	cout << "long long MIN:           " << (long long)xns::min<long long>() << endl;
-	cout << "long long MAX:           " << (long long)xns::max<long long>() << endl;
-	cout << "unsigned char MIN:       " << (long long)xns::min<unsigned char>() << endl;
-	cout << "unsigned char MAX:       " << (long long)xns::max<unsigned char>() << endl;
-	cout << "unsigned short MIN:      " << (long long)xns::min<unsigned short>() << endl;
-	cout << "unsigned short MAX:      " << (long long)xns::max<unsigned short>() << endl;
-	cout << "unsigned int MIN:        " << (long long)xns::min<unsigned int>() << endl;
-	cout << "unsigned int MAX:        " << (long long)xns::max<unsigned int>() << endl;
-	cout << "unsigned long MIN:       " << (long long)xns::min<unsigned long>() << endl;
-	cout << "unsigned long MAX:       " << (long long)xns::max<const unsigned long>() << endl;
-	cout << "unsigned long long MIN:  " << (long long)xns::min<unsigned long long>() << endl;
-	cout << "unsigned long long MAX:  " << (long long)xns::max<unsigned long long>() << endl;
+	UT::print<"bool">();
+	cout << "min: " << xns::limits::min<bool>() << "\n";
+	cout << "max: " << xns::limits::max<bool>() << "\n\n";
 
-	auto max = xns::max_digits<unsigned char>();
+	UT::print<"char8_t">();
+	cout << "min: " << (long long)xns::limits::min<char8_t>() << "\n";
+	cout << "max: " << (long long)xns::limits::max<char8_t>() << "\n\n";
+
+	UT::print<"char16_t">();
+	cout << "min: " << (long long)xns::limits::min<char16_t>() << "\n";
+	cout << "max: " << (long long)xns::limits::max<char16_t>() << "\n\n";
+
+	UT::print<"char32_t">();
+	cout << "min: " << (long long)xns::limits::min<char32_t>() << "\n";
+	cout << "max: " << (long long)xns::limits::max<char32_t>() << "\n\n";
+
+	UT::print<"wchar_t">();
+	cout << "min: " << (long long)xns::limits::min<wchar_t>() << "\n";
+	cout << "max: " << (long long)xns::limits::max<wchar_t>() << "\n\n";
+
+	UT::print<"char">();
+	cout << "min: " << (long long)xns::limits::min<char>() << "\n";
+	cout << "max: " << (long long)xns::limits::max<char>() << "\n\n";
+
+	UT::print<"signed char">();
+	cout << "min: " << (long long)xns::limits::min<signed char>() << "\n";
+	cout << "max: " << (long long)xns::limits::max<signed char>() << "\n\n";
+
+	UT::print<"unsigned char">();
+	cout << "min: " << (long long)xns::limits::min<unsigned char>() << "\n";
+	cout << "max: " << (long long)xns::limits::max<unsigned char>() << "\n\n";
+
+	UT::print<"short">();
+	cout << "min: " << xns::limits::min<short>() << "\n";
+	cout << "max: " << xns::limits::max<short>() << "\n\n";
+
+	UT::print<"unsigned short">();
+	cout << "min: " << xns::limits::min<unsigned short>() << "\n";
+	cout << "max: " << xns::limits::max<unsigned short>() << "\n\n";
+
+	UT::print<"int">();
+	cout << "min: " << xns::limits::min<int>() << "\n";
+	cout << "max: " << xns::limits::max<int>() << "\n\n";
+
+	UT::print<"unsigned int">();
+	cout << "min: " << xns::limits::min<unsigned int>() << "\n";
+	cout << "max: " << xns::limits::max<unsigned int>() << "\n\n";
+
+	UT::print<"long">();
+	cout << "min: " << xns::limits::min<long>() << "\n";
+	cout << "max: " << xns::limits::max<long>() << "\n\n";
+
+	UT::print<"unsigned long">();
+	cout << "min: " << xns::limits::min<unsigned long>() << "\n";
+	cout << "max: " << xns::limits::max<const unsigned long>() << "\n\n";
+
+	UT::print<"long long">();
+	cout << "min: " << xns::limits::min<long long>() << "\n";
+	cout << "max: " << xns::limits::max<long long>() << "\n\n";
+
+	UT::print<"unsigned long long">();
+	cout << "min: " << xns::limits::min<unsigned long long>() << "\n";
+	cout << "max: " << xns::limits::max<unsigned long long>() << "\n\n";
+
+
+	auto max = xns::limits::digits<char, xns::bin>();
 	std::cout << "max digits: " << (int)max << std::endl;
-	auto min = xns::min_digits<unsigned char>();
-	std::cout << "min digits: " << (int)min << std::endl;
+
+	using namespace xns;
+
+	std::cout << "static digits: " << limits::digits<10, xns::dec>() << std::endl;
+
+
 	return true;
 }
