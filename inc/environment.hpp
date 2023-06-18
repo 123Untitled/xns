@@ -2,8 +2,8 @@
 #define ENV_HEADER
 
 #include "string.hpp"
-#include "unique_pointer.hpp"
-#include "weak_pointer.hpp"
+#include "unique_ptr.hpp"
+#include "weak_ptr.hpp"
 #include "pair.hpp"
 #include "vector.hpp"
 #include "output.hpp"
