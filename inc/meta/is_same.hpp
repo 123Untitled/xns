@@ -43,6 +43,9 @@ namespace xns {
 	template <class T, class... U>
 	concept is_not_all_same = !is_all_same<T, U...>;
 
+	/* is all same remove cvr concept */
+	template <class T, class... U>
+	concept is_all_same_base = (is_same<remove_cvr<T>, remove_cvr<U>> && ...);
 
 
 
