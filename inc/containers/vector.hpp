@@ -44,34 +44,34 @@ namespace xns {
 			// -- A L I A S E S -----------------------------------------------
 
 			/* value type */
-			using value = T;
+			using value_type = T;
 
 			/* restrict type */
 			using restrict = R;
 
 			/* self type */
-			using self = vector<value, restrict>;
+			using self = vector<value_type, restrict>;
 
 			/* size type */
 			using size_type = xns::size_t;
 
 			/* reference type */
-			using reference = value&;
+			using reference = value_type&;
 
 			/* const reference type */
-			using const_reference = const value&;
+			using const_reference = const value_type&;
 
 			/* move reference type */
-			using move_reference = value&&;
+			using move_reference = value_type&&;
 
 			/* pointer type */
-			using pointer = value*;
+			using pointer = value_type*;
 
 			/* const pointer type */
-			using const_pointer = const value*;
+			using const_pointer = const value_type*;
 
 			/* allocator type */
-			using allocator = xns::allocator<value>;
+			using allocator = xns::allocator<value_type>;
 
 
 			// -- C O N S T R U C T O R S -------------------------------------
@@ -351,7 +351,7 @@ namespace xns {
 			}
 
 			/* copy push back */
-			void copy_back(const value& value) {
+			void copy_back(const value_type& value) {
 				// check capacity
 				if (!available()) {
 					// double capacity
@@ -363,7 +363,7 @@ namespace xns {
 			}
 
 			/* move back */ // INFO: this is preferred over move push back
-			void move_back(value&& value) {
+			void move_back(value_type&& value) {
 				// check capacity
 				if (!available()) {
 					// double capacity
@@ -423,6 +423,30 @@ namespace xns {
 				} // finaly, destroy elements and decrement size
 				while (z < _size) { allocator::destroy(_vector + --_size); }
 			}
+
+			/* move elements to the back of the vector if exists, else push back */
+			void to_back(const value_type& value) {
+				// loop over vector
+				for (size_type x = 0; x < _size; ++x) {
+					// check for match
+					if (_vector[x] == value) {
+						// declare tmp
+						value_type tmp = xns::move(_vector[x]);
+						// move elements
+						for (size_type z = x; z < (_size - 1); ++z) {
+							// move element
+							_vector[z] = xns::move(_vector[z + 1]);
+						}
+						// move tmp
+						_vector[_size - 1] = xns::move(tmp);
+						// return
+						return;
+					}
+				} // push back
+				copy_back(value);
+			}
+
+
 
 
 
