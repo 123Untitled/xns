@@ -23,7 +23,7 @@ bool UT::unit_tests<"math">() {
 
 	std::cout << static_cast<int>(static_cast<unsigned char>(nn)) << std::endl;
 
-	double f = (double)xns::max<unsigned int>();
+	double f = (double)xns::limits::max<unsigned int>();
 
 	std::cout << "max: " << f << std::endl;
 
