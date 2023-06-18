@@ -217,7 +217,7 @@ bool xns::escape::request_position(term_size& x, term_size& y) {
 				term_size digit = c - zero;
 
 				// check overflow
-				term_size tmp = (xns::max<term_size>() - digit) / base;
+				term_size tmp = (xns::limits::max<term_size>() - digit) / base;
 
 				if (*num > tmp) return false;
 
@@ -250,7 +250,7 @@ xns::escape::string xns::escape::move_position(term_size x, term_size y) {
 	char_t  escape[ESCAPE_BUFFER_SIZE];
 	xns::size_t ite;
 
-	constexpr const xns::size_t max = xns::max<xns::term_size>();
+	constexpr const xns::size_t max = xns::limits::max<xns::term_size>();
 
 	x += (x != max);
 	y += (y != max);
@@ -285,7 +285,7 @@ xns::escape::string xns::escape::_move_direction(term_size cells, const char_t d
 	// static returned string
 	//static Xf::CString escape;
 	// compile time buffer size
-	constexpr const xns::size_t size = 3 + xns::max_digits<xns::term_size>();
+	constexpr const xns::size_t size = 3 + xns::limits::digits<xns::term_size>();
 
 	// buffer
 	char_t buffer[size];
@@ -322,7 +322,7 @@ const xns::escape::string& xns::escape::move_x(term_size x) {
 
 	// compile time buffer size
 	constexpr const xns::size_t size = sizeof("\x1b[G")
-								+ xns::max_digits<xns::term_size>();
+								+ xns::limits::digits<xns::term_size>();
 	// buffer
 	char_t buffer[size];
 
@@ -330,7 +330,7 @@ const xns::escape::string& xns::escape::move_x(term_size x) {
 	xns::size_t i = size - 1;
 
 	// increment x if not max
-	x += (x != xns::max<xns::term_size>());
+	x += (x != xns::limits::max<xns::term_size>());
 
 	// last character
 	buffer[i] = 'G';
