@@ -37,7 +37,7 @@ namespace xns {
 			static void draw_line(const xns::u32, const xns::u32, const void*, const xns::u32);
 
 			/* draw string */
-			static void draw_string(const xns::u32, const xns::u32, const xns::cstring&);
+			static void draw_string(const xns::u32, const xns::u32, const xns::string&);
 
 			/* vertical draw */
 			static void vertival_draw(const xns::u32 x, xns::u32 y, const void *ptr, const xns::u32 size, xns::u32 line);
@@ -48,11 +48,11 @@ namespace xns {
 			/* draw integer */
 			static void draw_integer(const xns::u32);
 
-			static int drawStringNl(const xns::cstring& string);
+			static int drawStringNl(const xns::string& string);
 
-			static void animateDraw(const xns::cstring& string);
-			static void animateDrawNl(const xns::cstring& string);
-			static void animateDraw(const xns::cstring& string, const xns::u32 colorIn, const xns::u32 colorOut);
+			static void animateDraw(const xns::string& string);
+			static void animateDrawNl(const xns::string& string);
+			static void animateDraw(const xns::string& string, const xns::u32 colorIn, const xns::u32 colorOut);
 
 	};
 
