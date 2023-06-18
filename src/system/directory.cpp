@@ -1,5 +1,24 @@
 #include "directory.hpp"
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //Directory::Directory(void)
 //: _absolute{}, _directory{nullptr}, _content{}, _isopen{false} {
 //	_absolute.reserve(MAXPATHLEN);
@@ -38,66 +57,10 @@
 //
 ////std::vector<std::list>
 //
-//void Directory::simplify(String& path) {
-//
-//	std::list<String> lst;
-//
-//	String	directory;
-//	xns::size_t	size = path.length();
-//	for (xns::size_t x = 0; x < size; x++) {
-//		directory.clear();
-//		while (x < size && path[x] != C_SLASH)
-//			directory.push_back(path[x++]);
-//		if (directory == S_BACK) {
-//			if (lst.size()) lst.pop_back(); }
-//		else if (!directory.empty()
-//			&& directory != ".")
-//			lst.push_back(directory);
-//	}
-//	path.clear();
-//	for (auto ite = lst.begin(); ite != lst.end(); ite++)
-//		path += S_SLASH + *ite;
-//	path.push_back(C_SLASH);
-//}
 //
 //
 //
 //
-//void Directory::deallocation(void) {
-//	if (_directory)
-//		closedir(_directory);
-//}
-//
-//void Directory::clearDirectory(void) {
-//	for (xns::size_t x = 0; x < TYPE_N; x++)
-//		_content[x].clear();
-//}
-//
-//
-//void Directory::reset(void) {
-//	deallocation();
-//	clearDirectory();
-//	_directory	= nullptr;
-//	_isopen		= false;
-//}
-//
-//
-//bool Directory::isOpen(void) const {
-//	return (_isopen);
-//}
-//
-//const char* Directory::getDirectoryPath(void) const {
-//	return (_absolute.c_str());
-//}
-//
-//Directory::Err Directory::createDirectory(const String& path) {
-//	return ((makeDirectory(path)
-//		|| openDir(path)) ? ERROR : NOERR);
-//}
-//
-//Directory::Err Directory::makeDirectory(const String& path) {
-//	return (mkdir(path.c_str(), 0755) == -1 ? ERROR : NOERR);
-//}
 //
 //Directory::Err Directory::openDir(const String& path) {
 //	// check null pointer
@@ -122,17 +85,7 @@
 //	} return (ERROR);
 //}
 //
-//
-//void Directory::removeDots(void) {
-//	auto ite = _content[T_DIR].begin();
-//	while (ite != _content[T_DIR].end()) {
-//		if (!(ite->getName().compare(".."))
-//			|| !(ite->getName().compare(".")))
-//			_content[T_DIR].erase(ite);
-//		ite++;
-//	}
-//}
-//
+
 //void Directory::getDirectoryContent(void) {
 //
 //	const Dirent* file = nullptr;
@@ -269,14 +222,14 @@
 //bool DirEntity::makeLink(const String& source, const String& link) {
 //	return (symlink(source.c_str(), link.c_str()) == -1 ? ERROR : NOERR);
 //}
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+
+
+
+
+
+
+
+
+
+
+
