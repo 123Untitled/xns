@@ -1,5 +1,7 @@
-#include "unique_pointer.hpp"
 #include "unit_tests.hpp"
+
+#include "unique_ptr.hpp"
+#include "vector.hpp"
 
 template <class T>
 using AutoP = xns::unique_ptr<T>;
@@ -10,7 +12,10 @@ using AutoP = xns::unique_ptr<T>;
 
 void f(...) {}
 
-void UT::unique_pointer_ut(void) {
+template <>
+bool UT::unit_tests<"unique_ptr">(void) {
+
+
 
 	using namespace xns;
 	/*
@@ -66,6 +71,7 @@ void UT::unique_pointer_ut(void) {
 
 	}
 
+	return true;
 
 }
 
