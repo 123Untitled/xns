@@ -30,6 +30,7 @@ namespace xns {
 	#define ARCH_BYTES (sizeof(void*))
 
 
+
 	/* unsigned integer types */
 	template <decltype(sizeof(char)) N>
 	using unsign =  xns::conditional<(sizeof(unsigned char)      == N), unsigned char,
@@ -47,6 +48,9 @@ namespace xns {
 					xns::conditional<(sizeof(signed long)        == N), signed long,
 					xns::conditional<(sizeof(signed long long)   == N), signed long long,
 					void > > > > >;
+
+	/* pointer types */
+	using ptr_t   = unsign<ARCH_BYTES>;
 
 
 	/* byte types */
@@ -75,6 +79,13 @@ namespace xns {
 
 	/* maximum signed integer type */
 	using ssize_t = sign<ARCH_BYTES>;
+
+
+	/* maximum unsigned integer type */
+	using umax = unsign<ARCH_BYTES>;
+
+	/* maximum signed integer type */
+	using smax = sign<ARCH_BYTES>;
 
 }
 
