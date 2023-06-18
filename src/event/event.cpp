@@ -35,7 +35,7 @@ Xf::Event Xf::Event::_instance;
 /* add mode */
 Xf::Evntmode Xf::Event::new_mode(void) {
 	_modes.emplace_back(Mode{ });
-	Xf::Debug::print("new mode: %d\n", _modes.size() - 1);
+	xns::debug::print("new mode: %d\n", _modes.size() - 1);
 	if (_modes.empty()) {
 		// error
 		Evntmode mode{0};
@@ -131,18 +131,18 @@ void Xf::Event::stack_mode(const Evntmode& mode, const Evntopt opt) {
 void Xf::Event::unstack_mode(void) {
 	// check if there is a mode to unstack
 	if (_stack.empty()) {
-		Xf::Input::stop_loop();
+		xns::input::stop_loop();
 		return; }
 	// unstack mode
 	//_next.make(*_stack.top());
 
 
-	Xf::Debug::print("unstack mode: %d\n", _stack.top());
+	xns::debug::print("unstack mode: %d\n", _stack.top());
 	/////////////
 	_stack.pop();
 	// maybe better to pop and set new top mode ???
 	if (_stack.empty()) {
-		Xf::Input::stop_loop();
+		xns::input::stop_loop();
 		return;
 	}
 	//_next.make(*_stack.top());
@@ -171,7 +171,7 @@ void Xf::Event::call_event(const Evntype type) {
 }
 
 /* call all input subscribers */
-void Xf::Event::call_input(const xns::cstring& input) {
+void Xf::Event::call_input(const xns::string& input) {
 	// exit if no current mode
 	if (!_current) { return; }
 	// get subscribers
@@ -228,7 +228,7 @@ Xf::Evntmode::Evntmode(const xns::size_t idx)
 Xf::Evntmode::~Evntmode(void) {
 	// check if mode is active
 	if (_state) {
-		Xf::Debug::write("EVNTMODE: destructor called\n");
+		xns::debug::write("EVNTMODE: destructor called\n");
 		// remove mode from event manager
 		Xf::Event::instance().remove_mode(*this);
 	}
