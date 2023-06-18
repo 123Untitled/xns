@@ -9,3 +9,6 @@ vector:
 
 bst_iterator:
 	fix const iterator is mutable sometimes...
+
+tree:
+	rework signness of node members
