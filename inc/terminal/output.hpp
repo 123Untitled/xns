@@ -4,7 +4,8 @@
 #include "macro.hpp"
 #include "types.hpp"
 #include "string.hpp"
-#include "literal.hpp"
+#include "string_literal.hpp"
+#include "conversions.hpp"
 
 #include <unistd.h>
 
@@ -12,25 +13,6 @@
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
-
-
-	// -- F I L E  D E S C R I P T O R  T Y P E S -----------------------------
-
-	struct stdout {
-		/* file descriptor */
-		static constexpr int fd = STDOUT_FILENO;
-	};
-
-	struct stderr {
-		/* file descriptor */
-		static constexpr int fd = STDERR_FILENO;
-	};
-
-	/* is std file descriptor */
-	template <class T>
-	concept is_std_fd =    xns::is_same<T, stdout>
-						|| xns::is_same<T, stderr>;
-
 
 
 	// -- O U T P U T  C L A S S ----------------------------------------------
@@ -65,7 +47,7 @@ namespace xns {
 			static void write(const char* str);
 
 			/* write bytes */
-			static void write(const char* str, const xns::cstring::size_type size);
+			static void write(const char* str, const xns::size_t size);
 
 			/* write character */
 			template <xns::is_char T>
@@ -75,29 +57,51 @@ namespace xns {
 			}
 
 			/* write string */
-			static void write(const xns::cstring& str);
+			static void write(const xns::string& str);
 
-			/* write string */
-			template <class T> requires (xns::is_literal<T>)
-			static void write(void) {
-				// call buffer write
-				write(T::data(), T::size());
-			}
+			/* write string32 */
+			static void write(const xns::string32& str);
 
 			/* render */
-			template <is_std_fd T = xns::stdout>
+			template <xns::string_literal L = "stdout">
 			static void render(void) {
+
+				static_assert(L == "stdout" || L == "stderr",
+							  "): UNKNOWN FILE DESCRIPTOR :(");
+
+				constexpr int fd = (L == "stdout") ? STDOUT_FILENO : STDERR_FILENO;
 
 				// do nothing if buffer is empty
 				if (_instance._buffer.empty()) { return; }
 
 				// write buffer to file descriptor
-				(void)::write(T::fd, _instance._buffer.pointer(),
+				(void)::write(fd, _instance._buffer.pointer(),
 								  _instance._buffer.size());
 
 				// clear buffer
 				_instance._buffer.clear();
 			}
+
+			/*
+			template <class... A>
+			static void print(const A&... args) {
+				// write each argument
+				(void)(write(args), ...);
+			}*/
+
+			template <xns::is_integral T>
+			static void write(const T& number) {
+
+				// convert number to string
+				xns::string str = xns::conversion::integer_to_string(number);
+
+				// write string
+				write(str);
+			}
+
+
+
+
 
 
 
@@ -112,7 +116,7 @@ namespace xns {
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
 			/* buffers */
-			xns::cstring _buffer;
+			xns::string _buffer;
 
 
 			// -- P R I V A T E  S T A T I C  M E M B E R S -------------------
