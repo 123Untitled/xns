@@ -16,9 +16,9 @@
 #include "type_traits.hpp"
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
 
 	struct Esctype_def {
 
@@ -78,149 +78,140 @@ namespace Xf {
 
 
 
+	// -- E S C A P E ---------------------------------------------------------
 
-	// -- E S C A P E  C L A S S ----------------------------------------------
-
-	class Escape final {
+	class escape final {
 
 
 		private:
 
-			// -- P R I V A T E  A L I A S E S --------------------------------
+			// -- private types -----------------------------------------------
 
+			/* string type */
+			using string = xns::string;
 
-			/* value type */
-			using Value = xns::cstring;
-
-			/* char type */
-			using CharT = Value::char_t;
-
-			/* reference type */
-			using Reference = Value&;
-
-			/* const reference type */
-			using ConstRef = const Value&;
+			/* character type */
+			using char_t = typename string::char_t;
 
 			/* array type */
-			using EscArray = xns::array<Value, IDX(Esctype::ESCTYPE_MAX)>;
+			using esc_array = xns::array<string, IDX(Esctype::ESCTYPE_MAX)>;
 
+			/* terminal size */
+			using term_size = xns::term_size;
 
 
 		public:
 
-
-			// -- P U B L I C  C O N S T R U C T O R S ------------------------
+			// -- public constructors -----------------------------------------
 
 			/* non-instantiable class */
-			NON_INSTANCIABLE(Escape);
+			NON_INSTANCIABLE(escape);
+
 
 
 			// -- P U B L I C  S T A T I C  M E T H O D S ---------------------
 
 			/* move home */
-			static const xns::cstring& move_home(void);
+			static const string& move_home(void);
 
 
 			/* erase screen */
-			static const xns::cstring& erase_screen(void);
+			static const string& erase_screen(void);
 
 			/* erase line */
-			static const xns::cstring& erase_line(void);
+			static const string& erase_line(void);
 
 			/* erase to end of line */
-			static const xns::cstring& erase_to_end(void);
+			static const string& erase_to_end(void);
 
 			/* erase from start of line */
-			static const xns::cstring& erase_from_start(void);
+			static const string& erase_from_start(void);
 
 
 			/* enter screen */
-			static const xns::cstring& enter_screen(void);
+			static const string& enter_screen(void);
 
 			/* exit screen */
-			static const xns::cstring& exit_screen(void);
+			static const string& exit_screen(void);
 
 			/* save screen */
-			static const xns::cstring& save_screen(void);
+			static const string& save_screen(void);
 
 			/* restore screen */
-			static const xns::cstring& restore_screen(void);
+			static const string& restore_screen(void);
 
 
 			/* reset style */
-			static const xns::cstring& reset_style(void);
+			static const string& reset_style(void);
 
 
 			/* show cursor */
-			static const xns::cstring& show_cursor(void);
+			static const string& show_cursor(void);
 
 			/* hide cursor */
-			static const xns::cstring& hide_cursor(void);
+			static const string& hide_cursor(void);
 
 			/* request position */
-			static const xns::cstring& request_position(void);
+			static const string& request_position(void);
 
 
 			/* cursor beam */
-			static const xns::cstring& cursor_beam(void);
+			static const string& cursor_beam(void);
 
 			/* cursor underline */
-			static const xns::cstring& cursor_underline(void);
+			static const string& cursor_underline(void);
 
 			/* cursor block */
-			static const xns::cstring& cursor_block(void);
+			static const string& cursor_block(void);
 
 
 
 			// -- S P E C I A L  E S C A P E  S E Q U E N C E S ---------------
 
 			/* request position */
-			static bool request_position(xns::term_size&, xns::term_size&);
+			static bool request_position(term_size&, term_size&);
 
 
 			/* move position */
-			static xns::cstring move_position(xns::term_size, xns::term_size);
+			static xns::string move_position(term_size, term_size);
 
 			/* move x position */
-			static const xns::cstring& move_x(xns::term_size);
+			static const string& move_x(term_size);
 
 			/* move left */
-			static xns::cstring move_left(const xns::term_size = 1);
+			static string move_left(const term_size = 1);
 
 			/* move right */
-			static xns::cstring move_right(const xns::term_size = 1);
+			static string move_right(const term_size = 1);
 
 			/* move up */
-			static xns::cstring move_up(const xns::term_size = 1);
+			static string move_up(const term_size = 1);
 
 			/* move down */
-			static xns::cstring move_down(const xns::term_size = 1);
+			static string move_down(const term_size = 1);
+
 
 		private:
 
 			/* move direction */
-			static xns::cstring _move_direction(xns::term_size, const char);
+			static string _move_direction(term_size, const char_t);
 
 
 		public:
 
-			/* hex color */ // WARN, add hexcolor type to prototype
-			static xns::cstring hex_color(const int, const bool = true);
+			/* hex color */
+			static string hex_color(const xns::hexcolor, const bool = true);
 
 			/* rgb color */
-			static xns::cstring rgb_color(xns::u8, xns::u8, xns::u8, const bool = true);
-
-
+			static string rgb_color(xns::u8, xns::u8, xns::u8, const bool = true);
 
 
 		private:
 
-
-
-			// -- P R I V A T E  S T A T I C  M E M B E R S -------------------
+			// -- private static members --------------------------------------
 
 			/* escape sequences */
-			static const EscArray _escapes;
+			static const esc_array _escapes;
 
 	};
 
