@@ -16,25 +16,39 @@
 
 namespace xns {
 
+
 	// -- B O R D E R  C L A S S ----------------------------------------------
 
 	class border final {
 
+		// -- assertions ------------------------------------------------------
+
+		/* check string size vs terminal size */
+		static_assert(sizeof(xns::term_size) <= sizeof(xns::string::size_type),
+					"): TERMINAL SIZE IS BIGGER THAN STRING SIZE");
+
+
 		public:
 
-			// -- A L I A S E S -----------------------------------------------
+			// -- public types ------------------------------------------------
 
-			/* size type */
-			using size_type = xns::size_t;
+			/* terminal size type */
+			using term_size = xns::term_size;
+
+			/* rect type */
+			using rect = xns::rect<term_size>;
+
+			/* string type */
+			using string = xns::string;
 
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- public constructors -----------------------------------------
 
 			/* default constructor */
 			border(void);
 
 			/* size and position constructor */
-			border(const xns::rect& rect);
+			border(const rect& rect);
 
 			/* copy constructor */
 			border(const border& other);
@@ -46,7 +60,7 @@ namespace xns {
 			~border(void);
 
 
-			// -- O P E R A T O R S -------------------------------------------
+			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
 			border& operator=(const border& other);
@@ -54,10 +68,13 @@ namespace xns {
 			/* move assignment operator */
 			border& operator=(border&& other) noexcept;
 
+
+			// -- public boolean operators ------------------------------------
+
 			/* bool operator */
 			explicit operator bool(void) const;
 
-			/* bool not operator */
+			/* not operator */
 			bool operator!(void) const;
 
 
@@ -67,7 +84,7 @@ namespace xns {
 			void draw(void);
 
 			/* set size and position */
-			void set(const xns::rect& rect,
+			void set(const rect& rect,
 					const xns::hexcolor color = xns::color::GREY_COLOR);
 
 			/* set border color */
@@ -86,7 +103,7 @@ namespace xns {
 			};
 
 
-			// -- A L I A S E S -----------------------------------------------
+			// -- private types -----------------------------------------------
 
 			/* symbol type */
 			using symbol = xns::array<const char*, BORDER_MAX>;
@@ -95,10 +112,10 @@ namespace xns {
 			using allocator = xns::allocator<char>;
 
 
-			// -- M E M B E R S -----------------------------------------------
+			// -- private members ---------------------------------------------
 
 			/* cached border sequence */
-			xns::cstring _border;
+			string _border;
 
 
 			// -- S T A T I C  M E M B E R S ----------------------------------
