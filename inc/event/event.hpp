@@ -11,7 +11,7 @@
 #include "function.hpp"
 #include "string.hpp"
 #include "evntype.hpp"
-#include "unique_pointer.hpp"
+#include "unique_ptr.hpp"
 #include "stack.hpp"
 #include "debug.hpp"
 
