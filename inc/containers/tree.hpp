@@ -762,7 +762,7 @@ namespace xns {
 			}
 
 			/* get position */
-			inline xns::size_t xpos(void) const noexcept {
+			inline xns::s64 xpos(void) const noexcept {
 				// return position
 				return _pos;
 			}
@@ -899,7 +899,7 @@ namespace xns {
 			using scallback = xns::function<xns::size_t(const_reference)>;
 
 			/* value callback */
-			using vcallback = xns::function<xns::cstring(const_reference)>;
+			using vcallback = xns::function<xns::string(const_reference)>;
 
 
 			// -- constructors ------------------------------------------------
@@ -930,7 +930,9 @@ namespace xns {
 				const_bfs_iterator it{_tree._root};
 
 				// parent pos
-				size_type p_pos = 0;
+				//size_type p_pos = 0;
+				decltype(_tree._root->_pos) p_pos = 0; // THIS AVOID IMPLICIT CONVERSION ERROR BUT NOT TESTED
+
 				// max endpoint width
 				size_type width = 0;
 
@@ -955,7 +957,9 @@ namespace xns {
 						//max = max_width(it.right()) + 3;
 						width = _tree.endpoints(it.right());
 
-						it._node->_pos = p_pos - (width + 1);
+						//it._node->_pos = p_pos - (width + 1);
+						// AVOID IMPLICIT CONVERSION ERROR BUT NOT TESTED
+						it._node->_pos = p_pos - static_cast<decltype(_tree._root->_pos)>(width + 1);
 
 					}
 					else {
@@ -964,7 +968,9 @@ namespace xns {
 						//max = max_width(it.left()) + 3;
 						width = _tree.endpoints(it.left());
 
-						it._node->_pos = p_pos + (width + 1);
+						//it._node->_pos = p_pos + (width + 1);
+						// AVOID IMPLICIT CONVERSION ERROR BUT NOT TESTED
+						it._node->_pos = p_pos + static_cast<decltype(_tree._root->_pos)>(width + 1);
 					}
 
 					// update min position
@@ -984,7 +990,9 @@ namespace xns {
 
 				// compensate for negative min
 				smin *= -1;
-				xns::size_t max = smax + smin;
+				xns::size_t max =
+					static_cast<xns::u64>(smax) +
+					static_cast<xns::u64>(smin);
 
 				// matrix
 				//xns::vector<xns::cstring> matrix;
@@ -1030,7 +1038,7 @@ namespace xns {
 					//std::cout << "filling matrix\n";
 
 					// get node position
-					x = (it4.xpos() + smin) * X_OFFSET;
+					x = static_cast<size_type>((it4.xpos() + smin)) * X_OFFSET;
 					y = it4.level()         * Y_OFFSET;
 					//std::cout << *it4 << " | " <<
 					//	"x: " << x << ", y: " << y << "\n";
@@ -1039,7 +1047,7 @@ namespace xns {
 					if (it4.has_left()) {
 
 						// get left position
-						lx = (it4.left()->xpos() + smin) * X_OFFSET;
+						lx = static_cast<size_type>((it4.left()->xpos() + smin)) * X_OFFSET;
 						ly = it4.left()->level()         * Y_OFFSET;
 
 						// draw horizontal line
@@ -1057,7 +1065,7 @@ namespace xns {
 					if (it4.has_right()) {
 
 						// get right position
-						rx = (it4.right()->xpos() + smin) * X_OFFSET;
+						rx = static_cast<size_type>((it4.right()->xpos() + smin)) * X_OFFSET;
 						ry = it4.right()->level()         * Y_OFFSET;
 
 						// draw horizontal line
@@ -1105,7 +1113,7 @@ namespace xns {
 
 					//matrix[y][x] = it4._node->_value;
 
-					xns::cstring value = _vcall.call(it4._node->_value);
+					xns::string value = _vcall.call(it4._node->_value);
 
 					if (value.size()) {
 						size_type size = value.size();
@@ -1113,12 +1121,12 @@ namespace xns {
 						//std::cout << "size: " << size << "\n";
 						if (x > offset) {
 							for (size_type i = 0; i < size; ++i) {
-								matrix[y][x - offset + i] = value[i];
+								matrix[y][x - offset + i] = static_cast<char32_t>(value[i]);
 							}
 						}
 						else {
 							for (size_type i = 0; i < size; ++i) {
-								matrix[y][i] = value[i];
+								matrix[y][i] = static_cast<char32_t>(value[i]);
 							}
 						}
 
@@ -1134,7 +1142,7 @@ namespace xns {
 
 
 				//xns::output::write(Xf::Escape::erase_screen());
-				for (xns::vector<xns::cstring>::size_type _ = 0; _ < matrix.size(); ++_) {
+				for (xns::vector<xns::string>::size_type _ = 0; _ < matrix.size(); ++_) {
 					xns::output::write(matrix[_]);
 					xns::output::newline();
 					//std::cout << matrix[_] << "\n";
