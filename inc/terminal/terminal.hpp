@@ -13,11 +13,12 @@
 #include <cstdlib>
 #include <fcntl.h>
 
-// xf headers
+// xns headers
 #include "types.hpp"
 #include "macro.hpp"
 #include "event.hpp"
 
+#include "declval.hpp"
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
@@ -33,12 +34,16 @@ namespace xns {
 
 	class terminal final {
 
+
 		public:
 
-			// -- A L I A S E S -----------------------------------------------
+			// -- public types ------------------------------------------------
 
 			/* window size type */
 			using Wsize = unsigned short;
+
+			/* terminal size type */
+			using term_size = decltype(xns::declval<struct winsize>().ws_row);
 
 
 			// -- C O N S T R U C T O R S -------------------------------------
@@ -86,6 +91,7 @@ namespace xns {
 
 			/* terminal settings type */
 			using Termios = struct termios;
+
 
 
 			// -- C O N S T R U C T O R S -------------------------------------
