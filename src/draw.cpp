@@ -20,7 +20,7 @@ void xns::draw::clear_line(const xns::u32 posX, const xns::u32 posY, const xns::
 //}
 
 /* draw string */
-void xns::draw::draw_string(const xns::u32 x, const xns::u32 y, const xns::cstring& str) {
+void xns::draw::draw_string(const xns::u32 x, const xns::u32 y, const xns::string& str) {
 	// move to position
 	//Escape::move_position(x, y);
 	// draw string
@@ -39,23 +39,7 @@ void xns::draw::vertival_draw(const xns::u32 x, xns::u32 y, const void* ptr, con
 }
 
 void xns::draw::draw_integer(xns::u32 number) {
-
-	constexpr xns::u32 BUFFSIZE = 64;
-
-	static char seq[BUFFSIZE];
-
-	char* ptr = &(seq[BUFFSIZE]);
-
-	while (number) {
-
-		std::cout << "loop" << std::endl;
-		*(--ptr) = (number % 10) + '0';
-		number /= 10;
-	}
-	xns::u32 size = (seq + BUFFSIZE) - ptr;
-	//Buffer::draw(ptr, size);
-
-
+	(void)number;
 }
 
 
