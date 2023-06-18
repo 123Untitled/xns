@@ -1,14 +1,49 @@
 #ifndef COMMON_TYPE_HEADER
 #define COMMON_TYPE_HEADER
 
-#include <type_traits>
+//#include <type_traits>
+
+#include "remove.hpp"
+#include "is_same.hpp"
+
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
 
 
+	// -- C O M M O N  T Y P E ------------------------------------------------
 
+
+	// -- detail --------------------------------------------------------------
+
+	namespace impl {
+
+		/* common type */
+		template <class T, class... R>
+		struct common_type {
+			// remove reference of T
+			using type = xns::remove_reference<T>;
+			// check if all types are the same
+			static_assert((xns::is_same<type, xns::remove_reference<R>> && ...),
+						  "): ALL TYPES MUST BE THE SAME :(");
+		};
+
+		/* common type (specialization for one type) */
+		template <class T>
+		struct common_type<T> final {
+			// remove reference of T
+			using type = xns::remove_reference<T>;
+		};
+
+	}
+
+	template <class... T>
+	using common_type = typename impl::common_type<T...>::type;
+
+
+
+	/*
 	// primary template (used for zero types)
 	template<class...>
 		struct common_type {};
@@ -67,6 +102,7 @@ namespace xns {
 
 	template< class... T >
 		using common_type_t = typename common_type<T...>::type;
+		*/
 
 }
 
