@@ -12,20 +12,37 @@
 #include <unistd.h>
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
 
-	// -- I N P U T  C L A S S ------------------------------------------------
 
-	class Input final {
+	// -- I N P U T -----------------------------------------------------------
+
+	class input final {
+
 
 		public:
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- public types ------------------------------------------------
+
+			/* string type */
+			using string = xns::string;
+
+			/* character type */
+			using char_t = typename string::char_t;
+
+			/* size type */
+			using size_type = typename string::size_type;
+
+			/* signed type */
+			using signed_type = typename string::signed_type;
+
+
+			// -- public constructors -----------------------------------------
 
 			/* non-instanciable class */
-			NON_INSTANCIABLE(Input);
+			NON_INSTANCIABLE(input);
 
 
 			// -- S T A T I C  P U B L I C  M E T H O D S ---------------------
@@ -41,18 +58,6 @@ namespace Xf {
 
 
 		private:
-
-			// -- A L I A S E S -----------------------------------------------
-
-			/* character type */
-			using CharT = xns::cstring::char_t;
-
-			/* readed bytes type */
-			using signed_type = xns::ssize_t;
-
-			/* size type */
-			using Size = xns::cstring::size_type;
-
 
 			// -- S T A T I C  P R I V A T E  M E T H O D S -------------------
 
@@ -73,12 +78,18 @@ namespace Xf {
 
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------
 
-			static xns::cstring _input;
-			static CharT       _buff[BUFFER_SIZE + 1];
-			static signed_type      _readed;
-			static bool        _is_running;
+			/* input string */
+			static string _input;
 
-			static bool        _windowed;
+			/* buffer */ // TODO: implement resize method in string class
+			static char_t _buff[BUFFER_SIZE + 1];
+
+			/* readed bytes */
+			static signed_type _readed;
+
+
+			static bool _is_running;
+			static bool _windowed;
 
 	};
 
