@@ -149,6 +149,8 @@ namespace xns {
 			template <class... A>
 			constexpr literal_map(A&&... args) requires (sizeof...(A) > 1)
 			: _impl{xns::forward<A>(args)...} {
+				static_assert(sizeof...(A) == sizeof...(L),
+							  "): INCORRECT NUMBER OF ARGUMENTS :(");
 				// forward arguments to implementation
 			}
 
