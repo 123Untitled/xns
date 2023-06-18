@@ -117,6 +117,6 @@ const char* Exec::readOutput(void) {
 
 	output.clear();
 	while ((readed = read(0, buff, 1024)) > 0)
-		output.append(buff, readed);
+		output.append(buff, static_cast<size_t>(readed));
 	return (output.c_str());
 }
