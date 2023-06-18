@@ -1,6 +1,14 @@
 #ifndef MYLIB_HEADER
 #define MYLIB_HEADER
 
+/* 3d */
+#include "camera.hpp"
+
+
+/* time */
+#include "duration.hpp"
+
+#include "ratio.hpp"
 
 /* utilities */
 #include "types.hpp"
@@ -13,22 +21,39 @@
 #include "path.hpp"
 
 
+/* environment */
+#include "environment.hpp"
+
+
+/* math */
+#include "math.hpp"
+#include "matrix.hpp"
+#include "fixed.hpp"
+
+
 /* meta-programming */
 #include "type_traits.hpp"
 
 /* containers */
+#include "any.hpp"
 #include "string.hpp"
 #include "vector.hpp"
+#include "array.hpp"
 #include "list.hpp"
 #include "stack.hpp"
-#include "array.hpp"
-#include "tuple.hpp"
+#include "queue.hpp"
 #include "trie.hpp"
 #include "map.hpp"
 #include "tree.hpp"
+#include "tuple.hpp"
 #include "any.hpp"
 #include "variant.hpp"
-#include "queue.hpp"
+#include "literal_map.hpp"
+#include "pair.hpp"
+
+
+/* bit */
+#include "bit_view.hpp"
 
 
 /* invoke */
@@ -38,28 +63,30 @@
 
 
 /* random */
+#include "xorshift.hpp"
 #include "random.hpp"
 #include "probability.hpp"
 #include "id.hpp"
 
 
-#include "literal.hpp"
 #include "safe_enum.hpp"
 
 /* error handling */
 #include "debug.hpp"
+#include "exceptions.hpp"
 
 
 /* memory */
 #include "allocator.hpp"
 #include "unique_fd.hpp"
-#include "shared_pointer.hpp"
-#include "unique_pointer.hpp"
-#include "weak_pointer.hpp"
+#include "shared_ptr.hpp"
+#include "unique_ptr.hpp"
+#include "weak_ptr.hpp"
 
 /* event */
 #include "input.hpp"
 #include "event.hpp"
+#include "evntype.hpp"
 
 
 /* terminal */
@@ -68,7 +95,7 @@
 #include "output.hpp"
 
 
-#include "atoi.hpp"
+#include "conversions.hpp"
 #include "exec.hpp"
 #include "color.hpp"
 #include "window.hpp"
