@@ -6,32 +6,97 @@
 #include <chrono>
 #include <climits>
 
-#include "xns.hpp"
+#include "string_literal.hpp"
+
 #include "testclass.hpp"
 
-#define START_UT(msg) std::cout << "\n\nSTARTING UNIT TEST: \x1b[33m" << msg << "\x1b[0m\n" << std::endl;
 
 namespace UT {
 
-	bool path_ut(void);
 
-	bool meta_ut(void);
+	/* print start message */
+	template <xns::string_literal test>
+	void start_ut(void) {
+		std::cout << "\n\nSTARTING UNIT TEST: \x1b[33m" << test.data() << "\x1b[0m\n" << std::endl;
+	}
 
-	void tuple_ut(void);
+	/* unit test template [specialized in .cpp files] */
+	template <xns::string_literal>
+	bool unit_tests(void);
 
-	void string_ut(void);
+	// -- detail --------------------------------------------------------------
 
-	void window_ut(void);
+	namespace impl {
 
-	void numeric_limits_ut(void);
+		template <xns::string_literal test, xns::string_literal... rest>
+		bool dispatcher(void) {
+			// start ut
+			start_ut<test>();
+			// test current unit test
+			if (!unit_tests<test>()) { return false; }
 
-	void unique_pointer_ut(void);
+			// check if there are more unit tests
+			if constexpr (sizeof...(rest) > 0) { return dispatcher<rest...>(); }
 
-	void array_ut(void);
+			return true;
+		}
+	}
 
-	void environment_ut(void);
 
-	void duration_ut(void);
+	/* unit test dispatcher */
+	template <xns::string_literal... LT>
+	bool dispatcher(void) {
+		// check if there are unit tests
+		static_assert(sizeof...(LT) > 0, "): NO UNIT TESTS TO RUN :(");
+		// return true if all unit tests succeed
+		return impl::dispatcher<LT...>();
+	}
+
+
+	/* unit test launcher */
+	inline void launcher(void) {
+		UT::dispatcher<
+
+			// "window", (infinitely loops)
+
+			"environment",
+
+			"array",
+			"string",
+			"map",
+			"tree",
+			"tuple",
+			"literal_map",
+
+
+			"input",
+
+			"random",
+			"xorshift",
+
+			"duration",
+
+			"matrix",
+			"math",
+
+			"bit_view",
+
+			"path",
+
+			"meta",
+
+
+			"numeric_limits",
+
+
+			"unique_ptr" // actually segfaults
+
+
+
+
+		>();
+	}
+
 
 };
 
