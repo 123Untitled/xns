@@ -1,7 +1,6 @@
 #ifndef IS_INTEGRAL_HEADER
 #define IS_INTEGRAL_HEADER
 
-#include "types.hpp"
 #include "is_one_of.hpp"
 #include "remove.hpp"
 
