@@ -1,6 +1,6 @@
 #include "debug.hpp"
 
-int Xf::Debug::initialize(const char* tty) {
+int xns::debug::initialize(const char* tty) {
 
 	if (!tty) { tty = "/dev/ttys001"; }
 
@@ -15,7 +15,7 @@ int Xf::Debug::initialize(const char* tty) {
 	return tmp;
 }
 
-void Xf::Debug::write(const void* data, xns::size_t size) {
+void xns::debug::write(const void* data, xns::size_t size) {
 	// exit if no data or tty not open
 	if (_tty < 0) { return; }
 	if (!data)    { return; }
@@ -30,4 +30,4 @@ void Xf::Debug::write(const void* data, xns::size_t size) {
 
 
 
-int Xf::Debug::_tty = initialize();
+int xns::debug::_tty = initialize();
