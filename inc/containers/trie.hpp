@@ -5,9 +5,9 @@
 #include "vector.hpp"
 #include "pair.hpp"
 #include "tuple.hpp"
-#include "unique_pointer.hpp"
-#include "shared_pointer.hpp"
-#include "weak_pointer.hpp"
+#include "unique_ptr.hpp"
+#include "shared_ptr.hpp"
+#include "weak_ptr.hpp"
 #include "string.hpp"
 
 
@@ -129,7 +129,7 @@ namespace xns {
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* default insert */
-			void insert(const xns::cstring& key) {
+			void insert(const xns::string& key) {
 				// insert key
 				node* node = _insert(key);
 				// allocate default value
@@ -137,7 +137,7 @@ namespace xns {
 			}
 
 			/* copy insert */
-			void insert(const xns::cstring& key, const value_type& value) {
+			void insert(const xns::string& key, const value_type& value) {
 				// insert key
 				node* node = _insert(key);
 				// allocate copied value
@@ -145,7 +145,7 @@ namespace xns {
 			}
 
 			/* move insert */
-			void insert(const xns::cstring& key, value_type&& value) {
+			void insert(const xns::string& key, value_type&& value) {
 				// insert key
 				node* node = _insert(key);
 				// allocate moved value
@@ -154,7 +154,7 @@ namespace xns {
 
 			/* variadic insert */
 			template <class... A>
-			void insert(const xns::cstring& key, A&&... args) {
+			void insert(const xns::string& key, A&&... args) {
 				// insert key
 				node* node = _insert(key);
 				// allocate value
@@ -163,7 +163,7 @@ namespace xns {
 
 			/* derived default insert */
 			template <class D> requires (xns::is_derived_from<D, value_type>)
-			void insert(const xns::cstring& key) {
+			void insert(const xns::string& key) {
 				// insert key
 				node* node = _insert(key);
 				// allocate default value
@@ -172,7 +172,7 @@ namespace xns {
 
 			/* derived copy insert */
 			template <class D> requires (xns::is_derived_from<D, value_type>)
-			void insert(const xns::cstring& key, const D& value) {
+			void insert(const xns::string& key, const D& value) {
 				// insert key
 				node* node = _insert(key);
 				// allocate copied value
@@ -181,7 +181,7 @@ namespace xns {
 
 			/* derived move insert */
 			template <class D> requires (xns::is_derived_from<D, value_type>)
-			void insert(const xns::cstring& key, D&& value) {
+			void insert(const xns::string& key, D&& value) {
 				// insert key
 				node* node = _insert(key);
 				// allocate moved value
@@ -190,14 +190,14 @@ namespace xns {
 
 			/* derived variadic insert */
 			template <class D, class... A> requires (xns::is_derived_from<D, value_type>)
-			void insert(const xns::cstring& key, A&&... args) {
+			void insert(const xns::string& key, A&&... args) {
 				// insert key
 				node* node = _insert(key);
 				// allocate value
 				node->_value = xns::make_shared_pointer<D>(xns::forward<A>(args)...);
 			}
 
-			using KeyVector = xns::vector<xns::cstring>;
+			using KeyVector = xns::vector<xns::string>;
 
 
 			/* derived multi insert */
@@ -256,11 +256,11 @@ namespace xns {
 			}*/
 
 			/* find */
-			weak_value find(const xns::cstring& str) {
+			weak_value find(const xns::string& str) {
 				// get root node
 				node* node = &_root;
 				// loop through string
-				for (xns::cstring::size_type x = 0; x < str.size(); ++x) {
+				for (xns::string::size_type x = 0; x < str.size(); ++x) {
 					const size_type index = to_index(str[x]);
 					if (node->_table.at(index) != nullptr) {
 						// enter in node
