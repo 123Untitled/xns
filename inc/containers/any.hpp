@@ -4,7 +4,7 @@
 #include "type_traits.hpp"
 #include "macro.hpp"
 #include "allocator.hpp"
-#include "unique_pointer.hpp"
+#include "unique_ptr.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
