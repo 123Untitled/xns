@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "conditional.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"conditional">(void) {
-		// start unit test
-		START_UT("conditional");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"conditional">(void) {
+	// code here...
+	return false;
+}
+

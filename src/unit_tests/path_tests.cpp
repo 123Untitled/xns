@@ -1,23 +1,28 @@
 #include "unit_tests.hpp"
+#include "path.hpp"
 
 #include <filesystem>
 
-// this is a unit test to compare simplified path resolution with std::filesystem
+template <>
+bool UT::unit_tests<"path">(void) {
 
-bool UT::path_ut(void) {
+
+	xns::path<xns::string> p;
 
 	using path_t = xns::path<xns::string_view>;
 	path_t p1;
+
 	{
-	// original path
-	const char* str = "../../xns/../../../../lib/log.txt/.";
-	//const wchar_t* wstr = L"../../xns/../../../../lib/log.txt/.";
-	xns::cstring str2 = str;
 
-	std::cout << "original path: " << str << std::endl;
+		// original path
+		const char* str = "../../xns/../../../../lib/log.txt/.";
+		//const wchar_t* wstr = L"../../xns/../../../../lib/log.txt/.";
+		xns::string str2 = str;
 
-	xns::string_view sv = str2.pointer();
-	// simplified path
+		std::cout << "original path: " << str << std::endl;
+
+		xns::string_view sv = str2.pointer();
+		// simplified path
 
 
 		p1 = sv;

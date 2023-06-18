@@ -1,4 +1,6 @@
 #include "unit_tests.hpp"
+#include "string.hpp"
+
 
 
 
@@ -15,10 +17,10 @@
 #define ALLOCATED     true
 
 template <typename T>
-static void EXPECTED(	const xns::string<T>& str,
+static void EXPECTED(	const xns::basic_string<T>& str,
 						const bool ptr,
-						const typename xns::string<T>::size_type len,
-						const typename xns::string<T>::size_type cap) {
+						const typename xns::basic_string<T>::size_type len,
+						const typename xns::basic_string<T>::size_type cap) {
 	using xns::string;
 
 	// check pointer diff
@@ -52,7 +54,7 @@ static void EXPECTED(	const xns::string<T>& str,
 template <typename T>
 static void reserve_test(void) {
 
-	using Str = xns::string<T>;
+	using Str = xns::basic_string<T>;
 
 	{
 		Str s;
@@ -84,7 +86,12 @@ static void reserve_test(void) {
 	}
 	{
 		Str s;
-		s.reserve(std::numeric_limits<typename Str::size_type>::max() - 1);
+		try {
+			s.reserve(std::numeric_limits<typename Str::size_type>::max() - 1);
+		}
+		catch (const xns::exception& e) {
+			write(1, "\x1b[31mexcept has been thrown\x1b[0m\n", 34);
+		}
 		EXPECTED(s, NULLPTR, 0, 0);
 	}
 }
@@ -145,16 +152,17 @@ static void reserve_test(void) {
 //	////str.append(str2, str2, str2);
 //
 
-void UT::string_ut(void) {
+template <>
+bool UT::unit_tests<"string">(void) {
 
 	//append_string_test<char>();
 	reserve_test<char>();
 	//append_fill_test();
-	return;
+	return true;
 
-	xns::string<char16_t> sss;
+	xns::basic_string<char16_t> sss;
    // sss.forward_remove_duplicates();
-	xns::string<char> s;
+	xns::basic_string<char> s;
 	const unsigned char c = 'a';
 
 	s.to_string(c);
@@ -165,6 +173,6 @@ void UT::string_ut(void) {
 		write(1, "\n", 1);
 	}
 
-	return;
+	return true;
 
 }

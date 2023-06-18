@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "move.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"move">(void) {
-		// start unit test
-		START_UT("move");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"move">(void) {
+	// code here...
+	return false;
+}
+

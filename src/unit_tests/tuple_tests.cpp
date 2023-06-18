@@ -1,19 +1,28 @@
 #include "unit_tests.hpp"
+#include "tuple.hpp"
 
 
+template <>
+bool UT::unit_tests<"tuple">(void) {
 
-void UT::tuple_ut(void) {
-
-	START_UT("tuple");
 	using namespace xns;
 
+
+	xns::tuple<int, float, const char*> _tuple{1, 0.3f, "hello"};
+
+	//_tuple.set<8>(2);
+
+
+	auto& refff = xns::get<0>(_tuple);
+
+	std::cout << refff << std::endl;
 
 
 	using Type = Class<int, double, char>;
 
 	Type type{1, 2.0, 'c'};
 
-	tuple<Type, int, float> t3{xns::move(type), 2, 3.0f};
+	xns::tuple<Type, int, float> t3{xns::move(type), 2, 3.0f};
 
 	//Tuple<float, char> t02 = t3;
 
@@ -38,6 +47,7 @@ void UT::tuple_ut(void) {
 	//t4.iterate();
 	//t5.iterate();
 
-
+	return true;
 
 }
+

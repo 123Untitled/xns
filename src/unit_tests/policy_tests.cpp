@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "policy.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"policy">(void) {
-		// start unit test
-		START_UT("policy");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"policy">(void) {
+	// code here...
+	return false;
+}
+

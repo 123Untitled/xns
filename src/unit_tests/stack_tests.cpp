@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "stack.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"stack">(void) {
-		// start unit test
-		START_UT("stack");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"stack">(void) {
+	// code here...
+	return false;
+}
+

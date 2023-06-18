@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "is_unsigned.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"is_unsigned">(void) {
-		// start unit test
-		START_UT("is_unsigned");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"is_unsigned">(void) {
+	// code here...
+	return false;
+}
+

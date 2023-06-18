@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "integral.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"integral">(void) {
-		// start unit test
-		START_UT("integral");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"integral">(void) {
+	// code here...
+	return false;
+}
+

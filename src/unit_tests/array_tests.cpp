@@ -1,4 +1,6 @@
 #include "unit_tests.hpp"
+#include "array.hpp"
+
 
 template <size_t... I, size_t... J>
 void test(xns::index_seq<I...> i, xns::index_seq<J...> j) {
@@ -14,7 +16,9 @@ auto make(A&&... args) {
 	return RType{xns::forward<A>(args)...};
 }
 
-void UT::array_ut(void) {
+template <>
+bool UT::unit_tests<"array">(void) {
+
 
 	//test(Xf::make_index_range_step<0, 10, 2>{}, Xf::make_index_range_step<0, 10, 2>{});
 	//return;
@@ -27,7 +31,6 @@ void UT::array_ut(void) {
 		Array<int, 2>{5, 6}
 	};*/
 
-	START_UT("array");
 
 	//Array<int, 3> tab{1, 2, 3};
 
@@ -83,6 +86,7 @@ void UT::array_ut(void) {
 	};
 
 
+	return true;
 
 
 }

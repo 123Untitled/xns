@@ -1,6 +1,9 @@
 #include "unit_tests.hpp"
+#include "environment.hpp"
 
-void UT::environment_ut(void) {
+template <>
+bool UT::unit_tests<"environment">(void) {
+
 
 	//xns::env::print();
 	auto p = xns::env::get("PATH");
@@ -12,4 +15,6 @@ void UT::environment_ut(void) {
 		std::cout << "\"PATH\" not found" << std::endl;
 	}
 
+
+	return true;
 }

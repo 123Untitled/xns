@@ -1,4 +1,10 @@
 #include "unit_tests.hpp"
+#include "duration.hpp"
+#include "string.hpp"
+#include "output.hpp"
+
+#include <chrono>
+
 
 consteval xns::size_t max_len(void) {
 	const char* types[] = {
@@ -83,7 +89,6 @@ void std_test(const xns::string_view& from_name, const xns::string_view& to_name
 
 }
 
-#include <chrono>
 
 void ratio_ut(void) {
 
@@ -116,7 +121,9 @@ void ratio_ut(void) {
 
 }
 
-void UT::duration_ut(void) {
+template <>
+bool UT::unit_tests<"duration">(void) {
+
 
 	//ratio_ut();
 
@@ -128,10 +135,10 @@ void UT::duration_ut(void) {
 
 	using namespace xns;
 
-	START_UT("duration_cast");
+	start_ut<"duration_cast">();
 
 
-	START_UT("nanoseconds");
+	start_ut<"nanoseconds">();
 
 	test<nanoseconds, nanoseconds, 1>("nanoseconds", "nanoseconds");
 	test<nanoseconds, microseconds, 0>("nanoseconds", "microseconds");
@@ -144,7 +151,7 @@ void UT::duration_ut(void) {
 	test<nanoseconds, months, 0>("nanoseconds", "months");
 	test<nanoseconds, years, 0>("nanoseconds", "years");
 
-	START_UT("microseconds");
+	start_ut<"microseconds">();
 
 	test<microseconds, nanoseconds, 1000>("microseconds", "nanoseconds");
 	test<microseconds, microseconds, 1>("microseconds", "microseconds");
@@ -157,7 +164,7 @@ void UT::duration_ut(void) {
 	test<microseconds, months, 0>("microseconds", "months");
 	test<microseconds, years, 0>("microseconds", "years");
 
-	START_UT("milliseconds");
+	start_ut<"milliseconds">();
 
 	test<milliseconds, nanoseconds, 1000000>("milliseconds", "nanoseconds");
 	test<milliseconds, microseconds, 1000>("milliseconds", "microseconds");
@@ -170,7 +177,7 @@ void UT::duration_ut(void) {
 	test<milliseconds, months, 0>("milliseconds", "months");
 	test<milliseconds, years, 0>("milliseconds", "years");
 
-	START_UT("seconds");
+	start_ut<"seconds">();
 
 	test<seconds, nanoseconds, 1000000000>("seconds", "nanoseconds");
 	test<seconds, microseconds, 1000000>("seconds", "microseconds");
@@ -183,7 +190,7 @@ void UT::duration_ut(void) {
 	test<seconds, months, 0>("seconds", "months");
 	test<seconds, years, 0>("seconds", "years");
 
-	START_UT("minutes");
+	start_ut<"minutes">();
 
 	test<minutes, nanoseconds, 60000000000>("minutes", "nanoseconds");
 	test<minutes, microseconds, 60000000>("minutes", "microseconds");
@@ -196,7 +203,7 @@ void UT::duration_ut(void) {
 	test<minutes, months, 0>("minutes", "months");
 	test<minutes, years, 0>("minutes", "years");
 
-	START_UT("hours");
+	start_ut<"hours">();
 
 	test<hours, nanoseconds, 3600000000000>("hours", "nanoseconds");
 	test<hours, microseconds, 3600000000>("hours", "microseconds");
@@ -209,7 +216,7 @@ void UT::duration_ut(void) {
 	test<hours, months, 0>("hours", "months");
 	test<hours, years, 0>("hours", "years");
 
-	START_UT("days");
+	start_ut<"days">();
 
 	test<days, nanoseconds, 86400000000000>("days", "nanoseconds");
 	test<days, microseconds, 86400000000>("days", "microseconds");
@@ -223,7 +230,7 @@ void UT::duration_ut(void) {
 	test<days, years, 0>("days", "years");
 
 
-	START_UT("weeks");
+	start_ut<"weeks">();
 
 	test<weeks, nanoseconds, 604800000000000>("weeks", "nanoseconds");
 	test<weeks, microseconds, 604800000000>("weeks", "microseconds");
@@ -236,7 +243,7 @@ void UT::duration_ut(void) {
 	test<weeks, months, 0>("weeks", "months");
 	test<weeks, years, 0>("weeks", "years");
 
-	START_UT("months");
+	start_ut<"months">();
 
 	test<months, nanoseconds, 2628000000000000>("months", "nanoseconds");
 	std_test<std::chrono::months, std::chrono::nanoseconds, 2628000000000000>("months", "nanoseconds");
@@ -268,7 +275,7 @@ void UT::duration_ut(void) {
 	test<months, years, 0>("months", "years");
 	std_test<std::chrono::months, std::chrono::years, 0>("months", "years");
 
-	START_UT("years");
+	start_ut<"years">();
 
 
 
@@ -296,8 +303,5 @@ void UT::duration_ut(void) {
 
 
 
-
-
-
-
+	return 0;
 }

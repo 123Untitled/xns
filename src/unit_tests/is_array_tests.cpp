@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "is_array.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"is_array">(void) {
-		// start unit test
-		START_UT("is_array");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"is_array">(void) {
+	// code here...
+	return false;
+}
+

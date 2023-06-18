@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "bit_cast.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"bit_cast">(void) {
-		// start unit test
-		START_UT("bit_cast");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"bit_cast">(void) {
+	// code here...
+	return false;
+}
+

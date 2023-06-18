@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "debug.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"debug">(void) {
-		// start unit test
-		START_UT("debug");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"debug">(void) {
+	// code here...
+	return false;
+}
+

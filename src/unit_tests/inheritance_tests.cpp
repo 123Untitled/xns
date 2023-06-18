@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "inheritance.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"inheritance">(void) {
-		// start unit test
-		START_UT("inheritance");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"inheritance">(void) {
+	// code here...
+	return false;
+}
+

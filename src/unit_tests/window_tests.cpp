@@ -1,4 +1,6 @@
 #include "unit_tests.hpp"
+#include "window.hpp"
+#include "input.hpp"
 
 static void exit(void) { xns::input::stop_loop(); }
 static void render(void) { xns::output::render(); }
@@ -24,8 +26,8 @@ static Xf::Evntmode build_events(void) {
 	return mode;
 }
 
-
-void UT::window_ut(void) {
+template <>
+bool UT::unit_tests<"window">(void) {
 	using namespace Xf;
 
 	auto mode = build_events();
@@ -35,4 +37,6 @@ void UT::window_ut(void) {
 	//WindowManager win;
 
 	xns::input::start_loop();
+	return true;
 }
+

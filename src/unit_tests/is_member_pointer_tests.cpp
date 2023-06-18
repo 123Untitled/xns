@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "is_member_pointer.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"is_member_pointer">(void) {
-		// start unit test
-		START_UT("is_member_pointer");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"is_member_pointer">(void) {
+	// code here...
+	return false;
+}
+

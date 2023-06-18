@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "common_type.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"common_type">(void) {
-		// start unit test
-		START_UT("common_type");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"common_type">(void) {
+	// code here...
+	return false;
+}
+

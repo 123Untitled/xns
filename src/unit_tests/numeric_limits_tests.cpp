@@ -1,6 +1,9 @@
 #include "unit_tests.hpp"
+#include "numeric_limits.hpp"
 
-void numeric_limits_tests(void) {
+template <>
+bool UT::unit_tests<"numeric_limits">(void) {
+
 	// avoid namespace pollution
 	using namespace std;
 
@@ -39,4 +42,5 @@ void numeric_limits_tests(void) {
 	std::cout << "max digits: " << (int)max << std::endl;
 	auto min = xns::min_digits<unsigned char>();
 	std::cout << "min digits: " << (int)min << std::endl;
+	return true;
 }

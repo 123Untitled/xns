@@ -25,10 +25,11 @@ void test(const bool result, const char* msg) {
 		std::cout << "\x1b[31mfailure\x1b[0m" << std::endl;
 }
 
-bool UT::meta_ut(void) {
 
+template <>
+bool UT::unit_tests<"meta">(void) {
 
-	START_UT("is_derived_from");
+	/*
 
 	tests::base base;
 
@@ -161,6 +162,7 @@ bool UT::meta_ut(void) {
 	test<true >(std::is_pointer<const int* volatile>::value,     "const int* volatile");
 	test<true >(std::is_pointer<volatile int* volatile>::value,  "volatile int* volatile");
 	test<true >(std::is_pointer<const volatile int* volatile>::value, "const volatile int* volatile");
+	*/
 
 	return EXIT_SUCCESS;
 

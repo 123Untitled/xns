@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "shared_ptr.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"shared_pointer">(void) {
-		// start unit test
-		START_UT("shared_pointer");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"shared_ptr">(void) {
+	// code here...
+	return false;
+}
+

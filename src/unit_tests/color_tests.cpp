@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "color.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"color">(void) {
-		// start unit test
-		START_UT("color");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"color">(void) {
+	// code here...
+	return false;
+}
+

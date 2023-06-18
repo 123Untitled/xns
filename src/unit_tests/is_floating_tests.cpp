@@ -1,11 +1,10 @@
 #include "unit_tests.hpp"
+#include "is_floating.hpp"
 
-	/* unit test */
-	template <>
-	bool UT::unit_tests<"is_floating">(void) {
-		// start unit test
-		START_UT("is_floating");
-		// code here...
-		return false;
-	}
-	
+/* unit test */
+template <>
+bool UT::unit_tests<"is_floating">(void) {
+	// code here...
+	return false;
+}
+
