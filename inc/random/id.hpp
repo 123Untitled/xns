@@ -22,7 +22,7 @@ namespace xns {
 			// -- T Y P E S ---------------------------------------------------
 
 			/* string type */
-			using string = xns::cstring;
+			using string = xns::string;
 
 			/* character type */
 			using char_t = char;
