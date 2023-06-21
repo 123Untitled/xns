@@ -26,7 +26,7 @@ namespace xns {
 			file(void);
 
 			/* path constructor */
-			file(const xns::cstring&);
+			file(const xns::string&);
 
 			/* non-assignable class */
 			NON_ASSIGNABLE(file);
@@ -35,7 +35,7 @@ namespace xns {
 			~file(void);
 
 
-			void file_name(xns::cstring&& name);
+			void file_name(xns::string&& name);
 
 			/* open file */
 			void open(void);
@@ -45,7 +45,7 @@ namespace xns {
 
 
 			/* get path */
-			const xns::cstring& path(void) const;
+			const xns::string& path(void) const;
 
 		private:
 
@@ -56,8 +56,8 @@ namespace xns {
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
-			xns::cstring _file;
-			xns::cstring _path;
+			xns::string _file;
+			xns::string _path;
 			xns::unique_fd     _fd;
 			Stat             _data;
 			bool             _state;
