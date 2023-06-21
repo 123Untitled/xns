@@ -10,7 +10,6 @@
 #include "is_unsigned.hpp"
 #include "numeric_limits.hpp"
 #include "integral_constant.hpp"
-#include "integral.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
