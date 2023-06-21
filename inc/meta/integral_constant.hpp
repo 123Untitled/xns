@@ -7,28 +7,34 @@
 namespace xns {
 
 
-	// -- I N T E G R A L  C O N S T A N T --------------------------------------
+	// -- I N T E G R A L  C O N S T A N T ------------------------------------
 
 	/* integral constant */
 	template <class T, T V>
 	struct integral_constant {
 
-		/* value type */
-		using value_type = T;
 
-		/* compile-time value */
-		static constexpr value_type value = V;
+		// -- types -----------------------------------------------------------
+
+		/* value type */
+		using type = T;
 
 		/* self type */
 		using self = integral_constant<T, V>;
 
+
+		/* compile-time value */
+		static constexpr type value = V;
+
+
 		/* overload type() */
-		constexpr operator value_type() const noexcept { return value; }
+		consteval operator type() const noexcept { return value; }
 
 		/* overload intance() */
-		constexpr value_type operator()() const noexcept { return value; }
+		consteval type operator()() const noexcept { return value; }
 
 	};
+
 
 	/* bool constant */
 	template <bool B>
