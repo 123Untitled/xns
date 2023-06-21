@@ -7,12 +7,12 @@
 namespace xns {
 
 
-	// -- D E T A I L ---------------------------------------------------------
+	// -- detail --------------------------------------------------------------
 
 	namespace impl {
 
 
-		// -- R E M O V E  C O N S T ------------------------------------------
+		// -- remove const ----------------------------------------------------
 
 		/* remove const */
 		template <class T>
@@ -23,7 +23,7 @@ namespace xns {
 		struct remove_const<const T>       { using type = T; };
 
 
-		// -- R E M O V E  V O L A T I L E ------------------------------------
+		// -- remove volatile -------------------------------------------------
 
 		/* remove volatile */
 		template <class T>
@@ -34,7 +34,7 @@ namespace xns {
 		struct remove_volatile<volatile T> { using type = T; };
 
 
-		// -- R E M O V E  R E F E R E N C E ----------------------------------
+		// -- remove reference ------------------------------------------------
 
 		/* remove reference */
 		template <class T>
