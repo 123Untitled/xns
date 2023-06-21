@@ -29,3 +29,6 @@ xfunc.dSYM/
 # ignore all .DS_Store files recursively
 **/.DS_Store
 
+# ignore clang-filter
+clang-filter
+ccfilter
