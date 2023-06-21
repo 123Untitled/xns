@@ -4,6 +4,7 @@
 #include "types.hpp"
 #include "array.hpp"
 #include <iostream>
+#include <unistd.h>
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
