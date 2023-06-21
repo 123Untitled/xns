@@ -11,6 +11,7 @@
 #include "move.hpp"
 #include "numeric_limits.hpp"
 #include "policy.hpp"
+#include "is_scalar.hpp"
 
 
 
@@ -72,8 +73,10 @@ namespace xns {
 				return ptr;
 			}
 
-			/* realloc */ // TODO: check type is not a class or struct (because reallocating a class or struct is not possible)
+			/* realloc */
 			static mutable_pointer realloc(mutable_pointer addrs, const size_type size = 1) {
+				// check type is scalar (need to replace by is_trivially_copyable)
+				static_assert(xns::is_scalar<value_type>, "TYPE IS NOT SCALAR");
 				// reallocate memory
 				mutable_pointer ptr = static_cast<mutable_pointer>(std::realloc(addrs, size * sizeof(value_type)));
 				// check failed reallocation
