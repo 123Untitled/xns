@@ -44,6 +44,9 @@ namespace xns {
 			/* self type */
 			using self = safe_enum<E>;
 
+			/* definition type */
+			using definition = E;
+
 			/* integral type */
 			using type = typename E::type;
 
@@ -149,25 +152,10 @@ namespace xns {
 	};
 
 
-	// -- S A F E  E N U M  M E T A  ------------------------------------------
+	// -- I S  S A F E  E N U M -----------------------------------------------
 
-	namespace impl {
-
-		/* false type */
-		template <class T>
-		struct is_safe_enum                    : public xns::no {};
-
-		/* true type */
-		template <class T>
-		struct is_safe_enum<xns::safe_enum<T>> : public xns::yes {};
-
-	}
-
-	/* is safe enum concept */
 	template <class T>
-	concept is_safe_enum = impl::is_safe_enum<T>::value;
-
-
+	concept is_safe_enum = xns::is_same<T, xns::safe_enum<typename T::definition>>;
 
 
 
