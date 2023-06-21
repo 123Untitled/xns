@@ -5,9 +5,9 @@
 #include "types.hpp"
 #include "string.hpp"
 #include "vector.hpp"
-#include "literal.hpp"
 #include "safe_enum.hpp"
 #include "tuple.hpp"
+#include "string_literal.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -72,19 +72,43 @@ namespace xns {
 
 	// -- P A T H  C L A S S --------------------------------------------------
 
+	//template <xns::string_literal S, xns::string_literal P, xns::string_literal C, xns::is_string T = xns::cstring>
 	template <xns::is_string T>
 	class path {
 
 
+		// -- assertions ------------------------------------------------------
+
+		/* check separator length not zero */
+		//static_assert(S.size() > 0, "SEPARATOR must be at least one character long");
+
+		///* check parent length not zero */
+		//static_assert(P.size() > 0, "PARENT must be at least one character long");
+
+		///* check current length not zero */
+		//static_assert(C.size() > 0, "CURRENT must be at least one character long");
+
+		///* check separator not equal to parent */
+		//static_assert(S != P, "SEPARATOR and PARENT must be different");
+
+		///* check separator not equal to current */
+		//static_assert(S != C, "SEPARATOR and CURRENT must be different");
+
+		///* check parent not equal to current */
+		//static_assert(P != C, "PARENT and CURRENT must be different");
+
+
+
 		public:
 
-			// -- T Y P E S ---------------------------------------------------
+			// -- public types ------------------------------------------------
 
 			/* string type */
 			using string_type  = T;
 
 			/* self type */
-			using self         = path<string_type>;
+			using self         = path<T>;
+			//using self         = path<S, P, C, T>;
 
 			/* character type */
 			using char_t       = typename string_type::char_t;
@@ -102,7 +126,7 @@ namespace xns {
 			using string_size  = typename string_type::size_type;
 
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- public constructors -----------------------------------------
 
 			/* default constructor */
 			path(void)
@@ -111,14 +135,18 @@ namespace xns {
 			}
 
 			/* path constructor */
-			path(const string_type& path)
+			template <xns::is_string U>
+			path(const U& path)
 			: _segments{}, _type{path_type::UNDEFINED} {
 				// resolve path
 				resolve(path);
 			}
 
-			/* non-copyable class */
-			NON_COPYABLE(path);
+			/* copy constructor */
+			path(const path& other)
+			: _segments{other._segments}, _type{other._type} {
+				// nothing to do...
+			}
 
 			/* move constructor */
 			path(path&& other) noexcept
@@ -130,25 +158,32 @@ namespace xns {
 			~path(void) = default;
 
 
-			// -- A S S I G N M E N T -----------------------------------------
+			// -- public assignments ------------------------------------------
 
 			/* path assignment */
-			path& assign(const string_type& path) {
+			void assign(const string_type& path) {
 				// resolve path
 				resolve(path);
-				// return self reference
-				return *this;
+			}
+
+			/* copy assignment */
+			void assign(const path& other) {
+				// check for self-assignment
+				if (this != &other) {
+					// copy members
+					_segments = other._segments;
+					_type     = other._type;
+				}
 			}
 
 			/* move assignment */
-			path& assign(path&& other) noexcept {
+			void assign(path&& other) noexcept {
 				// check for self-assignment
 				if (this != &other) {
 					// move members
 					_segments = xns::move(other._segments);
 					_type     = other._type;
-				} // return self reference
-				return *this;
+				}
 			}
 
 
@@ -157,13 +192,19 @@ namespace xns {
 			/* path assignment operator */
 			path& operator=(const string_type& path) {
 				// return path assignment
-				return assign(path);
+				return assign(path), *this;
+			}
+
+			/* copy assignment operator */
+			path& operator=(const path& other) {
+				// return copy assignment
+				return assign(other), *this;
 			}
 
 			/* move assignment operator */
 			path& operator=(path&& other) noexcept {
 				// return move assignment
-				return assign(xns::move(other));
+				return assign(xns::move(other)), *this;
 			}
 
 
@@ -227,6 +268,28 @@ namespace xns {
 			}
 
 
+			// -- make path ---------------------------------------------------
+
+			/* make path */
+			xns::string get(void) const {
+				xns::string path;
+
+				if (_type == path_type::ABSOLUTE) {
+					path += SEP;
+				}
+
+				// loop over segments
+				for (size_type x = 0; x < _segments.size(); ++x) {
+
+					path += xns::get<0>(_segments[x]);
+					if (x < _segments.size() - 1) {
+						path += SEP;
+					}
+				}
+				return path;
+			}
+
+
 
 
 		private:
@@ -247,7 +310,8 @@ namespace xns {
 			// -- P R I V A T E  M E T H O D S --------------------------------
 
 			/* resolve path */
-			void resolve(const string_type& path) {
+			template <xns::is_string U>
+			void resolve(const U& path) {
 
 				// clear previous segments if any
 				_segments.clear();
@@ -293,6 +357,23 @@ namespace xns {
 			}
 
 
+			/* skip separators */
+			/*
+			template <typename STR>
+			void skip_separators(STR& path, string_size& x) const requires(S.size() == 1) {
+				// skip separators
+				while (path[x] == S[0]) { ++x; }
+			}*/
+
+			/* skip separators */
+			/*template <typename STR>
+			void skip_separators(STR& path, string_size& x) const requires(S.size() != 1) {
+				// skip separators
+				if (S == "hel") {
+
+				}
+			}*/
+
 
 			// -- M E M B E R S -----------------------------------------------
 
@@ -305,6 +386,12 @@ namespace xns {
 
 	};
 
+
+	// -- path aliases --------------------------------------------------------
+
+	//using unix_path = xns::path<"/", "..", ".", xns::cstring>;
+
+	//using unix_path_view = xns::path<"/", "..", ".", xns::string_view>;
 
 
 }
