@@ -1,68 +1,66 @@
 #ifndef ITERATOR_TRAITS_HEADER
 #define ITERATOR_TRAITS_HEADER
 
-#include "conditional.hpp"
 #include "types.hpp"
+#include "conditional.hpp"
 #include "integral_constant.hpp"
 #include "is_pointer.hpp"
+#include "is_one_of.hpp"
 
-namespace Xf {
+
+// -- X N S  N A M E S P A C E ------------------------------------------------
+
+namespace xns {
+
 
 	// -- I T E R A T O R  T A G S --------------------------------------------
 
 
 	/* unidirectional iterator tag */
-	struct Unidirectional_iterator_tag {};
+	struct unidirectional_iterator_tag {};
 
 	/* bidirectional iterator tag */
-	struct Bidirectional_iterator_tag : public Unidirectional_iterator_tag {};
+	struct bidirectional_iterator_tag : public unidirectional_iterator_tag {};
 
 	/* random access iterator tag */
-	struct Random_access_iterator_tag : public Bidirectional_iterator_tag {};
+	struct random_access_iterator_tag : public bidirectional_iterator_tag {};
 
 
-	/* is iterator tag false type */
+	/* is iterator tag */
 	template <class T>
-	struct is_iterator_tag : public false_t {};
-
-	/* is iterator tag true type */
-	template <>
-	struct is_iterator_tag<Unidirectional_iterator_tag> : public true_t {};
-
-	/* is iterator tag true type */
-	template <>
-	struct is_iterator_tag<Bidirectional_iterator_tag> : public true_t {};
-
-	/* is iterator tag true type */
-	template <>
-	struct is_iterator_tag<Random_access_iterator_tag> : public true_t {};
-
-
-
+	concept is_iterator_tag = xns::is_one_of<T,
+							  unidirectional_iterator_tag,
+							  bidirectional_iterator_tag,
+							  random_access_iterator_tag>;
 
 
 	// -- I T E R A T O R  T R A I T S ----------------------------------------
 
 	/* iterator traits */
 	template <class T>
-	struct IteratorTraits {
+	struct iterator_traits {
 
-		// -- A L I A S E S ---------------------------------------------------
+
+		// -- types -----------------------------------------------------------
 
 		/* iterator category */
-		using Category  = typename T::Category;
+		using tag        = typename T::tag;
 
 		/* value type */
-		using Value     = typename T::Value;
+		using value_type = typename T::value_type;
 
 		/* difference type */
-		using Diff      = typename T::Diff;
+		using diff_type  = typename T::diff_type;
 
 		/* pointer type */
-		using Pointer   = Xf::conditional_t<Xf::is_pointer<T>::value, T*, typename T::Pointer>;
+		using pointer    = xns::conditional<xns::is_pointer<T>,
+										    T*,
+										    typename T::pointer>;
 
 		/* reference type */
-		using Reference = Xf::conditional_t<Xf::is_pointer<T>::value, T&, typename T::Reference>;
+		using reference  = xns::conditional<xns::is_pointer<T>,
+										    T&,
+										    typename T::reference>;
 
 	};
 
@@ -70,8 +68,8 @@ namespace Xf {
 	// -- I T E R A T O R -----------------------------------------------------
 
 	/* iterator */
-	template <class T, class Category>
-	class Iterator {};
+	template <class T, class tag>
+	class iterator {};
 
 
 
