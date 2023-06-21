@@ -32,7 +32,7 @@ namespace xns {
 
 
 	/* unsigned integer types */
-	template <decltype(sizeof(char)) N>
+	template <decltype(sizeof(void*)) N>
 	using unsign =  xns::conditional<(sizeof(unsigned char)      == N), unsigned char,
 					xns::conditional<(sizeof(unsigned short)     == N), unsigned short,
 					xns::conditional<(sizeof(unsigned int)       == N), unsigned int,
@@ -41,7 +41,7 @@ namespace xns {
 					void > > > > >;
 
 	/* signed integer types */
-	template <decltype(sizeof(char)) N>
+	template <decltype(sizeof(void*)) N>
 	using sign =    xns::conditional<(sizeof(signed char)        == N), signed char,
 					xns::conditional<(sizeof(signed short)       == N), signed short,
 					xns::conditional<(sizeof(signed int)         == N), signed int,
