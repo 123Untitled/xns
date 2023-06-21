@@ -178,6 +178,14 @@ namespace xns {
 				}
 				_node = _container.top();
 				_container.pop();
+
+				node_pointer tmp = _node->_right;
+				while (tmp != nullptr) {
+					_container.push(tmp);
+					tmp = tmp->_left;
+				}
+
+
 			}
 
 			/* node post-order constructor */
@@ -282,15 +290,11 @@ namespace xns {
 					// pop node
 					_container.pop();
 
-					// push left child while it exists
-					if (_node->_right != nullptr) {
+					node_pointer node = _node->_right;
 
-						node_pointer node = _node->_right;
-
-						while (node != nullptr) {
-							_container.push(node);
-							node = node->_left;
-						}
+					while (node != nullptr) {
+						_container.push(node);
+						node = node->_left;
 					}
 				}
 				return *this;
@@ -489,11 +493,18 @@ namespace xns {
 				return (_node->_left == nullptr) != (_node->_right == nullptr);
 			}
 
+			/* is binary */
+			inline bool is_binary(void) const noexcept {
+				// return if node has two children
+				return _node->_left != nullptr && _node->_right != nullptr;
+			}
+
 			/* is endpoint */
 			inline bool is_endpoint(void) const noexcept {
 				// return if node is in extremity
 				return is_leaf() || is_unary();
 			}
+
 
 
 			// -- node access -------------------------------------------------
@@ -535,7 +546,7 @@ namespace xns {
 			}
 
 			/* x position */
-			inline size_type xpos(void) const noexcept {
+			inline xns::s64 xpos(void) const noexcept {
 				// return position
 				return _node->_pos;
 			}
