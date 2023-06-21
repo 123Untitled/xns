@@ -17,7 +17,7 @@ namespace xns {
 	concept is_integral = xns::is_one_of<xns::remove_cv<T>,
 
 		bool, char, short, int, long, long long,
-		char8_t, wchar_t, char32_t, char16_t,
+		char8_t, char32_t, char16_t, wchar_t,
 		signed char, unsigned char, unsigned short,
 		unsigned int, unsigned long, unsigned long long>;
 
