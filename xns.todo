@@ -12,3 +12,6 @@ bst_iterator:
 
 tree:
 	rework signness of node members
+
+make_signed/make_unsigned:
+	tests fails with [enum : bool] (need to detect underlying type)
