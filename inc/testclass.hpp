@@ -7,9 +7,9 @@
 #define TESTCLASS_DEBUG
 
 #ifdef TESTCLASS_DEBUG
-#define debug(msg) std::cout << msg << std::endl;
+#define test_debug(msg) std::cout << msg << std::endl;
 #else
-#define debug(msg)
+#define test_debug(msg)
 #endif
 
 #undef TESTCLASS_DEBUG
@@ -37,7 +37,7 @@ class Class final : public Base<T> {
 		:	_value_1{},
 			_value_2{},
 			_value_3{} {
-			debug("class default constructor");
+			test_debug("class default constructor");
 		}
 
 		/* value constructor */
@@ -45,7 +45,7 @@ class Class final : public Base<T> {
 		:	_value_1{value_1},
 			_value_2{value_2},
 			_value_3{value_3} {
-			debug("class value constructor");
+			test_debug("class value constructor");
 		}
 
 		/* copy constructor */
@@ -53,7 +53,7 @@ class Class final : public Base<T> {
 		:	_value_1{other._value_1},
 			_value_2{other._value_2},
 			_value_3{other._value_3} {
-			debug("class copy constructor");
+			test_debug("class copy constructor");
 		}
 
 		/* move constructor */
@@ -61,12 +61,12 @@ class Class final : public Base<T> {
 		:	_value_1{xns::move(other._value_1)},
 			_value_2{xns::move(other._value_2)},
 			_value_3{xns::move(other._value_3)} {
-			debug("class move constructor");
+			test_debug("class move constructor");
 		}
 
 		/* destructor */
 		~Class(void) {
-			debug("class destructor");
+			test_debug("class destructor");
 		}
 
 		/* copy operator */
@@ -76,7 +76,7 @@ class Class final : public Base<T> {
 				_value_2 = other._value_2;
 				_value_3 = other._value_3;
 			}
-			debug("class copy operator");
+			test_debug("class copy assignment");
 			return *this;
 		}
 
@@ -87,7 +87,7 @@ class Class final : public Base<T> {
 				_value_2 = xns::move(other._value_2);
 				_value_3 = xns::move(other._value_3);
 			}
-			debug("TEST MOVE ASSIGNMENT");
+			test_debug("class move assignment");
 			return *this;
 		}
 
