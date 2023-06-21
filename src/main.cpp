@@ -22,6 +22,10 @@ void start(void);
 
 int main(const int ac, const char** av, const char** env) {
 
+	UT::dispatcher<"directory">();
+	return 0;
+
+
 	//UT::dispatcher<"make_signed">();
 	UT::dispatcher<"is_signed", "make_unsigned">();
 	//UT::dispatcher<"make_unsigned">();
@@ -94,22 +98,6 @@ void start(void) {
 
 
 
-
-	xns::filesystem::directory_iterator it{"."};
-
-	while (it != nullptr) {
-		//auto& au = *it;
-		if (it.is_directory()) {
-			std::cout << "directory: ";
-		}
-		else {
-			std::cout << "file: ";
-		}
-		auto view = it.name();
-		write(1, view.data(), view.size());
-		write(1, "\n", 1);
-		++it;
-	}
 
 
 
