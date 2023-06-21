@@ -1,7 +1,7 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
-#include "math/matrix.hpp"
+#include "matrix.hpp"
 #include <cmath>
 
 
