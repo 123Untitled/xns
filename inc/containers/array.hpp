@@ -10,6 +10,8 @@
 #include "is_void.hpp"
 #include "forward.hpp"
 
+#include "safe_enum.hpp"
+
 #include <iostream>
 
 
@@ -19,7 +21,9 @@ namespace xns {
 
 
 	template <class T>
-	concept is_index = is_integral<xns::remove_reference<T>> || is_enum<xns::remove_reference<T>>;
+	concept is_index = is_integral <xns::remove_cvr<T>>
+					|| is_enum     <xns::remove_cvr<T>>
+					|| is_safe_enum<xns::remove_cvr<T>>;
 
 
 	// -- A R R A Y -----------------------------------------------------------
@@ -51,7 +55,7 @@ namespace xns {
 			using const_pointer   = const value_type*;
 
 			/* size type */
-			using size_type       = decltype((N * ...));
+			using size_type       = xns::size_t;
 
 
 		private:
@@ -108,7 +112,7 @@ namespace xns {
 			template <class I>
 			constexpr reference operator[](const I& index) {
 				// check index is integral
-				static_assert(xns::is_index<I>, "): INDEX MUST BE INTEGRAL :(");
+				static_assert(xns::is_index<I>, "): I MUST BE INDEX TYPE :("); // TODO: fix this
 				// return reference to indexed element
 				return _data[static_cast<size_type>(index)];
 			}
@@ -117,7 +121,7 @@ namespace xns {
 			template <class I>
 			constexpr const_reference operator[](const I& index) const {
 				// check index is integral
-				static_assert(xns::is_index<I>, "): INDEX MUST BE INTEGRAL :(");
+				static_assert(xns::is_index<I>, "): I MUST BE INDEX TYPE :("); // TODO: fix this
 				// return constant reference to indexed element
 				return _data[static_cast<size_type>(index)];
 			}
@@ -129,7 +133,7 @@ namespace xns {
 			template <class... I>
 			constexpr reference at(I&&... indexs) {
 				// check all indices are integral
-				static_assert((xns::is_index<I> && ...), "): INDEX MUST BE INTEGRAL :(");
+				static_assert((xns::is_index<I> && ...), "): I MUST BE INDEX TYPE :("); // TODO: fix this
 				// check number of indices is valid
 				static_assert(sizeof...(I) == _ndim,        "): WRONG NUMBER OF INDICES :(");
 				// return reference to element indexed by linearized indices
@@ -140,7 +144,7 @@ namespace xns {
 			template <class... I>
 			constexpr const_reference at(I&&... indexs) const {
 				// check all indices are integral
-				static_assert((xns::is_index<I> && ...), "): INDEX MUST BE INTEGRAL :(");
+				static_assert((xns::is_index<I> && ...), "): I MUST BE INDEX TYPE :("); // TODO: fix this
 				// check number of indices is valid
 				static_assert(sizeof...(I) == _ndim,        "): WRONG NUMBER OF INDICES :(");
 				// return reference to element indexed by linearized indices
@@ -273,14 +277,14 @@ namespace xns {
 
 			/* subscript for 1D array */
 			template <class I> requires (_ndim == 1)
-			inline constexpr size_type _subscript(I&& index) const {
+			inline constexpr size_type _subscript(const I& index) const {
 				// return linear index
 				return static_cast<size_type>(index);
 			}
 
 			/* subscript for 2D array */
-			template <class I> requires (_ndim == 2)
-			inline constexpr size_type _subscript(I&& y, I&& x) const {
+			template <class Y, class X> requires (_ndim == 2)
+			inline constexpr size_type _subscript(const Y& y, const X& x) const {
 				// return linear index
 				return (static_cast<size_type>(y) * _dims[1])
 					  + static_cast<size_type>(x);
