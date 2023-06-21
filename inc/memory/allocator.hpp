@@ -72,7 +72,7 @@ namespace xns {
 				return ptr;
 			}
 
-			/* realloc */
+			/* realloc */ // TODO: check type is not a class or struct (because reallocating a class or struct is not possible)
 			static mutable_pointer realloc(mutable_pointer addrs, const size_type size = 1) {
 				// reallocate memory
 				mutable_pointer ptr = static_cast<mutable_pointer>(std::realloc(addrs, size * sizeof(value_type)));
@@ -106,7 +106,7 @@ namespace xns {
 			/* max size */
 			inline static consteval size_type max_size(void) {
 				// return max size
-				return xns::max<size_type>() / sizeof(value_type);
+				return xns::limits::max<size_type>() / sizeof(value_type);
 			}
 
 
@@ -154,6 +154,6 @@ namespace xns {
 
 	};
 
-};
+}
 
 #endif
