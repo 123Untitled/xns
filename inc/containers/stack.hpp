@@ -296,7 +296,7 @@ namespace xns {
 
 			/* new node */
 			node_pointer new_node(void) {
-				// check if free nodes are available
+				// check if free node is available
 				if (_storage) { return unlink_storage(); }
 				// else allocate new node
 				return allocator::allocate();
@@ -321,9 +321,9 @@ namespace xns {
 
 			/* link storage */
 			void link_storage(node_pointer node) {
-				// link node's next pointer to storage
+				// set node's next node
 				node->_next = _storage;
-				// set storage
+				// set storage node
 				_storage = node;
 			}
 
@@ -337,6 +337,7 @@ namespace xns {
 				return node;
 			}
 
+			/* initialize members */
 			void initialize_members(void) {
 				// initialize top
 				_top = nullptr;
