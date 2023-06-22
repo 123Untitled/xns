@@ -132,30 +132,34 @@ namespace xns {
 
 			// -- assignments -------------------------------------------------
 
+			/* INFO: optimization possible by copying storage
+			 * implement custom method for copying storage
+			 * update size only at the end
+			 */
+
 			/* copy assignment */
-			self& assign(const self& other) noexcept {
+			void assign(const self& other) noexcept {
 				// check for self assignment
 				if (this != &other) {
 					// destroy self queue
 					_destroy_queue();
-					// declare node
+					// get other head
 					node_pointer node = other._head;
 					// loop over other queue
 					while (node != nullptr) {
-						// enqueue copy of value
-						copy_enqueue(node->value);
+						// enqueue value by copy
+						enqueue(node->value);
 						// move to next node
-						node = node->next;
-					}
-				} // return self reference
-				return *this;
-				// INFO: optimization possible by copying storage
-				// implement custom method for copying storage
-				// update size only at the end
+						node = node->next; }
+				}
 			}
 
-			/* move assignment */ // INFO: storage is not moved! (simple linked list reason)
-			self& assign(self&& other) noexcept {
+			/* INFO: storage is not moved!
+			 * (simple linked list reason)
+			 */
+
+			/* move assignment */
+			void assign(self&& other) noexcept {
 				// check for self assignment
 				if (this != &other) {
 					// destroy self queue
@@ -164,25 +168,28 @@ namespace xns {
 					_head = other._head;
 					_tail = other._tail;
 					_size = other._size;
-					// invalidate other
+					// invalidate other queue
 					other._init();
-				} // return self reference
-				return *this;
+				}
 			}
 
 
 			// -- assignment operators ----------------------------------------
 
 			/* copy assignment operator */
-			self& operator=(const self& other) noexcept {
-				// return copy assignment
-				return assign(other);
+			self& operator=(const self& other) {
+				// call copy assignment
+				assign(other);
+				// return self reference
+				return *this;
 			}
 
 			/* move assignment operator */
 			self& operator=(self&& other) noexcept {
-				// return move assignment
-				return assign(xns::move(other));
+				// call move assignment
+				assign(xns::move(other));
+				// return self reference
+				return *this;
 			}
 
 
@@ -336,7 +343,8 @@ namespace xns {
 				// loop over queue
 				while (_head) {
 					// unlink node
-					 node = _head;
+					node = _head;
+					// set head to next node
 					_head = node->next;
 					// destroy node
 					allocator::destroy(node);
@@ -359,7 +367,7 @@ namespace xns {
 				}
 			}
 
-			/* destroy queue */ // INFO: used for clear method
+			/* destroy queue */
 			inline void _destroy_queue(void) noexcept {
 				// declare node
 				node_pointer node = nullptr;
