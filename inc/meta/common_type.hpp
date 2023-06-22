@@ -23,9 +23,9 @@ namespace xns {
 		template <class T, class... R>
 		struct common_type {
 			// remove reference of T
-			using type = xns::remove_reference<T>;
+			using type = xns::remove_cvr<T>;
 			// check if all types are the same
-			static_assert((xns::is_same<type, xns::remove_reference<R>> && ...),
+			static_assert((xns::is_same<type, xns::remove_cvr<R>> && ...),
 						  "): ALL TYPES MUST BE THE SAME :(");
 		};
 
