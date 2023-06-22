@@ -22,7 +22,8 @@ void start(void);
 
 int main(const int ac, const char** av, const char** env) {
 
-	UT::dispatcher<"directory">();
+	UT::dispatcher<"list">();
+	//UT::dispatcher<"directory">();
 	return 0;
 
 
