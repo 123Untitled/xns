@@ -191,22 +191,40 @@ namespace xns {
 				/* non-assignable class */
 				NON_ASSIGNABLE(directory_iterator);
 
-				/* destructor (non-recursive) */
-				~directory_iterator(void) requires (recursive == false) {
-					// close directory
-					if (_container._first != nullptr) {
-						::closedir(_container._first);
+				/* destructor */
+				~directory_iterator(void) {
+
+					if constexpr (recursive == false) {
+						// close directory
+						if (_container._first != nullptr) {
+							::closedir(_container._first);
+						}
+					}
+					else if constexpr (recursive == true) {
+						// close all directories
+						while (_container.empty() == false) {
+							::closedir(_container.top()._first);
+							_container.pop();
+						}
 					}
 				}
 
-				/* destructor (recursive) */
-				~directory_iterator(void) requires (recursive == true) {
-					// close all directories
-					while (_container.empty() == false) {
-						::closedir(_container.top()._first);
-						_container.pop();
-					}
-				}
+				///* destructor (non-recursive) */
+				//~directory_iterator(void) requires (recursive == false) {
+				//	// close directory
+				//	if (_container._first != nullptr) {
+				//		::closedir(_container._first);
+				//	}
+				//}
+
+				///* destructor (recursive) */
+				//~directory_iterator(void) requires (recursive == true) {
+				//	// close all directories
+				//	while (_container.empty() == false) {
+				//		::closedir(_container.top()._first);
+				//		_container.pop();
+				//	}
+				//}
 
 
 				// -- public increment operators ------------------------------
