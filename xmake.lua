@@ -1,8 +1,12 @@
 -- minimal xmake version
 set_xmakever("2.8.1")
 
+-- allowed platforms
+set_allowedplats("macosx")
+
 -- set project
 set_project("xns")
+
 
 -- set version
 set_version("0.1.0", {build = "%Y%m%d%H%M"})
@@ -10,6 +14,8 @@ set_version("0.1.0", {build = "%Y%m%d%H%M"})
 -- add debug and release modes
 add_rules("mode.debug", "mode.release")
 
+-- default mode
+set_defaultmode("debug")
 
 -- set optimization: none, faster, fastest, smallest
 if is_mode("debug") then
