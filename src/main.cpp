@@ -14,13 +14,15 @@
 
 
 
-#if !defined(XNS_UT)
 
 
 void start(void);
 
 
 int main(const int ac, const char** av, const char** env) {
+	UT::dispatcher<"tree">();
+	return 0;
+	UT::dispatcher<"array">();
 
 	UT::dispatcher<"list">();
 	//UT::dispatcher<"directory">();
@@ -127,7 +129,6 @@ void start(void) {
 
 
 }
-#endif
 
 
 
