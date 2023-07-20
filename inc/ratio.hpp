@@ -60,13 +60,13 @@ namespace xns {
 			/* numerator */
 			static inline consteval size_type numerator(void) {
 				// return numerator
-				return _num;
+				return (sign(den) * num) / gcd(num, den);
 			}
 
 			/* denominator */
 			static inline consteval size_type denominator(void) {
 				// return denominator
-				return _den;
+				return abs(den) / gcd(num, den);
 			}
 
 
@@ -91,17 +91,6 @@ namespace xns {
 				// return sign
 				return (a > 0) - (a < 0);
 			}
-
-
-			// -- private constants -------------------------------------------
-
-			/* numerator */
-			static constexpr size_type _num = (sign(den) * num) / gcd(num, den);
-
-			/* denominator */
-			static constexpr size_type _den = abs(den) / gcd(num, den);
-
-
 
 
 	};
