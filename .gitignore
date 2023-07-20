@@ -5,6 +5,10 @@ xnsexec
 # ignore build directory
 _bld/
 
+# xmake ignore
+build/
+.xmake/
+
 # ignore .env files
 .env
 
