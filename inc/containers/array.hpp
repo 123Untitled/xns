@@ -152,26 +152,26 @@ namespace xns {
 			}
 
 			/* dimensions */
-			consteval size_type dimensions(void) const {
+			constexpr size_type dimensions(void) const {
 				// return number of dimensions
 				return _ndim;
 			}
 
 			/* capacity */
-			consteval size_type capacity(void) const {
+			constexpr size_type capacity(void) const {
 				// return number of elements
 				return _size;
 			}
 
 			/* size */
-			consteval size_type size(void) const {
+			constexpr size_type size(void) const {
 				// return number of elements
 				return _size;
 			}
 
 			/* size of dimension */
 			template <size_type IDX>
-			consteval size_type size(void) const {
+			constexpr size_type size(void) const {
 				// return size of dimension indexed by IDX
 				return _dims[IDX];
 			}
