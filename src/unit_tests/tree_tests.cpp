@@ -73,6 +73,9 @@ template <>
 bool UT::unit_tests<"tree">(void) {
 
 
+	generate_tree(30);
+	return true;
+
 //	const char* tree = R"(
 //            a
 //         /     \

@@ -1,5 +1,6 @@
 #include "unit_tests.hpp"
 #include "math.hpp"
+#include <cmath>
 
 template <>
 bool UT::unit_tests<"math">() {
