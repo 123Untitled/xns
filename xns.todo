@@ -15,3 +15,6 @@ tree:
 
 make_signed/make_unsigned:
 	tests fails with [enum : bool] (need to detect underlying type)
+
+list, stack, queue:
+	node recycle with static instance
