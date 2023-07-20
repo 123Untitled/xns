@@ -17,10 +17,11 @@ namespace xns {
 
 	// -- T R I E  C L A S S --------------------------------------------------
 
-	// this class implements a trie data structure
-	// WARNING: this class stores pointers in a ascii lookup table
-	// size of the lookup table is only printable ascii characters (95)
-	// class do not check if the key is a printable ascii character !
+	/* this class implements a trie data structure
+	 * WARNING: this class stores pointers in a ascii lookup table
+	 * size of the lookup table is only printable ascii characters (95)
+	 * class do not check if the key is only printable ascii characters
+	 */
 
 	template <class T>
 	class trie final {
@@ -44,10 +45,10 @@ namespace xns {
 
 		private:
 
-			// -- P R I V A T E  E N U M S ------------------------------------
+			// -- private enum ------------------------------------------------
 
 			/* lookup table size */
-			enum : size_type {
+			enum : xns::ubyte {
 				OFFSET = 32,
 				LOOKUP_SIZE = 95
 			};
@@ -322,7 +323,7 @@ namespace xns {
 			/* to index */
 			template <class C>
 			size_type to_index(const C c) const {
-				static_assert(sizeof(C) == 1, "C must be a char type");
+				static_assert(sizeof(C) == 1, "): TYPE C MUST BE SINGLE BYTE :(");
 				return (static_cast<size_type>(c)) - OFFSET;
 			}
 
