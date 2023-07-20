@@ -2039,7 +2039,7 @@ namespace xns {
 			signed_type compare(const S& other) const {
 
 				// assert same character type
-				static_assert(xns::is_same<char_t, typename S::char_type>,
+				static_assert(xns::is_same<char_t, typename S::char_t>,
 					"): CAN'T COMPARE DIFFERENT STRING TYPES :(");
 
 				// compare nullptr-ness
