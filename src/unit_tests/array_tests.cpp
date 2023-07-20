@@ -1,6 +1,7 @@
 #include "unit_tests.hpp"
 #include "array.hpp"
 
+
 template <>
 bool UT::unit_tests<"array">(void) {
 
@@ -10,6 +11,15 @@ bool UT::unit_tests<"array">(void) {
 		xns::array<int, 3>{1, 2, 3},
 		xns::array<int, 3>{4, 5, 6}
 	};
+
+	for (xns::size_t i = 0; i < a.size(); ++i) {
+		for (xns::size_t j = 0; j < a[i].size(); ++j) {
+			std::cout << a[i][j] << " ";
+		}
+		std::cout << std::endl;
+	}
+
+
 
 	xns::array arr1 = {1, 2, 3, 4, 5, 6};
 
@@ -49,6 +59,7 @@ bool UT::unit_tests<"array">(void) {
 		Type{3, 3.0f, 'c'},
 		Type{3, 3.0f, 'c'}
 	);
+
 
 
 	return true;
