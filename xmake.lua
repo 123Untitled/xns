@@ -2,7 +2,7 @@
 set_xmakever("2.8.1")
 
 -- allowed platforms
---set_allowedplats("macosx")
+set_allowedplats("macosx")
 
 -- set project
 set_project("xns")
@@ -26,7 +26,7 @@ if is_mode("release") then
 end
 
 -- set language
-set_languages("cxx23")
+set_languages("cxx20")
 
 -- flags
 add_cxxflags("-Wall", "-Wextra", "-Werror", "-Wpedantic", "-Wno-unused", "-Wno-unused-variable", "-Wno-unused-parameter",
@@ -35,7 +35,10 @@ add_cxxflags("-Wall", "-Wextra", "-Werror", "-Wpedantic", "-Wno-unused", "-Wno-u
 
 
 -- get source files
-local src = os.files("src/**")
+local src = os.files("src/**/*.cpp|main.cpp")
+local main = os.files("src/main.cpp")
+
+-- append files
 
 -- get include directories
 local inc = os.dirs("inc/**")
@@ -54,16 +57,6 @@ target("xns_static", function()
 	add_includedirs(inc)
 end)
 
-
--- executable file
-target("xns_exec", function()
-    -- set name
-	set_basename("xnsexec")
-    set_kind("binary")
-	add_deps("xns_static")
-end)
-
-
 -- shared library
 target("xns_shared", function()
     -- set name
@@ -72,6 +65,15 @@ target("xns_shared", function()
 	add_deps("xns_static")
 end)
 
+-- executable file
+target("xns_exec", function()
+    -- set name
+	set_basename("xnsexec")
+    set_kind("binary")
+	add_files(main)
+	add_includedirs(inc)
+	add_deps("xns_static")
+end)
 
 -- full clean
 task("fclean")
