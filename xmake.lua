@@ -2,7 +2,7 @@
 set_xmakever("2.8.1")
 
 -- allowed platforms
-set_allowedplats("macosx")
+--set_allowedplats("macosx")
 
 -- set project
 set_project("xns")
