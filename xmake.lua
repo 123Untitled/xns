@@ -35,7 +35,6 @@ add_cxxflags("-Wall", "-Wextra", "-Werror", "-Wpedantic", "-Wno-unused", "-Wno-u
 
 
 -- get source files
-local src = os.files("src/**/*.cpp|main.cpp")
 local main = os.files("src/main.cpp")
 
 -- append files
@@ -52,17 +51,10 @@ set_targetdir(".")
 target("xns_static", function()
 	-- set name
 	set_basename("xns")
+	add_files("src/xns/**/*.cpp")
+	add_files("src/xns/*.cpp")
 	set_kind("static")
-	add_files(src)
 	add_includedirs(inc)
-end)
-
--- shared library
-target("xns_shared", function()
-    -- set name
-	set_basename("xns")
-	set_kind("shared")
-	add_deps("xns_static")
 end)
 
 -- executable file
@@ -70,9 +62,11 @@ target("xns_exec", function()
     -- set name
 	set_basename("xnsexec")
     set_kind("binary")
-	add_files(main)
+	add_files("src/unit_tests/*.cpp")
 	add_includedirs(inc)
 	add_deps("xns_static")
+	-- link static library
+	add_links("libxns.a")
 end)
 
 -- full clean
