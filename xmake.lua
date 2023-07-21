@@ -98,9 +98,3 @@ task("ccdb")
 	-- Set the command line options for the plugin. There are no parameter options here, just the plugin description.
 	set_menu {}
 
-
-
-package("xns")
-	set_description("xns")
-	set_license("MIT")
-	set_urls("https://github.com/123Untitled/xns.git")
