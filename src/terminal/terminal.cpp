@@ -164,7 +164,7 @@ void xns::terminal::terminal_resize_handler(int signum) {
 	// query terminal size
 	if (_instance.query_terminal_size() != -1) {
 		// call resize event subscribers
-		Xf::Event::instance().call_event(Xf::Evntype::TERMINAL_RESIZE);
+		xns::event::instance().call_event(xns::evntype::TERMINAL_RESIZE);
 	}
 }
 
