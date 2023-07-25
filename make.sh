@@ -62,10 +62,10 @@ done
 # -- C H E C K  W O R K I N G  D I R E C T O R Y ------------------------------
 
 # check if the script is run in the right repository
-if [[ ! -d .git || $(git config --get remote.origin.url) != 'git@github.com:123Untitled/xns.git' ]]; then
-	echo 'Please run this script in the' $ERROR'xns'$RESET 'repository.'
-	exit 1
-fi
+#if [[ ! -d .git || $(git config --get remote.origin.url) != 'git@github.com:123Untitled/xns.git' ]]; then
+#	echo 'Please run this script in the' $ERROR'xns'$RESET 'repository.'
+#	exit 1
+#fi
 
 
 
