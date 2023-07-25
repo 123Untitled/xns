@@ -4,7 +4,7 @@ xnsexec
 xns_sh_gen
 
 #ignore single header
-./xns.hpp
+xns.hpp
 
 # ignore build directory
 _bld/
