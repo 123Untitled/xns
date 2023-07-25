@@ -1,14 +1,15 @@
-#ifndef XF_DEBUG_HPP
-#define XF_DEBUG_HPP
+#ifndef DEBUG_HEADER
+#define DEBUG_HEADER
 
 #include <iostream>
 #include <fcntl.h>
-#include <types.hpp>
 #include <unistd.h>
-#include <type_traits.hpp>
 #include <cstdio>
 #include <cstring>
 
+
+#include "type_traits.hpp"
+#include "types.hpp"
 #include "macro.hpp"
 
 
