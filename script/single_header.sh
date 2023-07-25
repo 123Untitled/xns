@@ -59,7 +59,7 @@ function parse {
 		exit 1
 	fi
 
-	echo -n $color'.'$reset
+	#echo -n $color'.'$reset
 
 	# split content into array
 	words=(${=content})
@@ -78,10 +78,26 @@ function parse {
 }
 
 
+
+ANIM=('-' '\' '|' '/')
+I=1
+# disable cursor
+echo -n '\x1b[?25l'
+echo -n 'Generating single header '
 for header in ${HEADERS[@]}; do
+	# print animation
+	echo -n '['${ANIM[$I]}']'
+	# move cursor right 3 characters
+	echo -n '\x1b[3D'
+	# increment animation index
+	((++I))
+	[[ $I -eq 5 ]] && I=1
 	parse $header
 done
-echo ""
+# enable cursor
+echo -n '\x1b[?25h'
+
+echo '['$color'ok'$reset']'
 
 # get tsort stdout and stderr in one variable without printing
 
