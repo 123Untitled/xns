@@ -16,7 +16,7 @@ NC='\x1b[0m'
 GIT_DIR='xns'
 INC_DIR='inc'
 SRC_DIR='src'
-REPO='git@github.com:123Untitled/libxfunc.git'
+REPO='git@github.com:123Untitled/xns.git'
 
 
 # -- C H E C K  W O R K I N G  D I R E C T O R Y ------------------------------
