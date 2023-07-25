@@ -46,6 +46,9 @@ namespace xns {
 			/* get environment variable */
 			static const weak_string get(const xns::string&);
 
+			/* get paths */
+			static xns::vector<xns::string> paths(void);
+
 			/* print environment */
 			static void print(void);
 
