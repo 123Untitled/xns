@@ -136,14 +136,6 @@ done
 
 # -- G E N E R A T E  S I N G L E  H E A D E R --------------------------------
 
-output='xns.hpp'
-
-# check if output file exists
-if [[ -f $output ]]; then
-	# remove output file
-	rm $output
-fi
-
 
 # system header associative array
 typeset -A system
@@ -166,13 +158,25 @@ for header in $FINAL; do
 
 done
 
+
+
+# -- G E N E R A T E  S I N G L E  H E A D E R --------------------------------
+
+# output file
+output='xns.hpp'
+
+# add include guard
+echo -E '#ifndef XNS_SINGLE_HEADER' > $output
+echo -E '#define XNS_SINGLE_HEADER' >> $output
+
+
 # loop over all system headers
 for header in ${(k)system}; do
 	# add system header to output file
 	echo '#include <'$header'>' >> $output
 done
 
-
+# add namespace
 echo 'namespace xns {' >> $output
 
 # loop over all header files
@@ -208,6 +212,9 @@ for header in $FINAL; do
 done
 
 echo '}' >> $output
+
+# end include guard
+echo -E '#endif' >> $output
 
 
 
