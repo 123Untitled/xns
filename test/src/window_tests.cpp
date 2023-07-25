@@ -1,26 +1,26 @@
 #include "unit_tests.hpp"
 #include "window.hpp"
-#include "input.hpp"
+#include "event.hpp"
+#include "output.hpp"
 
-static void exit(void) { xns::input::stop_loop(); }
+static void exit(void) { xns::event::stop_loop(); }
 static void render(void) { xns::output::render(); }
 static void press_enter(void) { xns::debug::print("enter\n"); }
 
-static Xf::Evntmode build_events(void) {
+static xns::evntmode build_events(void) {
 
-	using namespace Xf;
-	using Ev = Evntype;
+	using ev = xns::evntype;
 
-	auto mode = Event::instance().new_mode();
+	auto mode = xns::event::instance().new_mode();
 
-	mode.subscribe(Ev::ETX,   exit);
-	mode.subscribe(Ev::MIN_Q, exit);
-	mode.subscribe(Ev::ESC,   exit);
-	mode.subscribe(Ev::LOOP,  render);
-	mode.subscribe(Ev::CR, press_enter);
+	mode.subscribe(ev::ETX,   exit);
+	mode.subscribe(ev::MIN_Q, exit);
+	mode.subscribe(ev::ESC,   exit);
+	mode.subscribe(ev::LOOP,  render);
+	mode.subscribe(ev::CR, press_enter);
 
 	//Event::instance().set_mode(mode);
-	Event::instance().stack_mode(mode, Evntopt::FORCE);
+	xns::event::instance().stack_mode(mode, xns::evntopt::FORCE);
 	//Event::instance().stack_mode(mode);
 
 	return mode;
@@ -36,7 +36,7 @@ bool UT::unit_tests<"window">(void) {
 	//WindowManager::new_split<Xf::vsplit_t>();
 	//WindowManager win;
 
-	xns::input::start_loop();
+	xns::event::start_loop();
 	return true;
 }
 
