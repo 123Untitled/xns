@@ -1,6 +1,8 @@
 #ifndef MACRO_HEADER
 #define MACRO_HEADER
 
+namespace xns {
+
 #define LOOP(x,limit) for(UInt64 x = 0; x < UInt64(limit); ++x)
 
 #define Loop(ite) for (uint x = 0; x < (ite); ++x)
@@ -92,5 +94,6 @@
 
 
 
+}
 
 #endif
