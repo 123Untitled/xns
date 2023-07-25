@@ -10,7 +10,7 @@ GIT_DIR='xns'
 INC_DIR='inc'
 SRC_DIR='src'
 UT_DIR='unit_tests'
-REPO='git@github.com:123Untitled/libxfunc.git'
+REPO='git@github.com:123Untitled/xns.git'
 
 
 # -- C H E C K  W O R K I N G  D I R E C T O R Y ------------------------------
@@ -116,6 +116,8 @@ for HEADER in $HEADERS; do
 	if [[ ! $UNIT_TESTS =~ $HEADER ]]; then
 		# print message
 		echo 'Generating' $CE$HEADER'_tests.cpp'$NC'.'
+
+		continue
 		# get the unit test file path
 		local FILE_PATH=$SRC_DIR'/'$UT_DIR'/'$HEADER'_tests.cpp'
 		# generate unit test file
