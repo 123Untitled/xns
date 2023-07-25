@@ -111,9 +111,6 @@ COMPILEDB='compile_commands.json'
 # mode file name
 MODEFILE='.mode'
 
-# single header executable name
-SH_EXECUTABLE=$PROJECT'_sh_gen'
-
 # single header
 SINGLE_HEADER=$PROJECT'.hpp'
 
@@ -139,6 +136,12 @@ OBJDIR=$BLDDIR/'obj'
 # dependency directory
 DEPDIR=$BLDDIR/'dep'
 
+# log directory
+LOGDIR=$BLDDIR/'log'
+
+# script directory
+SCRIPTDIR=$ROOT/'script'
+
 # clangd cache directory
 CDCACHE=$ROOT/'.cache'
 
@@ -156,31 +159,6 @@ INCS=("${INCS[@]/#/-I}")
 
 # init object files
 OBJS=()
-
-
-# -- S I N G L E  H E A D E R -------------------------------------------------
-
-# single header directory
-SHDIR=$ROOT/'unify'
-
-# single header source directory
-SH_SRCDIR=$SHDIR/'src'
-
-# single header include directory
-SH_INCDIR=$SHDIR/'inc'
-
-# get recursively all source files in singdir
-SH_SRCS=($SH_SRCDIR/**/*.'cpp'(.N))
-
-# get recursively all subdirectories in singinc
-SH_INCS=($SH_INCDIR/**/*(/N) $SH_INCDIR)
-
-# insert -I prefix to each directory
-SH_INCS=("${SH_INCS[@]/#/-I}")
-
-# init single header object files
-SH_OBJS=()
-
 
 
 
@@ -267,7 +245,7 @@ RM=($(which rm) '-rfv')
 # -- H I E R A R C H Y --------------------------------------------------------
 
 # create directories
-$MK $BLDDIR $OBJDIR $DEPDIR
+$MK $BLDDIR $OBJDIR $DEPDIR $LOGDIR
 
 
 # -- A R G U M E N T S --------------------------------------------------------
@@ -336,6 +314,43 @@ if [[ $MODE != 'release' && $MODE != 'test' ]]; then
 fi
 
 
+
+function make_ninja {
+
+	# run ninja and check for errors
+	if ninja -f $NINJAFILE; then
+
+		if [[ $MODE == 'release' ]]; then
+			# check if xns.hpp is outdated
+			if [[ ! -f $SINGLE_HEADER || $SINGLE_HEADER -ot $STATIC || $SINGLE_HEADER -ot $SCRIPTDIR/'single_header.sh' ]]; then
+				$SCRIPTDIR/'single_header.sh'
+			fi
+		fi
+
+		#echo 'success' $SUCCESS'ninja'$RESET 'build'
+		exit 0
+	fi
+
+	# check clang-filter executable exists
+	if [[ ! -x "clang-filter" ]]; then
+		git clone 'git@github.com:123Untitled/build_system.git' 'build_system'
+		if [[ $? -ne 0 ]]; then
+			echo $error':('$reset 'failed to clone build_system repository.'
+			exit 1
+		fi
+		(cd 'build_system'/'clang-filter' && make && cp 'clang-filter' '../../')
+		if [[ $? -ne 0 ]]; then
+			echo $error':('$reset 'failed to compile clang-filter.'
+			exit 1
+		fi
+		rm -rf 'build_system'
+	fi
+
+	./clang-filter < $LOGDIR/*.log
+	rm -f $LOGDIR/*.log
+}
+
+
 # -- G E N E R A T O R --------------------------------------------------------
 
 # check if ninja file exists
@@ -364,7 +379,7 @@ if [[ -f $NINJAFILE ]]; then
 		if [[ $0 -nt $NINJAFILE ]]; then break; fi
 
 		# else call ninja
-		ninja
+		make_ninja
 		exit 0
 
 	done
@@ -372,13 +387,25 @@ if [[ -f $NINJAFILE ]]; then
 fi
 
 
-# check mode
+
+# -- U P D A T E  D A T A  F O R  S E L E C T E D  M O D E --------------------
+
+# check for release mode
 if [[ $MODE == 'release' ]]; then
+	# set maximum optimization level
 	OPTIMIZATION='-O3'
+	# disable debug symbols
+	DEBUG='-g0'
+# check for test mode
 elif [[ $MODE == 'test' ]]; then
+	# add test source files
 	SRCS+=($TEST_SRCS)
+	# add test include directories
 	INCS+=($TEST_INCS)
 fi
+
+
+
 
 
 # ninja generator function
@@ -402,7 +429,6 @@ function generate_ninja {
 	if [[ $MODE == 'release' ]]; then
 		echo "archiver = $ARCHIVER"                            >> $NINJAFILE
 		echo "arflags = $ARFLAGS"                              >> $NINJAFILE
-		echo "sh_incs = $SH_INCS"                              >> $NINJAFILE
 	fi
 
 	echo "incs = $INCS"                                        >> $NINJAFILE
@@ -418,7 +444,8 @@ function generate_ninja {
 
 	# compile
 	echo "rule compile" >> $NINJAFILE
-	echo "  command = \$cxx \$cxxflags \$incs -MMD -MF \$dep -c \$in -o \$out" >> $NINJAFILE
+	#echo "  command = \$cxx \$cxxflags \$incs -MMD -MF \$dep -c \$in -o \$out" >> $NINJAFILE
+	echo "  command = \$cxx \$cxxflags \$incs -MMD -MF \$dep -c \$in -o \$out 2> \$log" >> $NINJAFILE
 	echo "  depfile = \$dep" >> $NINJAFILE
 	echo "  description = compiling \$in\n" >> $NINJAFILE
 
@@ -435,20 +462,9 @@ function generate_ninja {
 		echo "  command = \$archiver -rcs \$out \$in" >> $NINJAFILE
 		echo "  description = archiving \$out\n" >> $NINJAFILE
 
-		# single header compilation
-		echo "rule sh_compile" >> $NINJAFILE
-		echo "  command = \$cxx \$cxxflags \$incs \$sh_incs -MMD -MF \$dep -c \$in -o \$out" >> $NINJAFILE
-		echo "  depfile = \$dep" >> $NINJAFILE
-		echo "  description = compiling \$in\n" >> $NINJAFILE
-
-		# single header link
-		echo "rule sh_link" >> $NINJAFILE
-		echo "  command = \$cxx \$in -o \$out" >> $NINJAFILE
-		echo "  description = linking \$out\n" >> $NINJAFILE
-
 		# single header generation
 		echo "rule single_header" >> $NINJAFILE
-		echo "  command = ./$SH_EXECUTABLE" >> $NINJAFILE
+		echo "  command = ./single_header.sh" >> $NINJAFILE
 		echo "  description = generating \$out\n" >> $NINJAFILE
 
 	fi
@@ -463,6 +479,7 @@ function generate_ninja {
 		HASH=${HASH%% *}
 		local OBJ=$OBJDIR'/'$HASH'.o'
 		local DEP=$DEPDIR'/'$HASH'.d'
+		local LOG=$LOGDIR'/'$HASH'.log'
 		# base name of source file
 		local BASE=${SRC##*/}
 		OBJS+=($OBJ)
@@ -470,41 +487,13 @@ function generate_ninja {
 		echo "# $BASE" >> $NINJAFILE
 		echo "build $OBJ: \$" >> $NINJAFILE
 		echo "compile $SRC | $NINJAFILE" >> $NINJAFILE
-		echo "  dep = $DEP\n" >> $NINJAFILE
+		echo "  dep = $DEP" >> $NINJAFILE
+		echo "  log = $LOG\n" >> $NINJAFILE
 
 	done
 
 
 	if [[ $MODE == 'release' ]]; then
-
-		echo "\n$(title 'single header build')\n" >> $NINJAFILE
-
-		# single header build
-		for SRC in $SH_SRCS; do
-			local HASH=$(shasum -a 1 <<< $SRC)
-			HASH=${HASH%% *}
-			local OBJ=$OBJDIR'/'$HASH'.o'
-			local DEP=$DEPDIR'/'$HASH'.d'
-			# base name of source file
-			local BASE=${SRC##*/}
-			SH_OBJS+=($OBJ)
-
-			echo "# $BASE" >> $NINJAFILE
-			echo "build $OBJ: \$" >> $NINJAFILE
-			echo "sh_compile $SRC | $NINJAFILE" >> $NINJAFILE
-			echo "  dep = $DEP\n" >> $NINJAFILE
-
-		done
-
-		# single header executable
-		echo "\n$(title 'sh executable')\n" >> $NINJAFILE
-		echo "build $SH_EXECUTABLE: sh_link \$" >> $NINJAFILE
-		for OBJ in $SH_OBJS; do
-			echo "$OBJ \$" >> $NINJAFILE
-		done
-		for OBJ in $OBJS; do
-			echo "$OBJ \$" >> $NINJAFILE
-		done
 
 		# static library
 		echo "\n$(title 'static library')\n" >> $NINJAFILE
@@ -514,14 +503,8 @@ function generate_ninja {
 		done
 
 		# single header
-		echo "\n$(title 'single header')\n" >> $NINJAFILE
-		echo "build $SINGLE_HEADER: single_header | $SH_EXECUTABLE\n" >> $NINJAFILE
-
-
-
-# -- S O U R C E S  B U I L D -------------------------------------------------
-
-
+		#echo "\n$(title 'single header')\n" >> $NINJAFILE
+		#echo "build $SINGLE_HEADER: single_header | $STATIC\n" >> $NINJAFILE
 
 
 	# executable build
@@ -571,14 +554,44 @@ generate_ninja & wait_generation $!
 wait $!
 
 
+function filter {
+	local line
+	while read -r line; do
+
+		if [[ $line =~ "^\[[0-9]+/[0-9]+\]" ]]; then
+			# erase line
+			echo -n '\x1b[2K'
+			echo -n '\x1b[0G'
+			echo -n "$line"
+			# move cursor to beginning of line
+			continue
+		fi
+
+		#n=${l#\[ninja\]}
+		#[ "x$l" != "x$n" ] && printf "%s\n" "$n" || printf "%s\n" "$l" >&2
+	done
+}
+
+#NINJA_STATUS="[%f/%t] "
+#set -o pipefail
+#ninja | filter
+#echo $?
+
+#exit 0
 
 # print success
 #echo "$(title 'done')"
 #echo 'run' $SUCCESS'ninja'$RESET 'to build'
-ninja
 
 
-# -- D A T A B A S E ----------------------------------------------------------
+make_ninja
+
+
+
+
+
+
+
 
 
 
