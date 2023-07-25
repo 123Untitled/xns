@@ -60,5 +60,15 @@ const xns::env::weak_string xns::env::get(const xns::string& name) {
 	return nullptr;
 }
 
+/* get paths */
+xns::vector<xns::string> xns::env::paths(void) {
+
+	weak_string weak{get("PATH")};
+
+	if (weak == nullptr) { return{}; }
+
+	return weak->split(":");
+}
+
 
 
