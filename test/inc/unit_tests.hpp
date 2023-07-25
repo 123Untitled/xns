@@ -9,8 +9,8 @@
 #include "string_literal.hpp"
 
 #include "testclass.hpp"
-#include "color.hpp"
-#include "escape.hpp"
+//#include "color.hpp"
+//#include "escape.hpp"
 
 
 namespace UT {
@@ -22,13 +22,14 @@ namespace UT {
 		std::cout << "\n\nSTARTING UNIT TEST: \x1b[33m" << test.data() << "\x1b[0m\n" << std::endl;
 	}
 
-	template <xns::hexcolor color, class... A>
+	//template <xns::hexcolor color, class... A>
+	template <int color, class... A>
 	void print(A&&... args) {
-		xns::string c = xns::escape::hex_color(color);
-		std::cout << c.data();
+		//xns::string c = xns::escape::hex_color(color);
+		//std::cout << c.data();
 		(std::cout << ... << args);
-		xns::string r = xns::escape::reset_style();
-		std::cout << r.data() << std::flush;
+		//xns::string r = xns::escape::reset_style();
+		//std::cout << r.data() << std::flush;
 	}
 
 	/* print message */

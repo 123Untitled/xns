@@ -1,6 +1,7 @@
 #include "unit_tests.hpp"
 #include "list.hpp"
 
+#include <unistd.h>
 #include <vector>
 
 /* unit test */
@@ -58,15 +59,15 @@ bool UT::unit_tests<"list">(void) {
 
 	xns::list<int>::iterator it2 = list2.begin();
 
-	write(1, "\n", 1);
-	write(1, "\n", 1);
+	::write(1, "\n", 1);
+	::write(1, "\n", 1);
 
 	while (it2 != list2.end()) {
 		std::cout << *it2 << std::endl;
 		++it2;
 	}
-	write(1, "\n", 1);
-	write(1, "\n", 1);
+	::write(1, "\n", 1);
+	::write(1, "\n", 1);
 
 	// expected print:
 	std::cout << "1" << std::endl;
