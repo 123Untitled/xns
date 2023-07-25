@@ -120,7 +120,7 @@ done
 
 
 
-# -- F I L E S  M O D E L -----------------------------------------------------
+# -- H E A D E R  F I L E  M O D E L ------------------------------------------
 
 # header file model
 HEADER_MODEL="#ifndef "$UPPER_CLASS_NAME"_HPP
@@ -173,6 +173,10 @@ namespace "$NAMESPACE_NAME" {
 
 #endif
 "
+
+
+
+# -- S O U R C E  F I L E  M O D E L ------------------------------------------
 
 # source file model
 SOURCE_MODEL="#include \""$CLASS_NAME".hpp\"
@@ -228,6 +232,9 @@ SOURCE_MODEL="#include \""$CLASS_NAME".hpp\"
 \treturn *this;
 }
 "
+
+
+# -- T E M P L A T E  F I L E  M O D E L --------------------------------------
 
 # template file model
 TEMPLATE_MODEL="#ifndef "$UPPER_CLASS_NAME"_HPP
