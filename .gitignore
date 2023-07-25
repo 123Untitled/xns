@@ -1,13 +1,17 @@
 
 # ignore executable
 xnsexec
+xns_sh_gen
+
+#ignore single header
+./xns.hpp
 
 # ignore build directory
 _bld/
-
-# xmake ignore
 build/
-.xmake/
+
+# ignore ninja build files
+**/build.ninja
 
 # ignore .env files
 .env
@@ -18,6 +22,9 @@ build/
 # ignore all .dylib files recursively
 **/*.dylib
 
+# ignore all .so files recursively
+**/*.so
+
 # ignore .dSYM debug files
 xfunc.dSYM/
 
@@ -26,6 +33,12 @@ xfunc.dSYM/
 
 # ignore all .log files recursively
 **/*.log
+
+# ignore all .o files recursively
+**/*.o
+
+# ignore all .d files recursively
+**/*.d
 
 # ignore all .cache files recursively
 **/.cache
