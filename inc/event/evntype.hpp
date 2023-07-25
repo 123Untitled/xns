@@ -5,10 +5,10 @@
 
 // -- N A M E S P A C E -------------------------------------------------------
 
-namespace Xf {
+namespace xns {
 
 	/* event */
-	enum class Evntype : xns::ubyte {
+	enum class evntype : xns::ubyte {
 		NUL,          // null character (ctrl+space)
 		SOH,          // start of heading (ctrl+a)
 		STX,          // start of text (ctrl+b)

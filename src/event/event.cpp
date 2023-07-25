@@ -4,13 +4,13 @@
 // -- P R I V A T E  C O N S T R U C T O R S ----------------------------------
 
 /* default constructor */
-Xf::Event::Event(void)
+xns::event::event(void)
 : _modes{ }, _current{ }, _next{ }, _stack{ } {
 	// code here...
 }
 
 /* destructor */
-Xf::Event::~Event(void) {
+xns::event::~event(void) {
 	// code here...
 }
 
@@ -18,7 +18,7 @@ Xf::Event::~Event(void) {
 // -- S T A T I C  M E T H O D S ----------------------------------------------
 
 /* get singleton instance */
-Xf::Event& Xf::Event::instance(void) {
+xns::event& xns::event::instance(void) {
 	// return instance
 	return _instance;
 }
@@ -27,26 +27,26 @@ Xf::Event& Xf::Event::instance(void) {
 // -- S T A T I C  P R I V A T E  M E M B E R S -------------------------------
 
 /* singleton instance */
-Xf::Event Xf::Event::_instance;
+xns::event xns::event::_instance;
 
 
 // -- P U B L I C  M E T H O D S ----------------------------------------------
 
 /* add mode */
-Xf::Evntmode Xf::Event::new_mode(void) {
-	_modes.emplace_back(Mode{ });
+xns::evntmode xns::event::new_mode(void) {
+	_modes.emplace_back(mode{ });
 	xns::debug::print("new mode: %d\n", _modes.size() - 1);
 	if (_modes.empty()) {
 		// error
-		Evntmode mode{0};
+		evntmode mode{0};
 		mode._state = false;
 		return mode;
 	}
-	return Evntmode{_modes.size() - 1};
+	return evntmode{_modes.size() - 1};
 }
 
 /* remove mode */
-void Xf::Event::remove_mode(Evntmode& mode) {
+void xns::event::remove_mode(evntmode& mode) {
 	// check if index is valid
 	if (!mode._state) { return; }
 	// invalid index
@@ -55,11 +55,11 @@ void Xf::Event::remove_mode(Evntmode& mode) {
 }
 
 /* set mode */
-void Xf::Event::set_mode(const Evntmode& mode, const Evntopt opt) {
+void xns::event::set_mode(const evntmode& mode, const evntopt opt) {
 	// check if index is valid
 	if (mode._state) {
 		// check if mode is forced
-		if (opt == Evntopt::FORCE) {
+		if (opt == evntopt::FORCE) {
 			// stack current mode
 			_current = xns::make_unique_pointer<xns::size_t>(mode._idx);
 			//_current.make(mode._idx);
@@ -71,7 +71,7 @@ void Xf::Event::set_mode(const Evntmode& mode, const Evntopt opt) {
 }
 
 /* apply mode */
-void Xf::Event::next_mode(void) {
+void xns::event::next_mode(void) {
 	//Xf::Debug::print("active mode: %d\n", *_current);
 	// check if there is a mode query
 	if (!_next) { return; }
@@ -79,7 +79,7 @@ void Xf::Event::next_mode(void) {
 	_current = xns::move(_next);
 
 	// get subscribers index by event type
-	EventVector& subscribers = _modes[*_current]._second[IDX(Evntype::BEGIN)];
+	event_vector& subscribers = _modes[*_current]._second[IDX(evntype::BEGIN)];
 	// loop through all observers
 	for (xns::size_t x = 0; x < subscribers.size(); ++x) {
 		// call subscriber
@@ -88,13 +88,13 @@ void Xf::Event::next_mode(void) {
 }
 
 /* is mode active */
-bool Xf::Event::is_mode(void) const {
+bool xns::event::is_mode(void) const {
 	// check if there is a current mode
 	return _current ? true : false;
 }
 
 /* is mode active */
-bool Xf::Event::is_mode(const Evntmode& mode) const {
+bool xns::event::is_mode(const evntmode& mode) const {
 	// check if there is a current mode and mode is valid
 	if (!_current || !mode._state) { return false; }
 	// check if mode is active
@@ -102,7 +102,7 @@ bool Xf::Event::is_mode(const Evntmode& mode) const {
 }
 
 /* stack current mode */
-void Xf::Event::stack_mode(void) {
+void xns::event::stack_mode(void) {
 	// check if there is a current mode
 	if (!_current) { return; }
 	// stack current mode
@@ -110,14 +110,14 @@ void Xf::Event::stack_mode(void) {
 }
 
 /* stack mode */
-void Xf::Event::stack_mode(const Evntmode& mode, const Evntopt opt) {
+void xns::event::stack_mode(const evntmode& mode, const evntopt opt) {
 	//std::cout << "   stack mode" << std::endl;
 	// check if mode is valid
 	if (!mode._state) { return; }
 	// stack mode
 	_stack.emplace(mode._idx);
 	// check if mode is forced
-	if (opt == Evntopt::FORCE) {
+	if (opt == evntopt::FORCE) {
 		// set next mode
 		_current = xns::make_unique_pointer<xns::size_t>(mode._idx);
 		//_current.make(mode._idx);
@@ -128,10 +128,11 @@ void Xf::Event::stack_mode(const Evntmode& mode, const Evntopt opt) {
 }
 
 /* unstack mode */
-void Xf::Event::unstack_mode(void) {
+void xns::event::unstack_mode(void) {
 	// check if there is a mode to unstack
 	if (_stack.empty()) {
-		xns::input::stop_loop();
+		//xns::input::stop_loop();
+		xns::event::stop_loop();
 		return; }
 	// unstack mode
 	//_next.make(*_stack.top());
@@ -142,7 +143,8 @@ void Xf::Event::unstack_mode(void) {
 	_stack.pop();
 	// maybe better to pop and set new top mode ???
 	if (_stack.empty()) {
-		xns::input::stop_loop();
+		xns::event::stop_loop();
+		//xns::input::stop_loop();
 		return;
 	}
 	//_next.make(*_stack.top());
@@ -158,11 +160,11 @@ void Xf::Event::unstack_mode(void) {
 
 
 /* call all event subscribers */
-void Xf::Event::call_event(const Evntype type) {
+void xns::event::call_event(const evntype type) {
 	// exit if no current mode or invalid event type
-	if (!_current || type >= Evntype::EVNT_MAX) { return; }
+	if (!_current || type >= evntype::EVNT_MAX) { return; }
 	// get subscribers index by event type
-	EventVector& subscribers = _modes[*_current]._second[IDX(type)];
+	event_vector& subscribers = _modes[*_current]._second[IDX(type)];
 	// loop through all observers
 	for (xns::size_t x = 0; x < subscribers.size(); ++x) {
 		// call subscriber
@@ -171,11 +173,11 @@ void Xf::Event::call_event(const Evntype type) {
 }
 
 /* call all input subscribers */
-void Xf::Event::call_input(const xns::string& input) {
+void xns::event::call_input(const xns::string& input) {
 	// exit if no current mode
 	if (!_current) { return; }
 	// get subscribers
-	InputVector& subscribers = _modes[*_current]._first;
+	input_vector& subscribers = _modes[*_current]._first;
 	// loop through all observers
 	for (xns::size_t x = 0; x < subscribers.size(); ++x) {
 		// call subscriber
@@ -187,21 +189,21 @@ void Xf::Event::call_input(const xns::string& input) {
 // -- P R I V A T E  M E T H O D S --------------------------------------------
 
 /* subscribe function to event */
-void Xf::Event::_subscribe(const Evntmode& mode, const Evntype type, EventFunction function) {
+void xns::event::_subscribe(const evntmode& mode, const evntype type, event_function function) {
 	// check invalid pointers and event type
-	if (!function || type >= Evntype::EVNT_MAX) { return; }
+	if (!function || type >= evntype::EVNT_MAX) { return; }
 	// get event subscriber vector
-	EventVector& subscribers = _modes[mode._idx]._second[IDX(type)];
+	event_vector& subscribers = _modes[mode._idx]._second[IDX(type)];
 	// add new subscriber
 	subscribers.emplace_back(function);
 }
 
 /* subscribe function to input */
-void Xf::Event::_subscribe(const Evntmode& mode, InputFunction function) {
+void xns::event::_subscribe(const evntmode& mode, input_function function) {
 	// check invalid pointers
 	if (!function) { return; }
 	// get input subscriber vector
-	InputVector& subscribers = _modes[mode._idx]._first;
+	input_vector& subscribers = _modes[mode._idx]._first;
 	// add new subscriber
 	subscribers.emplace_back(function);
 }
@@ -219,30 +221,30 @@ void Xf::Event::_subscribe(const Evntmode& mode, InputFunction function) {
 
 
 /* index private constructor */
-Xf::Evntmode::Evntmode(const xns::size_t idx)
+xns::evntmode::evntmode(const xns::size_t idx)
 : _idx{idx}, _state{true} {
 	// code here...
 }
 
 /* destructor */
-Xf::Evntmode::~Evntmode(void) {
+xns::evntmode::~evntmode(void) {
 	// check if mode is active
 	if (_state) {
 		xns::debug::write("EVNTMODE: destructor called\n");
 		// remove mode from event manager
-		Xf::Event::instance().remove_mode(*this);
+		xns::event::instance().remove_mode(*this);
 	}
 }
 
 /* move constructor */
-Xf::Evntmode::Evntmode(Evntmode&& other) noexcept
+xns::evntmode::evntmode(evntmode&& other) noexcept
 : _idx{other._idx}, _state{other._state} {
 	// invalidate other
 	other._state = false;
 }
 
 /* move assignment operator */
-Xf::Evntmode& Xf::Evntmode::operator=(Evntmode&& other) noexcept {
+xns::evntmode& xns::evntmode::operator=(evntmode&& other) noexcept {
 	// check for self-assignment
 	if (this != &other) {
 		// move other
@@ -258,23 +260,179 @@ Xf::Evntmode& Xf::Evntmode::operator=(Evntmode&& other) noexcept {
 // -- P U B L I C  M E T H O D S ----------------------------------------------
 
 /* subscribe function to event */
-void Xf::Evntmode::subscribe(const Evntype type, Event::EventFunction function) {
+void xns::evntmode::subscribe(const evntype type, event::event_function function) {
 	// check if mode is active
 	if (_state) {
 		// subscribe to event
-		Xf::Event::instance()._subscribe(*this, type, function);
+		xns::event::instance()._subscribe(*this, type, function);
 	}
 }
 
 /* subscribe function to input */
-void Xf::Evntmode::subscribe(Event::InputFunction function) {
+void xns::evntmode::subscribe(event::input_function function) {
 	// check if mode is active
 	if (_state) {
 		// subscribe to input
-		Xf::Event::instance()._subscribe(*this, function);
+		xns::event::instance()._subscribe(*this, function);
 	}
 }
 
 
+
+
+
+
+
+// -- S T A T I C  P R I V A T E  M E M B E R S -------------------------------
+
+/* readed bytes */
+xns::event::signed_type xns::event::_readed{0};
+
+/* buffer */
+xns::event::char_t xns::event::_buff[BUFFER_SIZE + 1]{'\0'};
+
+/* input string */
+xns::event::string xns::event::_input{""};
+
+/* running flag */
+bool xns::event::_is_running{false};
+
+/* windowed mode */
+bool xns::event::_windowed{false};
+
+
+// -- S T A T I C  P U B L I C  M E T H O D S ---------------------------------
+
+/* parameters */
+void xns::event::parameters(const bool windowed) {
+	// set windowed mode
+	_windowed = windowed;
+}
+
+/* input loop */
+void xns::event::start_loop(void) {
+
+	// get event instance
+	xns::event& evnt = xns::event::instance();
+
+	// activate requested mode
+	//evnt.next_mode();
+
+	// exit if there is no active mode
+	//if (!evnt.is_mode()) { return; std::cout << "no mode" << std::endl; }
+
+	// set running flag
+	_is_running = true;
+	// loop over reading
+	while (_is_running) {
+		// activate requested mode
+		evnt.next_mode();
+
+		evnt.call_event(xns::evntype::LOOP);
+
+		// read stdin
+		read_input();
+		// analyze readed bytes
+		dispatch();
+	}
+
+}
+
+/* stop input loop */
+void xns::event::stop_loop(void) {
+	// unset running flag
+	_is_running = false;
+}
+
+
+// -- S T A T I C  P R I V A T E  M E T H O D S -------------------------------
+
+/* read input while available */
+void xns::event::read_input(void) {
+
+	// reset previous readed bytes
+	_input.clear();
+
+	// read stdin
+	if (read_stdin() > 0) {
+
+		// append buffer to the string
+		_input.append(_buff, static_cast<size_type>(_readed));
+
+		// buffer is full, loop over reading
+		if (_readed == BUFFER_SIZE) {
+			// set to non-blocking read
+			//xns::terminal::raw_terminal(xns::VFlag::NON_BLOCKING);
+			// read stdin again
+			while (read_stdin() > 0) {
+				// append buffer to the string
+				_input.append(_buff, static_cast<size_type>(_readed));
+			}
+			// WARNING: not tested with only blocking read
+			// back to blocking read
+			//xns::terminal::raw_terminal(xns::VFlag::BLOCKING);
+		}
+
+	}
+}
+
+/* read stdin */
+xns::event::signed_type xns::event::read_stdin(void) {
+	// read bytes from stdin
+	_readed = read(STDIN_FILENO, _buff, BUFFER_SIZE);
+	// append null terminator
+	_buff[_readed] = '\0';
+	// return number of readed bytes
+	return _readed;
+}
+
+
+void xns::event::dispatch(void) {
+
+	if (_input.empty()) { return; }
+
+	// get event instance
+	xns::event& evnt = xns::event::instance();
+
+	using Ev = xns::evntype;
+
+	// filter extended ascii codes
+	_input.filter(xns::string::is_multibyte, false);
+
+
+	if (_input.length() == 3 && _input[0] == 0x1b) {
+
+		// check ctrl sequence
+		if (_input[1] == 0x5b) {
+			// check arrow sequence
+			switch (_input[2]) {
+				case 'A': // code for arrow up
+					evnt.call_event(Ev::UP);
+					return;
+				case 'B': // code for arrow down
+					evnt.call_event(Ev::DOWN);
+					return;
+				case 'C': // code for arrow right
+					evnt.call_event(Ev::RIGHT);
+					return;
+				case 'D': // code for arrow left
+					evnt.call_event(Ev::LEFT);
+					return;
+				default:
+					break;
+			}
+		}
+	}
+
+	if (_input.length() == 1) {
+		const xns::ubyte _char = (xns::ubyte)_input[0]; // NEED TO FIX CONVERSION
+		evnt.call_event(static_cast<Ev>(_char));
+	}
+
+	// filter control characters
+	_input.filter(xns::string::is_control, false);
+
+	evnt.call_input(_input);
+}
 
 
