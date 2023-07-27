@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh --no-rcs
 
 # This script is used to generate a single header file for xns library.
 
