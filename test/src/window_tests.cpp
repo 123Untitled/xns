@@ -4,7 +4,7 @@
 #include "output.hpp"
 
 static void exit(void) { xns::event::stop_loop(); }
-static void render(void) { xns::output::render(); }
+static void render(void) { xns::out::flush(); }
 static void press_enter(void) { xns::debug::print("enter\n"); }
 
 static xns::evntmode build_events(void) {

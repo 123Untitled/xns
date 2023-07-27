@@ -1143,11 +1143,11 @@ namespace xns {
 
 				//xns::output::write(Xf::Escape::erase_screen());
 				for (xns::vector<xns::string>::size_type _ = 0; _ < matrix.size(); ++_) {
-					xns::output::write(matrix[_]);
-					xns::output::newline();
+					xns::out::write(matrix[_]);
+					xns::out::newline();
 					//std::cout << matrix[_] << "\n";
 				}
-				xns::output::render();
+				xns::out::flush();
 
 				return;
 

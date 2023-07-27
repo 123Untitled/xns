@@ -15,19 +15,19 @@
 namespace xns {
 
 
-	// -- O U T P U T  C L A S S ----------------------------------------------
+	// -- O U T  C L A S S ----------------------------------------------------
 
-	class output final {
+	class out final {
 
 		private:
 
 			// -- P R I V A T E  C O N S T R U C T O R S ----------------------
 
 			/* default constructor */
-			output(void);
+			out(void);
 
 			/* non-assignable class */
-			NON_ASSIGNABLE(output);
+			NON_ASSIGNABLE(out);
 
 
 		public:
@@ -35,7 +35,7 @@ namespace xns {
 			// -- P U B L I C  D E S T R U C T O R S --------------------------
 
 			/* destructor */
-			~output(void);
+			~out(void);
 
 
 			// -- P U B L I C  S T A T I C  M E T H O D S ---------------------
@@ -52,8 +52,8 @@ namespace xns {
 			/* write character */
 			template <xns::is_char T>
 			static void write(const T& ch) {
-				// call buffer write
-				write(&ch, sizeof(T));
+				// append character to buffer
+				_instance._buffer.append(ch);
 			}
 
 			/* write string */
@@ -64,7 +64,7 @@ namespace xns {
 
 			/* render */
 			template <xns::string_literal L = "stdout">
-			static void render(void) {
+			static void flush(void) {
 
 				static_assert(L == "stdout" || L == "stderr",
 							  "): UNKNOWN FILE DESCRIPTOR :(");
@@ -122,7 +122,7 @@ namespace xns {
 			// -- P R I V A T E  S T A T I C  M E M B E R S -------------------
 
 			/* instance */
-			static output _instance;
+			static out _instance;
 
 
 	};

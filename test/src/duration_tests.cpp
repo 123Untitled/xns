@@ -24,68 +24,68 @@ consteval xns::size_t max_len(void) {
 template <xns::is_duration from, xns::is_duration to, xns::umax expected>
 void test(const xns::string_view& from_name, const xns::string_view& to_name) {
 
-	xns::output::write(from_name.data(), from_name.size());
+	xns::out::write(from_name.data(), from_name.size());
 	for (xns::size_t x = from_name.size(); x < max_len(); ++x) {
-		xns::output::write(" ");
+		xns::out::write(" ");
 	}
-	xns::output::write("-> ");
-	xns::output::write(to_name.data(), to_name.size());
+	xns::out::write("-> ");
+	xns::out::write(to_name.data(), to_name.size());
 	for (xns::size_t x = to_name.size(); x < max_len(); ++x) {
-		xns::output::write(" ");
+		xns::out::write(" ");
 	}
-	xns::output::write(" : ");
+	xns::out::write(" : ");
 
 	to _to = xns::duration_cast<to>(from{1});
 
 	if (_to.count() != expected) {
-		xns::output::write("\x1b[31mfailed:\x1b[0m ");
-		xns::output::write(_to.count());
-		xns::output::write(" != [");
-		xns::output::write(expected);
-		xns::output::write("]\n");
+		xns::out::write("\x1b[31mfailed:\x1b[0m ");
+		xns::out::write(_to.count());
+		xns::out::write(" != [");
+		xns::out::write(expected);
+		xns::out::write("]\n");
 	}
 	else {
-		xns::output::write("\x1b[32msuccess\x1b[0m ");
-		xns::output::write(_to.count());
-		xns::output::write(" == [");
-		xns::output::write(expected);
-		xns::output::write("]\n");
+		xns::out::write("\x1b[32msuccess\x1b[0m ");
+		xns::out::write(_to.count());
+		xns::out::write(" == [");
+		xns::out::write(expected);
+		xns::out::write("]\n");
 	}
-	xns::output::render();
+	xns::out::flush();
 
 }
 
 template <class from, class to, xns::umax expected>
 void std_test(const xns::string_view& from_name, const xns::string_view& to_name) {
 
-	xns::output::write(from_name.data(), from_name.size());
+	xns::out::write(from_name.data(), from_name.size());
 	for (xns::size_t x = from_name.size(); x < max_len(); ++x) {
-		xns::output::write(" ");
+		xns::out::write(" ");
 	}
-	xns::output::write("-> ");
-	xns::output::write(to_name.data(), to_name.size());
+	xns::out::write("-> ");
+	xns::out::write(to_name.data(), to_name.size());
 	for (xns::size_t x = to_name.size(); x < max_len(); ++x) {
-		xns::output::write(" ");
+		xns::out::write(" ");
 	}
-	xns::output::write(" : ");
+	xns::out::write(" : ");
 
 	to _to = std::chrono::duration_cast<to>(from{1});
 
 	if (_to.count() != expected) {
-		xns::output::write("\x1b[31mfailed:\x1b[0m ");
-		xns::output::write(_to.count());
-		xns::output::write(" != [");
-		xns::output::write(expected);
-		xns::output::write("]\n");
+		xns::out::write("\x1b[31mfailed:\x1b[0m ");
+		xns::out::write(_to.count());
+		xns::out::write(" != [");
+		xns::out::write(expected);
+		xns::out::write("]\n");
 	}
 	else {
-		xns::output::write("\x1b[32msuccess\x1b[0m ");
-		xns::output::write(_to.count());
-		xns::output::write(" == [");
-		xns::output::write(expected);
-		xns::output::write("]\n");
+		xns::out::write("\x1b[32msuccess\x1b[0m ");
+		xns::out::write(_to.count());
+		xns::out::write(" == [");
+		xns::out::write(expected);
+		xns::out::write("]\n");
 	}
-	xns::output::render();
+	xns::out::flush();
 
 }
 

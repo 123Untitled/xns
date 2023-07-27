@@ -79,8 +79,7 @@ void xns::border::draw(void) {
 	// check if border is empty
 	if (_border.empty()) { return; }
 	// draw border
-	//Buffer::draw(_border.pointer(), _border.size());
-	xns::output::write(_border);
+	xns::out::write(_border);
 }
 
 

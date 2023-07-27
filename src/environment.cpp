@@ -36,12 +36,12 @@ void xns::env::print(void) {
 	// loop over environment variables
 	for (size_type x = 0; x < _env.size(); ++x) {
 		// print variable
-		xns::output::write(_env[x]._first);
-		xns::output::write(" [=] ", 5);
-		xns::output::write(_env[x]._second);
-		xns::output::write("\n", 1);
+		xns::out::write(_env[x]._first);
+		xns::out::write(" [=] ", 5);
+		xns::out::write(_env[x]._second);
+		xns::out::write("\n", 1);
 	} // flush output
-	xns::output::render();
+	xns::out::flush();
 }
 
 

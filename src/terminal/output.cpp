@@ -1,46 +1,46 @@
 #include "output.hpp"
 
 /* singleton instance */
-xns::output xns::output::_instance = xns::output{};
+xns::out xns::out::_instance = xns::out{};
 
 /* default constructor */
-xns::output::output(void)
+xns::out::out(void)
 : _buffer{ } {
 	// reserve default buffer size
 	_buffer.reserve(DEFAULT_BUFFER_SIZE);
 }
 
 /* destructor */
-xns::output::~output(void) {
+xns::out::~out(void) {
 	// code here...
 }
 
 /* new line */
-void xns::output::newline(void) {
+void xns::out::newline(void) {
 	// append to buffer
 	_instance._buffer += '\n';
 }
 
 /* write unknown bytes */
-void xns::output::write(const char* str) {
+void xns::out::write(const char* str) {
 	// append to buffer
 	_instance._buffer.append(str);
 }
 
 /* write bytes */
-void xns::output::write(const char* str, const xns::size_t size) {
+void xns::out::write(const char* str, const xns::size_t size) {
 	// append to buffer
 	_instance._buffer.append(str, size);
 }
 
 /* write string */
-void xns::output::write(const xns::string& str) {
+void xns::out::write(const xns::string& str) {
 	// append to buffer
 	_instance._buffer.append(str);
 }
 
 /* write string32 */
-void xns::output::write(const xns::string32& str) {
+void xns::out::write(const xns::string32& str) {
 	// append to buffer
 	_instance._buffer.append(xns::char32_to<char>(str));
 }
