@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh --no-rcs
 
 # this script is used to generate ninja files for building
 
