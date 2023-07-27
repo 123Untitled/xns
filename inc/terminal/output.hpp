@@ -7,7 +7,6 @@
 #include "macro.hpp"
 #include "types.hpp"
 #include "string.hpp"
-#include "string_view.hpp"
 #include "string_literal.hpp"
 #include "conversions.hpp"
 
