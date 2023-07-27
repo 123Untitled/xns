@@ -67,6 +67,7 @@ done
 #	exit 1
 #fi
 
+echo $SUCCESS'xns'$RESET 'build started.'
 
 
 
