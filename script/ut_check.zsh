@@ -7,10 +7,16 @@ CE='\x1b[32m'
 NC='\x1b[0m'
 
 GIT_DIR='xns'
-INC_DIR='inc'
-SRC_DIR='src'
-UT_DIR='unit_tests'
-REPO='git@github.com:123Untitled/xns.git'
+
+XNS_INC_DIR='inc'
+XNS_SRC_DIR='src'
+TEST_DIR='test'
+TEST_SRC_DIR=$TEST_DIR/'src'
+
+
+SSH_REPO='git@github.com:123Untitled/xns.git'
+PUB_REPO='https://github.com/123Untitled/xns.git'
+
 
 
 # -- C H E C K  W O R K I N G  D I R E C T O R Y ------------------------------
@@ -25,7 +31,7 @@ fi
 GIT_REPO=$(git config --get remote.origin.url)
 
 # check if the script is run in the right repository
-if [ $GIT_REPO != $REPO ]; then
+if [[ $GIT_REPO != $SSH_REPO && $GIT_REPO != $PUB_REPO ]]; then
 	echo 'Please run this script in the' $CO$GIT_DIR$NC 'repository.'
 	exit 1
 fi
@@ -34,20 +40,15 @@ fi
 # -- C H E C K  D I R E C T O R I E S -----------------------------------------
 
 # check if the include directory exists
-if [ ! -d $INC_DIR ]; then
-	echo 'The' $CO$INC_DIR$NC 'directory does not exist.'
+if [ ! -d $XNS_INC_DIR ]; then
+	echo 'The' $CO$XNS_INC_DIR$NC 'directory does not exist.'
 	exit 1
 fi
 
-# check if the source directory exists
-if [ ! -d $SRC_DIR ]; then
-	echo 'The' $CO$SRC_DIR$NC 'directory does not exist.'
-	exit 1
-fi
 
 # check if the unit test directory exists
-if [ ! -d $SRC_DIR'/'$UT_DIR ]; then
-	echo 'The' $CO$SRC_DIR'/'$UT_DIR$NC 'directory does not exist.'
+if [ ! -d $TEST_SRC_DIR ]; then
+	echo 'The' $CO$TEST_SRC_DIR$NC 'directory does not exist.'
 	exit 1
 fi
 
@@ -67,20 +68,29 @@ fi
 # -- C H E C K  M I S S I N G  U N I T  T E S T  F I L E S --------------------
 
 # get all header files
-HEADERS=($INC_DIR'/'**'/'*'.hpp'(.N))
+HEADERS=($XNS_INC_DIR/**/*.hpp(.N))
+# get all unit test files
+UNIT_TESTS=($TEST_SRC_DIR/**/*.cpp(.N))
+
+
 # get basenames and remove extension
 HEADERS=(${${HEADERS[@]##*/}[@]%'.hpp'})
 
-# get all unit test files
-UNIT_TESTS=($SRC_DIR'/'$UT_DIR'/'**'/'*'.cpp'(.N))
-# get basenames and remove '_tests' suffix and extension
-UNIT_TESTS=(${${UNIT_TESTS[@]##*/}[@]%'_tests.cpp'})
+# remove extensions
+UNIT_TESTS=(${${UNIT_TESTS[@]##*/}[@]%'.cpp'})
+# remove '_tests' suffix
+UNIT_TESTS=(${(@)UNIT_TESTS%'_tests'})
 
-# remove 'xns' 'testclass' 'type_trait' and 'unit_tests' from the header files
+
+# remove main
+UNIT_TESTS=(${(@)UNIT_TESTS:#main})
+# remove xns
 HEADERS=(${(@)HEADERS:#xns})
+# remove testclass
 HEADERS=(${(@)HEADERS:#testclass})
+# remove type_traits
 HEADERS=(${(@)HEADERS:#type_traits})
-HEADERS=(${(@)HEADERS:#unit_tests})
+
 
 
 
@@ -110,12 +120,47 @@ bool UT::unit_tests<\"$FILE_NAME\">(void) {
 }
 
 
+function prompt {
+	# no echo
+	stty -echo
+	echo -n '[y/n] ? '
+
+	while true; do
+		# read one character
+		read -k 1 -s INPUT
+		# echo
+		if   [[ $INPUT =~ '[yY]' ]]; then
+			echo 'yes.'
+			stty echo
+			return 0
+		elif [[ $INPUT =~ '[nN]' ]]; then
+			echo 'no.'
+			stty echo
+			return 1
+		elif [[ $INPUT =~ '[qQ]' ]]; then
+			stty echo
+			echo 'abort.'
+			exit 0
+		fi
+	done
+	# never reach this point
+}
+
+
+
+
+
+
 # loop over all header files
 for HEADER in $HEADERS; do
-	# check if the unit test file exists
+	# check if the associated unit file exist
 	if [[ ! $UNIT_TESTS =~ $HEADER ]]; then
 		# print message
-		echo 'Generating' $CE$HEADER'_tests.cpp'$NC'.'
+		echo $CE$HEADER'_tests.cpp'$NC 'does not exist.'"\r"
+
+		echo -n 'Generate file ? '
+		prompt
+
 
 		continue
 		# get the unit test file path
@@ -132,10 +177,32 @@ for HEADER in $HEADERS; do
 		# commit unit test file
 		git commit -m "add unit test for $HEADER"
 
-	else
-		echo $CO$HEADER'_tests.cpp'$NC 'already exists.'
-		continue
 	fi
+done
+
+
+# loop over all unit test files
+for UNIT in $UNIT_TESTS; do
+	# check if the associated header file exist
+	if [[ ! $HEADERS =~ $UNIT ]]; then
+		# print message
+		echo $CO$UNIT'_tests.cpp'$NC 'does not have an associated header file.'"\r"
+		# find file path
+		local FILE_PATH=$UT_DIR'/src/'$UNIT'_tests.cpp'
+		# check if file exists
+		if [ ! -f $FILE_PATH ]; then
+			echo 'Internal error: file' $CO$FILE_PATH$NC 'does not exist.'
+			exit 1
+		fi
+		# purpose to delete the unit test file
+		echo -n 'Delete file ? '
+		if prompt; then
+			echo 'deleting file...'
+		else
+			echo 'keeping file...'
+		fi
+	fi
+
 done
 
 
