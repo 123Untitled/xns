@@ -165,19 +165,8 @@ done
 # output file
 output='xns.hpp'
 
-# add include guard
-echo -E '#ifndef XNS_SINGLE_HEADER' > $output
-echo -E '#define XNS_SINGLE_HEADER' >> $output
 
-
-# loop over all system headers
-for header in ${(k)system}; do
-	# add system header to output file
-	echo '#include <'$header'>' >> $output
-done
-
-# add namespace
-echo 'namespace xns {' >> $output
+file='namespace xns {'
 
 # loop over all header files
 for header in $FINAL; do
@@ -190,7 +179,7 @@ for header in $FINAL; do
 	# split by line
 	local lines=( ${(@f)content} )
 
-	F=0
+F=0
 	# loop over all lines
 	for line in $lines; do
 
@@ -202,7 +191,8 @@ for header in $FINAL; do
 			if [[ $line =~ "^}" ]]; then
 				break
 			else
-				echo -E $line >> $output
+				file+=$line$'\n'
+				#echo -E $line >> $output_tmp
 			fi
 		fi
 
@@ -211,10 +201,28 @@ for header in $FINAL; do
 
 done
 
-echo '}' >> $output
+file+='}'
+
+
+# remove all comments
+preprocessed=$(clang++ -std=c++2a -E -P -x c++ - <<< "$file")
+
+# add include guard
+echo -E '#ifndef XNS_SINGLE_HEADER' > $output
+echo -E '#define XNS_SINGLE_HEADER' >> $output
+
+# loop over all system headers
+for header in ${(k)system}; do
+	# add system header to output file
+	echo '#include <'$header'>' >> $output
+done
+
+# append preprocessed variable to output file
+echo -E $preprocessed >> $output
 
 # end include guard
 echo -E '#endif' >> $output
+
 
 
 
