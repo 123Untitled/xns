@@ -20,6 +20,10 @@ void start(void);
 
 
 int main(const int ac, const char** av, const char** env) {
+
+	UT::dispatcher<"list">();
+	return 0;
+
 	UT::dispatcher<"tree">();
 	return 0;
 	UT::dispatcher<"array">();
@@ -88,14 +92,14 @@ void start(void) {
 	time_t t = tv.tv_sec;
 	struct tm* ptm = localtime(&t);
 
-	xns::output::write("clock_gettime: ");
-	xns::output::write(ptm->tm_hour);
-	xns::output::write(" ");
-	xns::output::write(ptm->tm_min);
-	xns::output::write(" ");
-	xns::output::write(ptm->tm_sec);
-	xns::output::write("\n");
-	xns::output::render();
+	xns::out::write("clock_gettime: ");
+	xns::out::write(ptm->tm_hour);
+	xns::out::write(" ");
+	xns::out::write(ptm->tm_min);
+	xns::out::write(" ");
+	xns::out::write(ptm->tm_sec);
+	xns::out::write("\n");
+	xns::out::flush();
 
 
 
