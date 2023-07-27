@@ -205,7 +205,8 @@ file+='}'
 
 
 # remove all comments
-preprocessed=$(clang++ -std=c++2a -E -P -x c++ - <<< "$file")
+#preprocessed=$(clang++ -std=c++2a -E -P -dD -x c++ - <<< "$file")
+
 
 # add include guard
 echo -E '#ifndef XNS_SINGLE_HEADER' > $output
@@ -218,7 +219,8 @@ for header in ${(k)system}; do
 done
 
 # append preprocessed variable to output file
-echo -E $preprocessed >> $output
+echo -E $file >> $output
+#echo -E $preprocessed >> $output
 
 # end include guard
 echo -E '#endif' >> $output
