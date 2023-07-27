@@ -39,6 +39,12 @@ void xns::out::write(const xns::string& str) {
 	_instance._buffer.append(str);
 }
 
+/* write string view */
+void xns::out::write(const xns::string_view& str) {
+	// append to buffer
+	_instance._buffer.append(str);
+}
+
 /* write string32 */
 void xns::out::write(const xns::string32& str) {
 	// append to buffer

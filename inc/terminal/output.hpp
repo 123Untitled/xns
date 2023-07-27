@@ -1,12 +1,17 @@
 #ifndef BUFFER_HEADER
 #define BUFFER_HEADER
 
+// -- imports -----------------------------------------------------------------
+
+// xns headers
 #include "macro.hpp"
 #include "types.hpp"
 #include "string.hpp"
+#include "string_view.hpp"
 #include "string_literal.hpp"
 #include "conversions.hpp"
 
+// operating system headers
 #include <unistd.h>
 
 
@@ -58,6 +63,9 @@ namespace xns {
 
 			/* write string */
 			static void write(const xns::string& str);
+
+			/* write string view */
+			static void write(const xns::string_view& str);
 
 			/* write string32 */
 			static void write(const xns::string32& str);
