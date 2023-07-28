@@ -2,19 +2,15 @@
 
 # this script is used to generate ninja files for building
 
-# function to generate title : # -- T I T L E ---------------------------------
 
-
+# title generator
 function title {
-
 	# get argument
 	local NAME=$1
-
 	# to uppercase
 	NAME=${NAME:u}
-
+	# start composing title
 	TITLE='# -- '
-
 	# add spaces after each character, except spaces
 	for (( i=0; i<${#NAME}; ++i )); do
 		if [[ ${NAME:$i:1} =~ ' ' ]]; then
@@ -23,15 +19,13 @@ function title {
 			TITLE+=${NAME:$i:1}' '
 		fi
 	done
-
 	# get length of title
 	local LENGTH=${#TITLE}
-
 	# add dashes
 	for (( i=${#TITLE}; i < 79; ++i )); do
 		TITLE+='-'
 	done
-
+	# print title on stdout
 	echo $TITLE
 }
 
