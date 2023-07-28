@@ -1,4 +1,5 @@
 
+doc/
 # ignore executable
 xnsexec
 xns_sh_gen
