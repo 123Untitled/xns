@@ -11,6 +11,7 @@
 
 #include "pack_type.hpp"
 #include "integer_sequence.hpp"
+#include "index_of.hpp"
 
 #include "function.hpp"
 
@@ -153,6 +154,10 @@ namespace xns {
 			template <size_type IDX>
 			using indexed = xns::pack_type<IDX, A...>;
 
+			/* index of type */
+			template <class T>
+			static constexpr xns::size_t _index_of = xns::index_of<T, A...>();
+
 
 			// -- P R I V A T E  M E M B E R S --------------------------------
 
@@ -269,13 +274,23 @@ namespace xns {
 
 		// -- friends ---------------------------------------------------------
 
-		/* get tuple element as friend */
+		/* get tuple element with index as friend */
 		template <xns::size_t, class... U>
 		friend constexpr auto& get(tuple<U...>&);
 
-		/* get constant tuple element as friend */
+		/* get constant tuple element with index as friend */
 		template <xns::size_t, class... U>
 		friend constexpr const auto& get(const tuple<U...>&);
+
+		/* get tuple element with type as friend */
+		template <class T, class... U>
+		friend constexpr auto& get(tuple<U...>&);
+
+		/* get constant tuple element with type as friend */
+		template <class T, class... U>
+		friend constexpr const auto& get(const tuple<U...>&);
+
+
 
 
 	};
@@ -285,7 +300,7 @@ namespace xns {
 	tuple(A&&...) -> tuple<A...>;
 
 
-	/* get tuple element */
+	/* get tuple element with index */
 	template <xns::size_t IDX, class... A>
 	constexpr auto& get(tuple<A...>& tuple) {
 		// check if index is in range
@@ -294,7 +309,7 @@ namespace xns {
 		return tuple._impl.template element<IDX, typename xns::tuple<A...>::template indexed<IDX>>::value;
 	}
 
-	/* get constant tuple element */
+	/* get constant tuple element with index */
 	template <xns::size_t IDX, class... A>
 	constexpr const auto& get(const tuple<A...>& tuple) {
 		// check if index is in range
@@ -303,6 +318,27 @@ namespace xns {
 		return tuple._impl.template element<IDX, typename xns::tuple<A...>::template indexed<IDX>>::value;
 	}
 
+	/* get tuple element with type */
+	template <class T, class... A>
+	constexpr auto& get(tuple<A...>& tuple) {
+		// check if type is in tuple
+		static_assert(xns::is_one_of<T, A...>, "): TYPE NOT IN TUPLE! :(");
+		// get type index
+		constexpr auto index = xns::tuple<A...>::template _index_of<T>;
+		// return a reference to the tuple element
+		return tuple._impl.template element<index, typename xns::tuple<A...>::template indexed<index>>::value;
+	}
+
+	/* get constant tuple element with type */
+	template <class T, class... A>
+	constexpr const auto& get(const tuple<A...>& tuple) {
+		// check if type is in tuple
+		static_assert(xns::is_one_of<T, A...>, "): TYPE NOT IN TUPLE! :(");
+		// get type index
+		constexpr auto index = xns::tuple<A...>::template _index_of<T>;
+		// return a constant reference to the tuple element
+		return tuple._impl.template element<index, typename xns::tuple<A...>::template indexed<index>>::value;
+	}
 
 }
 

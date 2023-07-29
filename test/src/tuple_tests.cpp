@@ -13,6 +13,13 @@ bool UT::unit_tests<"tuple">(void) {
 	//_tuple.set<8>(2);
 
 
+	auto ret = xns::get<float>(_tuple);
+
+	std::cout << ret << std::endl;
+
+	return false;
+
+
 	auto& refff = xns::get<0>(_tuple);
 
 	std::cout << refff << std::endl;
