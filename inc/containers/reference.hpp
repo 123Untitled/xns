@@ -43,12 +43,10 @@ namespace xns {
 			reference(value_type&&) = delete;
 
 			/* copy constructor */
-			reference(const self& other) noexcept
-			: _ref{other._ref} {}
+			reference(const self&) noexcept = default;
 
 			/* move constructor */
-			reference(self&& other) noexcept
-			: reference{other} {}
+			reference(self&& other) noexcept = default;
 
 			/* destructor */
 			~reference(void) noexcept = default;
@@ -57,15 +55,10 @@ namespace xns {
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			self& operator=(const self& other) noexcept {
-				_ref = other._ref;
-				return *this;
-			}
+			self& operator=(const self&) noexcept = default;
 
 			/* move assignment operator */
-			self& operator=(self&& other) noexcept {
-				return operator=(other);
-			}
+			self& operator=(self&&) noexcept = default;
 
 
 			// -- public accessors --------------------------------------------
@@ -89,6 +82,35 @@ namespace xns {
 			value_type* _ref;
 
 	};
+
+
+	// -- ref function --------------------------------------------------------
+
+	/* create reference */
+	template <class T>
+	inline constexpr auto ref(T& ref) noexcept -> reference<T> {
+		return reference<T>{ref};
+	}
+
+	/* deleted rvalue ref */
+	template <class T>
+	auto ref(T&&) noexcept -> reference<T> = delete;
+
+
+
+	// -- cref function -------------------------------------------------------
+
+	/* create const reference */
+	template <class T>
+	inline constexpr auto cref(const T& ref) noexcept -> reference<const T> {
+		return reference<const T>{ref};
+	}
+
+	/* deleted rvalue cref */
+	template <class T>
+	auto cref(const T&&) noexcept -> reference<const T> = delete;
+
+
 
 };
 
