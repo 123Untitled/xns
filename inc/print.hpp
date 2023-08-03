@@ -155,6 +155,7 @@ namespace xns {
 
 
 
+	/*
 	template <class... A>
 	constexpr void print(const char* format, A... args) {
 		xns::size_t x = 0;
@@ -164,6 +165,7 @@ namespace xns {
 
 		}
 	}
+	*/
 
 }
 
