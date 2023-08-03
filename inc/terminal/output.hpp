@@ -96,7 +96,7 @@ namespace xns {
 				(void)(write(args), ...);
 			}*/
 
-			template <xns::is_integral T>
+			template <xns::is_integral T> requires (xns::is_char<T> == false)
 			static void write(const T& number) {
 
 				// convert number to string
@@ -134,6 +134,12 @@ namespace xns {
 
 	};
 
+
+	template <class... A>
+	void print(const A&... args) {
+		// write each argument
+		(out::write(args), ...);
+	}
 
 
 
