@@ -21,7 +21,12 @@ void start(void);
 
 int main(const int ac, const char** av, const char** env) {
 
-	UT::dispatcher<"tree">();
+	xns::print("hello world ", 23, xns::string{"it's me"}, ':', "Arthur", '\n');
+
+	xns::out::flush();
+	return 0;
+
+	UT::dispatcher<"reference">();
 	return 0;
 
 	UT::dispatcher<"tree">();
