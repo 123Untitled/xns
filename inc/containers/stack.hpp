@@ -370,44 +370,36 @@ namespace xns {
 
 		public:
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- lifecycle ---------------------------------------------------
 
 			/* default constructor */
 			node(void)
-			: _next(nullptr) {
-				// code here...
-			}
+			: _next{nullptr} {}
 
-			/* copy constructor */
-			//Node(Node& other)
-			node(const node& other) = delete;
-			/*Node(const Node& other)
-			: _value(other._value), _next(other._next) {
-				// code here...
-			}*/
+			/* non-copyable class */
+			NON_COPYABLE(node);
 
 			/* move constructor */
-			node(node&& other)
-			: _value(xns::move(other._value)), _next(xns::move(other._next)) {
-				// code here...
+			node(node&& other) noexcept
+			: _value{xns::move(other._value)}, _next{xns::move(other._next)} {
 			}
 
 			/* value copy constructor */
 			node(stack<T>::const_reference value)
-			: _value(value), _next(nullptr) {
+			: _value{value}, _next{nullptr} {
 				// code here...
 			}
 
 			/* value move constructor */
 			node(stack<T>::move_reference value) noexcept
-			: _value(xns::move(value)), _next(nullptr) {
+			: _value{xns::move(value)}, _next{nullptr} {
 				// code here...
 			}
 
 			/* value emplace constructor */
 			template <typename... A>
 			node(A&&... arguments)
-			: _value(xns::forward<A>(arguments)...), _next(nullptr) {
+			: _value{xns::forward<A>(arguments)...}, _next{nullptr} {
 				// code here...
 			}
 
@@ -417,10 +409,8 @@ namespace xns {
 				_next = nullptr;
 			}
 
-			node& operator=(const node& other) = delete;
 
-
-			// -- M E M B E R S -----------------------------------------------
+			// -- members -----------------------------------------------------
 
 			/* value */
 			stack<T>::value_type _value;
