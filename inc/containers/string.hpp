@@ -1851,6 +1851,10 @@ namespace xns {
 			constexpr basic_string_view(const_pointer str, const size_type size) noexcept
 			: _str{str}, _size{str ? size : 0} {}
 
+			/* string constructor */
+			constexpr basic_string_view(const xns::basic_string<char_t>& str) noexcept
+			: _str{str.data()}, _size{str.length()} {}
+
 			/* copy constructor */
 			constexpr basic_string_view(const self& other) noexcept
 			: _str{other._str}, _size{other._size} {}
