@@ -1,10 +1,8 @@
 #ifndef ESCAPE_HEADER
 #define ESCAPE_HEADER
 
-#include <unistd.h>
-#include <iostream>
 
-
+// local headers
 #include "types.hpp"
 #include "color.hpp"
 #include "output.hpp"
@@ -13,68 +11,41 @@
 #include "string.hpp"
 #include "numeric_limits.hpp"
 
-#include "type_traits.hpp"
+// operating system headers
+#include <unistd.h>
+
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
 
-	struct Esctype_def {
-
-		enum Type : xns::size_t {
-			/* move */
-			MOVE_HOME,
-			/* erase */
-			ERASE_SCREEN, ERASE_LINE, ERASE_TO_END, ERASE_FROM_START,
-			/* screen */
-			ENTER_SCREEN, EXIT_SCREEN, SAVE_SCREEN, RESTORE_SCREEN,
-			/* color */
-			RESET_STYLE,
-			/* cursor */
-			SHOW_CURSOR, HIDE_CURSOR, REQUEST_POSITION,
-			/* cursor style */
-			CURSOR_BEAM, CURSOR_UNDERLINE, CURSOR_BLOCK,
-			/* max */
-			ESCTYPE_MAX
-		};
-	};
-
-
-	/* safe enum class */
-	template <typename T>
-	class SafeEnum : public T {
-
-		private:
-			using Type = typename T::Type;
-			Type value;
-
-		public:
-			SafeEnum(const Type v) : value(v) { }
-			Type get(void) const { return value; }
-	};
-
-		enum Esctype : xns::size_t {
-			/* move */
-			MOVE_HOME,
-			/* erase */
-			ERASE_SCREEN, ERASE_LINE, ERASE_TO_END, ERASE_FROM_START,
-			/* screen */
-			ENTER_SCREEN, EXIT_SCREEN, SAVE_SCREEN, RESTORE_SCREEN,
-			/* color */
-			RESET_STYLE,
-			/* cursor */
-			SHOW_CURSOR, HIDE_CURSOR, REQUEST_POSITION,
-			/* cursor style */
-			CURSOR_BEAM, CURSOR_UNDERLINE, CURSOR_BLOCK,
-			/* max */
-			ESCTYPE_MAX
-		};
 
 	// -- E S C A P E  T Y P E ------------------------------------------------
 
-	//using Esctype = SafeEnum<Esctype_def>;
+	struct esctype_def {
+		// integral type
+		using type = xns::u8;
+		// enum type
+		enum enum_type : type {
+			/* move */
+			MOVE_HOME,
+			/* erase */
+			ERASE_SCREEN, ERASE_LINE, ERASE_TO_END, ERASE_FROM_START,
+			/* screen */
+			ENTER_SCREEN, EXIT_SCREEN, SAVE_SCREEN, RESTORE_SCREEN,
+			/* color */
+			RESET_STYLE,
+			/* cursor */
+			SHOW_CURSOR, HIDE_CURSOR, REQUEST_POSITION,
+			/* cursor style */
+			CURSOR_BEAM, CURSOR_UNDERLINE, CURSOR_BLOCK,
+			/* max */
+			MAX
+		};
+	};
 
+	using esctype = xns::safe_enum<esctype_def>;
 
 
 
@@ -90,11 +61,14 @@ namespace xns {
 			/* string type */
 			using string = xns::string;
 
+			/* string view type */
+			using view = xns::string_view;
+
 			/* character type */
 			using char_t = typename string::char_t;
 
 			/* array type */
-			using esc_array = xns::array<string, IDX(Esctype::ESCTYPE_MAX)>;
+			using esc_array = xns::array<view, esctype::size()>;
 
 			/* terminal size */
 			using term_size = xns::term_size;
@@ -102,67 +76,67 @@ namespace xns {
 
 		public:
 
-			// -- public constructors -----------------------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* non-instantiable class */
 			NON_INSTANCIABLE(escape);
 
 
 
-			// -- P U B L I C  S T A T I C  M E T H O D S ---------------------
+			// -- public static methods ---------------------------------------
 
 			/* move home */
-			static const string& move_home(void);
+			static const view& move_home(void);
 
 
 			/* erase screen */
-			static const string& erase_screen(void);
+			static const view& erase_screen(void);
 
 			/* erase line */
-			static const string& erase_line(void);
+			static const view& erase_line(void);
 
 			/* erase to end of line */
-			static const string& erase_to_end(void);
+			static const view& erase_to_end(void);
 
 			/* erase from start of line */
-			static const string& erase_from_start(void);
+			static const view& erase_from_start(void);
 
 
 			/* enter screen */
-			static const string& enter_screen(void);
+			static const view& enter_screen(void);
 
 			/* exit screen */
-			static const string& exit_screen(void);
+			static const view& exit_screen(void);
 
 			/* save screen */
-			static const string& save_screen(void);
+			static const view& save_screen(void);
 
 			/* restore screen */
-			static const string& restore_screen(void);
+			static const view& restore_screen(void);
 
 
 			/* reset style */
-			static const string& reset_style(void);
+			static const view& reset_style(void);
 
 
 			/* show cursor */
-			static const string& show_cursor(void);
+			static const view& show_cursor(void);
 
 			/* hide cursor */
-			static const string& hide_cursor(void);
+			static const view& hide_cursor(void);
 
 			/* request position */
-			static const string& request_position(void);
+			static const view& request_position(void);
 
 
 			/* cursor beam */
-			static const string& cursor_beam(void);
+			static const view& cursor_beam(void);
 
 			/* cursor underline */
-			static const string& cursor_underline(void);
+			static const view& cursor_underline(void);
 
 			/* cursor block */
-			static const string& cursor_block(void);
+			static const view& cursor_block(void);
 
 
 
@@ -211,7 +185,47 @@ namespace xns {
 			// -- private static members --------------------------------------
 
 			/* escape sequences */
-			static const esc_array _escapes;
+			static constexpr esc_array _escapes {
+
+				/* move home */
+				"\x1b[H",
+
+				/* erase screen */
+				"\x1b[2J",
+				/* erase line */
+				"\x1b[2K",
+				/* erase to end of line */
+				"\x1b[0K",
+				/* erase from start of line */
+				"\x1b[1K",
+
+				/* enter screen */
+				"\x1b[?1049h",
+				/* exit screen */
+				"\x1b[?1049l",
+				/* save screen */
+				"\x1b[?47h",
+				/* restore screen */
+				"\x1b[?47l",
+
+				/* reset style */
+				"\x1b[0m",
+
+				/* show cursor */
+				"\x1b[?25h",
+				/* hide cursor */
+				"\x1b[?25l",
+				/* request position */
+				"\x1b[6n",
+
+				/* cursor beam */
+				"\x1b[5 q",
+				/* cursor underline */
+				"\x1b[3 q",
+				/* cursor block */
+				"\x1b[1 q"
+
+			};
 
 	};
 

@@ -1,155 +1,106 @@
 #include "escape.hpp"
 
-#define ESC "\x1b"
-
-
-// WARNING NEED TO SET CONSTEXPR V
-
-const xns::escape::esc_array xns::escape::_escapes = {
-
-	/* move home */
-	ESC"[H",
-
-	/* erase screen */
-	ESC"[2J",
-	/* erase line */
-	ESC"[2K",
-	/* erase to end of line */
-	ESC"[0K",
-	/* erase from start of line */
-	ESC"[1K",
-
-	/* enter screen */
-	ESC"[?1049h",
-	/* exit screen */
-	ESC"[?1049l",
-	/* save screen */
-	ESC"[?47h",
-	/* restore screen */
-	ESC"[?47l",
-
-	/* reset style */
-	ESC"[0m",
-
-	/* show cursor */
-	ESC"[?25h",
-	/* hide cursor */
-	ESC"[?25l",
-	/* request position */
-	ESC"[6n",
-
-	/* cursor beam */
-	ESC"[5 q",
-	/* cursor underline */
-	ESC"[3 q",
-	/* cursor block */
-	ESC"[1 q"
-};
-
-#undef ESC
-
-
 
 /* move home */
-const xns::escape::string& xns::escape::move_home(void) {
+const xns::escape::view& xns::escape::move_home(void) {
 	// return escape sequence
-	return _escapes[Esctype::MOVE_HOME];
+	return _escapes[esctype::MOVE_HOME];
 }
 
 
 
 /* erase screen */
-const xns::escape::string& xns::escape::erase_screen(void) {
+const xns::escape::view& xns::escape::erase_screen(void) {
 	// return escape sequence
-	return _escapes[Esctype::ERASE_SCREEN];
+	return _escapes[esctype::ERASE_SCREEN];
 }
 
 /* erase line */
-const xns::escape::string& xns::escape::erase_line(void) {
+const xns::escape::view& xns::escape::erase_line(void) {
 	// return escape sequence
-	return _escapes[Esctype::ERASE_LINE];
+	return _escapes[esctype::ERASE_LINE];
 }
 
 /* erase to end of line */
-const xns::escape::string& xns::escape::erase_to_end(void) {
+const xns::escape::view& xns::escape::erase_to_end(void) {
 	// return escape sequence
-	return _escapes[Esctype::ERASE_TO_END];
+	return _escapes[esctype::ERASE_TO_END];
 }
 
 /* erase from start of line */
-const xns::escape::string& xns::escape::erase_from_start(void) {
+const xns::escape::view& xns::escape::erase_from_start(void) {
 	// return escape sequence
-	return _escapes[Esctype::ERASE_FROM_START];
+	return _escapes[esctype::ERASE_FROM_START];
 }
 
 
 /* enter screen */
-const xns::escape::string& xns::escape::enter_screen(void) {
+const xns::escape::view& xns::escape::enter_screen(void) {
 	// return escape sequence
-	return _escapes[Esctype::ENTER_SCREEN];
+	return _escapes[esctype::ENTER_SCREEN];
 }
 
 /* exit screen */
-const xns::escape::string& xns::escape::exit_screen(void) {
+const xns::escape::view& xns::escape::exit_screen(void) {
 	// return escape sequence
-	return _escapes[Esctype::EXIT_SCREEN];
+	return _escapes[esctype::EXIT_SCREEN];
 }
 
 /* save screen */
-const xns::escape::string& xns::escape::save_screen(void) {
+const xns::escape::view& xns::escape::save_screen(void) {
 	// return escape sequence
-	return _escapes[Esctype::SAVE_SCREEN];
+	return _escapes[esctype::SAVE_SCREEN];
 }
 
 /* restore screen */
-const xns::escape::string& xns::escape::restore_screen(void) {
+const xns::escape::view& xns::escape::restore_screen(void) {
 	// return escape sequence
-	return _escapes[Esctype::RESTORE_SCREEN];
+	return _escapes[esctype::RESTORE_SCREEN];
 }
 
 
 /* reset style */
-const xns::escape::string& xns::escape::reset_style(void) {
+const xns::escape::view& xns::escape::reset_style(void) {
 	// return escape sequence
-	return _escapes[Esctype::RESET_STYLE];
+	return _escapes[esctype::RESET_STYLE];
 }
 
 
 /* show cursor */
-const xns::escape::string& xns::escape::show_cursor(void) {
+const xns::escape::view& xns::escape::show_cursor(void) {
 	// return escape sequence
-	return _escapes[Esctype::SHOW_CURSOR];
+	return _escapes[esctype::SHOW_CURSOR];
 }
 
 /* hide cursor */
-const xns::escape::string& xns::escape::hide_cursor(void) {
+const xns::escape::view& xns::escape::hide_cursor(void) {
 	// return escape sequence
-	return _escapes[Esctype::HIDE_CURSOR];
+	return _escapes[esctype::HIDE_CURSOR];
 }
 
 /* request position */
-const xns::escape::string& xns::escape::request_position(void) {
+const xns::escape::view& xns::escape::request_position(void) {
 	// return escape sequence
-	return _escapes[Esctype::REQUEST_POSITION];
+	return _escapes[esctype::REQUEST_POSITION];
 }
 
 
 /* cursor beam */
-const xns::escape::string& xns::escape::cursor_beam(void) {
+const xns::escape::view& xns::escape::cursor_beam(void) {
 	// return escape sequence
-	return _escapes[Esctype::CURSOR_BEAM];
+	return _escapes[esctype::CURSOR_BEAM];
 }
 
 /* cursor underline */
-const xns::escape::string& xns::escape::cursor_underline(void) {
+const xns::escape::view& xns::escape::cursor_underline(void) {
 	// return escape sequence
-	return _escapes[Esctype::CURSOR_UNDERLINE];
+	return _escapes[esctype::CURSOR_UNDERLINE];
 }
 
 /* cursor block */
-const xns::escape::string& xns::escape::cursor_block(void) {
+const xns::escape::view& xns::escape::cursor_block(void) {
 	// return escape sequence
-	return _escapes[Esctype::CURSOR_BLOCK];
+	return _escapes[esctype::CURSOR_BLOCK];
 }
 
 
@@ -181,11 +132,6 @@ xns::escape::string xns::escape::move_down(const term_size cells) {
 
 
 
-
-
-
-
-
 #define BUFFER_SIZE_POS			32
 #define ZERO_ASCII				48
 #define BASE					10
@@ -203,9 +149,9 @@ bool xns::escape::request_position(term_size& x, term_size& y) {
 	constexpr xns::ubyte base = 10;
 	constexpr xns::ubyte zero = 48;
 
-	const string& esc = _escapes[IDX(Esctype::REQUEST_POSITION)];
+	const view& esc = _escapes[esctype::REQUEST_POSITION];
 
-	write(STDOUT_FILENO, esc.pointer(), esc.size());
+	::write(STDOUT_FILENO, esc.data(), esc.size());
 	x = y = 0;
 	// iterate while input available
 	while (0 < read(STDIN_FILENO, &c, 1) && c != 'R') {
