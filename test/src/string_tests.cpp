@@ -1,5 +1,6 @@
 #include "unit_tests.hpp"
 #include "string.hpp"
+#include "output.hpp"
 
 
 
@@ -152,8 +153,60 @@ static void reserve_test(void) {
 //	////str.append(str2, str2, str2);
 //
 
+static void subview(void) {
+	xns::string s{"hello world!"};
+	auto v = s.subview(6, 5);
+
+	xns::print(v, " ", v.size(), '\n');
+	xns::out::flush();
+}
+
+
 template <>
 bool UT::unit_tests<"string">(void) {
+
+	{
+		xns::string s{"\x1b[31mhello world!\x1b[32m I'm a string\x1b[34m with colors\x1b[0m"};
+		xns::print(s, '\n');
+		xns::out::flush();
+
+		xns::formated_string_iterator it{s, 5};
+
+		while (it) {
+
+			auto view = *it;
+
+			xns::print(view.size(), " `", view, "`\n");
+			xns::out::flush();
+
+			++it;
+		}
+
+	}
+	return true;
+
+	{
+		xns::string s{"hello world! I'm a string with colors"};
+		xns::print(s, '\n');
+		xns::out::flush();
+
+		xns::formated_string_iterator it{s, 3};
+
+		while (it) {
+
+			auto view = *it;
+
+			xns::print(view.size(), " `", view, "`\n");
+			xns::out::flush();
+
+			++it;
+		}
+
+	}
+
+	return true;
+
+
 
 	//append_string_test<char>();
 	reserve_test<char>();
