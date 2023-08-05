@@ -12,6 +12,8 @@
 #include "move.hpp"
 #include "is_char.hpp"
 
+#include "list.hpp"
+#include "tuple.hpp"
 #include "allocator.hpp"
 #include "vector.hpp"
 #include "array.hpp"
@@ -503,6 +505,22 @@ namespace xns {
 			// INFO: in reserve(), does user need to know that nullchar is not included in available space?
 			// answer: no, user should not know that nullchar is not included in available space
 
+
+			/* get subview */
+			basic_string_view<char_t> subview(const size_type index, const size_type size) const noexcept {
+
+				// check if index is out of bounds
+				if (_str != nullptr && index < _size) {
+
+					return index + size < _size
+							// return subview
+							? basic_string_view<char_t>{_str + index, size}
+							// return subview
+							: basic_string_view<char_t>{_str + index, _size - index};
+				}
+				// return subview
+				return {};
+			}
 
 
 			// -- M O D I F I E R S -------------------------------------------
@@ -2121,7 +2139,141 @@ namespace xns {
 	basic_string_view(const T*) -> basic_string_view<T>;
 
 
-};
+
+	// -- F O R M A T E D  S T R I N G  I T E R A T O R -----------------------
+
+	/* formatted string iterator */
+	template <xns::is_char T>
+	class formated_string_iterator {
+
+		public:
+
+
+			// -- public types ------------------------------------------------
+
+			/* const pointer type */
+			using const_pointer = const T*;
+
+			/* size type */
+			using size_type = typename basic_string<T>::size_type;
+
+
+			// -- public lifecycle --------------------------------------------
+
+			/* deleted default constructor */
+			formated_string_iterator(void) = delete;
+
+			/* constructor */
+			template <xns::is_string S>
+			constexpr formated_string_iterator(const S& string, const xns::size_t sline) noexcept
+			: _min{string.data()}, _max{string.data() + string.size()}, _size{sline}, _view{} {
+				++(*this);
+			}
+
+			/* destructor */
+			~formated_string_iterator(void) noexcept = default;
+
+
+			// -- public boolean operators ------------------------------------
+
+			/* boolean operator */
+			constexpr operator bool(void) const noexcept {
+				return _view.empty() == false;
+				// return validity
+				return _min < _max;
+			}
+
+			/* not operator */
+			constexpr bool operator!(void) const noexcept {
+				// return invalidity
+				return _min >= _max;
+			}
+
+
+			// -- public accessors --------------------------------------------
+
+			/* dereference operator */
+			constexpr basic_string_view<T> operator*(void) const noexcept {
+				return _view;
+			}
+
+
+
+			// -- public increment operators ----------------------------------
+
+			/* prefix increment operator */
+			constexpr formated_string_iterator& operator++(void) noexcept {
+
+				size_type x = 0;
+				const_pointer pos = _min;
+
+				// loop over string
+				while ((pos < _max) && (x < _size)) {
+
+					// check for escape character
+					if (*pos == 27) {
+						// skip escape sequence
+						while (pos < _max && *pos != 'm') {
+							++pos;
+						}
+						(pos < _max) && ++pos;
+						continue;
+					}
+					// count characters
+					while (pos < _max && *pos != 27 && x < _size) {
+						++x; ++pos;
+					}
+				}
+
+				// skip trailing escape sequence
+				while (pos < _max && *pos == 27) {
+					while (pos < _max && *pos != 'm') {
+						++pos;
+					}
+					(pos < _max) && ++pos;
+				}
+
+				size_type len = static_cast<size_type>(pos - _min);
+
+				_view = basic_string_view<T>{_min, len};
+
+				_min = pos;
+
+
+				return *this;
+			}
+
+
+
+
+
+		private:
+
+
+			/* range min */
+			const_pointer _min;
+
+			/* range max */
+			const_pointer _max;
+
+			/* line size */
+			xns::size_t _size;
+
+			/* view */
+			basic_string_view<T> _view;
+
+
+
+
+
+	}; // formated_string_iterator
+
+	// deduction guide
+	template <xns::is_string S>
+	formated_string_iterator(const S&, const xns::size_t) -> formated_string_iterator<typename S::char_t>;
+
+
+} // namespace xns
 
 
 
