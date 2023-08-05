@@ -1,9 +1,9 @@
 #include "unit_tests.hpp"
-#include "poly_method.hpp"
+#include "callable.hpp"
 
 /* unit test */
 template <>
-bool UT::unit_tests<"poly_method">(void) {
+bool UT::unit_tests<"callable">(void) {
 	// code here...
 	return false;
 }

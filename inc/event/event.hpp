@@ -14,7 +14,7 @@
 #include "unique_ptr.hpp"
 #include "stack.hpp"
 #include "debug.hpp"
-#include "poly_method.hpp"
+#include "callable.hpp"
 
 
 
@@ -193,10 +193,10 @@ namespace xns {
 			// -- P R I V A T E  A L I A S E S --------------------------------
 
 			/* input vector type */
-			using input_vector = xns::vector<xns::poly_method<void(const xns::string&)>>;
+			using input_vector = xns::vector<xns::callable<void(const xns::string&)>>;
 
 			/* event vector type */
-			using event_vector = xns::vector<xns::poly_method<void(void)>>;
+			using event_vector = xns::vector<xns::callable<void(void)>>;
 
 			/* event array type */
 			using event_array = xns::array<event_vector, IDX(evntype::EVNT_MAX)>;
