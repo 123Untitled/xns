@@ -35,7 +35,6 @@ xns::event xns::event::_instance;
 /* add mode */
 xns::evntmode xns::event::new_mode(void) {
 	_modes.emplace_back(mode{ });
-	xns::debug::print("new mode: %d\n", _modes.size() - 1);
 	if (_modes.empty()) {
 		// error
 		evntmode mode{0};
@@ -138,7 +137,6 @@ void xns::event::unstack_mode(void) {
 	//_next.make(*_stack.top());
 
 
-	xns::debug::print("unstack mode: %d\n", _stack.top());
 	/////////////
 	_stack.pop();
 	// maybe better to pop and set new top mode ???
@@ -230,7 +228,6 @@ xns::evntmode::evntmode(const xns::size_t idx)
 xns::evntmode::~evntmode(void) {
 	// check if mode is active
 	if (_state) {
-		xns::debug::write("EVNTMODE: destructor called\n");
 		// remove mode from event manager
 		xns::event::instance().remove_mode(*this);
 	}
