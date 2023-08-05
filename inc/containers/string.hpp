@@ -2151,6 +2151,9 @@ namespace xns {
 
 			// -- public types ------------------------------------------------
 
+			/* self type */
+			using self = formated_string_iterator<T>;
+
 			/* const pointer type */
 			using const_pointer = const T*;
 
@@ -2165,9 +2168,11 @@ namespace xns {
 
 			/* constructor */
 			template <xns::is_string S>
-			constexpr formated_string_iterator(const S& string, const xns::size_t sline) noexcept
-			: _min{string.data()}, _max{string.data() + string.size()}, _size{sline}, _view{} {
-				++(*this);
+			constexpr formated_string_iterator(const S& string, const xns::size_t size) noexcept
+			: _min{string.data()},
+			  _max{string.data() + string.size()},
+			  _view{} {
+				*this += size;
 			}
 
 			/* destructor */
@@ -2202,13 +2207,21 @@ namespace xns {
 			// -- public increment operators ----------------------------------
 
 			/* prefix increment operator */
-			constexpr formated_string_iterator& operator++(void) noexcept {
+			constexpr self& operator++(void) noexcept {
+
+				*this += 1;
+
+				return *this;
+			}
+
+
+			constexpr self operator+=(const size_type size) noexcept {
 
 				size_type x = 0;
 				const_pointer pos = _min;
 
 				// loop over string
-				while ((pos < _max) && (x < _size)) {
+				while ((pos < _max) && (x < size)) {
 
 					// check for escape character
 					if (*pos == 27) {
@@ -2220,7 +2233,7 @@ namespace xns {
 						continue;
 					}
 					// count characters
-					while (pos < _max && *pos != 27 && x < _size) {
+					while (pos < _max && *pos != 27 && x < size) {
 						++x; ++pos;
 					}
 				}
@@ -2242,6 +2255,7 @@ namespace xns {
 
 				return *this;
 			}
+
 
 
 
