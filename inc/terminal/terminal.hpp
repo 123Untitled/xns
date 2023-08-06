@@ -17,6 +17,7 @@
 #include "types.hpp"
 #include "macro.hpp"
 #include "event.hpp"
+#include "is_unsigned.hpp"
 
 #include "declval.hpp"
 
@@ -38,9 +39,6 @@ namespace xns {
 		public:
 
 			// -- public types ------------------------------------------------
-
-			/* window size type */
-			using Wsize = unsigned short;
 
 			/* terminal size type */
 			using term_size = decltype(xns::declval<struct winsize>().ws_row);
@@ -72,7 +70,18 @@ namespace xns {
 
 
 			/* get terminal size */
-			static void get_terminal_size(Wsize& width, Wsize& height);
+			template <class T>
+			static void get_terminal_size(T& width, T& height) {
+
+				// require unsigned integral type
+				// supporting at least term_size bits
+				static_assert(xns::is_unsigned_integral<T>
+						&& sizeof(T) >= sizeof(term_size),
+						"): TERMINAL SIZE TYPE MUST BE UNSIGNED INTEGRAL TYPE :(");
+
+				width = _instance._width;
+				height = _instance._height;
+			}
 
 
 			/* check tty and control terminal */
@@ -86,11 +95,7 @@ namespace xns {
 
 			// -- A L I A S E S -----------------------------------------------
 
-			/* window size structure type */
-			using Winsize = struct winsize;
 
-			/* terminal settings type */
-			using Termios = struct termios;
 
 
 
@@ -103,7 +108,7 @@ namespace xns {
 			// -- M E T H O D S -----------------------------------------------
 
 			/* get terminal settings */
-			const Termios setup_terminal(void);
+			const struct termios setup_terminal(void);
 
 			/* setup raw terminal */
 			void setup_raw(void);
@@ -133,16 +138,16 @@ namespace xns {
 			bool _is_setup;
 
 			// original terminal settings
-			const Termios _origin;
+			const struct termios _origin;
 
 			// raw terminal settings
-			Termios _raw;
+			struct termios _raw;
 
 			/* terminal width */
-			Wsize _width;
+			term_size _width;
 
 			/* terminal height */
-			Wsize _height;
+			term_size _height;
 
 
 

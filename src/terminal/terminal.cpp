@@ -63,10 +63,10 @@ xns::terminal& xns::terminal::instance(void) {
 }
 
 /* get terminal settings */
-const xns::terminal::Termios xns::terminal::setup_terminal(void) {
+const struct termios xns::terminal::setup_terminal(void) {
 
 	// termios structure
-	Termios origin;
+	struct termios origin;
 
 	// get current terminal settings
 	if (!tcgetattr(STDIN_FILENO, &origin)) {
@@ -133,17 +133,12 @@ void xns::terminal::restore_terminal(void) {
 }
 
 
-void xns::terminal::get_terminal_size(Wsize& width, Wsize& height) {
-	// assign reference parameters
-	width  = _instance._width;
-	height = _instance._height;
-}
 
 /* query terminal size */
 int xns::terminal::query_terminal_size(void) {
 
 	// winsize structure
-	Winsize win;
+	struct winsize win;
 
 	// query terminal dimensions
 	int err = ioctl(STDOUT_FILENO, TIOCGWINSZ, &win);
