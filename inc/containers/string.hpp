@@ -2411,6 +2411,76 @@ namespace xns {
 	};
 
 
+	// -- sub-formated string -------------------------------------------------
+
+	/* sub-formated string */
+	template <class T>
+	auto sub_fmt_string(const T& string, const xns::size_t size) noexcept -> basic_string<typename T::char_t> {
+
+		using const_pointer = typename T::const_pointer;
+		using size_type = typename T::size_type;
+
+		size_type x = 0;
+		const_pointer ptr = string.data();
+		const_pointer end = string.data() + string.size();
+		const_pointer esc = nullptr;
+		size_type m = 0;
+
+		// loop over string
+		while ((ptr < end) && (x < size)) {
+
+			// check for escape character
+			if (*ptr == 27) {
+				m = 0;
+				esc = ptr;
+				// skip escape sequence
+				while (ptr < end && *ptr != 'm') {
+					++ptr; ++m;
+				}
+				++m;
+				(ptr < end) && ++ptr;
+
+				continue;
+			}
+			// count characters
+			while (ptr < end && *ptr != 27 && x < size) {
+				++x; ++ptr;
+			}
+		}
+
+		basic_string<typename T::char_t> result;
+
+		x = 0;
+		if (esc) {
+			result.append(basic_string_view<typename T::char_t>{esc, m});
+
+			/*
+			for (size_type i = 0; i < result.size(); ++i) {
+
+				char c = result[i];
+
+				if (c == 27) {
+					std::cout << "e";
+				}
+				else {
+					std::cout << c;
+				}
+
+			}
+			std::cout << std::endl;
+			*/
+		}
+
+
+		result.append(basic_string_view<typename T::char_t>{ptr,
+				(size_type)(end - ptr)});
+
+		return result;
+	}
+
+
+
+
 
 
 
