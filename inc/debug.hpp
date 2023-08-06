@@ -1,16 +1,24 @@
 #ifndef DEBUG_HEADER
 #define DEBUG_HEADER
 
+// local headers
+#include "type_traits.hpp"
+#include "types.hpp"
+#include "macro.hpp"
+#include "unique_fd.hpp"
+
+// c++ standard headers
 #include <iostream>
+
+// operating system headers
 #include <fcntl.h>
 #include <unistd.h>
+
+
 #include <cstdio>
 #include <cstring>
 
 
-#include "type_traits.hpp"
-#include "types.hpp"
-#include "macro.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -24,29 +32,34 @@ namespace xns {
 
 		public:
 
-			// -- public constructors -----------------------------------------
+			// -- private lifecycle -------------------------------------------
 
-			/* non-instantiable class */
-			NON_INSTANCIABLE(debug);
+			/* deleted default constructor */
+			debug(void) = delete;
+
+			/* non-assignable class */
+			NON_ASSIGNABLE(debug);
+
+			/* destructor */
+			~debug(void) = default;
 
 
-			static int _tty;
+			static xns::unique_fd _tty;
 
-			static int initialize(const char* = nullptr);
+			static xns::unique_fd initialize(void) noexcept;
 
-			static void write(const void*, xns::size_t = 0);
 
 			template <typename... A>
 			static void print(const char* msg, A&&... args) {
 				// exit if no message or tty not open
 				if (!msg)     { return; }
-				if (_tty < 0) { return; }
+				if (_tty.valid() == false) { return; }
 
 				// avoid format-security warning
 				#pragma clang diagnostic push
 				#pragma clang diagnostic ignored "-Wformat-security"
 				// call fd printf with packed arguments
-				dprintf(_tty, msg, xns::forward<A>(args)...);
+				dprintf(_tty.get(), msg, xns::forward<A>(args)...);
 				#pragma clang diagnostic pop
 			}
 
