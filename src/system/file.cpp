@@ -25,7 +25,7 @@ void xns::file::open(void) {
 	if (!S_ISREG(_data.st_mode)) { return; }
 
 	// check error while opening file
-	_fd = xns::unique_fd::make_fd(::open(_path.pointer(), O_RDONLY));
+	_fd = xns::unique_fd{_path, O_RDONLY};
 
 	if (!_fd) { return; }
 
