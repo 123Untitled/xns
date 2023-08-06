@@ -30,8 +30,9 @@
 namespace xns {
 
 
-	// forward declarations
-	template <xns::is_char T>
+	// -- forward declarations ------------------------------------------------
+
+	template <xns::is_char>
 	class basic_string_view;
 
 	/* c-string ascii type */
@@ -50,8 +51,9 @@ namespace xns {
 	using u32string_view = basic_string_view<char32_t>;
 
 
-	// forward declarations
-	template <xns::is_char T>
+	// -- forward declarations ------------------------------------------------
+
+	template <xns::is_char>
 	class basic_string;
 
 	/* c-string ascii type */
@@ -75,7 +77,7 @@ namespace xns {
 	/* is string concept */
 	template <class T>
 	concept is_string = xns::is_same<T, xns::basic_string<typename T::char_t>>
-			|| xns::is_same<T, xns::basic_string_view<typename T::char_t>>;
+				|| xns::is_same<T, xns::basic_string_view<typename T::char_t>>;
 
 
 	// -- S T R I N G  C L A S S ----------------------------------------------
@@ -127,7 +129,7 @@ namespace xns {
 
 		private:
 
-			// -- M E M B E R S -----------------------------------------------
+			// -- private members ---------------------------------------------
 
 			/* pointer */
 			mutable_pointer _str;
@@ -141,7 +143,7 @@ namespace xns {
 
 		public:
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
 			basic_string(void)
@@ -152,7 +154,6 @@ namespace xns {
 			/* capacity constructor */
 			explicit basic_string(const size_type capacity)
 			: basic_string{} {
-				std::cout << "capacity constructor" << std::endl;
 				// exit if capacity is zero
 				if (!capacity) { return; }
 				// allocate memory
@@ -230,7 +231,6 @@ namespace xns {
 			/* copy constructor */
 			basic_string(const self& other)
 			: basic_string{other._str, other._size} {
-				//std::cout << "copy constructor" << std::endl;
 				// code here...
 			}
 
@@ -238,7 +238,6 @@ namespace xns {
 			/* move constructor */
 			basic_string(self&& other) noexcept
 			: _str{other._str}, _capacity{other._capacity}, _size{other._size} {
-				//std::cout << "move constructor" << std::endl;
 				// invalidate other
 				other._initialize_members();
 			}
@@ -2285,6 +2284,128 @@ namespace xns {
 	// deduction guide
 	template <xns::is_string S>
 	formated_string_iterator(const S&, const xns::size_t) -> formated_string_iterator<typename S::char_t>;
+
+
+
+	// -- F O R M A T E D  S T R I N G ----------------------------------------
+
+	// -- forward declarations ------------------------------------------------
+
+	template <xns::is_char T>
+	class basic_fmt_string;
+
+	/* c-string ascii type */
+	using fmt_string = basic_fmt_string<char>;
+
+	/* wide string type */
+	using wfmt_string = basic_fmt_string<wchar_t>;
+
+	/* utf-8 string type */
+	using u8fmt_string = basic_fmt_string<char8_t>;
+
+	/* utf-16 string type */
+	using u16fmt_string = basic_fmt_string<char16_t>;
+
+	/* utf-32 string type */
+	using u32fmt_string = basic_fmt_string<char32_t>;
+
+
+	// -- basic_fmt_string ----------------------------------------------------
+
+	/* formatted string */
+	template <xns::is_char T>
+	class basic_fmt_string {
+
+		public:
+
+			// -- public types ------------------------------------------------
+
+			/* self type */
+			using self = basic_fmt_string<T>;
+
+
+
+			// -- public lifecycle --------------------------------------------
+
+			/* default constructor */
+			constexpr basic_fmt_string(void) noexcept = default;
+
+			/* string copy constructor */
+			constexpr basic_fmt_string(const basic_string<T>& string) noexcept
+			: _string{string},
+			  _size{vlength(string)} {
+			}
+
+			/* string move constructor */
+			constexpr basic_fmt_string(basic_string<T>&& string) noexcept
+			: _string{xns::move(string)},
+			  _size{vlength(_string)} {
+			}
+
+			template <class... A>
+			constexpr basic_fmt_string(A&&... args) noexcept
+			: _string{xns::forward<A>(args)...},
+			  _size{vlength(_string)} {
+			}
+
+			/* destructor */
+			~basic_fmt_string(void) noexcept = default;
+
+
+			// -- public accessors --------------------------------------------
+
+			/* string size */
+			constexpr xns::size_t vsize(void) const noexcept {
+				return _size;
+			}
+
+			/* string object */
+			constexpr xns::basic_string<T>& string(void) noexcept {
+				return _string;
+			}
+
+			/* const string object */
+			constexpr const xns::basic_string<T>& string(void) const noexcept {
+				return _string;
+			}
+
+
+		private:
+
+			// -- private methods ---------------------------------------------
+
+			/* compute length */
+			static constexpr typename basic_string<T>::size_type vlength(const basic_string<T>& string) noexcept {
+
+				typename basic_string<T>::size_type x = 0;
+
+				bool escape = false;
+
+				// loop over string
+				for (typename basic_string<T>::size_type i = 0; i < string.size(); ++i) {
+
+					escape == false
+					? string[i] == 27   ? escape = true : ++x
+					: string[i] == 'm' && (escape = false);
+				}
+
+				return x;
+			}
+
+			// -- private members ---------------------------------------------
+
+			/* string */
+			basic_string<T> _string;
+
+			/* visual length */
+			xns::size_t _size;
+
+	};
+
+
+
+
+
 
 
 } // namespace xns
