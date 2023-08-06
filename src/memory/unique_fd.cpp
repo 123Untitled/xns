@@ -1,15 +1,16 @@
 #include "unique_fd.hpp"
 
-// -- C O N S T R U C T O R S ----------------------------------------------
+// -- U N I Q U E  F D  C L A S S ---------------------------------------------
+
+
+// -- public lifecycle --------------------------------------------------------
 
 /* default constructor */
-xns::unique_fd::unique_fd(void)
-: _fd{NULLFD} {
-	// code here...
-}
+xns::unique_fd::unique_fd(void) noexcept
+: _fd{NULLFD} {}
 
 /* file descriptor constructor */
-xns::unique_fd::unique_fd(const fd fd)
+xns::unique_fd::unique_fd(const fd_type fd) noexcept
 : _fd{fd} {
 
 	// check if fd is not null
@@ -32,62 +33,68 @@ xns::unique_fd::unique_fd(const fd fd)
 /* move constructor */
 xns::unique_fd::unique_fd(unique_fd&& other) noexcept
 : _fd{other._fd} {
-	// set other to null
+	// invalidate other file descriptor
 	other._fd = NULLFD;
 }
 
 /* destructor */
-xns::unique_fd::~unique_fd(void) {
-	// check if fd is not null
+xns::unique_fd::~unique_fd(void) noexcept {
+	// check file descriptor
 	if (_fd != NULLFD) {
 		// close file descriptor
-		std::cout << "CLOSING FD" << std::endl;
-		close(_fd);
+		::close(_fd);
 	}
 }
 
 
-// -- O P E R A T O R S -------------------------------------------
+// -- public assignment operators ---------------------------------------------
 
+/* move assignment operator */
 xns::unique_fd& xns::unique_fd::operator=(unique_fd&& other) noexcept {
-
 	// check for self assignment
 	if (this != &other) {
-
 		// close file descriptor
 		if (_fd != NULLFD) { close(_fd); }
-
 		// set fd
 		_fd = other._fd;
-
-		// set other to null
+		// invalidate other file descriptor
 		other._fd = NULLFD;
-
-	}
-
-	// return self reference
+	} // return self reference
 	return *this;
 }
 
-/* bool operator */
+
+// -- public boolean operators ------------------------------------------------
+
+/* boolean operator */
 xns::unique_fd::operator bool(void) const {
 	return _fd != NULLFD;
 }
 
-/* bool not operator */
+/* not operator */
 bool xns::unique_fd::operator!(void) const {
 	return _fd == NULLFD;
 }
 
 
-// -- M E T H O D S -----------------------------------------------
+// -- public accessors --------------------------------------------------------
+
+/* valid */
+bool xns::unique_fd::valid(void) const noexcept {
+	return _fd != NULLFD;
+}
 
 /* get file descriptor */
-xns::unique_fd::fd xns::unique_fd::get(void) const {
+xns::unique_fd::fd_type xns::unique_fd::get(void) const noexcept {
 	return _fd;
 }
 
-/* duplicate */
+
+
+// -- M E T H O D S -----------------------------------------------
+
+/* duplicate */ // deprecated
+[[deprecated("not well implemented")]]
 xns::unique_fd xns::unique_fd::duplicate(void) const {
 	// check if fd is not null
 	if (_fd != NULLFD) {
@@ -99,6 +106,7 @@ xns::unique_fd xns::unique_fd::duplicate(void) const {
 }
 
 /* duplicate 2 */
+[[deprecated("not well implemented")]]
 void xns::unique_fd::duplicate(unique_fd& other) const {
 	// check if fd is not null
 	if (_fd != NULLFD) {
@@ -106,11 +114,6 @@ void xns::unique_fd::duplicate(unique_fd& other) const {
 		dup2(_fd, other._fd);
 	}
 
-}
-
-/* make fd */
-xns::unique_fd xns::unique_fd::make_fd(const fd fd) {
-	return xns::unique_fd{fd};
 }
 
 

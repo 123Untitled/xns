@@ -1,13 +1,18 @@
 #ifndef UNIQUE_HPP
 #define UNIQUE_HPP
 
+// local headers
 #include "types.hpp"
 #include "allocator.hpp"
+#include "macro.hpp"
+#include "string.hpp"
 
+// operating system headers
 #include <fcntl.h>
 #include <unistd.h>
-#include <iostream>
 
+// c++ standard headers
+#include <iostream>
 #include <type_traits>
 
 
@@ -20,75 +25,89 @@ namespace xns {
 
 	class unique_fd final {
 
+
 		public:
 
-			// -- T Y P E S ---------------------------------------------------
+			// -- public types ------------------------------------------------
 
 			/* file descriptor type */
-			using fd = pid_t;
+			using fd_type = int;
+
+			/* self type */
+			using self = unique_fd;
 
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			unique_fd(void);
+			unique_fd(void) noexcept;
 
 			/* file descriptor constructor */
-			unique_fd(const fd fd);
+			explicit unique_fd(const fd_type fd) noexcept;
 
-			/* deleted copy constructor */
-			unique_fd(const unique_fd&) = delete;
+			/* variadic constructor */
+			template <xns::is_string S, class... A>
+			explicit unique_fd(const S& path, A&&... args) noexcept
+			: _fd{::open(path.data(), args...)} {
+			}
+
+			/* non-copyable class */
+			NON_COPYABLE(unique_fd);
 
 			/* move constructor */
-			unique_fd(unique_fd&& other) noexcept;
+			unique_fd(self&& other) noexcept;
 
 			/* destructor */
-			~unique_fd(void);
+			~unique_fd(void) noexcept;
 
 
-			// -- O P E R A T O R S -------------------------------------------
-
-			/* deleted copy assignment operator */
-			unique_fd& operator=(const unique_fd&) = delete;
+			// -- public assignment operators ---------------------------------
 
 			/* move assignment operator */
-			unique_fd& operator=(unique_fd&& other) noexcept;
+			self& operator=(unique_fd&& other) noexcept;
 
-			/* bool operator */
+
+			// -- public boolean operators ------------------------------------
+
+			/* boolean operator */
 			explicit operator bool(void) const;
 
-			/* bool not operator */
+			/* not operator */
 			bool operator!(void) const;
+
+
+			// -- public accessors --------------------------------------------
+
+			/* valid */
+			bool valid(void) const noexcept;
+
+			/* get file descriptor */
+			fd_type get(void) const noexcept;
 
 
 			// -- M E T H O D S -----------------------------------------------
 
-			/* get file descriptor */
-			fd get(void) const;
 
 			/* duplicate */
 			unique_fd duplicate(void) const;
 
 			/* duplicate 2 */
-			void duplicate(unique_fd& other) const;
+			void duplicate(self& other) const;
 
-
-			/* make fd */
-			static unique_fd make_fd(const fd);
 
 
 		private:
 
-			// -- E N U M S --------------------------------------------------
+			// -- private enums -----------------------------------------------
 
 			/* invalid file descriptor */
-			enum : int  { NULLFD = -1 };
+			enum : xns::s8  { NULLFD = -1 };
 
 
-			// -- M E M B E R S -----------------------------------------------
+			// -- private members ---------------------------------------------
 
 			/* file descriptor */
-			fd _fd;
+			fd_type _fd;
 
 	};
 
