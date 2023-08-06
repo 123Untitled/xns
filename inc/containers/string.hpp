@@ -2370,6 +2370,14 @@ namespace xns {
 			}
 
 
+			// -- public modifiers --------------------------------------------
+
+			/* compute length */
+			constexpr void compute_length(void) noexcept {
+				_size = vlength(_string);
+			}
+
+
 		private:
 
 			// -- private methods ---------------------------------------------
