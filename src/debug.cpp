@@ -2,9 +2,10 @@
 
 int xns::debug::initialize(const char* tty) {
 
+	/*
 	if (!tty) { tty = "/dev/ttys001"; }
 
-	int tmp = open(tty, O_WRONLY);
+	int tmp = ::open(tty, O_WRONLY);
 
 	if (tmp < 0) { return -1; }
 
@@ -13,6 +14,8 @@ int xns::debug::initialize(const char* tty) {
 	print("\n\n\x1b[32mLOG START\x1b[0m\n\n");
 
 	return tmp;
+	*/
+	return -1;
 }
 
 void xns::debug::write(const void* data, xns::size_t size) {
