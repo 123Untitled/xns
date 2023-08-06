@@ -71,7 +71,7 @@ namespace xns {
 			using esc_array = xns::array<view, esctype::size()>;
 
 			/* terminal size */
-			using term_size = xns::term_size;
+			using size_type = xns::size_t;
 
 
 		public:
@@ -143,32 +143,32 @@ namespace xns {
 			// -- S P E C I A L  E S C A P E  S E Q U E N C E S ---------------
 
 			/* request position */
-			static bool request_position(term_size&, term_size&);
+			static bool request_position(size_type&, size_type&);
 
 
 			/* move position */
-			static xns::string move_position(term_size, term_size);
+			static xns::string move_position(size_type, size_type);
 
 			/* move x position */
-			static const string& move_x(term_size);
+			static const string& move_x(size_type);
 
 			/* move left */
-			static string move_left(const term_size = 1);
+			static string move_left(const size_type = 1);
 
 			/* move right */
-			static string move_right(const term_size = 1);
+			static string move_right(const size_type = 1);
 
 			/* move up */
-			static string move_up(const term_size = 1);
+			static string move_up(const size_type = 1);
 
 			/* move down */
-			static string move_down(const term_size = 1);
+			static string move_down(const size_type = 1);
 
 
 		private:
 
 			/* move direction */
-			static string _move_direction(term_size, const char_t);
+			static string _move_direction(size_type, const char_t);
 
 
 		public:

@@ -106,25 +106,25 @@ const xns::escape::view& xns::escape::cursor_block(void) {
 
 
 /* move left */
-xns::escape::string xns::escape::move_left(const term_size cells) {
+xns::escape::string xns::escape::move_left(const size_type cells) {
 	// return escape sequence
 	return _move_direction(cells, 'D');
 }
 
 /* move right */
-xns::escape::string xns::escape::move_right(const term_size cells) {
+xns::escape::string xns::escape::move_right(const size_type cells) {
 	// return escape sequence
 	return _move_direction(cells, 'C');
 }
 
 /* move up */
-xns::escape::string xns::escape::move_up(const term_size cells) {
+xns::escape::string xns::escape::move_up(const size_type cells) {
 	// return escape sequence
 	return _move_direction(cells, 'A');
 }
 
 /* move down */
-xns::escape::string xns::escape::move_down(const term_size cells) {
+xns::escape::string xns::escape::move_down(const size_type cells) {
 	// return escape sequence
 	return _move_direction(cells, 'B');
 }
@@ -140,9 +140,9 @@ xns::escape::string xns::escape::move_down(const term_size cells) {
 #define BACKGROUND				false
 
 
-bool xns::escape::request_position(term_size& x, term_size& y) {
+bool xns::escape::request_position(size_type& x, size_type& y) {
 
-	term_size* num     = &y;
+	size_type* num     = &y;
 	bool       bracket = false;
 	xns::ubyte     c       = 0;
 
@@ -190,13 +190,13 @@ bool xns::escape::request_position(term_size& x, term_size& y) {
 
 
 /* get move position */
-xns::escape::string xns::escape::move_position(term_size x, term_size y) {
+xns::escape::string xns::escape::move_position(size_type x, size_type y) {
 	// ESC[{line};{column}H
 
 	char_t  escape[ESCAPE_BUFFER_SIZE];
 	xns::size_t ite;
 
-	constexpr const xns::size_t max = xns::limits::max<xns::term_size>();
+	constexpr const xns::size_t max = xns::limits::max<size_type>();
 
 	x += (x != max);
 	y += (y != max);
@@ -227,7 +227,7 @@ xns::escape::string xns::escape::move_position(term_size x, term_size y) {
 
 
 /* move direction */
-xns::escape::string xns::escape::_move_direction(term_size cells, const char_t dir) {
+xns::escape::string xns::escape::_move_direction(size_type cells, const char_t dir) {
 	// static returned string
 	//static Xf::CString escape;
 	// compile time buffer size
@@ -261,7 +261,7 @@ xns::escape::string xns::escape::_move_direction(term_size cells, const char_t d
 
 
 /* move x position */
-const xns::escape::string& xns::escape::move_x(term_size x) {
+const xns::escape::string& xns::escape::move_x(size_type x) {
 
 	// static returned string
 	static string escape;
