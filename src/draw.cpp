@@ -1,6 +1,7 @@
 #include "draw.hpp"
 
 void xns::draw::clear_line(const xns::u32 posX, const xns::u32 posY, const xns::u32 size) {
+	/*
 	xns::ubyte	*clear = new xns::ubyte[size];
 	xns::u32 i = 0;
 	while (i < size) {
@@ -10,6 +11,7 @@ void xns::draw::clear_line(const xns::u32 posX, const xns::u32 posY, const xns::
 	//Escape::move_position(posX, posY);
 	write(STDOUT_FILENO, clear, size);
 	delete[] clear;
+	*/
 }
 
 
@@ -29,6 +31,7 @@ void xns::draw::draw_string(const xns::u32 x, const xns::u32 y, const xns::strin
 
 /* vertivalDraw */
 void xns::draw::vertival_draw(const xns::u32 x, xns::u32 y, const void* ptr, const xns::u32 size, xns::u32 line) {
+	/*
 	(void)y;
 	while (line) {
 		//Escape::move_position(x, y);
@@ -36,6 +39,7 @@ void xns::draw::vertival_draw(const xns::u32 x, xns::u32 y, const void* ptr, con
 		--line;
 		++y;
 	}
+	*/
 }
 
 void xns::draw::draw_integer(xns::u32 number) {
