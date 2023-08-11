@@ -16,7 +16,7 @@ namespace xns {
 	template <class T, class... A>
 	consteval xns::size_t index_of(void) {
 
-		static_assert(xns::is_one_of<T, A...>, "TYPE NOT IN PACK");
+		static_assert(xns::is_one_of<T, A...>, "): INDEX_OF: TYPE NOT IN PACK :(");
 
 		xns::size_t idx = 0;
 		bool found = false;
