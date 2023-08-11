@@ -748,11 +748,11 @@ namespace xns {
 
 			/* post-increment operator */
 			self operator++(int) noexcept {
-				// get current node
+				// copy self
 				self tmp{*this};
 				// increment node
 				_node = _node->_next;
-				// return current node
+				// return copy
 				return tmp;
 			}
 
@@ -769,11 +769,11 @@ namespace xns {
 
 			/* post-decrement operator */
 			self operator--(int) noexcept {
-				// get current node
+				// copy self
 				self tmp{*this};
 				// decrement node
 				_node = _node->_prev;
-				// return current node
+				// return copy
 				return tmp;
 			}
 
@@ -796,13 +796,13 @@ namespace xns {
 
 			/* null equality operator */
 			bool operator==(std::nullptr_t) const noexcept {
-				// return node null equality
+				// return pointer invalidity
 				return _node == nullptr;
 			}
 
 			/* null inequality operator */
 			bool operator!=(std::nullptr_t) const noexcept {
-				// return node null inequality
+				// return pointer validity
 				return _node != nullptr;
 			}
 
