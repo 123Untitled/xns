@@ -2,7 +2,8 @@
 #define METHOD_HEADER
 
 #include "types.hpp"
-#include "type_traits.hpp"
+#include "forward.hpp"
+#include "move.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
