@@ -1,23 +1,14 @@
 #ifndef VECTOR_HEADER
 #define VECTOR_HEADER
 
-#include <iostream>
+// local headers
 #include "types.hpp"
 #include "allocator.hpp"
 #include "array.hpp"
-#include "policy.hpp"
+#include "is_comparable.hpp"
 
-
-
-// -- I S  C O M P A R A B L E ------------------------------------------------
-
-template <class T, class U>
-concept is_comparable = requires(T t, U u) {
-	{ t == u }; { t != u };
-	{ t <= u }; { t >= u };
-	{ t < u };  { t > u };
-};
-
+// c++ standard library headers
+#include <iostream>
 
 
 
@@ -27,30 +18,30 @@ namespace xns {
 
 	// -- V E C T O R  C L A S S ----------------------------------------------
 
-	template <class T, xns::restrict R = xns::assignable_t>
+	template <class T>
 	class vector final {
 
-		ASSERT_RESTRICT(R);
+
+		private:
+
+			// -- forward declarations ----------------------------------------
+
+			/* iterator */
+			template <bool>
+			class vector_iterator;
+
 
 		public:
 
-			// -- F R I E N D S -----------------------------------------------
-
-			/* make vector as friend */
-			template <class U, class S, class... A>
-			friend vector<U, S> make_vector(A&&... args);
 
 
-			// -- A L I A S E S -----------------------------------------------
+			// -- public types ------------------------------------------------
+
+			/* self type */
+			using self = vector<T>;
 
 			/* value type */
 			using value_type = T;
-
-			/* restrict type */
-			using restrict = R;
-
-			/* self type */
-			using self = vector<value_type, restrict>;
 
 			/* size type */
 			using size_type = xns::size_t;
@@ -73,21 +64,38 @@ namespace xns {
 			/* allocator type */
 			using allocator = xns::allocator<value_type>;
 
+			/* iterator type */
+			using iterator = vector_iterator<false>;
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			/* const iterator type */
+			using const_iterator = vector_iterator<true>;
+
+
+			// -- friends -----------------------------------------------------
+
+			/* make vector as friend */
+			template <class U, class... A>
+			friend auto make_vector(A&&...) -> vector<U>;
+
+			/* make copy as friend */
+			template <class U>
+			friend auto make_copy(const U&) -> U;
+
+
+			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
 			vector(void)
 			// initializations
-			: _vector{nullptr}, _capacity{0}, _size{0} { }
+			: _vector{nullptr}, _capacity{0}, _size{0} {}
 
 
+		private:
 
 			/* copy constructor */
-			vector(const self& other)
+			explicit vector(const self& other)
 			// initializations
 			: vector{} {
-				ASSERT_COPYABLE(R);
 				// reserve other size
 				reserve(other._size);
 				// loop through other vector
@@ -98,11 +106,13 @@ namespace xns {
 				_size = other._size;
 			}
 
+
+		public:
+
 			/* move constructor */
 			vector(self&& other) noexcept
 			// initializations
 			: _vector{other._vector}, _capacity{other._capacity}, _size{other._size} {
-				ASSERT_MOVEABLE(R);
 
 				// invalidate other vector
 				other.initialize_members();
@@ -120,21 +130,44 @@ namespace xns {
 			}
 
 
-			// -- D E B U G ---------------------------------------------------
+			// -- public iterators --------------------------------------------
 
-			void print(void) const {
-				std::cout << "\nsize: " << _size << std::endl;
-				std::cout << "capacity: " << _capacity << std::endl;
-				/*for (Size x = 0; x < _size; ++x) {
-					std::cout << _vector[x] << std::endl;
-				}*/
+			/* begin */
+			auto begin(void) noexcept -> iterator {
+				return iterator{_vector};
 			}
 
-			// -- O P E R A T O R S -------------------------------------------
+			/* const begin */
+			auto begin(void) const noexcept -> const_iterator {
+				return const_iterator{_vector};
+			}
+
+			/* end */
+			auto end(void) noexcept -> iterator {
+				return iterator{_vector + _size};
+			}
+
+			/* const end */
+			auto end(void) const noexcept -> const_iterator {
+				return const_iterator{_vector + _size};
+			}
+
+
+			// -- D E B U G ---------------------------------------------------
+
+			auto print(void) const -> void {
+				std::cout << "\nsize: " << _size << std::endl;
+				std::cout << "capacity: " << _capacity << std::endl;
+				for (const auto& x : *this) {
+					std::cout << x << " ";
+				}
+			}
+
+
+			// -- public assignment operators ---------------------------------
 
 			/* copy operator */
-			vector& operator=(const self& other) {
-				ASSERT_COPYABLE(R);
+			auto operator=(const self& other) -> self& {
 				// check for self-assignment
 				if (this != &other) {
 					// clear vector
@@ -154,8 +187,7 @@ namespace xns {
 			}
 
 			/* move operator */
-			vector& operator=(self&& other) noexcept {
-				ASSERT_MOVEABLE(R);
+			auto operator=(self&& other) noexcept -> self& {
 				// check for self-assignment
 				if (this != &other) {
 					// clear vector
@@ -174,97 +206,99 @@ namespace xns {
 			}
 
 			/* subscript operator */
-			reference operator[](const size_type index) {
+			auto operator[](const size_type index) -> reference {
 				// return reference
 				return _vector[index];
 			}
 
 			/* const subscript operator */
-			const_reference operator[](const size_type index) const {
+			auto operator[](const size_type index) const -> const_reference {
 				// return reference
 				return _vector[index];
 			}
 
 			/* at */
-			reference at(const size_type index) {
+			auto at(const size_type index) -> reference {
 				// return reference
 				return _vector[index];
 			}
 
 			/* const at */
-			const_reference at(const size_type index) const {
+			auto at(const size_type index) const -> const_reference {
 				// return reference
 				return _vector[index];
 			}
 
 
-			// -- E L E M E N T  A C C E S S ----------------------------------
-
-			/* front */
-			reference front(void) {
-				// return reference
-				return *_vector;
-			}
-
-			/* const front */
-			const_reference front(void) const {
-				// return reference
-				return *_vector;
-			}
-
-			/* back */
-			reference back(void) {
-				// return reference
-				return *(_vector + (_size - 1));
-			}
-
-			/* const back */
-			const_reference back(void) const {
-				// return reference
-				return *(_vector + (_size - 1));
-			}
-
-			/* data */
-			pointer data(void) {
-				// return pointer
-				return _vector;
-			}
-
-			/* const data */
-			const_pointer data(void) const {
-				// return pointer
-				return _vector;
-			}
-
-
-			// -- C A P A C I T Y ---------------------------------------------
+			// -- public accessors --------------------------------------------
 
 			/* empty */
-			bool empty(void) const {
+			auto empty(void) const -> bool {
 				// return result
 				return _size == 0;
 			}
 
 			/* size */
-			size_type size(void) const {
+			auto size(void) const -> size_type {
 				// return size
 				return _size;
 			}
 
 			/* capacity */
-			size_type capacity(void) const {
+			auto capacity(void) const -> size_type {
 				// return capacity
 				return _capacity;
 			}
 
 			/* max size */
-			size_type max_size(void) const {
+			auto max_size(void) const -> size_type {
 				// return max size
 				return allocator::max_size();
 			}
 
+			/* front */
+			auto front(void) -> reference {
+				// return reference
+				return *_vector;
+			}
+
+			/* const front */
+			auto front(void) const -> const_reference {
+				// return reference
+				return *_vector;
+			}
+
+			/* back */
+			auto back(void) -> reference {
+				// return reference
+				return *(_vector + (_size - 1));
+			}
+
+			/* const back */
+			auto back(void) const -> const_reference {
+				// return reference
+				return *(_vector + (_size - 1));
+			}
+
+			/* data */
+			auto data(void) -> pointer {
+				// return pointer
+				return _vector;
+			}
+
+			/* const data */
+			auto data(void) const -> const_pointer {
+				// return pointer
+				return _vector;
+			}
+
+
+
+
+			// -- public memory management ------------------------------------
+
 			/* reserve */
-			void reserve(const size_type capacity) {
+			auto reserve(const size_type capacity) -> void {
 				// check capacity
 				if (capacity > _capacity) {
 					// allocate memory
@@ -285,19 +319,12 @@ namespace xns {
 				}
 			}
 
-			// -- iteration ---------------------------------------------------
-
-			/* start */
-			size_type start(void) const {
-				// return start
-				return 0;
-			}
 
 
-			// -- M O D I F I E R S -------------------------------------------
+			// -- public modifiers --------------------------------------------
 
 			/* clear */
-			void clear(void) {
+			auto clear(void) -> void {
 				// loop through vector
 				for (size_type x = 0; x < _size; ++x) {
 					// destroy object
@@ -308,7 +335,7 @@ namespace xns {
 
 			/* emplace */
 			template <typename... Args>
-			void emplace(size_type pos, Args&&... args) {
+			auto emplace(size_type pos, Args&&... args) -> void {
 				// check position
 				if (pos > _size) { return; }
 				// check capacity
@@ -327,7 +354,7 @@ namespace xns {
 
 			/* emplace back */
 			template <class... A>
-			void emplace_back(A&&... args) {
+			auto emplace_back(A&&... args) -> void {
 				// check capacity
 				if (!available()) {
 					// double capacity
@@ -339,7 +366,7 @@ namespace xns {
 			}
 
 			/* push back */
-			void push_back(void) {
+			auto push_back(void) -> void {
 				// check capacity
 				if (!available()) {
 					// double capacity
@@ -351,7 +378,7 @@ namespace xns {
 			}
 
 			/* copy push back */
-			void copy_back(const value_type& value) {
+			auto copy_back(const value_type& value) -> void {
 				// check capacity
 				if (!available()) {
 					// double capacity
@@ -363,7 +390,7 @@ namespace xns {
 			}
 
 			/* move back */ // INFO: this is preferred over move push back
-			void move_back(value_type&& value) {
+			auto move_back(value_type&& value) -> void {
 				// check capacity
 				if (!available()) {
 					// double capacity
@@ -375,7 +402,7 @@ namespace xns {
 			}
 
 			/* pop back */
-			void pop_back(void) {
+			auto pop_back(void) -> void {
 				// check size
 				if (!_size) { return; }
 				// destroy object
@@ -388,7 +415,7 @@ namespace xns {
 			// -- E R A S E ---------------------------------------------------
 
 			/* erase */
-			void erase(const size_type pos) {
+			auto erase(const size_type pos) -> void {
 				// check position
 				if (pos >= _size) { return; }
 				// move elements
@@ -401,12 +428,22 @@ namespace xns {
 				allocator::destroy(_vector + _size);
 			}
 
+			/* erase */
+			auto erase(const iterator& pos) -> void {
+				// check position
+				if (pos._ptr < _vector) { return; }
+				// compute position (pointers subtraction gives a signed type (ptrdiff_t))
+				size_type x = static_cast<size_type>(pos._ptr - _vector);
+				// call erase
+				erase(x);
+			}
+
 
 
 			/* filter */ //requires is_comparable<U, value>
 			/* remove all elements that match the given value */
 			template <class... A>
-			void filter(const A&... compare) {
+			auto filter(const A&... compare) -> void {
 				// z is the index of the next element to move
 				size_type z = 0;
 				// loop over vector
@@ -425,7 +462,7 @@ namespace xns {
 			}
 
 			/* move elements to the back of the vector if exists, else push back */
-			void to_back(const value_type& value) {
+			auto to_back(const value_type& value) -> void {
 				// loop over vector
 				for (size_type x = 0; x < _size; ++x) {
 					// check for match
@@ -446,16 +483,100 @@ namespace xns {
 				copy_back(value);
 			}
 
+			/* dichotomic search */
+			template <class U>
+			auto dichotomic_search(const U& value) -> iterator {
 
+				// check if U is comparable to value_type
+				static_assert(is_comparable<U, value_type>,
+					"): TYPE ARE NOT COMPARABLE IN DICHOTOMIC SEARCH :(");
+
+				// check size
+				if (!_size) { return end(); }
+
+				// initialize bounds
+				size_type lower = 0;
+				size_type upper = _size - 1;
+
+				// loop
+				while (lower <= upper) {
+					std::cout << "loop" << std::endl;
+					// compute middle
+					size_type middle = (lower + upper) / 2;
+
+					// check value is greater
+					if      (value > _vector[middle]) { lower = middle + 1; }
+					// check value is lower
+					else if (value < _vector[middle]) { upper = middle - 1; }
+					// else value is equal
+					else    { return iterator(_vector + middle);            }
+				} // not found
+				return end();
+
+			}
+
+			/* dichotomic insert */
+			auto dichotomic_insert(const_reference value) -> void {
+
+				// check if U is comparable to value_type
+				static_assert(is_comparable<value_type, value_type>,
+					"): TYPE ARE NOT COMPARABLE IN DICHOTOMIC INSERT :(");
+
+
+				// initialize bounds
+				size_type lower = 0;
+				size_type upper = _size - 1;
+
+
+				// check size
+				if (!_size) { return copy_back(value); }
+
+				// loop
+				while (lower <= upper) {
+					// compute middle
+					size_type middle = (lower + upper) / 2;
+					// check value is greater
+					if (value > _vector[middle]) { lower = middle + 1; }
+					// check value is lower
+					else if (value < _vector[middle]) {
+
+						if (middle == 0) { lower = 0; break; }
+						// update upper
+						upper = middle - 1;
+					}
+					// else value is already in the vector
+					else { return; }
+
+				} // insert
+
+				insert(lower, value);
+			}
+
+
+			/* insert */
+			auto insert(size_type pos, const_reference value) -> void {
+				// check position
+				if (pos > _size) { return; }
+				// check capacity
+				if (available() == 0) { reserve(grow()); }
+				// move elements
+				for (size_type x = _size; x > pos; --x) {
+					// move element
+					_vector[x] = xns::move(_vector[x - 1]);
+				} // increment size
+				++_size;
+				// copy value
+				_vector[pos] = value;
+			}
 
 
 
 		private:
 
-			// -- P R I V A T E  M E T H O D S --------------------------------
+			// -- private methods ---------------------------------------------
 
 			/* initialize members */
-			void initialize_members(void) {
+			auto initialize_members(void) -> void {
 				// initialize pointer
 				_vector = nullptr;
 				// initialize capacity
@@ -465,21 +586,19 @@ namespace xns {
 			}
 
 			/* available */
-			size_type available(void) const {
+			auto available(void) const -> size_type {
 				// return available memory
 				return _capacity - _size;
 			}
 
 			/* check capacity */
-			inline size_type grow(void) {
+			inline auto grow(void) const -> size_type {
 				return (_capacity * 2) + (_capacity == 0);
 			}
 
-			/* destroy */
-			//void destroy(
 
 
-			// -- P R I V A T E  M E M B E R S --------------------------------
+			// -- private members ---------------------------------------------
 
 			/* data */
 			pointer _vector;
@@ -495,16 +614,17 @@ namespace xns {
 	};
 
 
-	// -- F R I E N D  F U N C T I O N S --------------------------------------
+
+	// -- M A K E  V E C T O R ------------------------------------------------
 
 	/* make vector */
-	template <class T, class R = xns::assignable_t, class... A>
-	xns::vector<T, R> make_vector(A&&... args) {
+	template <class T, class... A>
+	xns::vector<T> make_vector(A&&... args) {
 
-		using allocator = typename xns::vector<T, R>::allocator;
+		using allocator = typename xns::vector<T>::allocator;
 
 		// create vector
-		xns::vector<T, R> vec;
+		xns::vector<T> vec;
 
 		// allocate memory
 		vec._vector = allocator::allocate(sizeof...(A));
@@ -512,7 +632,7 @@ namespace xns {
 		// check allocation success
 		if (vec._vector != nullptr) {
 
-			typename vector<T, R>::size_type x = 0;
+			typename vector<T>::size_type x = 0;
 
 			// fold expression to construct by forwarding
 			(allocator::construct(&vec._vector[x++], xns::forward<A>(args)), ...);
@@ -523,6 +643,233 @@ namespace xns {
 		}
 		return vec;
 	}
+
+
+	// -- V E C T O R  I T E R A T O R ----------------------------------------
+
+	template <class T> template <bool C>
+	class vector<T>::vector_iterator final {
+
+
+		// -- friends ---------------------------------------------------------
+
+		/* other iterator as friend */
+		template <bool D>
+		friend class vector_iterator;
+
+		/* vector as friend */
+		friend class vector<T>;
+
+
+		private:
+
+			// -- private constants -------------------------------------------
+
+			/* iterator is const */
+			static constexpr bool _const = C;
+
+
+		public:
+
+			// -- public types ------------------------------------------------
+
+			/* list type */
+			using vector_type = xns::vector<T>;
+
+			/* value type */
+			using value_type = typename vector_type::value_type;
+
+			/* self type */
+			using self = vector_type::vector_iterator<C>;
+
+
+
+			/* reference type */
+			using reference = typename xns::conditional<C, vector_type::const_reference,
+														   vector_type::reference>;
+
+			/* pointer type */
+			using pointer   = typename xns::conditional<C, vector_type::const_pointer,
+														   vector_type::pointer>;
+
+
+			// -- public lifecycle --------------------------------------------
+
+			/* default constructor */
+			inline vector_iterator(void) noexcept
+			: _ptr{nullptr} {}
+
+			/* pointer constructor */
+			inline vector_iterator(pointer ptr) noexcept
+			: _ptr{ptr} {}
+
+			/* copy constructor (non-const) */
+			inline vector_iterator(const vector_type::iterator& other) noexcept
+			: _ptr{other._ptr} {}
+
+			/* copy constructor (const) */
+			inline vector_iterator(const vector_type::const_iterator& other) noexcept
+			: _ptr{other._ptr} {
+				// assert invalid conversion
+				static_assert(_const, "): CANNOT CONVERT CONST TO NON-CONST LIST ITERATOR");
+			}
+
+			/* move constructor (non-const) */
+			inline vector_iterator(vector_type::iterator&& other) noexcept
+			: vector_iterator{other._ptr} {}
+
+			/* move constructor (const) */
+			inline vector_iterator(vector_type::const_iterator&& other) noexcept
+			: vector_iterator{other._ptr} {}
+
+			/* destructor */
+			inline ~vector_iterator(void) noexcept = default;
+
+
+			// -- public assignment operators ---------------------------------
+
+			/* copy assignment operator (non-const) */
+			inline self& operator=(const vector_type::iterator& other) noexcept {
+				// copy pointer
+				_ptr = other._ptr;
+				// return self reference
+				return *this;
+			}
+
+			/* copy assignment operator (const) */
+			inline self& operator=(const vector_type::const_iterator& other) noexcept {
+				// assert invalid conversion
+				static_assert(_const, "): CANNOT CONVERT CONST TO NON-CONST LIST ITERATOR");
+				// copy pointer
+				_ptr = other._ptr;
+				// return self reference
+				return *this;
+			}
+
+			/* move assignment operator */
+			inline self& operator=(vector_type::iterator&& other) noexcept {
+				// call copy assignment operator
+				return operator=(other);
+			}
+
+			/* move assignment operator (const) */
+			inline self& operator=(vector_type::const_iterator&& other) noexcept {
+				// call copy assignment operator
+				return operator=(other);
+			}
+
+
+			// -- public accessor operators -----------------------------------
+
+			/* dereference operator */
+			inline reference operator*(void) const noexcept {
+				// return value
+				return *_ptr;
+			}
+
+			/* arrow operator */
+			inline pointer operator->(void) const noexcept {
+				// return address
+				return _ptr;
+			}
+
+
+			// -- public increment operators ----------------------------------
+
+			/* pre-increment operator */
+			inline self& operator++(void) noexcept {
+				// increment pointer
+				++_ptr;
+				// return self reference
+				return *this;
+			}
+
+			/* post-increment operator */
+			inline self operator++(int) noexcept {
+				// copy self
+				self tmp{*this};
+				// increment pointer
+				++_ptr;
+				// return copy
+				return tmp;
+			}
+
+
+			// -- public decrement operators ----------------------------------
+
+			/* pre-decrement operator */
+			inline self& operator--(void) noexcept {
+				// decrement pointer
+				--_ptr;
+				// return self reference
+				return *this;
+			}
+
+			/* post-decrement operator */
+			inline self operator--(int) noexcept {
+				// copy self
+				self tmp{*this};
+				// decrement pointer
+				--_ptr;
+				// return copy
+				return tmp;
+			}
+
+
+			// -- public comparison operators ---------------------------------
+
+			/* equality operator */
+			template <bool D>
+			inline bool operator==(const vector_iterator<D>& other) const noexcept {
+				// return pointer equality
+				return _ptr == other._ptr;
+			}
+
+			/* inequality operator */
+			template <bool D>
+			inline bool operator!=(const vector_iterator<D>& other) const noexcept {
+				// return pointer inequality
+				return _ptr != other._ptr;
+			}
+
+			/* null equality operator */
+			inline bool operator==(std::nullptr_t) const noexcept {
+				// return pointer invalidity
+				return _ptr == nullptr;
+			}
+
+			/* null inequality operator */
+			inline bool operator!=(std::nullptr_t) const noexcept {
+				// return pointer validity
+				return _ptr != nullptr;
+			}
+
+
+			// -- public boolean operators ------------------------------------
+
+			/* boolean operator */
+			inline explicit operator bool(void) const noexcept {
+				// return pointer validity
+				return _ptr != nullptr;
+			}
+
+			/* not operator */
+			inline bool operator!(void) const noexcept {
+				// return pointer invalidity
+				return _ptr == nullptr;
+			}
+
+
+		private:
+
+			// -- private members ---------------------------------------------
+
+			/* pointer */
+			pointer _ptr;
+
+	};
+
+
 
 };
 
