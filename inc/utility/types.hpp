@@ -6,7 +6,7 @@
 // include for struct winsize
 #include <sys/ioctl.h>
 // include for declval
-#include <utility>
+#include "declval.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -16,7 +16,7 @@ namespace xns {
 	// -- T Y P E S -------------------------------------------------------------
 
 	/* terminal size type */
-	using term_size = decltype(std::declval<struct winsize>().ws_row);
+	using term_size = decltype(xns::declval<struct winsize>().ws_row);
 
 	/* null pointer type */
 	using null = decltype(nullptr);
