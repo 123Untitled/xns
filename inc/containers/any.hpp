@@ -1,7 +1,6 @@
 #ifndef ANY_HEADER
 #define ANY_HEADER
 
-#include "type_traits.hpp"
 #include "macro.hpp"
 #include "allocator.hpp"
 #include "unique_ptr.hpp"
@@ -21,6 +20,7 @@ namespace xns {
 			// -- B A S E  S T R U C T ----------------------------------------
 
 			struct base {
+
 
 				/* default constructor */
 				base(void) = default;
