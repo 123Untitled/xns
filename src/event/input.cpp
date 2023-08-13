@@ -6,18 +6,24 @@
 
 // -- static public methods ---------------------------------------------------
 
-/* read stdin */
-xns::in::string xns::in::read(void) {
+/* read descriptor */
+auto xns::in::read(const int descriptor) -> string {
 
-	in::string input{};
-	size_type size{0};
-	signed_type readed{0};
+	in::string  input  { };
+	signed_type readed {0};
+	size_type   size   {0};
 
 	do {
 		// resize input
 		input.resize(input.size() + BUFFER_SIZE);
 		// read stdin
-		readed = ::read(STDIN_FILENO, input.data() + size, BUFFER_SIZE);
+		readed = ::read(descriptor, input.data() + size, BUFFER_SIZE);
+
+		if (readed < 0) {
+			// error
+			break;
+		}
+
 		// update total size
 		size += static_cast<size_type>(readed);
 
@@ -30,5 +36,38 @@ xns::in::string xns::in::read(void) {
 
 	return input;
 }
+
+/* recv descriptor */
+auto xns::in::recv(const int descriptor) -> string {
+
+	in::string  input  { };
+	signed_type readed {0};
+	size_type   size   {0};
+
+	do {
+		// resize input
+		input.resize(input.size() + BUFFER_SIZE);
+		// read stdin
+		readed = ::recv(descriptor, input.data() + size, BUFFER_SIZE, 0);
+
+		if (readed < 0) {
+			// error
+			break;
+		}
+
+		// update total size
+		size += static_cast<size_type>(readed);
+
+	// loop over stdin
+	} while (readed == BUFFER_SIZE);
+
+	if (readed < 0) { /* error */ }
+
+	input.resize(size);
+
+	return input;
+}
+
+
 
 
