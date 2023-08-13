@@ -217,7 +217,7 @@ namespace xns {
 	namespace impl {
 
 
-		template <xns::string_literal lit>
+		template <xns::basic_string_literal lit>
 		class split {
 
 			/* character type */
