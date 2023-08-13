@@ -99,31 +99,31 @@ namespace xns {
 			}
 
 
-			// -- A C C E S S O R S -------------------------------------------
+			// -- public accessors --------------------------------------------
 
 			/* address */
-			static mutable_pointer address(reference value) {
+			static auto address(reference value) -> mutable_pointer {
 				// return address
 				return &value;
 			}
 
 			/* const address */
-			static const_pointer address(const_reference value) {
+			static auto address(const_reference value) -> const_pointer {
 				// return constant address
 				return &value;
 			}
 
 			/* max size */
-			inline static consteval size_type max_size(void) {
+			static inline consteval auto max_size(void) -> size_type {
 				// return max size
 				return xns::limits::max<size_type>() / sizeof(value_type);
 			}
 
 
-			// -- C O N S T R U C T -------------------------------------------
+			// -- public construct methods ------------------------------------
 
 			/* copy construct */
-			static void construct(mutable_pointer addrs, const_reference value) {
+			static inline auto construct(mutable_pointer addrs, const_reference value) -> void {
 
 				static_assert(xns::is_copy_constructible<value_type>,
 						"TYPE IS NOT COPY CONSTRUCTIBLE");
@@ -133,7 +133,7 @@ namespace xns {
 			}
 
 			/* move construct */
-			static void construct(mutable_pointer addrs, move_reference value) {
+			static inline auto construct(mutable_pointer addrs, move_reference value) -> void {
 
 				static_assert(xns::is_move_constructible<value_type>,
 						"TYPE IS NOT MOVE CONSTRUCTIBLE");
@@ -144,7 +144,7 @@ namespace xns {
 
 			/* forward construct */
 			template <class... A>
-			static void construct(mutable_pointer addrs, A&&... args) {
+			static inline auto construct(mutable_pointer addrs, A&&... args) -> void {
 
 				static_assert(xns::is_constructible<value_type, A...>,
 						"TYPE IS NOT CONSTRUCTIBLE");
@@ -154,17 +154,41 @@ namespace xns {
 			}
 
 
-			// -- D E S T R U C T ---------------------------------------------
+			// -- public destroy methods --------------------------------------
 
 			/* destroy */
-			static void destroy(mutable_pointer addrs) {
-
+			static inline auto destroy(mutable_pointer addrs) -> void {
+				// check type is trivially destructible
 				if constexpr (xns::is_trivially_destructible<value_type> == false) {
+					// check type is destructible
 					static_assert(xns::is_destructible<value_type>,
 							"TYPE IS NOT DESTRUCTIBLE");
 					// call object destructor
 					addrs->~value_type();
 				}
+			}
+
+
+			// -- public assign methods ---------------------------------------
+
+			/* copy assign */
+			static inline auto assign(reference dst, const_reference src) -> void {
+
+				static_assert(xns::is_copy_assignable<value_type>,
+						"TYPE IS NOT COPY ASSIGNABLE");
+
+				// assign object by copy
+				dst = src;
+			}
+
+			/* move assign */
+			static inline auto assign(reference dst, move_reference src) -> void {
+
+				static_assert(xns::is_move_assignable<value_type>,
+						"TYPE IS NOT MOVE ASSIGNABLE");
+
+				// assign object by move
+				dst = xns::move(src);
 			}
 
 	};
