@@ -13,6 +13,8 @@
 
 // operating system headers
 #include <unistd.h>
+#include <sys/socket.h>
+
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -51,8 +53,12 @@ namespace xns {
 
 			// -- static public methods ---------------------------------------
 
-			/* read stdin */
-			static string read(void);
+			/* read descriptor */
+			static auto read(const int = STDIN_FILENO) -> string;
+
+			/* recv descriptor */
+			static auto recv(const int = STDIN_FILENO) -> string;
+
 
 
 
