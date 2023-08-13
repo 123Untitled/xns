@@ -78,64 +78,54 @@ namespace xns {
 			struct impl<xns::index_seq<IDX...>> final : public element<IDX, A>... {
 
 
-				// -- A L I A S E S -------------------------------------------
+				// -- public types --------------------------------------------
 
 				/* self type */
 				using self = impl<xns::index_seq<IDX...>>;
 
 
-				// -- C O N S T R U C T O R S ---------------------------------
+				// -- public lifecycle ----------------------------------------
 
 				/* default constructor */
 				inline constexpr impl(void)
 				// fold expression to default-initialize tuple elements
-				: element<IDX, A>{ }... {
-					// code here...
-				}
+				: element<IDX, A>{}... {}
 
 				/* variadic constructor */
 				template <class... U>
 				inline constexpr impl(U&&... args) requires (sizeof...(U) > 1)
 				// fold expression to initialize tuple elements
-				: element<IDX, A>{xns::forward<U>(args)}... {
-					// code here...
-				}
+				: element<IDX, A>{xns::forward<U>(args)}... {}
 
 				/* copy constructor */
 				inline constexpr impl(const self& other)
 				// fold expression to copy-initialize tuple elements
-				: element<IDX, A>{other}... {
-					// code here...
-				}
+				: element<IDX, A>{other}... {}
 
 				/* move constructor */
 				inline constexpr impl(self&& other) noexcept
 				// fold expression to move-initialize tuple elements
-				: element<IDX, A>{xns::move(other)}... {
-					// code here...
-				}
+				: element<IDX, A>{xns::move(other)}... {}
 
 				/* destructor */
-				inline constexpr ~impl(void) noexcept {
-					// code here...
-				}
+				inline constexpr ~impl(void) noexcept = default;
 
 
-				// -- A S S I G N M E N T  O P E R A T O R S ------------------
+				// -- public assignment operators -----------------------------
 
 				/* copy assignment operator */
-				inline constexpr self& operator=(const self& other) {
+				inline constexpr auto operator=(const self& other) -> self& {
 					// INFO: check for self-assignment is not necessary (see below)
-					// because this check is already done in the Tuple::operator=()
+					// because this check is already done in the tuple::operator=()
 					((element<IDX, A>::operator=(other)), ...);
 					// return self-reference
 					return *this;
 				}
 
 				/* move assignment operator */
-				inline constexpr self& operator=(self&& other) noexcept {
+				inline constexpr auto operator=(self&& other) noexcept -> self& {
 					// INFO: check for self-assignment is not necessary (see below)
-					// because this check is already done in the Tuple::operator=()
+					// because this check is already done in the tuple::operator=()
 					((element<IDX, A>::operator=(xns::move(other))), ...);
 					// return self-reference
 					return *this;
@@ -145,7 +135,7 @@ namespace xns {
 
 
 
-			// -- P R I V A T E  A L I A S E S --------------------------------
+			// -- private types -----------------------------------------------
 
 			/* sequence type */
 			using sequence = xns::index_seq_for<A...>;
@@ -159,31 +149,28 @@ namespace xns {
 			static constexpr xns::size_t _index_of = xns::index_of<T, A...>();
 
 
-			// -- P R I V A T E  M E M B E R S --------------------------------
+			// -- private members ---------------------------------------------
 
+			/* implementation */
 			impl<sequence> _impl;
 
 
 		public:
 
+			// -- public lifecycle --------------------------------------------
+
 			/* default constructor */
-			constexpr tuple(void)
-			: _impl{} {
-				// code here...
-			}
+			inline constexpr tuple(void)
+			: _impl{} {}
 
 			/* variadic constructor */
 			template <class... U> requires (sizeof...(U) > 1)
-			constexpr tuple(U&&... args)
-			: _impl{xns::forward<U>(args)...} {
-				// code here...
-			}
+			inline constexpr tuple(U&&... args)
+			: _impl{xns::forward<U>(args)...} {}
 
 			/* copy constructor */
 			constexpr tuple(const self& tuple)
-			: _impl{tuple._impl} {
-				// code here...
-			}
+			: _impl{tuple._impl} {}
 
 			/* copy constructor static assert overload */
 			template <class... U>
@@ -198,16 +185,13 @@ namespace xns {
 
 			/* move constructor */
 			constexpr tuple(self&& tuple) noexcept
-			: _impl{xns::move(tuple._impl)} {
-				std::cout << "move constructor" << std::endl;
-				// code here...
-			}
+			: _impl{xns::move(tuple._impl)} {}
 
 
-			// -- P U B L I C  A S S I G N M E N T  O P E R A T O R S ---------
+			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			constexpr self& operator=(const self& other) {
+			constexpr auto operator=(const self& other) -> self& {
 				// check for self-assignment
 				if (this != &other) {
 					// copy data
@@ -217,7 +201,7 @@ namespace xns {
 			}
 
 			/* move assignment operator */
-			constexpr self& operator=(self&& other) noexcept {
+			constexpr auto operator=(self&& other) noexcept -> self& {
 				// check for self-assignment
 				if (this != &other) {
 					// move data
@@ -227,11 +211,11 @@ namespace xns {
 			}
 
 
-			// -- P U B L I C  A C C E S S O R S ------------------------------
+			// -- public accessors --------------------------------------------
 
 			/* get tuple element */
 			template <size_type IDX>
-			constexpr auto& get(void) {
+			constexpr auto get(void) -> auto& {
 				// check if index is in range
 				static_assert(IDX < num_elements, "): INDEX OUT OF RANGE! :(");
 				// return a reference to the tuple element
@@ -240,34 +224,21 @@ namespace xns {
 
 			/* get constant tuple element */
 			template <size_type IDX>
-			constexpr const auto& get(void) const {
+			constexpr auto get(void) const -> const auto& {
 				// check if index is in range
 				static_assert(IDX < num_elements, "): INDEX OUT OF RANGE! :(");
 				// return a constant reference to the tuple element
 				return _impl.element<IDX, indexed<IDX>>::value;
 			}
 
-			/* get tuple size */
-			constexpr size_type size(void) const {
-				// return the tuple size
-				return num_elements;
-			}
-
 
 			// -- setters -----------------------------------------------------
 
-			/* set tuple element by copy */
-			template <size_type IDX>
-			constexpr void set(const indexed<IDX>& value) {
-				// set tuple element
-				_impl.element<IDX, indexed<IDX>>::value = value;
-			}
-
-			/* set tuple element by move */
+			/* set tuple element */
 			template <size_type IDX>
 			constexpr void set(indexed<IDX>&& value) {
 				// set tuple element
-				_impl.element<IDX, indexed<IDX>>::value = xns::move(value);
+				_impl.element<IDX, indexed<IDX>>::value = xns::forward<indexed<IDX>>(value);
 			}
 
 
@@ -339,6 +310,45 @@ namespace xns {
 	//	// return a constant reference to the tuple element
 	//	return tuple._impl.template element<index, typename xns::tuple<A...>::template indexed<index>>::value;
 	//}
+
+	/* get tuple size */
+	/*template <class... U>
+	inline consteval auto tuple_size(const xns::tuple<U...>&) noexcept -> xns::tuple<U...>::size_type {
+		// return the tuple size
+		return sizeof...(U);
+	}*/
+
+
+	// -- I S  T U P L E ------------------------------------------------------
+
+	namespace impl {
+
+		template <typename T>
+		struct is_tuple : xns::no {};
+
+		template <typename... A>
+		struct is_tuple<xns::tuple<A...>> : xns::yes {};
+
+	}
+
+	/* is tuple concept */
+	template <typename T>
+	concept is_tuple = impl::is_tuple<xns::remove_cvrp<T>>::value;
+
+
+	namespace impl {
+
+		template <typename... A>
+		struct tuple_size;
+
+		template <typename... A>
+		struct tuple_size<xns::tuple<A...>>
+		: xns::integral_constant<xns::size_t, sizeof...(A)> {};
+
+	}
+
+	template <typename T>
+	inline constexpr auto tuple_size = impl::tuple_size<xns::remove_cvrp<T>>::value;
 
 }
 
