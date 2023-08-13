@@ -17,7 +17,7 @@ namespace UT {
 
 
 	/* print start message */
-	template <xns::string_literal test>
+	template <xns::basic_string_literal test>
 	void start_ut(void) {
 		std::cout << "\n\nSTARTING UNIT TEST: \x1b[33m" << test.data() << "\x1b[0m\n" << std::endl;
 	}
@@ -33,13 +33,13 @@ namespace UT {
 	}
 
 	/* print message */
-	template <xns::string_literal msg>
+	template <xns::basic_string_literal msg>
 	void print(void) {
 		std::cout << "\x1b[33m" << msg.data() << "\x1b[0m" << std::endl;
 	}
 
 	/* unit test template [specialized in .cpp files] */
-	template <xns::string_literal>
+	template <xns::basic_string_literal>
 	bool unit_tests(void);
 
 
@@ -47,7 +47,7 @@ namespace UT {
 
 	namespace impl {
 
-		template <xns::string_literal test, xns::string_literal... rest>
+		template <xns::basic_string_literal test, xns::basic_string_literal... rest>
 		bool dispatcher(void) {
 			// start ut
 			start_ut<test>();
@@ -63,7 +63,7 @@ namespace UT {
 
 
 	/* unit test dispatcher */
-	template <xns::string_literal... LT>
+	template <xns::basic_string_literal... LT>
 	bool dispatcher(void) {
 		// check if there are unit tests
 		static_assert(sizeof...(LT) > 0, "): NO UNIT TESTS TO RUN :(");
