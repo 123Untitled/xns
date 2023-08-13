@@ -2,10 +2,9 @@
 #define DEBUG_HEADER
 
 // local headers
-#include "type_traits.hpp"
 #include "types.hpp"
 #include "macro.hpp"
-#include "unique_fd.hpp"
+#include "unique_descriptor.hpp"
 
 // c++ standard headers
 #include <iostream>
@@ -25,6 +24,7 @@
 
 namespace xns {
 
+	// command: echo $(tty) | nc -U ./xns_debug.sock
 
 	// -- D E B U G -----------------------------------------------------------
 
@@ -44,23 +44,23 @@ namespace xns {
 			~debug(void) = default;
 
 
-			static xns::unique_fd _tty;
+			//static xns::unique_fd _tty;
 
-			static xns::unique_fd initialize(void) noexcept;
+			//static xns::unique_fd initialize(void) noexcept;
 
 
 			template <typename... A>
 			static void print(const char* msg, A&&... args) {
 				// exit if no message or tty not open
-				if (!msg)     { return; }
-				if (_tty.valid() == false) { return; }
+				//if (!msg)     { return; }
+				//if (_tty.valid() == false) { return; }
 
-				// avoid format-security warning
-				#pragma clang diagnostic push
-				#pragma clang diagnostic ignored "-Wformat-security"
-				// call fd printf with packed arguments
-				dprintf(_tty.get(), msg, xns::forward<A>(args)...);
-				#pragma clang diagnostic pop
+				//// avoid format-security warning
+				//#pragma clang diagnostic push
+				//#pragma clang diagnostic ignored "-Wformat-security"
+				//// call fd printf with packed arguments
+				//dprintf(_tty.get(), msg, xns::forward<A>(args)...);
+				//#pragma clang diagnostic pop
 			}
 
 
