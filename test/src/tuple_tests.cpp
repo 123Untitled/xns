@@ -13,9 +13,9 @@ bool UT::unit_tests<"tuple">(void) {
 	//_tuple.set<8>(2);
 
 
-	auto ret = xns::get<float>(_tuple);
+	//auto ret = xns::get<float>(_tuple);
 
-	std::cout << ret << std::endl;
+	//std::cout << ret << std::endl;
 
 	return false;
 
