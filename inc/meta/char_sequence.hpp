@@ -97,7 +97,7 @@ namespace xns {
 	namespace impl {
 
 
-		template <xns::is_char T, xns::size_t B, xns::size_t E, xns::string_literal lit>
+		template <xns::is_char T, xns::size_t B, xns::size_t E, xns::basic_string_literal lit>
 		class make_character_seq {
 
 
@@ -137,13 +137,13 @@ namespace xns {
 
 				/* specialization for I == E, end of recursion */
 				template <size_t I, char_t... SEQ> requires (I == E)
-				struct impl<I, SEQ...> {
+				struct impl<I, SEQ...> final {
 					using type = character_seq<char_t, SEQ...>;
 				};
 
 				/* specialization for I < E, continue recursion */
 				template <size_t I, char_t... SEQ> requires (I < E)
-				struct impl<I, SEQ...> {
+				struct impl<I, SEQ...> final {
 					using type = typename impl<I + 1, SEQ..., lit._data[I]>::type;
 				};
 
@@ -167,32 +167,32 @@ namespace xns {
 
 
 	/* make character sequence */
-	template <xns::is_char T, xns::string_literal lit>
+	template <xns::is_char T, xns::basic_string_literal lit>
 	using make_character_seq = typename impl::make_character_seq<T, 0, lit.size() - 1, lit>::type;
 
 
 
-	template <xns::string_literal lit>
+	template <xns::basic_string_literal lit>
 	using make_char_seq2   = typename impl::make_character_seq<char, 0, lit.size()-1, lit>::type;
 
 	/* make character sequence of char */
-	template <xns::size_t B, xns::size_t E, xns::string_literal lit>
+	template <xns::size_t B, xns::size_t E, xns::basic_string_literal lit>
 	using make_char_seq   = typename impl::make_character_seq<char, B, E, lit>::type;
 
 	/* make character sequence of char8_t */
-	template <xns::size_t B, xns::size_t E, xns::string_literal lit>
+	template <xns::size_t B, xns::size_t E, xns::basic_string_literal lit>
 	using make_char8_seq  = typename impl::make_character_seq<char8_t, B, E, lit>::type;
 
 	/* make character sequence of char16_t */
-	template <xns::size_t B, xns::size_t E, xns::string_literal lit>
+	template <xns::size_t B, xns::size_t E, xns::basic_string_literal lit>
 	using make_char16_seq = typename impl::make_character_seq<char16_t, B, E, lit>::type;
 
 	/* make character sequence of char32_t */
-	template <xns::size_t B, xns::size_t E, xns::string_literal lit>
+	template <xns::size_t B, xns::size_t E, xns::basic_string_literal lit>
 	using make_char32_seq = typename impl::make_character_seq<char32_t, B, E, lit>::type;
 
 	/* make character sequence of wchar_t */
-	template <xns::size_t B, xns::size_t E, xns::string_literal lit>
+	template <xns::size_t B, xns::size_t E, xns::basic_string_literal lit>
 	using make_wchar_seq  = typename impl::make_character_seq<wchar_t, B, E, lit>::type;
 
 
