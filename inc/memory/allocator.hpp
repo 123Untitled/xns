@@ -1,9 +1,7 @@
 #ifndef ALLOCATOR_HEADER
 #define ALLOCATOR_HEADER
 
-#include <limits>
-#include <cstdlib>
-
+// local headers
 #include "types.hpp"
 #include "macro.hpp"
 #include "forward.hpp"
@@ -12,6 +10,15 @@
 #include "numeric_limits.hpp"
 #include "policy.hpp"
 #include "is_scalar.hpp"
+
+#include "is_constructible.hpp"
+#include "is_destructible.hpp"
+#include "is_trivially_destructible.hpp"
+
+// standard headers
+#include <limits>
+#include <cstdlib>
+
 
 
 
@@ -151,8 +158,13 @@ namespace xns {
 
 			/* destroy */
 			static void destroy(mutable_pointer addrs) {
-				// call object destructor
-				addrs->~value_type();
+
+				if constexpr (xns::is_trivially_destructible<value_type> == false) {
+					static_assert(xns::is_destructible<value_type>,
+							"TYPE IS NOT DESTRUCTIBLE");
+					// call object destructor
+					addrs->~value_type();
+				}
 			}
 
 	};
