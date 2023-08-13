@@ -8,39 +8,20 @@
 #include "tree.hpp"
 #include "literal_map.hpp"
 #include "tuple.hpp"
+#include "is_comparable.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
 
-	// -- is convertible ------------------------------------------------------
 
-	template <class T, class U>
-	concept is_convertible = requires(T a) {
-		{ static_cast<U>(a) };
-	};
-
-	// -- is comparable -------------------------------------------------------
-
-	template <class T>
-	concept is_comparable = requires(T a, T b) {
-		{ a == b } -> is_convertible<bool>;
-		{ a != b } -> is_convertible<bool>;
-		{ a < b } -> is_convertible<bool>;
-		{ a > b } -> is_convertible<bool>;
-		{ a <= b } -> is_convertible<bool>;
-		{ a >= b } -> is_convertible<bool>;
-	};
-
-
-
-	// -- M A P ---------------------------------------------------------------
+	// -- M A P  C L A S S ----------------------------------------------------
 
 	template <class K, class V>
 	class map final {
 
-		static_assert(is_comparable<K>, "K must be comparable");
+		static_assert(xns::is_comparable<K>, "): MAP: KEY TYPE MUST BE COMPARABLE :(");
 
 		public:
 
@@ -109,15 +90,13 @@ namespace xns {
 
 				node_pointer node = _tree.root();
 
-				//node_pointer nde  = &_root;
 				node_pointer parent  = nullptr;
 
 				// loop until node is null
 				while (node) {
-					// keep track of parent
-					// less compare
 					pair_type& pair = node->value();
 
+					// less compare
 					if      (key < pair._first) {
 						parent = node;
 						node = node->left();
@@ -127,17 +106,12 @@ namespace xns {
 						parent = node;
 						node = node->right();
 					}
-					// equal compare, replace value ?
-					else                         {
-						//node->_value = value;
-						return;
-					}
+					// else equal
+					else { return; }
 				}
 
 				// create new node
 				node = _tree.new_node(pair_type{key, value});
-				std::cout << "new node..." << std::endl;
-				std::cout << "key: " << node->value()._first << std::endl;
 
 				if (parent == nullptr) {
 					_tree.root(node);
@@ -164,7 +138,7 @@ namespace xns {
 			}
 
 			static xns::string vcall(const pair_type& pair) {
-				return pair._first;
+				return xns::string{pair._first};
 			}
 
 			static xns::size_t scall(const pair_type& pair) {
@@ -172,6 +146,20 @@ namespace xns {
 			}
 
 		void print(void) {
+
+			auto b = _tree.bfs_begin();
+			while (b) { ++b; }
+
+			auto i = _tree.in_order_begin();
+			while (i) { ++i; }
+
+			auto p = _tree.pre_order_begin();
+			while (p) { ++p; }
+
+			auto o = _tree.post_order_begin();
+			while (o) { ++o; }
+
+
 			_tree.print(scall, vcall);
 		}
 
