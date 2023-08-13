@@ -235,10 +235,13 @@ namespace xns {
 			// -- setters -----------------------------------------------------
 
 			/* set tuple element */
-			template <size_type IDX>
-			constexpr void set(indexed<IDX>&& value) {
+			template <typename T, size_type IDX>
+			constexpr void set(T&& value) {
+
+				using type = indexed<IDX>;
+
 				// set tuple element
-				_impl.element<IDX, indexed<IDX>>::value = xns::forward<indexed<IDX>>(value);
+				_impl.element<IDX, type>::value = xns::forward<T>(value);
 			}
 
 
