@@ -53,14 +53,32 @@ for REQ in $REQUIRED; do
 done
 
 
+
 # -- C H E C K  W O R K I N G  D I R E C T O R Y ------------------------------
 
-# check if the script is run in the right repository
-if [[ ! -d .git || $(git config --get remote.origin.url) != 'git@github.com:123Untitled/xns.git' ]]; then
+XNS_PUBLIC_URL='https://github.com/123Untitled/xns.git'
+XNS_SSH_URL='git@github.com:123Untitled/xns.git'
+
+
+function invalid_repository {
 	echo 'Please run this script in the' $ERROR'xns'$RESET 'repository.'
+	exit 1
+}
+
+# check if the script is run in the right repository
+if [[ ! -d .git ]]; then
+	invalid_repository
 	exit 1
 fi
 
+# get remote origin url
+REMOTE_ORIGIN_URL=$(git config --get remote.origin.url)
+
+# check if remote origin url corresponds to the public url or the ssh url
+if [[ $REMOTE_ORIGIN_URL != $XNS_PUBLIC_URL ]] && [[ $REMOTE_ORIGIN_URL != $XNS_SSH_URL ]]; then
+	invalid_repository
+	exit 1
+fi
 
 
 
