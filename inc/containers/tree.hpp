@@ -865,7 +865,7 @@ namespace xns {
 			/* unicode box enum */
 			enum : xns::u8 { HL, VL, TL, TR, BL, BR, BB, MAX };
 
-			/* horizontal line */
+			/* unicode box array */
 			static constexpr const xns::array<char32_t, MAX> _branch = {
 				U'\u2500', // HL
 				U'\u2502', // VL
@@ -875,17 +875,6 @@ namespace xns {
 				U'\u256F', // BR
 				U'\u2534'  // BB
 			};
-
-			// HL char32_t(0x2500) // horizontal line
-
-			// unicode code points
-			// HL: "\u2500"
-			// VL: "\u2502"
-			// TL: "\u251c"
-			// TR: "\u2524"
-			// BL: "\u2514"
-			// BR: "\u2518"
-			// BB: "\u2534"
 
 
 		public:
@@ -926,51 +915,42 @@ namespace xns {
 				// check root
 				if (_tree._root == nullptr) { return; }
 
-				// bfs node constructor
-				const_bfs_iterator it{_tree._root};
+
+				using pos = decltype(_tree._root->_pos);
+
 
 				// parent pos
-				//size_type p_pos = 0;
-				decltype(_tree._root->_pos) p_pos = 0; // THIS AVOID IMPLICIT CONVERSION ERROR BUT NOT TESTED
+				pos p_pos = 0; // THIS AVOID IMPLICIT CONVERSION ERROR BUT NOT TESTED
 
 				// max endpoint width
 				size_type width = 0;
 
-				xns::s64 smin = 0;
-				xns::s64 smax = 0;
+				xns::s64 smin = 0, smax = 0;
 
 				xns::size_t level = 0;
 
 				_tree._root->_pos = 0;
 
-				++it;
+				// bfs node constructor
+				const_bfs_iterator it{_tree._root};
 
-				// loop until end
-				while (it != nullptr) {
+				// loop over tree (skip root)
+				for (++it; it != nullptr; ++it) {
 
-					//std::cout << "level: " << it._node->_level << std::endl;
+					// get parent position
+					p_pos = it.parent()->_pos;
 
+					// check node is left child
 					if (it.is_left()) {
-
-						p_pos = it.parent()->_pos;
-
-						//max = max_width(it.right()) + 3;
 						width = _tree.endpoints(it.right());
-
-						//it._node->_pos = p_pos - (width + 1);
 						// AVOID IMPLICIT CONVERSION ERROR BUT NOT TESTED
-						it._node->_pos = p_pos - static_cast<decltype(_tree._root->_pos)>(width + 1);
-
+						it._node->_pos = p_pos - static_cast<pos>(width + 1);
 					}
+					// else node is right child
 					else {
-						p_pos = it.parent()->_pos;
-
-						//max = max_width(it.left()) + 3;
 						width = _tree.endpoints(it.left());
-
-						//it._node->_pos = p_pos + (width + 1);
 						// AVOID IMPLICIT CONVERSION ERROR BUT NOT TESTED
-						it._node->_pos = p_pos + static_cast<decltype(_tree._root->_pos)>(width + 1);
+						it._node->_pos = p_pos + static_cast<pos>(width + 1);
 					}
 
 					// update min position
@@ -983,10 +963,11 @@ namespace xns {
 					}
 					level = it._node->_level;
 
-
-					++it;
-
 				}
+
+
+
+
 
 				// compensate for negative min
 				smin *= -1;
@@ -995,9 +976,7 @@ namespace xns {
 					static_cast<xns::u64>(smin);
 
 				// matrix
-				//xns::vector<xns::cstring> matrix;
 				xns::string32 unicode;
-
 
 				xns::vector<xns::string32> matrix;
 
@@ -1035,13 +1014,10 @@ namespace xns {
 				size_type x = 0, y = 0, lx = 0, ly = 0, rx = 0, ry = 0;
 
 				for (; it4 != nullptr; ++it4) {
-					//std::cout << "filling matrix\n";
 
 					// get node position
 					x = static_cast<size_type>((it4.xpos() + smin)) * X_OFFSET;
 					y = it4.level()         * Y_OFFSET;
-					//std::cout << *it4 << " | " <<
-					//	"x: " << x << ", y: " << y << "\n";
 
 					// check if left
 					if (it4.has_left()) {
@@ -1093,32 +1069,13 @@ namespace xns {
 						}
 					}
 
-					/*
-					xns::string_view str = it4._node->_value.view();
-					if (str.size()) {
-						matrix[y][x] = str[0];
-					}
-					else {
-						matrix[y][x] = '@';
-					}*/
-
-					/*size_type size = str.size();
-					size_type offset = size / 2;
-
-					for (size_type i = 0; i < size; ++i) {
-						matrix[y][x - offset + i] = str[i];
-					}*/
-
-
-
-					//matrix[y][x] = it4._node->_value;
 
 					xns::string value = _vcall.call(it4._node->_value);
 
 					if (value.size()) {
 						size_type size = value.size();
 						size_type offset = size / 2;
-						//std::cout << "size: " << size << "\n";
+
 						if (x > offset) {
 							for (size_type i = 0; i < size; ++i) {
 								matrix[y][x - offset + i] = static_cast<char32_t>(value[i]);
@@ -1137,15 +1094,13 @@ namespace xns {
 				}
 
 
-				//std::cout << "printing matrix\n";
 
 
 
-				//xns::output::write(Xf::Escape::erase_screen());
+				// print matrix
 				for (xns::vector<xns::string>::size_type _ = 0; _ < matrix.size(); ++_) {
 					xns::out::write(matrix[_]);
 					xns::out::newline();
-					//std::cout << matrix[_] << "\n";
 				}
 				xns::out::flush();
 
