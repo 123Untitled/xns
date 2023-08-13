@@ -70,7 +70,7 @@ namespace xns {
 			static void write(const xns::string32& str);
 
 			/* render */
-			template <xns::string_literal L = "stdout">
+			template <xns::basic_string_literal L = "stdout">
 			static void flush(void) {
 
 				static_assert(L == "stdout" || L == "stderr",
