@@ -1,7 +1,6 @@
 #ifndef FUNCTION_HEADER
 #define FUNCTION_HEADER
 
-#include "type_traits.hpp"
 #include "forward.hpp"
 #include "macro.hpp"
 
