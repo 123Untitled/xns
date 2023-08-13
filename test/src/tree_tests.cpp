@@ -14,9 +14,9 @@ xns::string tpvc(const char& c) {
 
 
 
-void generate_tree(const xns::size_t size) {
+xns::tree<char> generate_tree(const xns::size_t size) {
 	// check size
-	if (!size) { return; }
+	if (!size) { return {}; }
 	// create tree
 	xns::tree<char> ast;
 	// vector of node pointers
@@ -24,7 +24,7 @@ void generate_tree(const xns::size_t size) {
 	// reserve space for nodes
 	nodes.reserve(size);
 	// loop to allocate nodes
-	for (auto i = nodes.start(); i < size; ++i) {
+	for (xns::size_t i = 0; i < size; ++i) {
 		//char c = xns::random::random_gen(94 - 33) + 33; // NEED TO IMPLEMENT RANDOM TEMPLATE, to fix implicite conversion
 		char c = 'a';
 		nodes.copy_back(ast.new_node(c));
@@ -38,7 +38,7 @@ void generate_tree(const xns::size_t size) {
 
 	node* current = nodes[0];
 
-	for (auto i = nodes.start() + 1; i < size; ++i) {
+	for (xns::size_t i = 0 + 1; i < size; ++i) {
 		do {
 			if (xns::random::random_bool()) {
 
@@ -57,14 +57,8 @@ void generate_tree(const xns::size_t size) {
 		current = nodes[0];
 	}
 
-	auto it = ast.in_order_begin();
-	ast.print(tpsc, tpvc);
 
-	while (it != ast.end()) {
-		std::cout << *it << " ";
-		++it;
-	}
-	std::cout << std::endl;
+	return ast;
 
 }
 
@@ -73,7 +67,18 @@ template <>
 bool UT::unit_tests<"tree">(void) {
 
 
-	generate_tree(30);
+	xns::tree<char> tr = generate_tree(30);
+
+	auto it = tr.in_order_begin();
+	tr.print(tpsc, tpvc);
+
+	while (it != tr.end()) {
+		std::cout << *it << " ";
+		++it;
+	}
+	std::cout << std::endl;
+
+
 	return true;
 
 //	const char* tree = R"(
