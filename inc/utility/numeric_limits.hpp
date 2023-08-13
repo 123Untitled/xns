@@ -112,6 +112,19 @@ namespace xns {
 			}
 
 
+
+
+			template <typename R, typename T>
+			static auto in_range(const T& value) -> bool {
+
+				// check types are integral
+				static_assert(xns::is_integral<R> && xns::is_integral<T>,
+						"): IN_RANGE: TYPES MUST BE INTEGRAL :(");
+
+				return (value >= limits::min<R>()) && (value <= limits::max<R>());
+			}
+
+
 	};
 
 
