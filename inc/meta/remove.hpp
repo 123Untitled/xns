@@ -48,6 +48,29 @@ namespace xns {
 		template <class T>
 		struct remove_reference<T&&>       { using type = T; };
 
+
+		// -- remove pointer --------------------------------------------------
+
+		/* remove pointer */
+		template <class T>
+		struct remove_pointer              { using type = T; };
+
+		/* remove pointer specialization */
+		template <class T>
+		struct remove_pointer<T*>          { using type = T; };
+
+		/* remove pointer specialization */
+		template <class T>
+		struct remove_pointer<T* const>    { using type = T; };
+
+		/* remove pointer specialization */
+		template <class T>
+		struct remove_pointer<T* volatile> { using type = T; };
+
+		/* remove pointer specialization */
+		template <class T>
+		struct remove_pointer<T* const volatile> { using type = T; };
+
 	}
 
 
@@ -72,6 +95,13 @@ namespace xns {
 	using remove_reference = typename impl::remove_reference<T>::type;
 
 
+	// -- R E M O V E  P O I N T E R ------------------------------------------
+
+	/* remove pointer */
+	template <class T>
+	using remove_pointer   = typename impl::remove_pointer<T>::type;
+
+
 	// -- R E M O V E  C V ----------------------------------------------------
 
 	/* remove cv */
@@ -84,6 +114,13 @@ namespace xns {
 	/* remove cvr */
 	template <class T>
 	using remove_cvr       = remove_cv<remove_reference<T>>;
+
+
+	// -- R E M O V E  C V R P ------------------------------------------------
+
+	/* remove cvrp */
+	template <class T>
+	using remove_cvrp      = remove_pointer<remove_cvr<T>>;
 
 
 }
