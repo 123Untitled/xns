@@ -2,8 +2,10 @@
 #define PARAMETER_PACK_HEADER
 
 #include <type_traits>
-#include "pack_type.hpp"
+#include "type_at.hpp"
 #include "integer_sequence.hpp"
+
+#include "is_constructible.hpp"
 
 // not RENAMED !!!
 
@@ -37,9 +39,9 @@ namespace xns {
 
 
 	template <size_t IDX, class... A>
-	auto get(A&... args) -> xns::pack_type<IDX, A&...>& {
+	auto get(A&... args) -> xns::type_at<IDX, A&...>& {
 
-		return Get_impl<pack_type<IDX, A...>, // type at index
+		return Get_impl<type_at<IDX, A...>, // type at index
 						IDX,                   // index
 						0,                   // index J
 						A...                 // pack types
@@ -64,6 +66,56 @@ namespace xns {
 		// call implementation to extract the pack
 		return pack_extract_imp<RType>(indxs, args...);
 	}
+
+
+	template <class... A>
+	struct constructible_type {
+
+
+		private:
+
+			// -- private structs ---------------------------------------------
+
+			template <class...>
+			struct impl;
+
+			template <class T, class... Tp>
+			requires (xns::is_constructible_strict<T, A...> == false)
+			struct impl<T, Tp...> final {
+				using type = typename impl<Tp...>::type;
+			};
+
+			template <class T, class... Tp>
+			requires (xns::is_constructible_strict<T, A...> == true)
+			struct impl<T, Tp...> final {
+				using type = T;
+			};
+
+			template <class T> requires (!xns::is_constructible_strict<T, A...>)
+			struct impl<T> final {
+				static_assert(xns::is_constructible_strict<T, A...>,
+							  "): NO CONSTRUCTIBLE TYPE IN VARIADIC :(");
+			};
+
+
+
+		public:
+
+			template <class... T>
+			static consteval auto counter(void) -> xns::size_t {
+				xns::size_t count = 0;
+				((count += xns::is_constructible_strict<T, A...>), ...);
+				return count;
+			}
+
+
+			template <class... T>
+			using type = typename impl<T...>::type;
+	};
+
+
+
+
 
 
 
