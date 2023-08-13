@@ -19,7 +19,7 @@ namespace xns {
 
 	// -- F I L E  C L A S S --------------------------------------------------
 
-	class file final {
+	class file final : public xns::unique_descriptor {
 
 
 		public:
@@ -28,22 +28,16 @@ namespace xns {
 
 			/* default constructor */
 			inline file(void) noexcept
-			: _descriptor{} {
-				// code here...
-			}
+			: unique_descriptor{} {}
 
 			/* variadic constructor */
 			template <typename... A>
 			inline file(const xns::string& path, A&&... args) noexcept
-			: _descriptor{xns::trust{}, ::open(path.data(), args...)} {
-				// code here...
-			}
+			: unique_descriptor{xns::trust{}, ::open(path.data(), args...)} {}
 
 			/* move constructor */
 			inline file(xns::file&& other) noexcept
-			: _descriptor{xns::move(other._descriptor)} {
-				// code here...
-			}
+			: unique_descriptor{xns::move(other)} {}
 
 			/* non-assignable class */
 			NON_COPYABLE(file);
@@ -66,8 +60,6 @@ namespace xns {
 
 			// -- private members ---------------------------------------------
 
-			/* file descriptor */
-			xns::unique_descriptor _descriptor;
 
 
 

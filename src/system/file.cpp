@@ -4,6 +4,6 @@
 
 void xns::file::content(void) {
 
-	if (_descriptor.invalid()) { return; }
+	if (invalid()) { return; }
 
 }
