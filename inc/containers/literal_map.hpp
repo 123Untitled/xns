@@ -16,7 +16,7 @@ namespace xns {
 
 	// -- L I T E R A L  M A P ------------------------------------------------
 
-	template <class T, xns::string_literal... L>
+	template <class T, xns::basic_string_literal... L>
 	class literal_map final {
 
 
@@ -56,7 +56,7 @@ namespace xns {
 			// -- private types -----------------------------------------------
 
 			/* key helper */
-			template <xns::string_literal l>
+			template <xns::basic_string_literal l>
 			using key = xns::make_character_seq<typename decltype(l)::char_t, l>;
 
 
@@ -202,14 +202,14 @@ namespace xns {
 			}
 
 			/* get element */
-			template <xns::string_literal l>
+			template <xns::basic_string_literal l>
 			constexpr reference get(void) {
 				// return element indexed by key
 				return _impl.element<key<l>>::data;
 			}
 
 			/* const get element */
-			template <xns::string_literal l>
+			template <xns::basic_string_literal l>
 			constexpr const_reference get(void) const {
 				// return const element indexed by key
 				return _impl.element<key<l>>::data;
@@ -219,22 +219,22 @@ namespace xns {
 			// -- public setters ----------------------------------------------
 
 			/* set element by copy */
-			template <xns::string_literal l>
+			template <xns::basic_string_literal l>
 			constexpr void set(const_reference value) {
 				// set element by copy
 				_impl.element<key<l>>::data = value;
 			}
 
 			/* set element by move */
-			template <xns::string_literal l>
+			template <xns::basic_string_literal l>
 			constexpr void set(move_reference value) {
 				// set element by move
 				_impl.element<key<l>>::data = xns::move(value);
 			}
 
 			/* emplace element */
-			template <xns::string_literal l, class... A>
-			constexpr void forward(A&&... args) {
+			template <xns::basic_string_literal l, class... A>
+			constexpr void emplace(A&&... args) {
 				// forward arguments to element
 				_impl.element<key<l>>::data = value_type{xns::forward<A>(args)...};
 			}
