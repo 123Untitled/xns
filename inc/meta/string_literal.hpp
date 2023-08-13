@@ -173,163 +173,163 @@ namespace xns {
 	basic_string_literal(const T (&)[N]) -> basic_string_literal<T, N>;
 
 
-	// -- S T R I N G  L I T E R A L ------------------------------------------
+	//// -- S T R I N G  L I T E R A L ------------------------------------------
 
-	template <xns::size_t N>
-	class string_literal final : public basic_string_literal<char, N> {
+	//template <xns::size_t N>
+	//class string_literal final : public basic_string_literal<char, N> {
 
 
-		// -- assertions ------------------------------------------------------
+	//	// -- assertions ------------------------------------------------------
 
-		/* check for 'char' type */
-		//static_assert(xns::is_same<T, char>,
-		//		"): STRING_LITERAL: MUST BE 'char' TYPE :(");
+	//	/* check for 'char' type */
+	//	//static_assert(xns::is_same<T, char>,
+	//	//		"): STRING_LITERAL: MUST BE 'char' TYPE :(");
 
 
-		public:
+	//	public:
 
-			// -- public lifecycle --------------------------------------------
+	//		// -- public lifecycle --------------------------------------------
 
-			/* array constructor override */
-			template <xns::size_t M>
-			inline consteval string_literal(const char (&str)[M]) noexcept
-			: basic_string_literal<char, M>{str} {}
+	//		/* array constructor override */
+	//		template <xns::size_t M>
+	//		inline consteval string_literal(const char (&str)[M]) noexcept
+	//		: basic_string_literal<char, M>{str} {}
 
 
-	};
+	//};
 
-	// -- deduction guides ----------------------------------------------------
+	//// -- deduction guides ----------------------------------------------------
 
-	template <xns::size_t N>
-	string_literal(const char (&)[N]) -> xns::string_literal<N>;
+	//template <xns::size_t N>
+	//string_literal(const char (&)[N]) -> xns::string_literal<N>;
 
 
 
 
-	// -- W S T R I N G  L I T E R A L ----------------------------------------
+	//// -- W S T R I N G  L I T E R A L ----------------------------------------
 
-	template <typename T, xns::size_t N>
-	class wstring_literal final : public basic_string_literal<T, N> {
+	//template <typename T, xns::size_t N>
+	//class wstring_literal final : public basic_string_literal<T, N> {
 
 
-		// -- assertions ------------------------------------------------------
+	//	// -- assertions ------------------------------------------------------
 
-		/* check for 'wchar_t' type */
-		static_assert(xns::is_same<T, wchar_t>,
-				"): WSTRING_LITERAL: MUST BE 'wchar_t' TYPE :(");
+	//	/* check for 'wchar_t' type */
+	//	static_assert(xns::is_same<T, wchar_t>,
+	//			"): WSTRING_LITERAL: MUST BE 'wchar_t' TYPE :(");
 
 
-		public:
+	//	public:
 
-			// -- public lifecycle --------------------------------------------
+	//		// -- public lifecycle --------------------------------------------
 
-			/* array constructor override */
-			template <typename U, xns::size_t M>
-			inline consteval wstring_literal(const U (&str)[M]) noexcept
-			: basic_string_literal<U, M>(str) {}
+	//		/* array constructor override */
+	//		template <typename U, xns::size_t M>
+	//		inline consteval wstring_literal(const U (&str)[M]) noexcept
+	//		: basic_string_literal<U, M>(str) {}
 
-	};
+	//};
 
-	// -- deduction guides ----------------------------------------------------
+	//// -- deduction guides ----------------------------------------------------
 
-	template <typename T, xns::size_t N>
-	wstring_literal(const T (&)[N]) -> wstring_literal<T, N>;
+	//template <typename T, xns::size_t N>
+	//wstring_literal(const T (&)[N]) -> wstring_literal<T, N>;
 
 
 
 
-	// -- U 8 S T R I N G  L I T E R A L --------------------------------------
+	//// -- U 8 S T R I N G  L I T E R A L --------------------------------------
 
-	template <typename T, xns::size_t N>
-	class u8string_literal final : public basic_string_literal<T, N> {
+	//template <typename T, xns::size_t N>
+	//class u8string_literal final : public basic_string_literal<T, N> {
 
 
-		// -- assertions ------------------------------------------------------
+	//	// -- assertions ------------------------------------------------------
 
-		/* check for 'char8_t' type */
-		static_assert(xns::is_same<T, char8_t>,
-				"): U8STRING_LITERAL: MUST BE 'char8_t' TYPE :(");
+	//	/* check for 'char8_t' type */
+	//	static_assert(xns::is_same<T, char8_t>,
+	//			"): U8STRING_LITERAL: MUST BE 'char8_t' TYPE :(");
 
 
-		public:
+	//	public:
 
-			// -- public lifecycle --------------------------------------------
+	//		// -- public lifecycle --------------------------------------------
 
-			/* array constructor override */
-			template <typename U, xns::size_t M>
-			inline consteval u8string_literal(const U (&str)[M]) noexcept
-			: basic_string_literal<U, M>(str) {}
+	//		/* array constructor override */
+	//		template <typename U, xns::size_t M>
+	//		inline consteval u8string_literal(const U (&str)[M]) noexcept
+	//		: basic_string_literal<U, M>(str) {}
 
-	};
+	//};
 
-	// -- deduction guides ----------------------------------------------------
+	//// -- deduction guides ----------------------------------------------------
 
-	template <typename T, xns::size_t N>
-	u8string_literal(const T (&)[N]) -> u8string_literal<T, N>;
+	//template <typename T, xns::size_t N>
+	//u8string_literal(const T (&)[N]) -> u8string_literal<T, N>;
 
 
 
 
-	// -- U 1 6 S T R I N G  L I T E R A L ------------------------------------
+	//// -- U 1 6 S T R I N G  L I T E R A L ------------------------------------
 
-	template <typename T, xns::size_t N>
-	class u16string_literal final : public basic_string_literal<T, N> {
+	//template <typename T, xns::size_t N>
+	//class u16string_literal final : public basic_string_literal<T, N> {
 
 
-		// -- assertions ------------------------------------------------------
+	//	// -- assertions ------------------------------------------------------
 
-		/* check for 'char16_t' type */
-		static_assert(xns::is_same<T, char16_t>,
-				"): U8STRING_LITERAL: MUST BE 'char16_t' TYPE :(");
+	//	/* check for 'char16_t' type */
+	//	static_assert(xns::is_same<T, char16_t>,
+	//			"): U8STRING_LITERAL: MUST BE 'char16_t' TYPE :(");
 
 
-		public:
+	//	public:
 
-			// -- public lifecycle --------------------------------------------
+	//		// -- public lifecycle --------------------------------------------
 
-			/* array constructor override */
-			template <typename U, xns::size_t M>
-			inline consteval u16string_literal(const U (&str)[M]) noexcept
-			: basic_string_literal<U, M>(str) {}
+	//		/* array constructor override */
+	//		template <typename U, xns::size_t M>
+	//		inline consteval u16string_literal(const U (&str)[M]) noexcept
+	//		: basic_string_literal<U, M>(str) {}
 
-	};
+	//};
 
-	// -- deduction guides ----------------------------------------------------
+	//// -- deduction guides ----------------------------------------------------
 
-	template <typename T, xns::size_t N>
-	u16string_literal(const T (&)[N]) -> u16string_literal<T, N>;
+	//template <typename T, xns::size_t N>
+	//u16string_literal(const T (&)[N]) -> u16string_literal<T, N>;
 
 
 
 
-	// -- U 3 2 S T R I N G  L I T E R A L ------------------------------------
+	//// -- U 3 2 S T R I N G  L I T E R A L ------------------------------------
 
-	template <typename T, xns::size_t N>
-	class u32string_literal final : public basic_string_literal<T, N> {
+	//template <typename T, xns::size_t N>
+	//class u32string_literal final : public basic_string_literal<T, N> {
 
 
-		// -- assertions ------------------------------------------------------
+	//	// -- assertions ------------------------------------------------------
 
-		/* check for 'char32_t' type */
-		static_assert(xns::is_same<T, char32_t>,
-				"): U8STRING_LITERAL: MUST BE 'char32_t' TYPE :(");
+	//	/* check for 'char32_t' type */
+	//	static_assert(xns::is_same<T, char32_t>,
+	//			"): U8STRING_LITERAL: MUST BE 'char32_t' TYPE :(");
 
 
-		public:
+	//	public:
 
-			// -- public lifecycle --------------------------------------------
+	//		// -- public lifecycle --------------------------------------------
 
-			/* array constructor override */
-			template <typename U, xns::size_t M>
-			inline consteval u32string_literal(const U (&str)[M]) noexcept
-			: basic_string_literal<U, M>(str) {}
+	//		/* array constructor override */
+	//		template <typename U, xns::size_t M>
+	//		inline consteval u32string_literal(const U (&str)[M]) noexcept
+	//		: basic_string_literal<U, M>(str) {}
 
-	};
+	//};
 
-	// -- deduction guides ----------------------------------------------------
+	//// -- deduction guides ----------------------------------------------------
 
-	template <typename T, xns::size_t N>
-	u32string_literal(const T (&)[N]) -> u32string_literal<T, N>;
+	//template <typename T, xns::size_t N>
+	//u32string_literal(const T (&)[N]) -> u32string_literal<T, N>;
 
 
 
