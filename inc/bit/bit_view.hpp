@@ -51,7 +51,7 @@ namespace xns {
 
 			/* value constructor */
 			constexpr bit_view(mutable_reference value) noexcept
-			: _data(value) {}
+			: _data{value} {}
 
 			/* copy constructor */
 			constexpr bit_view(const self& other) noexcept = default;
@@ -66,22 +66,31 @@ namespace xns {
 			// -- public modifiers --------------------------------------------
 
 			/* set bit */
-			void set(const size_type nth) noexcept {
+			inline constexpr auto set(const size_type nth) noexcept -> void {
 				// set nth bit to 1
 				_data |= (1 << nth);
 			}
 
 			/* toggle bit */
-			void toggle(const size_type nth) noexcept {
+			inline constexpr auto toggle(const size_type nth) noexcept -> void {
 				// toggle nth bit
 				_data ^= (1 << nth);
+			}
+
+
+			// -- public subscript operators ----------------------------------
+
+			/* subscript operator */
+			inline constexpr auto operator[](const size_type nth) const noexcept -> int {
+				// return nth bit
+				return (_data >> nth) & 1U;
 			}
 
 
 			// -- public accessors --------------------------------------------
 
 			/* get bit count */
-			constexpr size_type count(void) const noexcept {
+			constexpr size_type bits(void) const noexcept {
 				// return number of bits
 				return _bits;
 			}
@@ -89,7 +98,7 @@ namespace xns {
 			/* get bit */
 			constexpr int get(const size_type nth) const noexcept {
 				// get nth bit
-				return (_data >> nth) & 1;
+				return (_data >> nth) & 1U;
 			}
 
 
