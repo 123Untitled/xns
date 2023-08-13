@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh --no-rcs --errexit
 
 # this script is used to generate missing unit test files
 
@@ -84,12 +84,8 @@ UNIT_TESTS=(${(@)UNIT_TESTS%'_tests'})
 
 # remove main
 UNIT_TESTS=(${(@)UNIT_TESTS:#main})
-# remove xns
-HEADERS=(${(@)HEADERS:#xns})
 # remove testclass
 HEADERS=(${(@)HEADERS:#testclass})
-# remove type_traits
-HEADERS=(${(@)HEADERS:#type_traits})
 
 
 
@@ -98,31 +94,34 @@ function model {
 
 	# check if there is one argument
 	if [ $# -ne 1 ]; then
+		echo 'Internal error: function' $CO'model'$NC 'expects one argument.'
 		exit 1
 	fi
 
 	local FILE_NAME=$1
 
 	# unit test file model
-	UNIT_TEST_MODEL="#include \"unit_tests.hpp\"
+	UNIT_TEST_MODEL=\
+"#include \"unit_tests.hpp\"
+#include \"$FILE_NAME.hpp\"
 
 /* unit test */
 template <>
 bool UT::unit_tests<\"$FILE_NAME\">(void) {
-\t// start unit test
-\tSTART_UT(\"$FILE_NAME\");
 \t// code here...
 \treturn false;
 }
-"
 
+int main(void) {
+\treturn UT::unit_tests<\"$FILE_NAME\">()
+\t\t? EXIT_SUCCESS : EXIT_FAILURE;
+}
+"
 	echo $UNIT_TEST_MODEL
 }
 
 
 function prompt {
-	# no echo
-	stty -echo
 	echo -n '[y/n] ? '
 
 	while true; do
@@ -131,14 +130,11 @@ function prompt {
 		# echo
 		if   [[ $INPUT =~ '[yY]' ]]; then
 			echo 'yes.'
-			stty echo
 			return 0
 		elif [[ $INPUT =~ '[nN]' ]]; then
 			echo 'no.'
-			stty echo
 			return 1
 		elif [[ $INPUT =~ '[qQ]' ]]; then
-			stty echo
 			echo 'abort.'
 			exit 0
 		fi
@@ -149,62 +145,80 @@ function prompt {
 
 
 
+function missing_test {
 
+	# loop over all header files
+	for HEADER in $HEADERS; do
+		# check if the associated unit file exist
+		if [[ ! $UNIT_TESTS =~ $HEADER ]]; then
+			# print message
+			echo $CE$HEADER'_tests.cpp'$NC 'does not exist.'"\r"
 
-# loop over all header files
-for HEADER in $HEADERS; do
-	# check if the associated unit file exist
-	if [[ ! $UNIT_TESTS =~ $HEADER ]]; then
-		# print message
-		echo $CE$HEADER'_tests.cpp'$NC 'does not exist.'"\r"
+			echo -n 'Generate file ? '
+			if ! prompt; then
+				continue
+			fi
 
-		echo -n 'Generate file ? '
-		prompt
+			# get the unit test file path
+			local FILE_PATH=$TEST_SRC_DIR'/'$HEADER'_tests.cpp'
 
+			# check if the unit test file already exists
+			if [ -f $FILE_PATH ]; then
+				echo 'Internal error: file' $CO$FILE_PATH$NC 'already exists.'
+				exit 1
+			fi
 
-		continue
-		# get the unit test file path
-		local FILE_PATH=$SRC_DIR'/'$UT_DIR'/'$HEADER'_tests.cpp'
-		# generate unit test file
-		model $HEADER > $FILE_PATH
-		# check if the unit test file was generated
-		if [ $? -ne 0 ]; then
-			echo 'Failed to generate' $CE$HEADER'_tests.cpp'$NC'.'
-			exit 1
+			# generate unit test file
+			model $HEADER > $FILE_PATH
+
+			# check if the unit test file was generated
+			if [ $? -ne 0 ]; then
+				echo 'Failed to generate' $CE$HEADER'_tests.cpp'$NC'.'
+				exit 1
+			fi
+
+			# add unit test file to git
+			git add -v $FILE_PATH
+			# commit unit test file
+			git commit -v -m "add unit test for $HEADER"
+			# push changes
+			git push -v
+
 		fi
-		# add unit test file to git
-		git add $FILE_PATH
-		# commit unit test file
-		git commit -m "add unit test for $HEADER"
-
-	fi
-done
+	done
+}
 
 
-# loop over all unit test files
-for UNIT in $UNIT_TESTS; do
-	# check if the associated header file exist
-	if [[ ! $HEADERS =~ $UNIT ]]; then
-		# print message
-		echo $CO$UNIT'_tests.cpp'$NC 'does not have an associated header file.'"\r"
-		# find file path
-		local FILE_PATH=$UT_DIR'/src/'$UNIT'_tests.cpp'
-		# check if file exists
-		if [ ! -f $FILE_PATH ]; then
-			echo 'Internal error: file' $CO$FILE_PATH$NC 'does not exist.'
-			exit 1
+function missing_header {
+
+	# loop over all unit test files
+	for UNIT in $UNIT_TESTS; do
+		# check if the associated header file exist
+		if [[ ! $HEADERS =~ $UNIT ]]; then
+			# print message
+			echo $CO$UNIT'_tests.cpp'$NC 'does not have an associated header file.'"\r"
+			# find file path
+			local FILE_PATH=$UT_DIR'/src/'$UNIT'_tests.cpp'
+			# check if file exists
+			if [ ! -f $FILE_PATH ]; then
+				echo 'Internal error: file' $CO$FILE_PATH$NC 'does not exist.'
+				exit 1
+			fi
+			# purpose to delete the unit test file
+			echo -n 'Delete file ? '
+			if prompt; then
+				echo 'deleting file...'
+			else
+				echo 'keeping file...'
+			fi
 		fi
-		# purpose to delete the unit test file
-		echo -n 'Delete file ? '
-		if prompt; then
-			echo 'deleting file...'
-		else
-			echo 'keeping file...'
-		fi
-	fi
 
-done
+	done
 
+}
+
+missing_test
+missing_header
 
 
 
