@@ -299,7 +299,7 @@ void test(from_pointer, const char* ptr) {
 }
 
 template <std::size_t N>
-void test2(const xns::string_literal<N>& str) {
+void test2(const xns::basic_string_literal<N>& str) {
 	std::cout << "from string_literal\n";
 }
 
@@ -316,7 +316,7 @@ void test2(const char(&ptr)[N]) {
 
 int main(void) {
 
-	xns::string_literal str{"hello"};
+	xns::basic_string_literal str{"hello"};
 	str.size();
 
 	//test2(xns::string_literal{"hello"});

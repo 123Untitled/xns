@@ -6,7 +6,7 @@
 
 
 /* checker */
-template <xns::string_literal msg, class T>
+template <xns::basic_string_literal msg, class T>
 static bool checker(void) {
 
 	// get signed type

@@ -78,10 +78,10 @@ namespace xns {
 			// -- public constructors -----------------------------------------
 
 			template <xns::is_char T, xns::size_t N>
-			static consteval void test(const xns::string_literal<T, N>& str) {
+			static consteval void test(const xns::basic_string_literal<T, N>& str) {
 			}
 
-			template <xns::string_literal lit, xns::size_t... N>
+			template <xns::basic_string_literal lit, xns::size_t... N>
 			static consteval auto split(const xns::index_seq<N...>& seq) {
 
 
@@ -94,7 +94,7 @@ namespace xns {
 			}
 
 			/* format string constructor */
-			template <xns::string_literal lit, class... A>
+			template <xns::basic_string_literal lit, class... A>
 			static consteval auto print(const A&... args) {
 
 
@@ -126,7 +126,7 @@ namespace xns {
 			// -- private static methods --------------------------------------
 
 			/* get format specifier number */
-			template <xns::string_literal lit>
+			template <xns::basic_string_literal lit>
 			static consteval size_type specifier_number(void) {
 
 				auto ar = lit.data();

@@ -5,7 +5,7 @@
 #include <type_traits>
 
 
-template <xns::string_literal msg, class T, bool expected>
+template <xns::basic_string_literal msg, class T, bool expected>
 static bool checker(void) {
 
 	// print test
