@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh --no-rcs
+#!/usr/bin/env zsh --no-rcs --errexit
 
 # this script is used to generate ninja files for building
 
@@ -56,12 +56,11 @@ done
 # -- C H E C K  W O R K I N G  D I R E C T O R Y ------------------------------
 
 # check if the script is run in the right repository
-#if [[ ! -d .git || $(git config --get remote.origin.url) != 'git@github.com:123Untitled/xns.git' ]]; then
-#	echo 'Please run this script in the' $ERROR'xns'$RESET 'repository.'
-#	exit 1
-#fi
+if [[ ! -d .git || $(git config --get remote.origin.url) != 'git@github.com:123Untitled/xns.git' ]]; then
+	echo 'Please run this script in the' $ERROR'xns'$RESET 'repository.'
+	exit 1
+fi
 
-echo $SUCCESS'xns'$RESET 'build started.'
 
 
 
@@ -89,7 +88,7 @@ fi
 PROJECT='xns'
 
 # executable name
-EXECUTABLE=$PROJECT'exec'
+EXECUTABLE='exec'
 
 # static library name
 STATIC='lib'$PROJECT'.a'
@@ -181,9 +180,11 @@ TEST_INCS=("${TEST_INCS[@]/#/-I}")
 
 
 # -- T O O L C H A I N --------------------------------------------------------
+BREW_CXX='/opt/homebrew/opt/llvm/bin/clang++'
 
 # compiler
-COMPILER=$(which clang++)
+COMPILER=$BREW_CXX
+#COMPILER=$(which clang++)
 
 # linker
 LINKER=$COMPILER
@@ -243,15 +244,20 @@ RM=($(which rm) '-rfv')
 $MK $BLDDIR $OBJDIR $DEPDIR $LOGDIR
 
 
+
+
+
 # -- A R G U M E N T S --------------------------------------------------------
 
 # check command line arguments
-if [[ $# -gt 1 ]]; then
+if [[ $# -eq 1 && $1 == 'help' ]]; then
 	echo "usage: ./make.sh [release|debug|test|install|rm]"
-	exit 1
+	exit 0
 fi
 
-if [[ $# -eq 1 ]]; then
+
+
+if [[ $# -gt 0 ]]; then
 	# check for 'rm' argument
 	if [[ $1 == 'rm' ]]; then
 		# check if ninja file exists
@@ -260,7 +266,7 @@ if [[ $# -eq 1 ]]; then
 			ninja -t clean
 		fi
 		# remove build directory and clangd cache
-		$RM $BLDDIR $CDCACHE $NINJAFILE
+		$RM $BLDDIR $CDCACHE $NINJAFILE $SINGLE_HEADER
 		exit 0
 
 	# check for 'release' argument
@@ -274,6 +280,24 @@ if [[ $# -eq 1 ]]; then
 	# check for 'test' argument
 	elif [[ $1 == 'test' ]]; then
 		echo 'MODE=test' > $BLDDIR/$MODEFILE
+		if [[ $# -eq 2 ]]; then
+			if [[ $2 == 'main' ]]; then
+				TEST_SRCS=($TEST_SRCDIR/'main.cpp')
+			else
+				# search for test file
+				for TEST in $TEST_SRCS; do
+					# extract basename
+					local BASENAME=${TEST##*/}
+					# remove _tests.cpp suffix
+					BASENAME=${BASENAME%_tests.cpp}
+					# check if test name matches
+					if [[ $BASENAME == $2 ]]; then
+						TEST_SRCS=($TEST)
+						break
+					fi
+				done
+			fi
+		fi
 
 	# check for 'install' argument
 	elif [[ $1 == 'install' ]]; then
@@ -286,6 +310,8 @@ if [[ $# -eq 1 ]]; then
 		exit 1
 	fi
 fi
+
+
 
 # -- M O D E ------------------------------------------------------------------
 
@@ -309,6 +335,7 @@ if [[ $MODE != 'release' && $MODE != 'test' ]]; then
 fi
 
 
+echo $SUCCESS'xns'$RESET 'build started.'
 
 function make_ninja {
 
