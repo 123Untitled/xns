@@ -1,25 +1,26 @@
 #ifndef DECLVAL_HEADER
 #define DECLVAL_HEADER
 
-#include <type_traits>
-
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
 
+	/* libc++ implementation */
+
+	// -- D E C L V A L -------------------------------------------------------
+
+	namespace impl {
+
+		template <typename T, typename R = T&&>
+		R declval(int);
+
+		template <typename T>
+		T declval(long);
+	}
 
 	template<typename T>
-	constexpr bool always_false = false;
-
-	// -- D E C L V A L ---------------------------------------------------------
-
-	/* declval */
-	template <class T>
-	typename std::add_rvalue_reference<T>::type declval(void) noexcept {
-
-		static_assert(always_false<T>, "DECLVAL NOT ALLOWED IN AN EVALUATED CONTEXT");
-	}
+	auto declval(void) noexcept -> decltype(impl::declval<T>(0));
 
 
 }
