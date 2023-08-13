@@ -23,7 +23,7 @@ bool UT::unit_tests<"literal_map">(void) {
 
 
 
-	constexpr xns::string_literal sf{"hello {0}, {1}\n"};
+	constexpr xns::basic_string_literal sf{"hello {0}, {1}\n"};
 
 	using seq = xns::make_char_seq<6, 8, sf>;
 	using seq2 = xns::make_char_seq<1, 3, sf>;
@@ -31,7 +31,7 @@ bool UT::unit_tests<"literal_map">(void) {
 	seq::print();
 	//xns::static_tokenizer<seq> st;
 
-	xns::string_literal wsl{L"hello"};
+	xns::basic_string_literal wsl{L"hello"};
 
 
 	//constexpr char ar[1] = {'a'};
@@ -84,3 +84,12 @@ bool UT::unit_tests<"literal_map">(void) {
 
 	return true;
 }
+
+
+int main(void) {
+	UT::unit_tests<"literal_map">();
+	return 0;
+}
+
+
+
