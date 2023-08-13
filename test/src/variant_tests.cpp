@@ -68,23 +68,25 @@ void benchmark(void) {
 	// get time in nanoseconds
 	auto start = get_time();
 
+	constexpr std::size_t N = 1000000;
+
 	std::vector<variant> vec;
 
-	for (std::size_t i = 0; i < 10000000; ++i) {
+	for (std::size_t i = 0; i < N; ++i) {
 		vec.push_back(variant{});
 	}
 
-	for (std::size_t i = 0; i < 10000000; ++i) {
+	for (std::size_t i = 0; i < N; ++i) {
 		variant& var = vec[i];
 		var.template emplace<std::size_t>(i);
 	}
 
-	for (std::size_t i = 0; i < 10000000; ++i) {
+	for (std::size_t i = 0; i < N; ++i) {
 		variant& var = vec[i];
 		var.template emplace<float>(123.456f);
 	}
 
-	for (std::size_t i = 0; i < 10000000; ++i) {
+	for (std::size_t i = 0; i < N; ++i) {
 		variant& var = vec[i];
 		var.template emplace<std::string>("hello world");
 	}
@@ -92,13 +94,13 @@ void benchmark(void) {
 
 	std::vector<variant> vec2;
 
-	for (std::size_t i = 0; i < 10000000; ++i) {
+	for (std::size_t i = 0; i < N; ++i) {
 		vec2.push_back(vec[i]);
 	}
 
 	std::vector<variant> vec3;
 
-	for (std::size_t i = 0; i < 10000000; ++i) {
+	for (std::size_t i = 0; i < N; ++i) {
 		vec3.push_back(std::move(vec[i]));
 	}
 
@@ -194,17 +196,19 @@ bool UT::unit_tests<"variant">(void) {
 }
 
 
+#include "reference.hpp"
 
 
 
 int main(void) {
 
-
+	/*
 	benchmark<xns::variant<std::string, std::size_t, float>>();
 	benchmark<std::variant<std::string, std::size_t, float>>();
 
 
 	return EXIT_SUCCESS;
+	*/
 
 	return UT::unit_tests<"variant">()
 		? EXIT_SUCCESS : EXIT_FAILURE;
