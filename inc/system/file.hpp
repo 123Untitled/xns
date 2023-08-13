@@ -1,10 +1,12 @@
 #ifndef FILE_HEADER
 #define FILE_HEADER
 
+// local headers
 #include "string.hpp"
 #include "draw.hpp"
-#include "unique_fd.hpp"
+#include "unique_descriptor.hpp"
 
+// operating system headers
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -14,55 +16,59 @@
 
 namespace xns {
 
+
 	// -- F I L E  C L A S S --------------------------------------------------
 
 	class file final {
 
+
 		public:
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			file(void);
+			inline file(void) noexcept
+			: _descriptor{} {
+				// code here...
+			}
 
-			/* path constructor */
-			file(const xns::string&);
+			/* variadic constructor */
+			template <typename... A>
+			inline file(const xns::string& path, A&&... args) noexcept
+			: _descriptor{xns::trust{}, ::open(path.data(), args...)} {
+				// code here...
+			}
+
+			/* move constructor */
+			inline file(xns::file&& other) noexcept
+			: _descriptor{xns::move(other._descriptor)} {
+				// code here...
+			}
 
 			/* non-assignable class */
-			NON_ASSIGNABLE(file);
+			NON_COPYABLE(file);
 
 			/* destructor */
-			~file(void);
+			inline ~file(void) noexcept {
+				// code here...
+			}
 
 
-			void file_name(xns::string&& name);
 
-			/* open file */
-			void open(void);
 
 			/* get file content */
 			void content(void);
 
 
-			/* get path */
-			const xns::string& path(void) const;
-
 		private:
 
-			// -- A L I A S E S -----------------------------------------------
-
-			using Stat = struct stat;
 
 
-			// -- P R I V A T E  M E M B E R S --------------------------------
+			// -- private members ---------------------------------------------
 
-			xns::string _file;
-			xns::string _path;
-			xns::unique_fd     _fd;
-			Stat             _data;
-			bool             _state;
+			/* file descriptor */
+			xns::unique_descriptor _descriptor;
 
-			void operator|(file);
 
 
 	};
