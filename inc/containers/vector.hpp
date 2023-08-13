@@ -485,11 +485,12 @@ namespace xns {
 
 			/* dichotomic search */
 			template <class U>
-			auto dichotomic_search(const U& value) -> iterator {
+			auto dichotomic_search(const U& value) -> iterator
+				requires (xns::is_comparable<U, value_type>) {
 
 				// check if U is comparable to value_type
-				static_assert(is_comparable<U, value_type>,
-					"): TYPE ARE NOT COMPARABLE IN DICHOTOMIC SEARCH :(");
+				//static_assert(is_comparable<U, value_type>,
+				//	"): TYPE ARE NOT COMPARABLE IN DICHOTOMIC SEARCH :(");
 
 				// check size
 				if (!_size) { return end(); }
@@ -516,11 +517,12 @@ namespace xns {
 			}
 
 			/* dichotomic insert */
-			auto dichotomic_insert(const_reference value) -> void {
+			auto dichotomic_insert(const_reference value) -> void
+				requires (xns::is_comparable<value_type>) {
 
 				// check if U is comparable to value_type
-				static_assert(is_comparable<value_type, value_type>,
-					"): TYPE ARE NOT COMPARABLE IN DICHOTOMIC INSERT :(");
+				//static_assert(is_comparable<value_type, value_type>,
+				//	"): TYPE ARE NOT COMPARABLE IN DICHOTOMIC INSERT :(");
 
 
 				// initialize bounds
