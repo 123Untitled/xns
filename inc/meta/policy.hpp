@@ -56,25 +56,6 @@ namespace xns {
 		static_assert(xns::restrict<TYPE>, "TYPE MUST BE A RESTRICT TYPE")
 
 
-	// -- I S  C O N S T R U C T I B L E  C O N C E P T -----------------------
-
-	/* is copyable */
-	template <class T>
-	concept is_copy_constructible = requires(T a, const T& b) {
-		T{b}, a = b;
-	};
-
-	/* is moveable */
-	template <class T>
-	concept is_move_constructible = requires(T a, T&& b) {
-		T{xns::move(b)}, a = xns::move(b);
-	};
-
-	/* is constructible */
-	template <class T, class... A>
-	concept is_constructible = requires(A&&... args) {
-		T{xns::forward<A>(args)...};
-	};
 
 
 
