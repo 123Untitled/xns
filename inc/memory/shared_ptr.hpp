@@ -2,8 +2,8 @@
 #define SHARED_PTR_HEADER
 
 #include "types.hpp"
+#include "inheritance.hpp"
 #include "macro.hpp"
-#include "type_traits.hpp"
 #include "allocator.hpp"
 
 
