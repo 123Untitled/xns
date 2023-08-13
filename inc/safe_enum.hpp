@@ -1,22 +1,24 @@
 #ifndef SAFE_ENUM_HEADER
 #define SAFE_ENUM_HEADER
 
+// local headers
 #include "types.hpp"
-#include "type_traits.hpp"
+#include "is_same.hpp"
 
-// -- O W N  N A M E S P A C E ------------------------------------------------
+
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
 
 	/* enum definition concept */
-	template <class E>
+	template <typename E>
 	concept enum_def = requires {
 		typename E::type;
 		typename E::enum_type;
 	};
 
 	/* enum max concept */
-	template <class E>
+	template <typename E>
 	concept enum_max = requires {
 		E::enum_type::MAX;
 	};
@@ -24,22 +26,26 @@ namespace xns {
 
 	// -- S A F E  E N U M  C L A S S -----------------------------------------
 
-	template <class E>
+	template <typename E>
 	class safe_enum final : public E {
 
 
 		// -- R E Q U I R E M E N T S -----------------------------------------
 
 		/* E must be an enum definition */
-		static_assert(enum_def<E>, "E MUST BE AN ENUM DEFINITION");
+		static_assert(enum_def<E>, "): SAFE_ENUM: MUST BE AN ENUM DEFINITION :(");
 
 		/* E must have a 'MAX' field */
-		static_assert(enum_max<E>, "E MUST HAVE A MAXIMUM VALUE");
+		static_assert(enum_max<E>, "): SAFE_ENUM: MUST HAVE A MAXIMUM VALUE ('MAX') :(");
+
+		/* E must have a positive 'MAX' value */
+		static_assert(E::MAX >= 0, "): SAFE_ENUM: MAXIMUM VALUE ('MAX') MUST BE POSITIVE :(");
+
 
 
 		public:
 
-			// -- P U B L I C  T Y P E S --------------------------------------
+			// -- public types ------------------------------------------------
 
 			/* self type */
 			using self = safe_enum<E>;
@@ -53,46 +59,43 @@ namespace xns {
 			/* enum type */
 			using enum_type = typename E::enum_type;
 
-
-			// -- C O N S T A N T S -------------------------------------------
-
-			/* maximum value */
-			static constexpr type max = E::enum_type::MAX;
+			/* size type */
+			using size_type = xns::size_t;
 
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			constexpr safe_enum(void) noexcept
-			: _value{0} { }
+			inline constexpr safe_enum(void) noexcept
+			: _value{0} {}
 
 			/* enum constructor */
-			constexpr safe_enum(const enum_type value) noexcept
-			: _value{value} { }
+			inline constexpr safe_enum(const enum_type value) noexcept
+			: _value{value} {}
 
 
-			// -- A C C E S S O R S -------------------------------------------
+			// -- public accessors --------------------------------------------
 
 			/* get number of elements */
-			static consteval type size(void) {
+			inline static constexpr auto size(void) -> size_type {
 				// return maximum value
-				return max;
+				return definition::enum_type::MAX;
 			}
 
 			/* get value */
-			constexpr enum_type value(void) const {
-				// return underlying enum value
+			inline constexpr auto value(void) const -> enum_type {
+				// return enum value
 				return _value;
 			}
 
-			/* get integral value */
-			constexpr type integral(void) const {
+			/* get underlying integral value */
+			constexpr auto integral(void) const -> type {
 				// return integral value
 				return static_cast<type>(_value);
 			}
 
 
-			// -- M U T A T O R S ---------------------------------------------
+			// -- public conversion operators ---------------------------------
 
 			// INFO: used for 'switch' statements
 			/* implicit conversion to enum type */
@@ -104,57 +107,18 @@ namespace xns {
 
 		private:
 
-			// -- M E M B E R S -----------------------------------------------
+			// -- private members ---------------------------------------------
 
+			/* enum value */
 			enum_type _value;
 
-
-		public:
-
-			// -- F R I E N D S -----------------------------------------------
-
-			///* equality operator */
-			//friend constexpr bool operator==(const self& lhs, const self& rhs) noexcept {
-			//	// return value equality
-			//	return lhs._value == rhs._value;
-			//}
-
-			///* inequality operator */
-			//friend constexpr bool operator!=(const self& lhs, const self& rhs) noexcept {
-			//	// return value inequality
-			//	return lhs._value != rhs._value;
-			//}
-
-			///* less than operator */
-			//friend constexpr bool operator<(const self& lhs, const self& rhs) noexcept {
-			//	// return value less than
-			//	return lhs._value < rhs._value;
-			//}
-
-			///* greater than operator */
-			//friend constexpr bool operator>(const self& lhs, const self& rhs) noexcept {
-			//	// return value greater than
-			//	return lhs._value > rhs._value;
-			//}
-
-			///* less than or equal operator */
-			//friend constexpr bool operator<=(const self& lhs, const self& rhs) noexcept {
-			//	// return value less than or equal
-			//	return lhs._value <= rhs._value;
-			//}
-
-			///* greater than or equal operator */
-			//friend constexpr bool operator>=(const self& lhs, const self& rhs) noexcept {
-			//	// return value greater than or equal
-			//	return lhs._value >= rhs._value;
-			//}
 
 	};
 
 
 	// -- I S  S A F E  E N U M -----------------------------------------------
 
-	template <class T>
+	template <typename T>
 	concept is_safe_enum = xns::is_same<T, xns::safe_enum<typename T::definition>>;
 
 
