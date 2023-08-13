@@ -183,8 +183,8 @@ TEST_INCS=("${TEST_INCS[@]/#/-I}")
 BREW_CXX='/opt/homebrew/opt/llvm/bin/clang++'
 
 # compiler
-COMPILER=$BREW_CXX
-#COMPILER=$(which clang++)
+#COMPILER=$BREW_CXX
+COMPILER=$(which clang++)
 
 # linker
 LINKER=$COMPILER
