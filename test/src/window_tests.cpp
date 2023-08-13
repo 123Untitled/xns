@@ -28,7 +28,6 @@ static xns::evntmode build_events(void) {
 
 template <>
 bool UT::unit_tests<"window">(void) {
-	using namespace Xf;
 
 	auto mode = build_events();
 
