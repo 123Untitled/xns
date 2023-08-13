@@ -165,33 +165,34 @@ static void subview(void) {
 template <>
 bool UT::unit_tests<"string">(void) {
 
+	/*{
+		xns::fmt_string s{"hello!\x1b[3;31mworld!\x1b[0m."};
+
+		std::cout << s.string() << std::endl;
+		std::cout << s.vsize() << std::endl;
+		std::cout << s.string().size() << std::endl;
+	}*/
+	{
+
+		xns::string cs{"\x1b[32mhello!\x1b[3;31mworld!\x1b[0m."};
+		std::cout << cs << std::endl;
+
+		auto s3 = xns::sub_fmt_string(cs, 8);
+
+		std::cout << s3 << std::endl;
+
+
+	}
+	return true;
+
 	{
 		xns::string s{"\x1b[31mhello world!\x1b[32m I'm a string\x1b[34m with colors\x1b[0m"};
 		xns::print(s, '\n');
 		xns::out::flush();
 
-		xns::formated_string_iterator it{s, 5};
-
-		while (it) {
-
-			auto view = *it;
-
-			xns::print(view.size(), " `", view, "`\n");
-			xns::out::flush();
-
-			++it;
-		}
-
-	}
-	return true;
-
-	{
-		xns::string s{"hello world! I'm a string with colors"};
-		xns::print(s, '\n');
-		xns::out::flush();
-
 		xns::formated_string_iterator it{s, 3};
 
+		xns::size_t i = 1;
 		while (it) {
 
 			auto view = *it;
@@ -199,12 +200,12 @@ bool UT::unit_tests<"string">(void) {
 			xns::print(view.size(), " `", view, "`\n");
 			xns::out::flush();
 
-			++it;
+			it += 6;
 		}
 
 	}
-
 	return true;
+
 
 
 
@@ -229,3 +230,109 @@ bool UT::unit_tests<"string">(void) {
 	return true;
 
 }
+
+
+#include <cstring>
+
+void compare(void) {
+
+	xns::array arr = {
+		xns::string_view{"arthur"},
+		xns::string_view{"loas"},
+		xns::string_view{"robert"},
+		xns::string_view{"noemie"}
+	};
+
+	long c1 = 0;
+	long c2 = 0;
+
+	for (xns::size_t i = 0; i < arr.size()-1; ++i) {
+
+		c1 = std::strcmp(arr[i].data(), arr[i+1].data());
+		c2 = arr[i].compare(arr[i+1]);
+
+		if ((c1 < 0 && c2 < 0) || c1 == c2 || (c1 > 0 && c2 > 0)) {
+			std::cout << "\x1b[32m";
+		}
+		else {
+			std::cout << "\x1b[31m";
+		}
+		std::cout << arr[i] << " " << arr[i+1] << std::endl;
+		std::cout << "strcmp: " << c1 << " compare: " << c2 << std::endl;
+		std::cout << "\x1b[0m";
+
+
+	}
+
+
+
+
+
+
+}
+
+
+
+/*
+void test(const char* ptr) {
+	std::cout << "from const char*\n";
+}
+
+template <xns::size_t N>
+void test(const char(&ptr)[N]) {
+	std::cout << "from const char(&)[N]\n";
+}*/
+
+
+#include "string_literal.hpp"
+
+struct from_pointer {};
+struct from_array {};
+
+template <std::size_t N>
+void test(from_array, const char(&ptr)[N]) {
+    std::cout << "from const char(&)[" << N << "]\n";
+}
+
+void test(from_pointer, const char* ptr) {
+    std::cout << "from const char*\n";
+}
+
+template <std::size_t N>
+void test2(const xns::string_literal<N>& str) {
+	std::cout << "from string_literal\n";
+}
+
+/*void test2(const char* ptr) {
+	std::cout << "from const char*\n";
+}*/
+
+/*
+template <std::size_t N>
+void test2(const char(&ptr)[N]) {
+	std::cout << "from const char(&)[" << N << "]\n";
+}*/
+
+
+int main(void) {
+
+	xns::string_literal str{"hello"};
+	str.size();
+
+	//test2(xns::string_literal{"hello"});
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
