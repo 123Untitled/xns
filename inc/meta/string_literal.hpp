@@ -11,6 +11,7 @@
 namespace xns {
 
 
+
 	// -- B A S I C  S T R I N G  L I T E R A L -------------------------------
 
 	template<typename T, xns::size_t N>
@@ -172,19 +173,17 @@ namespace xns {
 	basic_string_literal(const T (&)[N]) -> basic_string_literal<T, N>;
 
 
-
-
 	// -- S T R I N G  L I T E R A L ------------------------------------------
 
-	template <typename T, xns::size_t N>
-	class string_literal final : public basic_string_literal<T, N> {
+	template <xns::size_t N>
+	class string_literal final : public basic_string_literal<char, N> {
 
 
 		// -- assertions ------------------------------------------------------
 
 		/* check for 'char' type */
-		static_assert(xns::is_same<T, char>,
-				"): STRING_LITERAL: MUST BE 'char' TYPE :(");
+		//static_assert(xns::is_same<T, char>,
+		//		"): STRING_LITERAL: MUST BE 'char' TYPE :(");
 
 
 		public:
@@ -192,16 +191,17 @@ namespace xns {
 			// -- public lifecycle --------------------------------------------
 
 			/* array constructor override */
-			template <typename U, xns::size_t M>
-			inline consteval string_literal(const U (&str)[M]) noexcept
-			: basic_string_literal<U, M>(str) {}
+			template <xns::size_t M>
+			inline consteval string_literal(const char (&str)[M]) noexcept
+			: basic_string_literal<char, M>{str} {}
+
 
 	};
 
 	// -- deduction guides ----------------------------------------------------
 
-	template <typename T, xns::size_t N>
-	string_literal(const T (&)[N]) -> string_literal<T, N>;
+	template <xns::size_t N>
+	string_literal(const char (&)[N]) -> xns::string_literal<N>;
 
 
 
@@ -330,6 +330,12 @@ namespace xns {
 
 	template <typename T, xns::size_t N>
 	u32string_literal(const T (&)[N]) -> u32string_literal<T, N>;
+
+
+
+
+
+
 
 
 
