@@ -53,6 +53,7 @@ inline auto operator>=(const struct pollfd& lhs,
 }
 
 
+
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 
@@ -177,9 +178,9 @@ namespace xns {
 					// link
 					link::attach(socket);
 					// dichotomic insert
-					_poll.dichotomic_insert({socket.get(),
+					/*_poll.dichotomic_insert({socket.get(),
 											 static_cast<short>(POLLIN),
-											 static_cast<short>(0)});
+											 static_cast<short>(0)});*/
 					print();
 
 				}
@@ -189,7 +190,7 @@ namespace xns {
 					// unlink
 					link::detach(sock);
 					// assume pollfd is sorted
-					_poll.erase(_poll.dichotomic_search(sock));
+					//_poll.erase(_poll.dichotomic_search(sock));
 					print();
 				}
 
