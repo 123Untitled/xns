@@ -115,13 +115,19 @@ namespace xns {
 
 
 			template <typename R, typename T>
-			static auto in_range(const T& value) -> bool {
+			static inline auto in_range(const T& value) -> bool {
 
 				// check types are integral
 				static_assert(xns::is_integral<R> && xns::is_integral<T>,
 						"): IN_RANGE: TYPES MUST BE INTEGRAL :(");
 
-				return (value >= limits::min<R>()) && (value <= limits::max<R>());
+				constexpr auto min = limits::min<R>();
+				constexpr auto max = limits::max<R>();
+
+
+
+				// remove: comparison of integers of different signs: warning
+				return (T)value >= (T)min && (T)value <= (T)max;
 			}
 
 
