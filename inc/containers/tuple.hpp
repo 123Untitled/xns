@@ -9,7 +9,7 @@
 #include "move.hpp"
 #include "is_same.hpp"
 
-#include "pack_type.hpp"
+#include "type_at.hpp"
 #include "integer_sequence.hpp"
 #include "index_of.hpp"
 
@@ -152,7 +152,7 @@ namespace xns {
 
 			/* indexed type */
 			template <size_type IDX>
-			using indexed = xns::pack_type<IDX, A...>;
+			using indexed = xns::type_at<IDX, A...>;
 
 			/* index of type */
 			template <class T>
