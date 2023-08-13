@@ -23,6 +23,8 @@
 #include "is_signed.hpp"
 
 
+// strncmp
+#include <cstring>
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -1050,10 +1052,9 @@ namespace xns {
 			// -- E X T R A C T I O N -----------------------------------------
 
 			/* split */
-			template <xns::restrict R = xns::assignable_t>
-			xns::vector<self, R> split(self&& sep) const {
+			xns::vector<self> split(self&& sep) const {
 				// vector of strings
-				xns::vector<self, R> vec;
+				xns::vector<self> vec;
 				// check if string is not null
 				if (_str) {
 					// loop through string characters
@@ -1878,130 +1879,106 @@ namespace xns {
 
 			/* move constructor */
 			constexpr basic_string_view(self&& other) noexcept
-			: _str{other._str}, _size{other._size} {
-				// invalidate other
-				other._str  = nullptr;
-				other._size = 0;
-			}
+			: basic_string_view{other} {}
 
 			/* destructor */
 			~basic_string_view(void) noexcept = default;
 
 
-			// -- assignments -------------------------------------------------
+			// -- public modifiers --------------------------------------------
 
 			/* pointer assignment */
-			constexpr void assign(const_pointer str) noexcept {
-				// assign string
-				_str = str;
-				// assign size
+			inline constexpr auto assign(const_pointer str) noexcept -> void {
+				// assign members
+				_str  = str;
 				_size = _strlen(str);
 			}
 
 			/* pointer and length assignment */
-			constexpr void assign(const_pointer str, const size_type size) noexcept {
-				// assign string
-				_str = str;
-				// assign size
-				_size = str ? size : 0;
+			inline constexpr auto assign(const_pointer str, const size_type size) noexcept -> void {
+				// assign members
+				_str  = str;
+				_size = size;
 			}
 
 			/* copy assignment */
-			constexpr void assign(const self& other) noexcept {
-				// copy string
-				_str = other._str;
-				// copy size
+			inline constexpr auto assign(const self& other) noexcept -> void {
+				// copy members
+				_str  = other._str;
 				_size = other._size;
 			}
 
-			/* move assignment */
-			constexpr void assign(self&& other) noexcept {
-				// move string
-				_str = other._str;
-				// move size
-				_size = other._size;
-				// invalidate other
-				other._str  = nullptr;
-				other._size = 0;
-			}
 
-
-			// -- A S S I G N M E N T  O P E R A T O R S ----------------------
+			// -- public assignment operators ---------------------------------
 
 			/* pointer assignment operator */
-			constexpr self& operator=(const_pointer str) noexcept {
+			inline constexpr auto operator=(const_pointer str) noexcept -> self& {
 				// return pointer assignment
 				return assign(str), *this;
 			}
 
 			/* copy assignment operator */
-			constexpr self& operator=(const self& other) noexcept {
+			inline constexpr auto operator=(const self& other) noexcept -> self& {
 				// return copy assignment
 				return assign(other), *this;
 			}
 
 			/* move assignment operator */
-			constexpr self& operator=(self&& other) noexcept {
+			inline constexpr auto operator=(self&& other) noexcept -> self& {
 				// return move assignment
-				return assign(xns::move(other)), *this;
+				return assign(other), *this;
 			}
 
 
-			// -- S U B S C R I P T I O N  O P E R A T O R S ------------------
+			// -- public subscript operators ----------------------------------
 
 			/* subscript operator */
-			constexpr const_reference operator[](const size_type index) const noexcept {
+			inline constexpr auto operator[](const size_type index) const noexcept -> const_reference {
 				// return character
 				return _str[index];
 			}
 
 
-			// -- A C C E S S O R S -------------------------------------------
+			// -- public accessors --------------------------------------------
 
 			/* at */
-			constexpr const_reference at(const size_type index) const noexcept {
+			inline constexpr auto at(const size_type index) const noexcept -> const_reference {
 				// return character
 				return _str[index];
 			}
 
 			/* size */
-			constexpr size_type size(void) const noexcept {
-				// return size
-				return _size;
-			}
-
-			/* length */
-			constexpr size_type length(void) const noexcept {
+			inline constexpr auto size(void) const noexcept -> size_type {
 				// return size
 				return _size;
 			}
 
 			/* empty */
-			constexpr bool empty(void) const noexcept {
+			inline constexpr auto empty(void) const noexcept -> bool {
 				// return empty
 				return _size == 0;
 			}
 
 			/* front */
-			constexpr const_reference front(void) const noexcept {
+			inline constexpr auto front(void) const noexcept -> const_reference {
 				// return front
 				return *_str;
 			}
 
 			/* back */
-			constexpr const_reference back(void) const noexcept {
+			inline constexpr auto back(void) const noexcept -> const_reference {
 				// return back
 				return _str[_size - 1];
 			}
 
 			/* const pointer */
-			constexpr const_pointer pointer(void) const noexcept {
+			inline constexpr auto pointer(void) const noexcept -> const_pointer {
 				// return pointer
 				return _str;
 			}
 
 			/* data */
-			constexpr const_pointer data(void) const noexcept {
+			inline constexpr auto data(void) const noexcept -> const_pointer {
 				// return data
 				return _str;
 			}
@@ -2068,10 +2045,10 @@ namespace xns {
 				if (!other._str) { return 1; }
 
 				// compare sizes
-				if (_size != other._size) {
+				/*if (_size != other._size) {
 					// avoid overflow, can't just subtract
 					return _size < other._size ? -1 : 1;
-				}
+				}*/
 
 				size_type x = 0;
 
@@ -2092,17 +2069,54 @@ namespace xns {
 			// -- comparison operators ----------------------------------------
 
 			/* pointer comparison operator */
-			constexpr bool operator==(const_pointer other) const noexcept {
+			inline constexpr auto operator==(const_pointer other) const noexcept -> bool {
 				// return comparison
 				return compare(other) == 0;
 			}
 
-			/* string comparison operator */
+			/* equality operator */
 			template <xns::is_string S>
-			constexpr bool operator==(const S& other) const noexcept {
+			inline constexpr auto operator==(const S& other) const noexcept -> bool {
 				// return comparison
 				return compare(other) == 0;
 			}
+
+			/* inequality operator */
+			template <xns::is_string S>
+			inline constexpr auto operator!=(const S& other) const noexcept -> bool {
+				// return comparison
+				return compare(other) != 0;
+			}
+
+			/* less than operator */
+			template <xns::is_string S>
+			inline constexpr auto operator<(const S& other) const noexcept -> bool {
+				// return comparison
+				return compare(other) < 0;
+			}
+
+			/* greater than operator */
+			template <xns::is_string S>
+			inline constexpr auto operator>(const S& other) const noexcept -> bool {
+				// return comparison
+				return compare(other) > 0;
+			}
+
+			/* less than or equal to operator */
+			template <xns::is_string S>
+			inline constexpr auto operator<=(const S& other) const noexcept -> bool {
+				// return comparison
+				return compare(other) <= 0;
+			}
+
+			/* greater than or equal to operator */
+			template <xns::is_string S>
+			inline constexpr auto operator>=(const S& other) const noexcept -> bool {
+				// return comparison
+				return compare(other) >= 0;
+			}
+
+
 
 		private:
 
@@ -2136,6 +2150,26 @@ namespace xns {
 	/* deduction guide */
 	template <xns::is_char T>
 	basic_string_view(const T*) -> basic_string_view<T>;
+
+
+	inline std::ostream& operator<<(std::ostream& os, const basic_string_view<char>& string) {
+		// write string
+		os.write(string.data(), (std::streamsize)string.size());
+		// return stream
+		return os;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
