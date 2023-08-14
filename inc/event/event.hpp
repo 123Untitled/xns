@@ -359,7 +359,7 @@ namespace xns {
 		// check invalid pointers and event type
 		if (!method || !instance || type >= evntype::EVNT_MAX) { return; }
 		// get event subscriber vector
-		event_vector& subscribers = _modes[mode._idx]._second[IDX(type)];
+		event_vector& subscribers = xns::get<1>(_modes[mode._idx])[IDX(type)];//._second[IDX(type)];
 		// add new subscriber
 		subscribers.emplace_back(method, instance);
 	}
@@ -370,7 +370,7 @@ namespace xns {
 		// check invalid pointers
 		if (!method || !instance) { return; }
 		// get input subscriber vector
-		input_vector& subscribers = _modes[mode._idx]._first;
+		input_vector& subscribers = xns::get<0>(_modes[mode._idx]);//._first;
 		// add new subscriber
 		subscribers.emplace_back(method, instance);
 	}
