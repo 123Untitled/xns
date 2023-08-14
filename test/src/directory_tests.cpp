@@ -29,3 +29,9 @@ bool UT::unit_tests<"directory">(void) {
 	return false;
 }
 
+int main(void) {
+
+	UT::unit_tests<"directory">();
+
+	return 0;
+}
