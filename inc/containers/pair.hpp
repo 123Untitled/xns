@@ -4,6 +4,7 @@
 // local headers
 #include "types.hpp"
 #include "move.hpp"
+#include "forward.hpp"
 #include "indexed_element.hpp"
 
 
@@ -39,11 +40,12 @@ namespace xns {
 
 			/* copy pair constructor */
 			inline constexpr pair(const first& first, const second& second)
-			: _first{first}, _second{second} { }
+			: _first{first}, _second{second} {}
 
-			/* move pair constructor */
-			inline constexpr pair(first&& first, second&& second)
-			: _first{xns::move(first)}, _second{xns::move(second)} {}
+			/* forward constructor */
+			template <typename U1 = T1, typename U2 = T2>
+			inline constexpr pair(U1&& first, U2&& second)
+			: _first{xns::forward<U1>(first)}, _second{xns::forward<U2>(second)} {}
 
 			/* copy constructor */
 			inline constexpr pair(const self& other)
@@ -238,6 +240,25 @@ namespace xns {
 			return pair._first;
 		} else { return pair._second; }
 	}
+
+
+
+
+			/* here from std::reference */
+
+			// template <class U1, class U2>
+			// inline constexpr pair(pair<U1, U2>& pair);
+
+			// template <class U1, class U2>
+			// constexpr pair(pair<U1, U2>&& pair);
+
+			// template <class U1, class U2>
+			// constexpr pair(const pair<U1, U2>& pair);
+
+			// template <class U1, class U2>
+			// constexpr pair(const pair<U1, U2>&& pair);
+
+			/* end here from std::reference */
 
 
 
