@@ -8,15 +8,7 @@
 #include "path.hpp"
 #include "stack.hpp"
 #include "pair.hpp"
-#include "os.hpp"
-
-// macos headers
-#if defined(APPLE_OS)
-	#include <sys/dir.h>
-// linux headers
-#elif defined(LINUX_OS)
-	#include <dirent.h>
-#endif
+#include "unique_directory.hpp"
 
 
 
@@ -30,90 +22,7 @@ namespace xns {
 	namespace filesystem {
 
 
-
-
-		// -- D I R E C T O R Y  E N T R Y ------------------------------------
-
-		//class directory_entry final {
-
-		//	public:
-
-		//		// -- public constructors -------------------------------------
-
-		//		/* default constructor */
-		//		directory_entry(void);
-
-		//		/* member constructor */
-		//		directory_entry(const xns::string& path) {
-		//			stat(path.pointer(), &_stat);
-		//		}
-
-		//		/* copy constructor */
-		//		directory_entry(const directory_entry& other)
-		//		: _name{other._name}, _path{other._path}, _stat{other._stat} {
-		//		}
-
-		//		/* destructor */
-		//		~directory_entry(void);
-
-
-		//	private:
-
-		//		// -- private types -------------------------------------------
-
-		//		/* file stat */
-		//		//using filestat   = struct stat;
-
-
-		//		// -- private members -----------------------------------------
-
-		//		/* name of entity */
-		//		xns::string _name;
-
-		//		/* full path of entity */
-		//		xns::path<xns::string> _path;
-
-		//		/* file stat */
-		//		//filestat    _stat;
-
-		//	public:
-
-		//		// -- public accessors ----------------------------------------
-
-		//		/* get name of entity */
-		//		const xns::string& get_name(void) const;
-
-		//		/* get full path of entity */
-		//		const xns::path<xns::string>& get_path(void) const;
-
-		//		/* get file size */
-		//		xns::size_t get_size(void) const;
-
-
-		//		// -- public boolean methods ----------------------------------
-
-		//		/* is directory */
-		//		bool is_directory(void) const;
-
-		//		/* is regular */
-		//		bool is_regular(void) const;
-
-		//		/* is symbolic link */
-		//		bool is_symlink(void) const;
-
-		//		/* is block */
-		//		bool is_block(void) const;
-
-		//		/* is character */
-		//		bool is_character(void) const;
-
-		//		/* is fifo */
-		//		bool is_fifo(void) const;
-
-		//};
-
-
-		// -- I T E R A T O R -------------------------------------------------
+		// -- D I R E C T O R Y  I T E R A T O R  C L A S S -------------------
 
 		template <bool recursive>
 		class directory_iterator final {
@@ -123,10 +32,13 @@ namespace xns {
 
 				// -- private types -------------------------------------------
 
+				/* pair type */
+				using pair = xns::pair<xns::unique_directory,
+									   xns::string>;
+
 				/* container type */
-				using container = xns::conditional<recursive,
-												   xns::stack<xns::pair<DIR*, xns::string>>,
-												   xns::pair<DIR*, xns::string>>;
+				using container = xns::conditional<recursive, xns::stack<pair>,
+															  pair>;
 
 				/* directory entry type */
 				using entity_ptr = struct dirent*;
@@ -155,21 +67,18 @@ namespace xns {
 				directory_iterator(void) = delete;
 
 				/* nullptr constructor */
-				directory_iterator(xns::null)
+				inline directory_iterator(xns::null) noexcept
 				: _container{}, _entity{nullptr} {}
 
 				/* path constructor (non-recursive) */
 				directory_iterator(const xns::string& path) requires (recursive == false)
-				: _container{}, _entity{nullptr} {
-					// check path validity
-					if (path.empty() == true) { return; }
-					// open directory and set pair
-					_container = xns::pair{::opendir(path.data()), path};
+				: _container{path, path}, _entity{nullptr} {
+
 					// check opening failure
-					if (_container._first == nullptr) {
-						write(STDERR_FILENO, "Error: could not open directory\n", 32);
+					if (xns::get<xns::unique_directory>(_container).is_open() == false) {
 						return;
-					} // get first entry
+					}
+					// get first entry
 					operator++();
 				}
 
@@ -177,14 +86,12 @@ namespace xns {
 				directory_iterator(const xns::string& path) requires (recursive == true)
 				: _container{}, _entity{nullptr} {
 
-					DIR* dir = ::opendir(path.data());
+					xns::unique_directory dir{path};
 					// check opening failure
-					if (dir == nullptr) {
-						write(STDERR_FILENO, "Error: could not open directory\n", 32);
-						return;
-					}
+					if (dir.is_open() == false) { return; }
 					// open directory
-					_container.push(xns::pair{dir, path});
+					_container.emplace(xns::move(dir), path);
+					// get first entry
 					operator++();
 				}
 
@@ -192,69 +99,34 @@ namespace xns {
 				NON_ASSIGNABLE(directory_iterator);
 
 				/* destructor */
-				~directory_iterator(void) {
-
-					if constexpr (recursive == false) {
-						// close directory
-						if (_container._first != nullptr) {
-							::closedir(_container._first);
-						}
-					}
-					else if constexpr (recursive == true) {
-						// close all directories
-						while (_container.empty() == false) {
-							::closedir(_container.top()._first);
-							_container.pop();
-						}
-					}
-				}
-
-				///* destructor (non-recursive) */
-				//~directory_iterator(void) requires (recursive == false) {
-				//	// close directory
-				//	if (_container._first != nullptr) {
-				//		::closedir(_container._first);
-				//	}
-				//}
-
-				///* destructor (recursive) */
-				//~directory_iterator(void) requires (recursive == true) {
-				//	// close all directories
-				//	while (_container.empty() == false) {
-				//		::closedir(_container.top()._first);
-				//		_container.pop();
-				//	}
-				//}
+				~directory_iterator(void) noexcept = default;
 
 
 				// -- public increment operators ------------------------------
 
 				/* pre-increment operator (non-recursive) */
-				directory_iterator& operator++(void) requires (recursive == false) {
+				auto operator++(void) noexcept -> self& requires (recursive == false) {
 					// get next entry
-					while ((_entity = ::readdir(_container._first)) != nullptr) {
+					while ((_entity = ::readdir(xns::get<xns::unique_directory>(_container)))
+							!= nullptr) {
 						// check for directory '.' or '..'
-						if (_entity->d_type == DT_DIR
-							&& skip() == true) { continue; }
-						// exit loop
-						break;
+						if (_entity->d_type != DT_DIR
+						 || skip() == false) { break; }
 					}
 					return *this;
 				}
 
 
 				/* pre-increment operator (recursive) */
-				directory_iterator& operator++(void) requires (recursive == true) {
+				auto operator++(void) -> self& requires (recursive == true) {
 
 					while (_container.empty() == false) {
 
 						// get next entry
-						_entity = ::readdir(_container.top()._first);
+						_entity = ::readdir(xns::get<xns::unique_directory>(_container.top()));
 
 						// check for end of directory
 						if (_entity == nullptr) {
-							// close directory
-							::closedir(_container.top()._first);
 							_container.pop();
 							continue;
 						}
@@ -265,7 +137,7 @@ namespace xns {
 							// skip '.' and '..' directories
 							if (skip() == true) { continue; }
 
-							xns::string path{_container.top()._second};
+							xns::string path{xns::get<xns::string>(_container.top())};
 							path.append(SEPARATOR);
 							#if defined(APPLE_OS)
 								path.append(_entity->d_name, _entity->d_namlen);
@@ -273,12 +145,15 @@ namespace xns {
 								path.append(_entity->d_name);
 							#endif
 
-							DIR* dir = ::opendir(path.data());
+							xns::unique_directory dir{path};
 
 							// check opening failure (need to set errno like status)
-							if (dir == nullptr) { break; }
+							if (dir.is_open() == false) {
+								write(STDERR_FILENO, "Error: could not open directory\n", 32);
+								continue;
+							}
 
-							_container.push(xns::pair{dir, xns::move(path)});
+							_container.emplace(xns::move(dir), xns::move(path));
 							break;
 						}
 
@@ -289,8 +164,6 @@ namespace xns {
 				}
 
 
-
-
 				/* post-increment operator */
 				directory_iterator& operator++(int) = delete;
 
@@ -299,7 +172,7 @@ namespace xns {
 				// -- comparison operators ------------------------------------
 
 				/* equality operator */
-				bool operator==(const directory_iterator& other) const {
+				inline auto operator==(const directory_iterator& other) const noexcept -> bool {
 					// compare inodes of entities
 					#if defined(BSD_OS) || defined(APPLE_OS)
 						return  _entity
@@ -313,17 +186,17 @@ namespace xns {
 				}
 
 				/* inequality operator */
-				bool operator!=(const directory_iterator& other) const {
+				inline auto operator!=(const directory_iterator& other) const noexcept -> bool {
 					return operator==(other) == false;
 				}
 
 				/* null pointer equality operator */
-				bool operator==(xns::null) const {
+				inline auto operator==(xns::null) const noexcept -> bool {
 					return _entity == nullptr;
 				}
 
 				/* null pointer inequality operator */
-				bool operator!=(xns::null) const {
+				inline auto operator!=(xns::null) const noexcept -> bool {
 					return _entity != nullptr;
 				}
 
@@ -331,12 +204,12 @@ namespace xns {
 				// -- public boolean operators --------------------------------
 
 				/* boolean operator */
-				operator bool(void) const {
+				inline operator bool(void) const noexcept {
 					return _entity != nullptr;
 				}
 
 				/* not operator */
-				bool operator!(void) const {
+				inline auto operator!(void) const noexcept -> bool {
 					return _entity == nullptr;
 				}
 
@@ -344,13 +217,14 @@ namespace xns {
 				// -- public accessors ----------------------------------------
 
 				/* get name of entity */
-				xns::string_view name(void) const {
+				auto name(void) const noexcept -> xns::string_view {
 					return _entity->d_name;
 				}
 
 				/* get path of entity */
-				xns::string path(void) const requires (recursive == true) {
-					xns::string path{_container.top()._second};
+				auto path(void) const -> xns::string requires (recursive == true) {
+					//xns::string path{_container.top()._second};
+					xns::string path{xns::get<xns::string>(_container.top())};
 					path.append(SEPARATOR);
 					#if defined(APPLE_OS)
 						path.append(_entity->d_name, _entity->d_namlen);
@@ -362,8 +236,9 @@ namespace xns {
 				}
 
 				/* get path of entity */
-				xns::string path(void) const requires (recursive == false) {
-					xns::string path{_container._second};
+				auto path(void) const -> xns::string requires (recursive == false) {
+					//xns::string path{_container._second};
+					xns::string path{xns::get<xns::string>(_container)};
 					path.append(SEPARATOR);
 					#if defined(APPLE_OS)
 						path.append(_entity->d_name, _entity->d_namlen);
@@ -378,47 +253,47 @@ namespace xns {
 				// -- public boolean methods ----------------------------------
 
 				/* is hidden */
-				bool is_hidden(void) const {
+				inline auto is_hidden(void) const noexcept -> bool {
 					return _entity->d_name[0] == POINT;
 				}
 
 				/* is unknown */
-				bool is_unknown(void) const {
+				inline auto is_unknown(void) const noexcept -> bool {
 					return _entity->d_type == DT_UNKNOWN;
 				}
 
 				/* is directory */
-				bool is_directory(void) const {
+				inline auto is_directory(void) const noexcept -> bool {
 					return _entity->d_type == DT_DIR;
 				}
 
 				/* is regular */
-				bool is_regular(void) const {
+				inline auto is_regular(void) const noexcept -> bool {
 					return _entity->d_type == DT_REG;
 				}
 
 				/* is symbolic link */
-				bool is_symlink(void) const {
+				inline auto is_symlink(void) const noexcept -> bool {
 					return _entity->d_type == DT_LNK;
 				}
 
 				/* is block */
-				bool is_block(void) const {
+				inline auto is_block(void) const noexcept -> bool {
 					return _entity->d_type == DT_BLK;
 				}
 
 				/* is character */
-				bool is_character(void) const {
+				inline auto is_character(void) const noexcept -> bool {
 					return _entity->d_type == DT_CHR;
 				}
 
 				/* is fifo */
-				bool is_fifo(void) const {
+				inline auto is_fifo(void) const noexcept -> bool {
 					return _entity->d_type == DT_FIFO;
 				}
 
 				/* is socket */
-				bool is_socket(void) const {
+				inline auto is_socket(void) const noexcept -> bool {
 					return _entity->d_type == DT_SOCK;
 				}
 
@@ -429,7 +304,7 @@ namespace xns {
 				// -- private utility methods ---------------------------------
 
 				/* check '.' and '..' directories */
-				inline bool skip(void) const {
+				inline auto skip(void) const noexcept -> bool {
 					// branchless ternary
 					return _entity->d_name[0] == POINT  ?
 						   _entity->d_name[1] == '\0' ? true :
@@ -456,6 +331,11 @@ namespace xns {
 
 		/* recursive iterator type */
 		using recursive_iterator = directory_iterator<true>;
+
+
+
+
+
 
 
 	}
@@ -573,3 +453,83 @@ namespace xns {
 // st_mtim;			/* Time of last modification */
 // st_ctim;			/* Time of last status change */
 #endif
+
+		// -- D I R E C T O R Y  E N T R Y ------------------------------------
+
+		//class directory_entry final {
+
+		//	public:
+
+		//		// -- public constructors -------------------------------------
+
+		//		/* default constructor */
+		//		directory_entry(void);
+
+		//		/* member constructor */
+		//		directory_entry(const xns::string& path) {
+		//			stat(path.pointer(), &_stat);
+		//		}
+
+		//		/* copy constructor */
+		//		directory_entry(const directory_entry& other)
+		//		: _name{other._name}, _path{other._path}, _stat{other._stat} {
+		//		}
+
+		//		/* destructor */
+		//		~directory_entry(void);
+
+
+		//	private:
+
+		//		// -- private types -------------------------------------------
+
+		//		/* file stat */
+		//		//using filestat   = struct stat;
+
+
+		//		// -- private members -----------------------------------------
+
+		//		/* name of entity */
+		//		xns::string _name;
+
+		//		/* full path of entity */
+		//		xns::path<xns::string> _path;
+
+		//		/* file stat */
+		//		//filestat    _stat;
+
+		//	public:
+
+		//		// -- public accessors ----------------------------------------
+
+		//		/* get name of entity */
+		//		const xns::string& get_name(void) const;
+
+		//		/* get full path of entity */
+		//		const xns::path<xns::string>& get_path(void) const;
+
+		//		/* get file size */
+		//		xns::size_t get_size(void) const;
+
+
+		//		// -- public boolean methods ----------------------------------
+
+		//		/* is directory */
+		//		bool is_directory(void) const;
+
+		//		/* is regular */
+		//		bool is_regular(void) const;
+
+		//		/* is symbolic link */
+		//		bool is_symlink(void) const;
+
+		//		/* is block */
+		//		bool is_block(void) const;
+
+		//		/* is character */
+		//		bool is_character(void) const;
+
+		//		/* is fifo */
+		//		bool is_fifo(void) const;
+
+		//};
