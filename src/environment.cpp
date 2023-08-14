@@ -36,9 +36,9 @@ void xns::env::print(void) {
 	// loop over environment variables
 	for (size_type x = 0; x < _env.size(); ++x) {
 		// print variable
-		xns::out::write(_env[x]._first);
+		xns::out::write(xns::get<0>(_env[x]));
 		xns::out::write(" [=] ", 5);
-		xns::out::write(_env[x]._second);
+		xns::out::write(xns::get<1>(_env[x]));
 		xns::out::write("\n", 1);
 	} // flush output
 	xns::out::flush();
@@ -53,9 +53,9 @@ const xns::env::weak_string xns::env::get(const xns::string& name) {
 	// loop over environment variables
 	for (size_type x = 0; x < _env.size(); ++x) {
 		// check if key matches
-		if (_env[x]._first == name) {
+		if (xns::get<0>(_env[x]) == name) {
 			// return value
-			return weak_string{&_env[x]._second}; }
+			return weak_string{&xns::get<1>(_env[x])}; }
 	} // else return nullptr
 	return nullptr;
 }
