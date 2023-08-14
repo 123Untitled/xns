@@ -13,7 +13,10 @@ bool UT::unit_tests<"pair">(void) {
 
 
 	xns::pair<int, float> pair{2, 0.3f};
-	std::pair<int, float> pair2{2, 0.3f};
+
+	xns::pair<int, int> pair3{2, 3};
+
+	int& i2 = xns::get<1>(pair3);
 
 	//int i = std::get<int>(pair2);
 
