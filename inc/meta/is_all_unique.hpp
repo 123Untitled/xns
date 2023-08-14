@@ -3,6 +3,7 @@
 
 #include "integral_constant.hpp"
 #include "is_one_of.hpp"
+#include "is_same.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -19,17 +20,47 @@ namespace xns {
 
 
 		/* is all unique */
-		template <class...>
+		template <typename...>
 		struct is_all_unique;
 
 		/* is all unique specialization */
-		template <class T, class... A>
+		template <typename T, typename... A>
 		struct is_all_unique<T, A...> : public xns::bool_constant<
 		(!xns::is_one_of<T, A...> && (is_all_unique<A...>::value)) > {};
 
 		/* end of recursion */
-		template <class T>
+		template <typename T>
 		struct is_all_unique<T> : public xns::yes {};
+
+
+		/* is unique */
+		template <bool, typename...>
+		struct is_unique;
+
+		/* is unique specialization */
+		template <typename U, typename T, typename... Tp>
+		struct is_unique<false, U, T, Tp...> : public xns::bool_constant<
+		(!xns::is_same<U, T> && impl::is_unique<false, U, Tp...>::value)
+		|| (xns::is_same<U, T> && impl::is_unique<true, U, Tp...>::value)
+		> {};
+
+		/* is unique specialization */
+		template <typename U, typename T, typename... Tp>
+		struct is_unique<true, U, T, Tp...> : public xns::bool_constant<
+		(!xns::is_same<U, T> && impl::is_unique<true, U, Tp...>::value)
+		|| false> {};
+
+		/* end of recursion */
+		template <typename U, typename T>
+		struct is_unique<false, U, T> : public xns::bool_constant<
+		true> {};
+
+		/* end of recursion */
+		template <typename U, typename T>
+		struct is_unique<true, U, T> : public xns::bool_constant<
+		!xns::is_same<U, T>> {};
+
+
 
 	}
 
@@ -37,6 +68,11 @@ namespace xns {
 	/* is all unique concept */
 	template <class... A>
 	concept is_all_unique = impl::is_all_unique<A...>::value;
+
+	/* is unique concept */
+	template <class T, class... A>
+	concept is_unique = impl::is_unique<false, T, A...>::value;
+
 
 
 	// -- U N I Q U E  T Y P E S ----------------------------------------------
