@@ -1,16 +1,28 @@
 #include "unit_tests.hpp"
 #include "tuple.hpp"
 
+const int&& foo(void) {
+
+	static int i = 0;
+
+	return xns::move(i);
+}
 
 template <>
 bool UT::unit_tests<"tuple">(void) {
 
-	using namespace xns;
+
+	xns::tuple<int, float, const char*> _tuple{2, 0.3f, "hello"};
+
+	int refff = xns::get<int>(xns::move(_tuple));
+
+	static_assert(xns::is_unique<char, int, float, const char*>);
 
 
-	xns::tuple<int, float, const char*> _tuple{1, 0.3f, "hello"};
+	//int& reff = xns::get<1>(_tuple);
 
-	//_tuple.set<8>(2);
+
+	//_tuple.set<0>(2);
 
 
 	//auto ret = xns::get<float>(_tuple);
@@ -20,9 +32,9 @@ bool UT::unit_tests<"tuple">(void) {
 	return false;
 
 
-	auto& refff = xns::get<0>(_tuple);
 
-	std::cout << refff << std::endl;
+
+	//std::cout << refff << std::endl;
 
 
 	using Type = Class<int, double, char>;
@@ -58,3 +70,11 @@ bool UT::unit_tests<"tuple">(void) {
 
 }
 
+
+int main(void) {
+
+	UT::unit_tests<"tuple">();
+
+	return 0;
+
+}
