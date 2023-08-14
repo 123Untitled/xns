@@ -78,7 +78,7 @@ void xns::event::next_mode(void) {
 	_current = xns::move(_next);
 
 	// get subscribers index by event type
-	event_vector& subscribers = _modes[*_current]._second[IDX(evntype::BEGIN)];
+	event_vector& subscribers = xns::get<1>(_modes[*_current])[IDX(evntype::BEGIN)];//._second[IDX(evntype::BEGIN)];
 	// loop through all observers
 	for (xns::size_t x = 0; x < subscribers.size(); ++x) {
 		// call subscriber
@@ -162,7 +162,7 @@ void xns::event::call_event(const evntype type) {
 	// exit if no current mode or invalid event type
 	if (!_current || type >= evntype::EVNT_MAX) { return; }
 	// get subscribers index by event type
-	event_vector& subscribers = _modes[*_current]._second[IDX(type)];
+	event_vector& subscribers = xns::get<1>(_modes[*_current])[IDX(type)];//._second[IDX(type)];
 	// loop through all observers
 	for (xns::size_t x = 0; x < subscribers.size(); ++x) {
 		// call subscriber
@@ -175,7 +175,7 @@ void xns::event::call_input(const xns::string& input) {
 	// exit if no current mode
 	if (!_current) { return; }
 	// get subscribers
-	input_vector& subscribers = _modes[*_current]._first;
+	input_vector& subscribers = xns::get<0>(_modes[*_current]);//._first;
 	// loop through all observers
 	for (xns::size_t x = 0; x < subscribers.size(); ++x) {
 		// call subscriber
@@ -191,7 +191,7 @@ void xns::event::_subscribe(const evntmode& mode, const evntype type, event_func
 	// check invalid pointers and event type
 	if (!function || type >= evntype::EVNT_MAX) { return; }
 	// get event subscriber vector
-	event_vector& subscribers = _modes[mode._idx]._second[IDX(type)];
+	event_vector& subscribers = xns::get<1>(_modes[mode._idx])[IDX(type)];//._second[IDX(type)];
 	// add new subscriber
 	subscribers.emplace_back(function);
 }
@@ -201,7 +201,7 @@ void xns::event::_subscribe(const evntmode& mode, input_function function) {
 	// check invalid pointers
 	if (!function) { return; }
 	// get input subscriber vector
-	input_vector& subscribers = _modes[mode._idx]._first;
+	input_vector& subscribers = xns::get<0>(_modes[mode._idx]);//._first;
 	// add new subscriber
 	subscribers.emplace_back(function);
 }
