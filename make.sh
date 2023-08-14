@@ -371,6 +371,7 @@ function make_ninja {
 		exit 0
 	fi
 
+	return 1
 	# check clang-filter executable exists
 	if [[ ! -x "clang-filter" ]]; then
 		git clone 'git@github.com:123Untitled/build_system.git' 'build_system'
@@ -484,8 +485,8 @@ function generate_ninja {
 
 	# compile
 	echo "rule compile" >> $NINJAFILE
-	#echo "  command = \$cxx \$cxxflags \$incs -MMD -MF \$dep -c \$in -o \$out" >> $NINJAFILE
-	echo "  command = \$cxx \$cxxflags \$incs -MMD -MF \$dep -c \$in -o \$out 2> \$log" >> $NINJAFILE
+	echo "  command = \$cxx \$cxxflags \$incs -MMD -MF \$dep -c \$in -o \$out" >> $NINJAFILE
+	#echo "  command = \$cxx \$cxxflags \$incs -MMD -MF \$dep -c \$in -o \$out 2> \$log" >> $NINJAFILE
 	echo "  depfile = \$dep" >> $NINJAFILE
 	echo "  description = compiling \$in\n" >> $NINJAFILE
 
