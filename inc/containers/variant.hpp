@@ -11,6 +11,7 @@
 #include "is_all_unique.hpp"
 #include "is_const.hpp"
 #include "allocator.hpp"
+#include "indexed_element.hpp"
 
 
 
@@ -195,25 +196,6 @@ namespace xns {
 
 			// -- public accessors --------------------------------------------
 
-			/* get reference to value */
-			template <typename T>
-			inline constexpr auto get(void) noexcept -> T& {
-				// check if type is in variant
-				static_assert(xns::is_one_of<T, A...>,
-						"): VARIANT: TYPE NOT IN CONTAINER :(");
-				// return reference to value
-				return _storage.template to_reference<T>();
-			}
-
-			/* get const reference to value */
-			template <typename T>
-			inline constexpr auto get(void) const noexcept -> const T& {
-				// check if type is in variant
-				static_assert(xns::is_one_of<T, A...>,
-						"): VARIANT: TYPE NOT IN CONTAINER :(");
-				// return const reference to value
-				return _storage.template to_reference<T>();
-			}
 
 			/* is containing type */
 			inline constexpr auto contains(void) const noexcept -> bool {
@@ -351,13 +333,127 @@ namespace xns {
 			};
 
 
+			// -- friends -----------------------------------------------------
+
+			/* get mutable reference as friend */
+			template <typename T, typename... U>
+			friend inline constexpr auto get(xns::variant<U...>&) -> T&;
+
+			/* get mutable rvalue reference as friend */
+			template <typename T, typename... U>
+			friend inline constexpr auto get(xns::variant<U...>&&) -> T&&;
+
+			/* get const reference as friend */
+			template <typename T, typename... U>
+			friend inline constexpr auto get(const xns::variant<U...>&) -> const T&;
+
+			/* get const rvalue reference as friend */
+			template <typename T, typename... U>
+			friend inline constexpr auto get(const xns::variant<U...>&&) -> const T&&;
+
+
+			/* get indexed mutable reference as friend */
+			template <xns::size_t I, typename... T>
+			friend inline constexpr auto get(xns::variant<T...>&) -> xns::indexed_element<I, xns::variant<T...>>&;
+
+			/* get indexed mutable rvalue reference as friend */
+			template <xns::size_t I, typename... T>
+			friend inline constexpr auto get(xns::variant<T...>&&) -> xns::indexed_element<I, xns::variant<T...>>&&;
+
+			/* get indexed const reference as friend */
+			template <xns::size_t I, typename... T>
+			friend inline constexpr auto get(const xns::variant<T...>&) -> const xns::indexed_element<I, xns::variant<T...>>&;
+
+			/* get indexed const rvalue reference as friend */
+			template <xns::size_t I, typename... T>
+			friend inline constexpr auto get(const xns::variant<T...>&&) -> const xns::indexed_element<I, xns::variant<T...>>&&;
+
 	};
 
 
 
+	/* get mutable reference */
+	template <typename T, typename... A>
+	inline constexpr auto get(xns::variant<A...>& variant) -> T& {
+		// check if type is in variant
+		static_assert(xns::is_one_of<T, A...>,
+				"): VARIANT: TYPE NOT IN CONTAINER :(");
+		// return mutable reference
+		return variant._storage.template to_reference<T>();
+	}
 
+	/* get mutable rvalue reference */
+	template <typename T, typename... A>
+	inline constexpr auto get(xns::variant<A...>&& variant) -> T&& {
+		// check if type is in variant
+		static_assert(xns::is_one_of<T, A...>,
+				"): VARIANT: TYPE NOT IN CONTAINER :(");
+		// return mutable rvalue reference
+		return xns::move(variant._storage.template to_reference<T>());
+	}
+
+	/* get const reference */
+	template <typename T, typename... A>
+	inline constexpr auto get(const xns::variant<A...>& variant) -> const T& {
+		// check if type is in variant
+		static_assert(xns::is_one_of<T, A...>,
+				"): VARIANT: TYPE NOT IN CONTAINER :(");
+		// return const reference
+		return variant._storage.template to_reference<T>();
+	}
+
+	/* get const rvalue reference */
+	template <typename T, typename... A>
+	inline constexpr auto get(const xns::variant<A...>&& variant) -> const T&& {
+		// check if type is in variant
+		static_assert(xns::is_one_of<T, A...>,
+				"): VARIANT: TYPE NOT IN CONTAINER :(");
+		// return const rvalue reference
+		return xns::move(variant._storage.template to_reference<T>());
+	}
+
+
+	/* get indexed mutable reference */
+	template <xns::size_t I, typename... T>
+	inline constexpr auto get(xns::variant<T...>& variant) -> xns::indexed_element<I, xns::variant<T...>>& {
+		// check if index out of bounds
+		static_assert(I < sizeof...(T),
+				"): VARIANT: INDEX OUT OF BOUNDS :(");
+		// return mutable reference
+		return variant._storage.template to_reference<xns::type_at<I, T...>>();
+	}
+
+	/* get indexed mutable rvalue reference */
+	template <xns::size_t I, typename... T>
+	inline constexpr auto get(xns::variant<T...>&& variant) -> xns::indexed_element<I, xns::variant<T...>>&& {
+		// check if index out of bounds
+		static_assert(I < sizeof...(T),
+				"): VARIANT: INDEX OUT OF BOUNDS :(");
+		// return mutable rvalue reference
+		return xns::move(variant._storage.template to_reference<xns::type_at<I, T...>>());
+	}
+
+	/* get indexed const reference */
+	template <xns::size_t I, typename... T>
+	inline constexpr auto get(const xns::variant<T...>& variant) -> const xns::indexed_element<I, xns::variant<T...>>& {
+		// check if index out of bounds
+		static_assert(I < sizeof...(T),
+				"): VARIANT: INDEX OUT OF BOUNDS :(");
+		// return const reference
+		return variant._storage.template to_reference<xns::type_at<I, T...>>();
+	}
+
+	/* get indexed const rvalue reference */
+	template <xns::size_t I, typename... T>
+	inline constexpr auto get(const xns::variant<T...>&& variant) -> const xns::indexed_element<I, xns::variant<T...>>&& {
+		// check if index out of bounds
+		static_assert(I < sizeof...(T),
+				"): VARIANT: INDEX OUT OF BOUNDS :(");
+		// return const rvalue reference
+		return xns::move(variant._storage.template to_reference<xns::type_at<I, T...>>());
+	}
 
 }
 
 
-#endif
+#endif // VARIANT_HEADER
