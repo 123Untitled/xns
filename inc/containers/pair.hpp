@@ -81,7 +81,6 @@ namespace xns {
 
 
 		private:
-		public:
 
 			// -- private members ---------------------------------------------
 
@@ -94,95 +93,113 @@ namespace xns {
 
 			// -- friends -----------------------------------------------------
 
+			/* get mutable reference to first as friend */
 			template <typename A, typename B>
 			friend inline constexpr auto get(xns::pair<A, B>&) noexcept -> A&;
 
+			/* get mutable reference to second as friend */
 			template <typename A, typename B>
 			friend inline constexpr auto get(xns::pair<B, A>&) noexcept -> A&;
 
 
+			/* get const reference to first as friend */
 			template <typename A, typename B>
 			friend inline constexpr auto get(const xns::pair<A, B>&) noexcept -> const A&;
 
+			/* get const reference to second as friend */
 			template <typename A, typename B>
 			friend inline constexpr auto get(const xns::pair<B, A>&) noexcept -> const A&;
 
 
+			/* get mutable rvalue reference to first as friend */
 			template <typename A, typename B>
 			friend inline constexpr auto get(xns::pair<A, B>&&) noexcept -> A&&;
 
+			/* get mutable rvalue reference to second as friend */
 			template <typename A, typename B>
 			friend inline constexpr auto get(xns::pair<B, A>&&) noexcept -> A&&;
 
+
+			/* get const rvalue reference to first as friend */
 			template <typename A, typename B>
 			friend inline constexpr auto get(const xns::pair<A, B>&&) noexcept -> const A&&;
 
+			/* get const rvalue reference to second as friend */
 			template <typename A, typename B>
 			friend inline constexpr auto get(const xns::pair<B, A>&&) noexcept -> const A&&;
 
 
+			/* get indexed mutable reference as friend */
 			template <xns::size_t I, typename A, typename B>
 			friend inline constexpr auto get(xns::pair<A, B>&) noexcept -> xns::indexed_element<I, xns::pair<A, B>>&;
 
+			/* get indexed const reference as friend */
 			template <xns::size_t I, typename A, typename B>
 			friend inline constexpr auto get(const xns::pair<A, B>&) noexcept -> const xns::indexed_element<I, xns::pair<A, B>>&;
 
+			/* get indexed mutable rvalue reference as friend */
 			template < xns::size_t I, typename A, typename B>
 			friend inline constexpr auto get(xns::pair<A, B>&&) noexcept -> xns::indexed_element<I, xns::pair<A, B>>&&;
 
+			/* get indexed const rvalue reference as friend */
 			template < xns::size_t I, typename A, typename B>
 			friend inline constexpr auto get(const xns::pair<A, B>&&) noexcept -> const xns::indexed_element<I, xns::pair<A, B>>&&;
 
 	};
 
 
+	// -- G E T  S P E C I A L I Z A T I O N S --------------------------------
+
+	/* get mutable reference to first */
 	template <typename T, typename U>
 	inline constexpr auto get(xns::pair<T, U>& pair) noexcept -> T& {
 		return pair._first;
 	}
 
+	/* get mutable reference to second */
 	template <typename T, typename U>
 	inline constexpr auto get(xns::pair<U, T>& pair) noexcept -> T& {
 		return pair._second;
 	}
 
-
+	/* get const reference to first */
 	template <typename T, typename U>
 	inline constexpr auto get(const xns::pair<T, U>& pair) noexcept -> const T& {
 		return pair._first;
 	}
 
+	/* get const reference to second */
 	template <typename T, typename U>
 	inline constexpr auto get(const xns::pair<U, T>& pair) noexcept -> const T& {
 		return pair._second;
 	}
 
-
+	/* get mutable rvalue reference to first */
 	template <typename T, typename U>
 	inline constexpr auto get(xns::pair<T, U>&& pair) noexcept -> T&& {
 		return xns::move(pair._first);
 	}
 
+	/* get mutable rvalue reference to second */
 	template <typename T, typename U>
 	inline constexpr auto get(xns::pair<U, T>&& pair) noexcept -> T&& {
 		return xns::move(pair._second);
 	}
 
-
+	/* get const rvalue reference to first */
 	template <typename T, typename U>
 	inline constexpr auto get(const xns::pair<T, U>&& pair) noexcept -> const T&& {
 		return xns::move(pair._first);
 	}
 
+	/* get const rvalue reference to second */
 	template <typename T, typename U>
 	inline constexpr auto get(const xns::pair<U, T>&& pair) noexcept -> const T&& {
 		return xns::move(pair._second);
 	}
 
 
-
-
-
+	/* get indexed mutable reference */
 	template <xns::size_t I, typename T1, typename T2>
     inline constexpr auto get(xns::pair<T1, T2>& pair) noexcept -> xns::indexed_element<I, xns::pair<T1, T2>>& {
 		// check index
@@ -192,6 +209,7 @@ namespace xns {
 		} else { return pair._second; }
 	}
 
+	/* get indexed const reference */
 	template <xns::size_t I, typename T1, typename T2>
     inline constexpr auto get(const xns::pair<T1, T2>& pair) noexcept -> const xns::indexed_element<I, xns::pair<T1, T2>>& {
 		// check index
@@ -201,6 +219,7 @@ namespace xns {
 		} else { return pair._second; }
 	}
 
+	/* get indexed mutable rvalue reference */
 	template < xns::size_t I, typename T1, typename T2>
     inline constexpr auto get(xns::pair<T1, T2>&& pair) noexcept -> xns::indexed_element<I, xns::pair<T1, T2>>&& {
 		// check index
@@ -210,6 +229,7 @@ namespace xns {
 		} else { return pair._second; }
 	}
 
+	/* get indexed const rvalue reference */
 	template < xns::size_t I, typename T1, typename T2>
     inline constexpr auto get(const xns::pair<T1, T2>&& pair) noexcept -> const xns::indexed_element<I, xns::pair<T1, T2>>&& {
 		// check index
