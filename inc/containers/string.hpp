@@ -1206,7 +1206,6 @@ namespace xns {
 
 
 			/* signed integer to string */
-			//template <typename N, typename = Xf::enable_if_signed<N>>
 			template <xns::is_signed N>
 			void to_string(N number) {
 				// temporary string
