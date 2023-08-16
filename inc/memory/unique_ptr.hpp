@@ -58,7 +58,7 @@ namespace xns {
 
 			/* make unique pointer as friend */
 			template <class U, class... A>
-			friend unique_ptr<U> make_unique_pointer(A&&... args);
+			friend unique_ptr<U> make_unique(A&&... args);
 
 
 			// -- P U B L I C  C O N S T R U C T O R S ------------------------
@@ -287,7 +287,7 @@ namespace xns {
 
 	/* make unique pointer */
 	template <class T, class... A>
-	unique_ptr<T> make_unique_pointer(A&&... args) {
+	unique_ptr<T> make_unique(A&&... args) {
 		// instantiate unique pointer
 		unique_ptr<T> ptr;
 		// allocate memory
