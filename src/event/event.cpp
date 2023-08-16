@@ -60,11 +60,11 @@ void xns::event::set_mode(const evntmode& mode, const evntopt opt) {
 		// check if mode is forced
 		if (opt == evntopt::FORCE) {
 			// stack current mode
-			_current = xns::make_unique_pointer<xns::size_t>(mode._idx);
+			_current = xns::make_unique<xns::size_t>(mode._idx);
 			//_current.make(mode._idx);
 			return;
 		} // set next mode
-		_next = xns::make_unique_pointer<xns::size_t>(mode._idx);
+		_next = xns::make_unique<xns::size_t>(mode._idx);
 		//_next.make(mode._idx);
 	}
 }
@@ -118,11 +118,11 @@ void xns::event::stack_mode(const evntmode& mode, const evntopt opt) {
 	// check if mode is forced
 	if (opt == evntopt::FORCE) {
 		// set next mode
-		_current = xns::make_unique_pointer<xns::size_t>(mode._idx);
+		_current = xns::make_unique<xns::size_t>(mode._idx);
 		//_current.make(mode._idx);
 		return;
 	} // set next mode
-	_next = xns::make_unique_pointer<xns::size_t>(mode._idx);
+	_next = xns::make_unique<xns::size_t>(mode._idx);
 	//_next.make(mode._idx);
 }
 
@@ -147,7 +147,7 @@ void xns::event::unstack_mode(void) {
 	}
 	//_next.make(*_stack.top());
 	//_next.make(_stack.top());
-	_next = xns::make_unique_pointer<xns::size_t>(_stack.top());
+	_next = xns::make_unique<xns::size_t>(_stack.top());
 	_current = xns::move(_next);
 	//////////////
 
