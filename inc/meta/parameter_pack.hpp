@@ -39,7 +39,7 @@ namespace xns {
 
 
 	template <size_t IDX, class... A>
-	auto get(A&... args) -> xns::type_at<IDX, A&...>& {
+	auto _get(A&... args) -> xns::type_at<IDX, A&...>& {
 
 		return Get_impl<type_at<IDX, A...>, // type at index
 						IDX,                   // index
@@ -51,20 +51,20 @@ namespace xns {
 
 
 
-	template <class RType, xns::size_t... INDX, class... A>
-	RType pack_extract_imp(xns::index_seq<INDX...>i, A&... args) {
+	template <typename R, xns::size_t... IDX, typename... A>
+	auto pack_extract_imp(xns::index_seq<IDX...>i, A&... args) -> R {
 		//debug_sequence(i); // REMOVE i
 		//return RType{};
 		// extract the pack recursively
-		return RType{get<INDX>(args...)...}; //TADA
+		return R{_get<IDX>(args...)...}; //TADA
 	}
 
-	template <class RType, xns::size_t BEGIN, xns::size_t END, class... A>
-	RType pack_extract(A&... args) {
+	template <typename R, xns::size_t BEGIN, xns::size_t END, typename... A>
+	auto pack_extract(A&... args) -> R {
 		// create index range
 		xns::make_index_range<BEGIN, END> indxs; // ???
 		// call implementation to extract the pack
-		return pack_extract_imp<RType>(indxs, args...);
+		return pack_extract_imp<R>(indxs, args...);
 	}
 
 
