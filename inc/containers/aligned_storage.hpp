@@ -63,21 +63,6 @@ namespace xns {
 
 	};
 
-	/* get max size of parameter pack */
-	template <class... A>
-	consteval auto size_of_max(void) -> xns::size_t {
-		xns::size_t size = 0;
-		((size = (sizeof(A) > size ? sizeof(A) : size)), ...);
-		return size;
-	}
-
-	/* get max alignment of parameter pack */
-	template <class... A>
-	consteval auto align_of_max(void) -> xns::size_t {
-		xns::size_t align = 0;
-		((align = (alignof(A) > align ? alignof(A) : align)), ...);
-		return align;
-	}
 
 }
 
