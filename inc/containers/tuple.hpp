@@ -393,42 +393,6 @@ namespace xns {
 
 
 
-
-
-
-
-
-
-	/* get tuple element with type */
-	//template <class T, class... A>
-	//constexpr auto& get(tuple<A...>& tuple) {
-	//	// check if type is in tuple
-	//	static_assert(xns::is_one_of<T, A...>, "): TYPE NOT IN TUPLE! :(");
-	//	// get type index
-	//	constexpr auto index = xns::tuple<A...>::template _index_of<T>;
-	//	// return a reference to the tuple element
-	//	return tuple._impl.template element<index, typename xns::tuple<A...>::template indexed<index>>::value;
-	//}
-
-	///* get constant tuple element with type */
-	//template <class T, class... A>
-	//constexpr const auto& get(const tuple<A...>& tuple) {
-	//	// check if type is in tuple
-	//	static_assert(xns::is_one_of<T, A...>, "): TYPE NOT IN TUPLE! :(");
-	//	// get type index
-	//	constexpr auto index = xns::tuple<A...>::template _index_of<T>;
-	//	// return a constant reference to the tuple element
-	//	return tuple._impl.template element<index, typename xns::tuple<A...>::template indexed<index>>::value;
-	//}
-
-	/* get tuple size */
-	/*template <class... U>
-	inline consteval auto tuple_size(const xns::tuple<U...>&) noexcept -> xns::tuple<U...>::size_type {
-		// return the tuple size
-		return sizeof...(U);
-	}*/
-
-
 	// -- T U P L E  C O N C A T E N A T I O N --------------------------------
 
 	template <typename... A>
