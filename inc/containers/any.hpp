@@ -75,7 +75,7 @@ namespace xns {
 
 				/* clone */
 				xns::unique_ptr<base> clone(void) const override {
-					return xns::make_unique_pointer<derived<T>>(_value);
+					return xns::make_unique<derived<T>>(_value);
 				}
 
 
@@ -99,14 +99,14 @@ namespace xns {
 			/* value constructor */
 			template <class T>
 			any(const T& value)
-			: _ptr{xns::make_unique_pointer<derived<T>>(value)} {
+			: _ptr{xns::make_unique<derived<T>>(value)} {
 				// nothing to do...
 			}
 
 			/* move value constructor */
 			template <class T>
 			any(T&& value)
-			: _ptr{xns::make_unique_pointer<derived<T>>(xns::move(value))} {
+			: _ptr{xns::make_unique<derived<T>>(xns::move(value))} {
 				// nothing to do...
 			}
 

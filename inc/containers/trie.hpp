@@ -134,7 +134,7 @@ namespace xns {
 				// insert key
 				node* node = _insert(key);
 				// allocate default value
-				node->_value = xns::make_shared_pointer<value_type>();
+				node->_value = xns::make_shared<value_type>();
 			}
 
 			/* copy insert */
@@ -142,7 +142,7 @@ namespace xns {
 				// insert key
 				node* node = _insert(key);
 				// allocate copied value
-				node->_value = xns::make_shared_pointer<value_type>(value);
+				node->_value = xns::make_shared<value_type>(value);
 			}
 
 			/* move insert */
@@ -150,7 +150,7 @@ namespace xns {
 				// insert key
 				node* node = _insert(key);
 				// allocate moved value
-				node->_value = xns::make_shared_pointer<value_type>(xns::move(value));
+				node->_value = xns::make_shared<value_type>(xns::move(value));
 			}
 
 			/* variadic insert */
@@ -159,7 +159,7 @@ namespace xns {
 				// insert key
 				node* node = _insert(key);
 				// allocate value
-				node->_value = xns::make_shared_pointer<value_type>(xns::forward<A>(args)...);
+				node->_value = xns::make_shared<value_type>(xns::forward<A>(args)...);
 			}
 
 			/* derived default insert */
@@ -168,7 +168,7 @@ namespace xns {
 				// insert key
 				node* node = _insert(key);
 				// allocate default value
-				node->_value = xns::make_shared_pointer<D>();
+				node->_value = xns::make_shared<D>();
 			}
 
 			/* derived copy insert */
@@ -177,7 +177,7 @@ namespace xns {
 				// insert key
 				node* node = _insert(key);
 				// allocate copied value
-				node->_value = xns::make_shared_pointer<D>(value);
+				node->_value = xns::make_shared<D>(value);
 			}
 
 			/* derived move insert */
@@ -186,7 +186,7 @@ namespace xns {
 				// insert key
 				node* node = _insert(key);
 				// allocate moved value
-				node->_value = xns::make_shared_pointer<D>(xns::move(value));
+				node->_value = xns::make_shared<D>(xns::move(value));
 			}
 
 			/* derived variadic insert */
@@ -195,7 +195,7 @@ namespace xns {
 				// insert key
 				node* node = _insert(key);
 				// allocate value
-				node->_value = xns::make_shared_pointer<D>(xns::forward<A>(args)...);
+				node->_value = xns::make_shared<D>(xns::forward<A>(args)...);
 			}
 
 			using KeyVector = xns::vector<xns::string>;
@@ -205,7 +205,7 @@ namespace xns {
 			template <xns::is_string S, class D, class... A> requires (xns::is_derived_from<D, value_type>)
 			void insert(const xns::vector<S>& alias, A&&... args) {
 				// instanciate value
-				shared_value value = xns::make_shared_pointer<D>(xns::forward<A>(args)...);
+				shared_value value = xns::make_shared<D>(xns::forward<A>(args)...);
 				// loop through alias
 				for (typename xns::vector<S>::size_type x = 0; x < alias.size(); ++x) {
 					// insert key
@@ -219,7 +219,7 @@ namespace xns {
 			template <xns::is_string S, class... A>
 			void insert(const xns::vector<S>& alias, A&&... args) {
 				// instanciate value
-				shared_value value = xns::make_shared_pointer<value_type>(xns::forward<A>(args)...);
+				shared_value value = xns::make_shared<value_type>(xns::forward<A>(args)...);
 				// loop through alias
 				for (typename xns::vector<S>::size_type x = 0; x < alias.size(); ++x) {
 					// insert key
@@ -232,7 +232,7 @@ namespace xns {
 			/*template <class D, class... A> requires (xns::is_base_of_c<T, D>)
 			void insert(const KeyVector& alias, A&&... args) {
 				// instanciate value
-				shared_value value = xns::make_shared_pointer<D>(xns::forward<A>(args)...);
+				shared_value value = xns::make_shared<D>(xns::forward<A>(args)...);
 				// loop through alias
 				for (KeyVector::size_type x = 0; x < alias.size(); ++x) {
 					// insert key
@@ -246,7 +246,7 @@ namespace xns {
 			/*template <class... A>
 			void insert(const KeyVector& alias, A&&... args) {
 				// instanciate value
-				shared_value value = xns::make_shared_pointer<value_type>(xns::forward<A>(args)...);
+				shared_value value = xns::make_shared<value_type>(xns::forward<A>(args)...);
 				// loop through alias
 				for (KeyVector::size_type x = 0; x < alias.size(); ++x) {
 					// insert key
@@ -313,7 +313,7 @@ namespace xns {
 					// check indexed node validity
 					if (nde->_table.at(index) == nullptr) {
 						// make new node
-						nde->_table.at(index) = xns::make_unique_pointer<node>();
+						nde->_table.at(index) = xns::make_unique<node>();
 					} // move to node
 					nde = &(*nde->_table.at(index));
 				} // return node

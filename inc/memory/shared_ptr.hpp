@@ -1,24 +1,27 @@
 #ifndef SHARED_PTR_HEADER
 #define SHARED_PTR_HEADER
 
+// local headers
 #include "types.hpp"
-#include "inheritance.hpp"
 #include "macro.hpp"
 #include "allocator.hpp"
+#include "inheritance.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
 
+
 	// -- S H A R E D  P O I N T E R  C L A S S -------------------------------
 
-	template <class T>
+	template <typename T>
 	class shared_ptr final {
+
 
 		public:
 
-			// -- P U B L I C  A L I A S E S ----------------------------------
+			// -- public types ------------------------------------------------
 
 			/* value type */
 			using value_type      = T;
@@ -48,54 +51,44 @@ namespace xns {
 			using size_type       = typename allocator::size_type;
 
 
-			// -- F R I E N D S -----------------------------------------------
+			// -- friends -----------------------------------------------------
 
 			/* weak pointer as friend */
-			template <class U>
+			template <typename>
 			friend class weak_ptr;
 
 			/* derived types as friend */
-			template <class>
+			template <typename>
 			friend class shared_ptr;
 
 			/* make shared pointer as friend */
-			template <class U, class... A>
-			friend shared_ptr<U> make_shared_pointer(A&&... args);
+			template <typename U, typename... A>
+			friend auto make_shared(A&&... args) -> xns::shared_ptr<U>;
 
 
-			// -- P U B L I C  C O N S T R U C T O R S ------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
 			shared_ptr(void) noexcept
-			: _data{nullptr}, _count{nullptr} {
-				// code here...
-			}
+			: _data{nullptr}, _count{nullptr} {}
 
 			/* nullptr constructor */
 			shared_ptr(xns::null) noexcept
-			: shared_ptr{ } {
-				// code here...
-			}
+			: shared_ptr{} {}
 
 			/* self copy constructor */
 			shared_ptr(const self& other) noexcept
 			: _data{other._data}, _count{other._count} {
-				// check pointer validity
-				if (_data) {
-					// increment number of references
-					++(*_count);
-				}
+				// increment number of references
+				if (_data) { ++(*_count); }
 			}
 
 			/* derived copy constructor */
 			template <class D> requires xns::is_derived_from<D, value_type>
 			shared_ptr(const shared_ptr<D>& other) noexcept
 			: _data{other._data}, _count{other._count} {
-				// check pointer validity
-				if (_data) {
-					// increment number of references
-					++(*_count);
-				}
+				// increment number of references
+				if (_data) { ++(*_count); }
 			}
 
 			/* self move constructor */
@@ -132,7 +125,7 @@ namespace xns {
 			// -- P U B L I C  A S S I G N M E N T ----------------------------
 
 			/* nullptr assignment */
-			self& assign(xns::null) {
+			inline auto assign(xns::null) -> self& {
 				// clean up
 				reset();
 				// return self reference
@@ -244,79 +237,85 @@ namespace xns {
 			}
 
 
-			// -- P U B L I C  A C C E S S O R S  O P E R A T O R S -----------
+			// -- public accessors --------------------------------------------
+
+			/* count */
+			inline auto count(void) const noexcept -> size_type {
+				// return number of references
+				return _data ? *_count : 0;
+			}
 
 			/* dereference operator */
-			reference operator*(void) {
+			inline auto operator*(void) noexcept -> reference {
 				// return reference
 				return *_data;
 			}
 
 			/* const dereference operator */
-			const_reference operator*(void) const {
+			inline auto operator*(void) const noexcept -> const_reference {
 				// return const reference
 				return *_data;
 			}
 
 			/* arrow operator */
-			mutable_pointer operator->(void) {
+			inline auto operator->(void) noexcept -> mutable_pointer {
 				// return pointer
 				return _data;
 			}
 
 			/* const arrow operator */
-			const_pointer operator->(void) const {
+			inline auto operator->(void) const noexcept -> const_pointer {
 				// return const pointer
 				return _data;
 			}
 
 
-			// -- P U B L I C  B O O L E A N  O P E R A T O R S ---------------
+			// -- public boolean operators ------------------------------------
 
 			/* boolean operator */
-			operator bool(void) const {
+			inline operator bool(void) const noexcept {
 				// return pointer validity
 				return _data != nullptr;
 			}
 
 			/* not operator */
-			bool operator!(void) const {
+			inline auto operator!(void) const noexcept -> bool {
 				// return pointer invalidity
 				return _data == nullptr;
 			}
 
 
-			// -- P U B L I C  C O M P A R I S O N  O P E R A T O R S ---------
+			// -- public comparison operators ---------------------------------
 
 			/* equality operator */
-			bool operator==(const self& other) const noexcept {
+			inline auto operator==(const self& other) const noexcept -> bool {
 				// return pointer equality
 				return _data == other._data;
 			}
 
 			/* inequality operator */
-			bool operator!=(const self& other) const noexcept {
+			inline auto operator!=(const self& other) const noexcept -> bool {
 				// return pointer inequality
 				return _data != other._data;
 			}
 
 			/* nullptr equality operator */
-			bool operator==(xns::null) const noexcept {
+			inline auto operator==(xns::null) const noexcept -> bool {
 				// return pointer invalidity
 				return _data == nullptr;
 			}
 
 			/* nullptr inequality operator */
-			bool operator!=(xns::null) const noexcept {
+			inline auto operator!=(xns::null) const noexcept -> bool {
 				// return pointer validity
 				return _data != nullptr;
 			}
 
 
-			// -- P U B L I C  M E T H O D S ----------------------------------
+			// -- public modifiers --------------------------------------------
 
 			/* reset */
-			void reset(void) {
+			auto reset(void) noexcept -> void {
 				// check pointer validity
 				if ((_data != nullptr) && (--(*_count) == 0)) {
 					// destroy object
@@ -332,16 +331,12 @@ namespace xns {
 				}
 			}
 
-			/* count */
-			size_type count(void) const {
-				// return number of references
-				return _data ? *_count : 0;
-			}
+
 
 
 		private:
 
-			// -- P R I V A T E  M E M B E R S --------------------------------
+			// -- private members ---------------------------------------------
 
 			/* data */
 			mutable_pointer _data;
@@ -355,25 +350,15 @@ namespace xns {
 	// -- F R I E N D  F U N C T I O N S --------------------------------------
 
 	/* make shared pointer */
-	template <class T, class... A>
-	shared_ptr<T> make_shared_pointer(A&&... args) {
+	template <typename T, typename... A>
+	auto make_shared(A&&... args) -> xns::shared_ptr<T> {
 		// instantiate shared pointer
-		shared_ptr<T> ptr;
+		xns::shared_ptr<T> ptr;
 		// allocate memory
 		ptr._data = shared_ptr<T>::allocator::allocate();
-		// check allocation failure
-		if (ptr._data == nullptr) { return ptr; }
 		// allocate counter
 		ptr._count = xns::allocator<typename shared_ptr<T>::size_type>::allocate();
-		// check allocation failure
-		if (ptr._count == nullptr) {
-			// deallocate memory
-			shared_ptr<T>::allocator::deallocate(ptr._data);
-			// set pointer to nullptr
-			ptr._data = nullptr;
-			// return shared pointer
-			return ptr;
-		} // else construct object by forwarding arguments
+		// construct object by forwarding arguments
 		shared_ptr<T>::allocator::construct(ptr._data, xns::forward<A>(args)...);
 		// initialize counter
 		*ptr._count = 1;

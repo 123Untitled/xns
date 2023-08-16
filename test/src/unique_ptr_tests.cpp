@@ -38,7 +38,7 @@ bool UT::unit_tests<"unique_ptr">(void) {
 
 	//AutoP<B> p3{Xf::move(p1)};
 
-	AutoP<Derived> p1 = xns::make_unique_pointer<Derived>(123, 99.9f, 'X');
+	AutoP<Derived> p1 = xns::make_unique<Derived>(123, 99.9f, 'X');
 	if (!p1) {
 		std::cout << "null" << std::endl;
 	}
@@ -50,11 +50,11 @@ bool UT::unit_tests<"unique_ptr">(void) {
 
 
 
-	xns::unique_ptr<int> ptr_int = xns::make_unique_pointer<int>(123);
+	xns::unique_ptr<int> ptr_int = xns::make_unique<int>(123);
 
 	xns::vector<xns::unique_ptr<int>> vec;
 
-	vec.move_back(xns::make_unique_pointer<int>(123));
+	vec.move_back(xns::make_unique<int>(123));
 
 	//Xf::AutoPointer<void> v{};
 
