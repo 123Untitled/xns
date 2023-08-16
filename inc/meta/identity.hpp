@@ -1,7 +1,6 @@
 #ifndef IDENTITY_HEADER
 #define IDENTITY_HEADER
 
-#include "types.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
