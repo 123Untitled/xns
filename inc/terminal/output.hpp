@@ -56,7 +56,6 @@ namespace xns {
 			/* write character */
 			template <xns::is_char T>
 			static void write(const T& ch) {
-				::write(STDOUT_FILENO, "write char\n", 11);
 				// append character to buffer
 				_instance._buffer.append(ch);
 			}
@@ -99,7 +98,6 @@ namespace xns {
 
 			template <xns::is_integral T> requires (xns::is_char<T> == false)
 			static void write(const T& number) {
-				::write(STDOUT_FILENO, "write number\n", 13);
 
 				// convert number to string
 				xns::string str = xns::conversion::integer_to_string(number);
