@@ -41,7 +41,7 @@ void xns::env::print(void) {
 		xns::out::write(xns::get<1>(_env[x]));
 		xns::out::write("\n", 1);
 	} // flush output
-	xns::out::flush();
+	xns::out::render();
 }
 
 

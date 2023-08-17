@@ -71,7 +71,7 @@ namespace xns {
 
 			/* render */
 			template <xns::basic_string_literal L = "stdout">
-			static void flush(void) {
+			static void render(void) {
 
 				static_assert(L == "stdout" || L == "stderr",
 							  "): UNKNOWN FILE DESCRIPTOR :(");
@@ -103,7 +103,7 @@ namespace xns {
 				xns::string str = xns::conversion::integer_to_string(number);
 
 				// write string
-				write(str);
+				xns::out::write(str);
 			}
 
 

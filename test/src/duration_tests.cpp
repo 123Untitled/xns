@@ -51,7 +51,7 @@ void test(const xns::string_view& from_name, const xns::string_view& to_name) {
 		xns::out::write(expected);
 		xns::out::write("]\n");
 	}
-	xns::out::flush();
+	xns::out::render();
 
 }
 
@@ -85,7 +85,7 @@ void std_test(const xns::string_view& from_name, const xns::string_view& to_name
 		xns::out::write(expected);
 		xns::out::write("]\n");
 	}
-	xns::out::flush();
+	xns::out::render();
 
 }
 

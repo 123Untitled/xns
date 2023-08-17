@@ -1102,7 +1102,7 @@ namespace xns {
 					xns::out::write(matrix[_]);
 					xns::out::newline();
 				}
-				xns::out::flush();
+				xns::out::render();
 
 				return;
 

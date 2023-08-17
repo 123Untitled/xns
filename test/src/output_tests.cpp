@@ -9,9 +9,9 @@ bool UT::unit_tests<"output">(void) {
 
 	xns::out::write(str);
 
-	xns::out::newline();
+	//xns::out::newline();
+	xns::out::render();
 
-	xns::out::flush();
 
 	// code here...
 	return false;

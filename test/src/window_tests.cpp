@@ -4,7 +4,7 @@
 #include "output.hpp"
 
 static void exit(void) { xns::event::stop_loop(); }
-static void render(void) { xns::out::flush(); }
+static void render(void) { xns::out::render(); }
 static void press_enter(void) { xns::debug::print("enter\n"); }
 
 static xns::evntmode build_events(void) {
@@ -39,3 +39,9 @@ bool UT::unit_tests<"window">(void) {
 	return true;
 }
 
+int main(void) {
+
+	UT::unit_tests<"window">();
+
+	return 0;
+}

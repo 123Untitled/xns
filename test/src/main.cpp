@@ -79,7 +79,7 @@ void start(void) {
 	//xns::out::write(" ");
 	//xns::out::write(ptm->tm_sec);
 	//xns::out::write("\n");
-	//xns::out::flush();
+	//xns::out::render();
 
 }
 

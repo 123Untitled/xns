@@ -158,7 +158,7 @@ static void subview(void) {
 	auto v = s.subview(6, 5);
 
 	xns::print(v, " ", v.size(), '\n');
-	xns::out::flush();
+	xns::out::render();
 }
 
 
@@ -188,7 +188,7 @@ bool UT::unit_tests<"string">(void) {
 	{
 		xns::string s{"\x1b[31mhello world!\x1b[32m I'm a string\x1b[34m with colors\x1b[0m"};
 		xns::print(s, '\n');
-		xns::out::flush();
+		xns::out::render();
 
 		xns::formated_string_iterator it{s, 3};
 
@@ -198,7 +198,7 @@ bool UT::unit_tests<"string">(void) {
 			auto view = *it;
 
 			xns::print(view.size(), " `", view, "`\n");
-			xns::out::flush();
+			xns::out::render();
 
 			it += 6;
 		}
