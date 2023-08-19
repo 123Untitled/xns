@@ -1,8 +1,12 @@
 #ifndef BITSET_HPP
 #define BITSET_HPP
 
+// local headers
 #include "types.hpp"
 #include "array.hpp"
+#include "endianness.hpp"
+#include "integer_sequence.hpp"
+
 #include <iostream>
 #include <unistd.h>
 
@@ -18,6 +22,7 @@ namespace xns {
 	class bit_view final {
 
 
+
 		public:
 
 			// -- public types ------------------------------------------------
@@ -27,6 +32,9 @@ namespace xns {
 
 			/* value type */
 			using value_type = T;
+
+			/* storage type */
+			using storage = xns::ubyte*;
 
 			/* pointer type */
 			using mutable_pointer = value_type*;
@@ -44,14 +52,24 @@ namespace xns {
 			using size_type = xns::size_t;
 
 
+		private:
+
+			// -- private constants -------------------------------------------
+
+			/* number of bits in value type */
+			static constexpr size_type _bits = sizeof(value_type) * XNS_CHAR_BIT;
+
+
+		public:
+
 			// -- public constructors -----------------------------------------
 
 			/* deleted default constructor */
 			constexpr bit_view(void) = delete;
 
-			/* value constructor */
+			/* reference constructor */
 			constexpr bit_view(mutable_reference value) noexcept
-			: _data{value} {}
+			: _data{reinterpret_cast<storage>(&value)} {}
 
 			/* copy constructor */
 			constexpr bit_view(const self& other) noexcept = default;
@@ -66,81 +84,139 @@ namespace xns {
 			// -- public modifiers --------------------------------------------
 
 			/* set bit */
-			inline constexpr auto set(const size_type nth) noexcept -> void {
+			template <size_type N>
+			inline constexpr auto set(void) noexcept -> void {
+				// check if N is in range
+				static_assert(N < _bits, "): BIT_VIEW: N is out of range! :(");
 				// set nth bit to 1
-				_data |= (1 << nth);
+				_data[byte_index<N>()] |= (1 << bit_index<N>());
 			}
 
 			/* toggle bit */
-			inline constexpr auto toggle(const size_type nth) noexcept -> void {
+			template <size_type N>
+			inline constexpr auto toggle(void) noexcept -> void {
+				// check if N is in range
+				static_assert(N < _bits, "): BIT_VIEW: N is out of range! :(");
 				// toggle nth bit
-				_data ^= (1 << nth);
+				_data[byte_index<N>()] ^= (1 << bit_index<N>());
 			}
 
-
-			// -- public subscript operators ----------------------------------
-
-			/* subscript operator */
-			inline constexpr auto operator[](const size_type nth) const noexcept -> int {
-				// return nth bit
-				return (_data >> nth) & 1U;
+			/* reset bit */
+			template <size_type N>
+			inline constexpr auto reset(void) noexcept -> void {
+				// check if N is in range
+				static_assert(N < _bits, "): BIT_VIEW: N is out of range! :(");
+				// reset nth bit
+				_data[byte_index<N>()] &= ~(1 << bit_index<N>());
 			}
+
 
 
 			// -- public accessors --------------------------------------------
 
 			/* get bit count */
-			constexpr size_type bits(void) const noexcept {
+			consteval size_type bits(void) const noexcept {
 				// return number of bits
 				return _bits;
 			}
 
 			/* get bit */
-			constexpr int get(const size_type nth) const noexcept {
-				// get nth bit
-				return (_data >> nth) & 1U;
+			template <size_type N>
+			constexpr int get(void) const noexcept {
+				// check if N is in range
+				static_assert(N < _bits, "): BIT_VIEW: N is out of range! :(");
+				// return bit
+				return (_data[byte_index<N>()] >> bit_index<N>()) & 1;
 			}
+
 
 
 			// -- public methods ----------------------------------------------
 
 			/* print bits */
 			void print(void) const noexcept {
+				print_impl<_bits - 1>();
+			}
 
-				xns::array<char, _bits + sizeof(value_type) - 1> buffer;
-
-				// loop over bits
-				for (size_type b = 0, o = 0; b < _bits; ++b) {
-
-					// add space every 8 bits (except first)
-					if (b % 8 == 0 && b != 0) {
-						buffer[b+o] = ' ';
-						++o;
-					}
-					// get bit
-					buffer[b+o] = (char)(get(b) + '0');
+			template <xns::size_t N> requires (N > 0)
+			void print_impl(void) const noexcept {
+				if constexpr ((N % XNS_CHAR_BIT == 0) && (N != 0)) {
+					write(1, " ", 1);
 				}
 
-				write(1, buffer.data(), buffer.size());
+				int bit = get<N>();
+				if (bit) {
+					write(1, "1", 1);
+				} else {
+					write(1, "0", 1);
+				}
+
+				print_impl<N - 1>();
+			}
+
+			template <xns::size_t N> requires (N == 0)
+			void print_impl(void) const noexcept {
+				int bit = get<0>();
+				if (bit) {
+					write(1, "1", 1);
+				} else {
+					write(1, "0", 1);
+				}
+
 				write(1, "\n", 1);
 			}
 
 
+
+
+
+
 		private:
 
-			// -- private constants -------------------------------------------
+			// -- private methods ---------------------------------------------
 
-			/* number of bits in value type */
-			static constexpr size_type _bits = sizeof(value_type) * 8;
+
+			/* get byte index (little endian) */
+			template <size_type N> requires (xns::endianness::is_little())
+			static consteval auto byte_index(void) noexcept -> size_type {
+				return sizeof(value_type) - 1 - (N / XNS_CHAR_BIT);
+				// return byte index
+				return N / XNS_CHAR_BIT;
+			}
+
+			/* get bit index (within byte) (little endian) */
+			template <size_type N> requires (xns::endianness::is_little())
+			static consteval auto bit_index(void) noexcept -> size_type {
+				return XNS_CHAR_BIT - 1 - (N % XNS_CHAR_BIT);
+				// return bit index
+				return N % XNS_CHAR_BIT;
+			}
+
+			/* get byte index (big endian) */
+			template <size_type N> requires (xns::endianness::is_big())
+			static consteval auto byte_index(void) noexcept -> size_type {
+				// return byte index
+				return sizeof(value_type) - 1 - (N / XNS_CHAR_BIT);
+			}
+
+			/* get bit index (within byte) (big endian) */
+			template <size_type N> requires (xns::endianness::is_big())
+			static consteval auto bit_index(void) noexcept -> size_type {
+				// return bit index
+				return XNS_CHAR_BIT - 1 - (N % XNS_CHAR_BIT);
+			}
+
+
 
 
 			// -- private members ---------------------------------------------
 
-			/* value pointer */
-			mutable_reference _data;
+			/* storage pointer */
+			storage _data;
 
 
 	};
+
 
 }
 
