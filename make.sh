@@ -3,31 +3,6 @@
 # this script is used to generate ninja files for building
 
 
-# title generator
-function title {
-	# get argument
-	local NAME=$1
-	# to uppercase
-	NAME=${NAME:u}
-	# start composing title
-	TITLE='# -- '
-	# add spaces after each character, except spaces
-	for (( i=0; i<${#NAME}; ++i )); do
-		if [[ ${NAME:$i:1} =~ ' ' ]]; then
-			TITLE+=' '
-		else
-			TITLE+=${NAME:$i:1}' '
-		fi
-	done
-	# get length of title
-	local LENGTH=${#TITLE}
-	# add dashes
-	for (( i=${#TITLE}; i < 79; ++i )); do
-		TITLE+='-'
-	done
-	# print title on stdout
-	echo $TITLE
-}
 
 
 # -- C O L O R S --------------------------------------------------------------
@@ -42,7 +17,22 @@ RESET='\x1b[0m'
 # -- R E Q U I R E M E N T S --------------------------------------------------
 
 # list all required programs
-REQUIRED=('clang++' 'command' 'which' 'echo' 'git' 'ar' 'ninja' 'date' 'shasum' 'mkdir' 'rm' 'pwd' 'uname' 'vared' 'bindkey')
+REQUIRED=('clang++'
+		  'command'
+		  'which'
+		  'echo'
+		  'git'
+		  'ar'
+		  'ninja'
+		  'date'
+		  'shasum'
+		  'mkdir'
+		  'rm'
+		  'pwd'
+		  'uname'
+		  'vared'
+		  'bindkey'
+);
 
 # check if all required programs are installed
 for REQ in $REQUIRED; do
@@ -447,6 +437,31 @@ fi
 
 
 
+# title generator
+function title {
+	# get argument
+	local NAME=$1
+	# to uppercase
+	NAME=${NAME:u}
+	# start composing title
+	TITLE='# -- '
+	# add spaces after each character, except spaces
+	for (( i=0; i<${#NAME}; ++i )); do
+		if [[ ${NAME:$i:1} =~ ' ' ]]; then
+			TITLE+=' '
+		else
+			TITLE+=${NAME:$i:1}' '
+		fi
+	done
+	# get length of title
+	local LENGTH=${#TITLE}
+	# add dashes
+	for (( i=${#TITLE}; i < 79; ++i )); do
+		TITLE+='-'
+	done
+	# print title on stdout
+	echo $TITLE
+}
 
 
 # ninja generator function
