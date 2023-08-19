@@ -11,6 +11,10 @@ const int&& foo(void) {
 template <>
 bool UT::unit_tests<"tuple">(void) {
 
+	xns::tuple<int, int> t1{1, 2};
+
+	xns::get<1>(t1);
+
 
 	xns::tuple<int, float, const char*> _tuple{2, 0.3f, "hello"};
 
