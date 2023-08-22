@@ -4,6 +4,7 @@
 #include "move.hpp"
 #include "is_integral.hpp"
 #include "is_floating.hpp"
+#include "types.hpp"
 
 #include <iostream>
 
