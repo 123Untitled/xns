@@ -1,7 +1,7 @@
 #ifndef ARRAY_HEADER
 #define ARRAY_HEADER
 
-
+// local headers
 #include "types.hpp"
 #include "move.hpp"
 #include "common_type.hpp"
@@ -9,6 +9,7 @@
 #include "is_enum.hpp"
 #include "is_void.hpp"
 #include "forward.hpp"
+#include "is_convertible.hpp"
 
 #include "safe_enum.hpp"
 
@@ -23,7 +24,12 @@ namespace xns {
 	template <class T>
 	concept is_index = is_integral <xns::remove_cvr<T>>
 					|| is_enum     <xns::remove_cvr<T>>
-					|| is_safe_enum<xns::remove_cvr<T>>;
+					|| is_safe_enum<xns::remove_cvr<T>>
+					|| is_convertible<T, unsigned char,
+										 unsigned short,
+										 unsigned int,
+										 unsigned long,
+										 unsigned long long>;
 
 
 	// -- A R R A Y -----------------------------------------------------------
