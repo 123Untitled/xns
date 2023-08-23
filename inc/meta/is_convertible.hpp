@@ -12,11 +12,19 @@ namespace xns {
 
 	// -- I S  C O N V E R T I B L E ------------------------------------------
 
+	namespace impl {
+
+		/* is convertible implementation */
+		template <typename From, typename To>
+		concept is_convertible = requires {
+			xns::is_same<To, decltype(static_cast<To>(xns::declval<From>()))>;
+		};
+
+	}
+
 	/* is convertible concept */
-	template <typename From, typename To>
-	concept is_convertible = requires {
-		xns::is_same<To, decltype(static_cast<To>(xns::declval<From>()))>;
-	};
+	template <typename From, typename... To>
+	concept is_convertible = (impl::is_convertible<From, To> || ...);
 
 }
 
