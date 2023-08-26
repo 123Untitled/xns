@@ -8,3 +8,10 @@ bool UT::unit_tests<"fixed">(void) {
 	return false;
 }
 
+int main(void) {
+
+
+	UT::unit_tests<"fixed">();
+
+	return 0;
+}

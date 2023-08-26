@@ -32,6 +32,7 @@ bool UT::unit_tests<"poller">(void) {
 		poller.remove_socket(s);
 	}
 
+	poller.stop();
 
 
 

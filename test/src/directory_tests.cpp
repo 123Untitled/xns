@@ -8,22 +8,21 @@ bool UT::unit_tests<"directory">(void) {
 
 
 	xns::filesystem::recursive_iterator it{"./inc"};
+
 	//xns::filesystem::iterator it{"."};
 	int i = 0;
 
 	while (it != nullptr) {
 
-		auto view = it.name();
-		auto path = it.path();
-
-		//write(1, view.data(), view.size());
-		//write(1, "\n", 1);
-		write(1, path.data(), path.size());
-		write(1, "\n", 1);
-		//if (i > 10) break;
-		//++i;
+		if (it.is_directory()) {
+			xns::print("\x1b[31mDIR\x1b[0m ", it.name(), '\n');
+		}
+		else if (it.is_regular()) {
+			xns::print("\x1b[32mREG\x1b[0m ", it.name(), '\n');
+		}
 		++it;
 	}
+	xns::out::render();
 
 	// code here...
 	return false;
