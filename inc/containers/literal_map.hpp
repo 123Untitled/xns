@@ -20,11 +20,20 @@ namespace xns {
 	class literal_map final {
 
 
+		private:
+
+			// -- private types -----------------------------------------------
+
+			/* key helper */
+			template <xns::basic_string_literal l>
+			using key = xns::make_character_seq<typename decltype(l)::char_t, l>;
+
+
 		// -- assertions ------------------------------------------------------
 
 		/* check all string literals are unique */
 		static_assert(xns::is_all_unique
-					 <xns::make_character_seq<typename decltype(L)::char_t, L>...>,
+					 <key<L>...>,
 					 "): STRING LITERALS MUST BE UNIQUE :(");
 
 		/* check for map size */
@@ -53,16 +62,11 @@ namespace xns {
 
 		private:
 
-			// -- private types -----------------------------------------------
-
-			/* key helper */
-			template <xns::basic_string_literal l>
-			using key = xns::make_character_seq<typename decltype(l)::char_t, l>;
 
 
 			// -- private element struct --------------------------------------
 
-			template <class SEQ>
+			template <typename SEQ>
 			struct element {
 
 				/* value */
