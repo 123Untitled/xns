@@ -18,3 +18,9 @@ bool UT::unit_tests<"environment">(void) {
 
 	return true;
 }
+
+
+int main(void) {
+	UT::unit_tests<"environment">();
+	return 0;
+}

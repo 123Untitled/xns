@@ -1,19 +1,25 @@
 #include "environment.hpp"
 
+// environ
+extern constinit const char** environ;
+
 
 // -- E N V I R O N M E N T ---------------------------------------------------
 
 
-// -- private static members --------------------------------------------------
+// -- private lifecycle -------------------------------------------------------
 
-/* environment variables */
-xns::env::vector_type xns::env::_env{};
+/* default constructor */
+xns::env::env(void) {
+	// initialize environment
+	init(environ);
+}
 
 
-// -- public static methods ---------------------------------------------------
+// -- private modifiers -------------------------------------------------------
 
 /* initialize environment */
-void xns::env::init(const char** envp) {
+auto xns::env::init(const char** envp) -> void {
 
 	// check pointer validity
 	if (envp == nullptr || _env.empty() == false) { return; }
@@ -33,12 +39,15 @@ void xns::env::init(const char** envp) {
 
 /* print environment */
 void xns::env::print(void) {
+
+	auto& instance = xns::env::shared();
+
 	// loop over environment variables
-	for (size_type x = 0; x < _env.size(); ++x) {
+	for (size_type x = 0; x < instance._env.size(); ++x) {
 		// print variable
-		xns::out::write(xns::get<0>(_env[x]));
+		xns::out::write(xns::get<0>(instance._env[x]));
 		xns::out::write(" [=] ", 5);
-		xns::out::write(xns::get<1>(_env[x]));
+		xns::out::write(xns::get<1>(instance._env[x]));
 		xns::out::write("\n", 1);
 	} // flush output
 	xns::out::render();
@@ -48,20 +57,22 @@ void xns::env::print(void) {
 // -- public methods ----------------------------------------------------------
 
 /* get environment variable */
-const xns::env::weak_string xns::env::get(const xns::string& name) {
+auto xns::env::get(const xns::string& name) noexcept -> const xns::env::weak_string {
+
+	auto& instance = xns::env::shared();
 
 	// loop over environment variables
-	for (size_type x = 0; x < _env.size(); ++x) {
+	for (size_type x = 0; x < instance._env.size(); ++x) {
 		// check if key matches
-		if (xns::get<0>(_env[x]) == name) {
+		if (xns::get<0>(instance._env[x]) == name) {
 			// return value
-			return weak_string{&xns::get<1>(_env[x])}; }
+			return weak_string{&xns::get<1>(instance._env[x])}; }
 	} // else return nullptr
 	return nullptr;
 }
 
 /* get paths */
-xns::vector<xns::string> xns::env::paths(void) {
+auto xns::env::paths(void) -> xns::vector<xns::string> {
 
 	weak_string weak{get("PATH")};
 

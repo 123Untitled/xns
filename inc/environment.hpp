@@ -18,6 +18,7 @@ namespace xns {
 
 	class env {
 
+
 		public:
 
 			// -- public types ------------------------------------------------
@@ -32,33 +33,52 @@ namespace xns {
 			using weak_string = xns::weak_ptr<const xns::string>;
 
 
-			// -- public constructors -----------------------------------------
-
-			/* non-instanciable class */
-			NON_INSTANCIABLE(env);
-
 
 			// -- public static methods ---------------------------------------
 
-			/* initialize environment */
-			static void init(const char** envp);
-
 			/* get environment variable */
-			static const weak_string get(const xns::string&);
+			static auto get(const xns::string&) noexcept -> const weak_string;
 
 			/* get paths */
-			static xns::vector<xns::string> paths(void);
+			static auto paths(void) -> xns::vector<xns::string>;
 
 			/* print environment */
-			static void print(void);
+			static auto print(void) -> void;
 
 
 		private:
 
-			// -- private static members --------------------------------------
+			// -- private lifecycle -------------------------------------------
+
+			/* default constructor */
+			env(void);
+
+			/* non-assignable class */
+			NON_ASSIGNABLE(env);
+
+			/* destructor */
+			~env(void) noexcept = default;
+
+
+			// -- private modifiers -------------------------------------------
+
+			/* initialize environment */
+			auto init(const char**) -> void;
+
+
+			// -- private static accessors ------------------------------------
+
+			/* get instance */
+			inline static auto shared(void) -> env& {
+				static env instance{};
+				return instance;
+			}
+
+
+			// -- private members ---------------------------------------------
 
 			/* environment variables */
-			static vector_type _env;
+			vector_type _env;
 
 
 	};
