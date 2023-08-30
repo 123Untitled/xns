@@ -34,17 +34,12 @@ namespace xns {
 
 			/* is little endian */
 			static consteval auto is_little(void) noexcept -> bool {
-				return value == endian::LITTLE;
+				return value == LITTLE;
 			}
 
 			/* is big endian */
 			static consteval auto is_big(void) noexcept -> bool {
-				return value == endian::BIG;
-			}
-
-			/* is unknown endian */
-			static consteval auto is_unknown(void) noexcept -> bool {
-				return value == endian::UNKNOWN;
+				return value == BIG;
 			}
 
 
@@ -52,42 +47,22 @@ namespace xns {
 
 			// -- private enums -----------------------------------------------
 
-			enum endian : xns::u32 {
+			enum : xns::u32 {
 				LITTLE  = 0x00'00'00'01,
 				BIG     = 0x01'00'00'00,
-				UNKNOWN = 0xFF'FF'FF'FF
 			};
-
-
-			// -- implementation ----------------------------------------------
-
-			/* forward declaration */
-			template <xns::u32>
-			struct impl;
-
-			/* little specialization */
-			template <>
-			struct impl<endian::LITTLE> {
-				static constexpr auto value = endian::LITTLE;
-			};
-
-			/* big specialization */
-			template <>
-			struct impl<endian::BIG> {
-				static constexpr auto value = endian::BIG;
-			};
-
 
 			// -- private static constants ------------------------------------
 
 			/* value */
-			static constexpr endian value = impl<(0xFFFFFFFF & 1)>::value;
+			static constexpr xns::u32 value = (0xFFFFFFFF & 1);
 
 
 			// -- assertions --------------------------------------------------
 
 			/* endianness is either little or big */
-			static_assert(value != endian::UNKNOWN, "): ENDIANNESS: unknown endianness! :(");
+			static_assert(value == LITTLE || value == BIG,
+					"): ENDIANNESS: unknown endianness! :(");
 
 	};
 
