@@ -90,3 +90,12 @@ bool UT::unit_tests<"numeric_limits">(void) {
 
 	return true;
 }
+
+
+
+int main(void) {
+
+	UT::unit_tests<"numeric_limits">();
+
+	return 0;
+}
