@@ -6,12 +6,19 @@ template <>
 bool UT::unit_tests<"random">(void) {
 
 
-	using type = double;
+	using type = char;
 
-	for (int i = 0; i < 10; ++i) {
-		std::cout << (type)xns::random::random_int<type>() << std::endl;
+	for (int i = 0; i < 1000; ++i) {
+		type x = xns::random::integral<type>();
+		std::cout << (int)x << " ";
 	}
+	std::cout << std::endl;
 
 	return true;
+}
+
+int main(void) {
+	UT::unit_tests<"random">();
+	return 0;
 }
 

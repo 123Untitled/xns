@@ -1,5 +1,7 @@
 #include "unit_tests.hpp"
 #include "vector.hpp"
+#include "random.hpp"
+#include "time.hpp"
 
 
 
@@ -30,6 +32,34 @@ static void dichotic_test(void) {
 	}
 }
 
+static auto simd_test(void) -> void {
+
+	using size_type = typename xns::vector<int>::size_type;
+
+	xns::vector<int> vec;
+
+	constexpr size_type N = 1'000'000;
+
+	for (size_type i = 0; i < N; ++i) {
+		vec.copy_back(xns::random::integral<int>());
+	}
+
+	auto start = xns::time::now();
+
+	for (size_type i = 0; i < 100; ++i) {
+		xns::vector<int> vc{vec};
+	}
+
+	auto end = xns::time::now();
+
+	std::cout << "copy: " << end - start << " ns" << std::endl;
+
+
+
+
+
+
+}
 
 
 /* unit test */
@@ -42,6 +72,10 @@ bool UT::unit_tests<"vector">(void) {
 }
 
 int main(void) {
+
+	simd_test();
+
+
 	UT::unit_tests<"vector">();
 	return 0;
 }

@@ -2,44 +2,77 @@
 #include "map.hpp"
 
 #include "variant.hpp"
+#include "random.hpp"
+#include <chrono>
+#include <map>
+#include <set>
+
+
+
+void benchmark(void) {
+
+	// get time in nanoseconds
+	auto get_time = []() -> auto {
+		return std::chrono::duration_cast<std::chrono::nanoseconds>(
+			std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+	};
+
+
+	constexpr std::size_t N = 10000000;
+
+	{
+
+		// get time in nanoseconds
+		auto start = get_time();
+
+		{
+			xns::map<int, float> _map;
+
+			for (xns::size_t i = 0; i < N; ++i) {
+				_map.insert(xns::random::integral<int>() % 50, 0.0f);
+			}
+		}
+
+		// get time in nanoseconds
+		auto end = get_time();
+		std::cout << "[xns::map] time: " << (end - start) << " ns" << std::endl;
+
+	}
+
+	{
+		// get time in nanoseconds
+		auto start = get_time();
+
+		{
+			std::set<int> _map;
+
+			for (xns::size_t i = 0; i < N; ++i) {
+				_map.insert(xns::random::integral<int>() % 50);
+			}
+		}
+
+		// get time in nanoseconds
+		auto end = get_time();
+		std::cout << "[std::map] time: " << (end - start) << " ns" << std::endl;
+	}
+
+
+
+
+}
 
 template <>
 bool UT::unit_tests<"map">(void) {
 
-	xns::string s1{"hello"};
-	xns::string s2{"world"};
-	xns::string s3{"this"};
-	xns::string s4{"is"};
-	xns::string s5{"cool"};
+	benchmark();
+	return true;
 
-	xns::string_view s6{"a"};
-	xns::string_view s7{"b"};
+	xns::map<int, float> _map;
+	return true;
 
-		std::cout << (s6 < s7) << std::endl;
-		std::cout << (s6 > s7) << std::endl;
-
-
-
-	xns::map<xns::string_view, float> _map;
-
-	_map.insert("hello", 1.0f);
-	_map.insert("world", 2.0f);
-	_map.insert("this", 3.0f);
-	_map.insert("is", 4.0f);
-	_map.insert("cool", 5.0f);
-	_map.insert("i'm", 6.0f);
-	_map.insert("a", 7.0f);
-	_map.insert("map", 8.0f);
-	_map.insert("with", 9.0f);
-	_map.insert("string", 10.0f);
-	_map.insert("views", 11.0f);
-	_map.insert("as", 12.0f);
-	_map.insert("keys", 13.0f);
-	_map.insert("and", 14.0f);
-	_map.insert("floats", 15.0f);
-	_map.insert("as", 16.0f);
-	_map.insert("values", 17.0f);
-
+	for (xns::size_t i = 0; i < 15; ++i) {
+		_map.insert(xns::random::integral<int>() % 50, 0.0f);
+	}
 
 
 
@@ -58,7 +91,11 @@ bool UT::unit_tests<"map">(void) {
 
 }
 
+
+
+
 int main(void) {
+
 
 	UT::unit_tests<"map">();
 
