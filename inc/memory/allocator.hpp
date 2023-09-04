@@ -10,13 +10,11 @@
 #include "numeric_limits.hpp"
 #include "policy.hpp"
 #include "is_scalar.hpp"
-
 #include "is_constructible.hpp"
 #include "is_destructible.hpp"
 #include "is_trivially_destructible.hpp"
 
 // standard headers
-#include <limits>
 #include <cstdlib>
 
 
@@ -32,15 +30,16 @@ namespace xns {
 	template <class T>
 	class allocator final {
 
+
 		public:
 
-			// -- T Y P E S ---------------------------------------------------
+			// -- public types ------------------------------------------------
+
+			/* self type */
+			using self            = xns::allocator<T>;
 
 			/* value type */
 			using value_type      = T;
-
-			/* self type */
-			using self            = allocator<value_type>;
 
 			/* size type */
 			using size_type       = xns::size_t;
@@ -61,14 +60,13 @@ namespace xns {
 			using const_pointer   = const T*;
 
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* non-instantiable class */
 			NON_INSTANCIABLE(allocator);
 
 
-
-			// -- A L L O C A T I O N -----------------------------------------
+			// -- public static methods ---------------------------------------
 
 			/* allocate */
 			static mutable_pointer allocate(const size_type size = 1) {
@@ -190,6 +188,7 @@ namespace xns {
 				// assign object by move
 				dst = xns::move(src);
 			}
+
 
 	};
 
