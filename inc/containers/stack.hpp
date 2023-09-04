@@ -1,10 +1,15 @@
 #ifndef STACK_HEADER
 #define STACK_HEADER
 
+// local headers
 #include "types.hpp"
 #include "move.hpp"
 #include "forward.hpp"
-#include "allocator.hpp"
+#include "memory.hpp"
+#include "swap.hpp"
+#include "is_same.hpp"
+#include "is_constructible.hpp"
+
 #include <iostream>
 
 
@@ -21,7 +26,7 @@ namespace xns {
 
 		public:
 
-			// -- T Y P E S ---------------------------------------------------
+			// -- public types ------------------------------------------------
 
 			/* value type */
 			using value_type      = T;
@@ -50,28 +55,28 @@ namespace xns {
 
 		private:
 
-			/* forward declaration */
-			struct node;
+			// -- forward declarations ----------------------------------------
+
+			/* node class */
+			class node;
 
 
-			// -- P R I V A T E  A L I A S E S --------------------------------
+			// -- private types -----------------------------------------------
 
 			/* node pointer type */
 			using node_pointer = node*;
 
 			/* allocator type */
-			using allocator = xns::allocator<xns::stack<T>::node>;
+			using allocator = xns::memory::pool<node>;
 
 
 		public:
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			explicit stack(void) noexcept
-			: _top{nullptr}, _storage{nullptr}, _size{0} {
-				// code here...
-			}
+			inline explicit stack(void) noexcept
+			: _top{nullptr}, _size{0} {}
 
 			/* copy constructor */
 			stack(const self& other)
@@ -88,48 +93,27 @@ namespace xns {
 			}
 
 			/* move constructor */
-			stack(self&& other) noexcept
-			: _top{other._top}, _storage{other._storage}, _size{other._size} {
+			inline stack(self&& other) noexcept
+			: _top{other._top}, _size{other._size} {
 				// invalidate other
-				other.initialize_members();
+				other.init();
 			}
 
 			/* destructor */
-			~stack(void) {
-				// get top node
-				node_pointer node = _top;
-				// loop through stack
-				while (node) {
-					// get next node
-					node_pointer next = node->_next;
-					// destroy node
-					allocator::destroy(node);
-					// deallocate node
-					allocator::deallocate(node);
-					// set node to next
-					node = next;
-				} // get storage node
-				node = _storage;
-				// loop through storage
-				while (node) {
-					// get next node
-					node_pointer next = node->_next;
-					// deallocate node
-					allocator::deallocate(node);
-					// set node to next
-					node = next;
-				}
+			inline ~stack(void) noexcept {
+				// free stack
+				free_stack();
 			}
 
 
-			// -- O P E R A T O R S -------------------------------------------
+			// -- public assignment operators ---------------------------------
 
-			/* copy operator */
-			self& operator=(const self& other) {
+			/* copy assignment operator */
+			auto operator=(const self& other) -> self& {
 				// check self assignment
 				if (this != &other) {
-					// clear self (keep own storage)
-					clear();
+					free_stack();
+					init();
 					// get other top
 					node_pointer node = other._top;
 					// loop through other stack
@@ -142,142 +126,109 @@ namespace xns {
 				} return *this;
 			}
 
-			/* move operator */ // WARNING: doesn't move storage
-			self& operator=(self&& other) noexcept {
+			/* move assignment operator */
+			auto operator=(self&& other) noexcept -> self& {
 				// check self assignment
 				if (this != &other) {
-					// clear self (keep own storage)
-					clear();
-					// move only top
+					// free stack
+					free_stack();
+					// move members
 					_top = other._top;
-					// assign size
 					_size = other._size;
-					// invalidate other top
-					other._top = nullptr;
-					// reset other size
-					other._size = 0;
+					// invalidate other
+					other.init();
 				} // return self reference
 				return *this;
 			}
 
 
-			// -- A C C E S S O R S -------------------------------------------
+			// -- public accessors --------------------------------------------
 
 			/* top */
-			reference top(void) {
+			inline auto top(void) noexcept -> reference {
 				// return top value reference
 				return _top->_value;
 			}
 
 			/* const top */
-			const_reference top(void) const {
+			inline auto top(void) const noexcept -> const_reference {
 				// return top value const reference
 				return _top->_value;
 			}
 
 			/* size */
-			size_type size(void) const {
+			inline auto size(void) const noexcept -> size_type {
 				// return size
 				return _size;
 			}
 
 			/* empty */
-			bool empty(void) const {
+			inline auto empty(void) const noexcept -> bool {
 				// return if size is zero
 				return _size == 0;
 			}
 
 
 
-			// -- M E T H O D S -----------------------------------------------
+			// -- public modifiers --------------------------------------------
 
 			/* push */
-			void push(const_reference value) {
-				// node pointer
-				node_pointer node = new_node();
-				// check if pointer is valid
-				if (!node) { return; }
-				// construct node
-				allocator::construct(node, value);
-				// link node
-				link(node);
-				// increment size
-				++_size;
-			}
-
-			/* move push */
-			void push(move_reference value) {
-				// node pointer
-				node_pointer node = new_node();
-				// check if pointer is valid
-				if (!node) { return; }
-				// construct node
-				allocator::construct(node, xns::move(value));
-				// link node
-				link(node);
+			template <typename U>
+			auto push(U&& value) -> void {
+				// assert that U is same as value_type
+				static_assert(xns::is_same<xns::remove_cvr<U>, value_type>,
+						"): STACK: U MUST BE SAME AS T :(");
+				// allocate and link node
+				node_pointer node = allocator::make(xns::forward<U>(value));
+				node->_next = _top;
+				_top = node;
 				// increment size
 				++_size;
 			}
 
 			/* emplace */
 			template <typename... A>
-			void emplace(A&&... arguments) {
-				// node pointer
-				node_pointer node = new_node();
-				// check if pointer is valid
-				if (!node) { return; }
-				// construct node
-				allocator::construct(node, xns::forward<A>(arguments)...);
-				// link node
-				link(node);
+			auto emplace(A&&... args) -> void {
+				// assert that T is constructible from A
+				static_assert(xns::is_constructible<value_type, A...>,
+						"): STACK: T MUST BE CONSTRUCTIBLE FROM A... :(");
+				// allocate and link node
+				node_pointer node = allocator::make(xns::forward<A>(args)...);
+				node->_next = _top;
+				_top = node;
 				// increment size
 				++_size;
 			}
 
 			/* pop */
-			void pop(void) {
-				// unlink node
-				node_pointer node = unlink();
-				// check if pointer is valid
-				if (!node) { return; }
-				// destroy node
-				allocator::destroy(node);
-				// link node to storage
-				link_storage(node);
-				// decrement size
-				--_size;
+			auto pop(void) noexcept -> void {
+				// check if stack is not empty
+				if (_top) {
+					// get top node
+					node_pointer node = _top;
+					_top = _top->_next;
+					// deallocate node
+					allocator::store(node);
+					// decrement size
+					--_size;
+				}
 			}
 
-
-			/* shrink */
-			void shrink(void) {
-				// node pointer
-				node_pointer node;
-				// loop through storage
-				while ((node = unlink_storage())) {
-					// deallocate node
-					allocator::deallocate(node);
-				}
-				// reset storage
-				_storage = nullptr;
+			/* swap */
+			auto swap(self& other) noexcept -> void {
+				// swap members
+				xns::swap(_top, other._top);
+				xns::swap(_size, other._size);
 			}
 
 			/* clear */
-			void clear(void) {
-				// node pointer
-				node_pointer node;
-				// loop through stack
-				while ((node = unlink())) {
-					// destroy node
-					allocator::destroy(node);
-					// link node to storage
-					link_storage(node);
-				} // reset size
-				_size = 0;
+			auto clear(void) noexcept -> void {
+				// free stack
+				free_stack(); init();
 			}
 
 			/* print stack */
-			void print(void) {
+			auto print(void) noexcept -> void {
 				std::cout << "size: " << _size << std::endl;
 				// get top node
 				node_pointer node = _top;
@@ -290,127 +241,79 @@ namespace xns {
 				}
 			}
 
+
 		private:
 
-			// -- P R I V A T E  M E T H O D S --------------------------------
+			// -- private modifiers -------------------------------------------
 
-			/* new node */
-			node_pointer new_node(void) {
-				// check if free node is available
-				if (_storage) { return unlink_storage(); }
-				// else allocate new node
-				return allocator::allocate();
-			}
-
-
-			void link(node_pointer node) {
-				// link node's next pointer to top node
-				node->_next = _top;
-				// set top node
-				_top = node;
-			}
-
-			node_pointer unlink(void) {
-				// get top node
-				node_pointer node = _top;
-				// check if pointer is valid
-				if (_top) { _top = _top->_next; }
-				// return unlinked node
-				return node;
-			}
-
-			/* link storage */
-			void link_storage(node_pointer node) {
-				// set node's next node
-				node->_next = _storage;
-				// set storage node
-				_storage = node;
-			}
-
-			/* unlink storage */
-			node_pointer unlink_storage(void) {
-				// get storage node
-				node_pointer node = _storage;
-				// check if pointer is valid
-				if (_storage) { _storage = _storage->_next; }
-				// return unlinked node
-				return node;
-			}
-
-			/* initialize members */
-			void initialize_members(void) {
-				// initialize top
-				_top = nullptr;
-				// initialize storage
-				_storage = nullptr;
-				// initialize size
+			/* init members */
+			inline auto init(void) noexcept -> void {
+				// initialize members
+				_top  = nullptr;
 				_size = 0;
 			}
 
+			/* free stack */
+			auto free_stack(void) noexcept -> void {
+				// get top node
+				node_pointer node = _top;
+				// loop through stack
+				while (node) {
+					// get next node
+					node_pointer next = node->_next;
+					// deallocate node
+					allocator::store(node);
+					// set node to next
+					node = next;
+				}
+			}
 
-			// -- P R I V A T E  M E M B E R S --------------------------------
+
+			// -- private members ---------------------------------------------
 
 			/* top */
 			node_pointer _top;
 
-			/* storage */
-			node_pointer _storage;
-
 			/* size */
 			size_type _size;
-
 
 	};
 
 
 	// -- N O D E  C L A S S --------------------------------------------------
 
-	template <class T>
-	struct stack<T>::node final {
+	template <typename T>
+	class xns::stack<T>::node final {
 
 		public:
 
-			// -- lifecycle ---------------------------------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			node(void)
+			inline node(void) noexcept
 			: _next{nullptr} {}
 
-			/* non-copyable class */
-			NON_COPYABLE(node);
-
-			/* move constructor */
-			node(node&& other) noexcept
-			: _value{xns::move(other._value)}, _next{xns::move(other._next)} {
-			}
+			/* non-assignable class */
+			NON_ASSIGNABLE(node);
 
 			/* value copy constructor */
-			node(stack<T>::const_reference value)
-			: _value{value}, _next{nullptr} {
-				// code here...
-			}
+			inline explicit node(stack<T>::const_reference value)
+			: _value{value}, _next{nullptr} {}
 
 			/* value move constructor */
-			node(stack<T>::move_reference value) noexcept
-			: _value{xns::move(value)}, _next{nullptr} {
-				// code here...
-			}
+			inline explicit node(stack<T>::move_reference value) noexcept
+			: _value{xns::move(value)}, _next{nullptr} {}
 
 			/* value emplace constructor */
 			template <typename... A>
-			node(A&&... arguments)
-			: _value{xns::forward<A>(arguments)...}, _next{nullptr} {
-				// code here...
-			}
+			inline explicit node(A&&... args)
+			: _value{xns::forward<A>(args)...}, _next{nullptr} {}
 
 			/* destructor */
-			~node(void) {
-				// initialize next
-				_next = nullptr;
-			}
+			inline ~node(void) noexcept = default;
 
 
-			// -- members -----------------------------------------------------
+			// -- public members ----------------------------------------------
 
 			/* value */
 			stack<T>::value_type _value;
