@@ -196,7 +196,6 @@ namespace xns {
 	};
 
 
-
 }
 
 #endif
