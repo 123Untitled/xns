@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh --no-rcs --errexit
+#!/usr/bin/env zsh --no-rcs
 
 # this script is used to generate missing unit test files
 
