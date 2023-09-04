@@ -35,7 +35,7 @@ namespace xns {
 				// loop through bits
 				for (type x = 0; x < bits; ++x) {
 					// add shifted bit to max
-					type_max += (static_cast<type>(1) << x);
+					type_max |= static_cast<type>(static_cast<type>(1) << x);
 				} // return max
 				return type_max;
 			}
