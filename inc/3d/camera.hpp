@@ -88,10 +88,9 @@ namespace xns {
 			};
 
 
-
 			// -- public types ------------------------------------------------
 
-			using view_matrix = matrix<double, 4, 4>;
+			using view_matrix = xns::matrix<double, 4, 4>;
 
 
 			// -- public constructors -----------------------------------------
@@ -139,7 +138,7 @@ namespace xns {
 
 			// -- public types ------------------------------------------------
 
-			using projection_matrix = matrix<double, 4, 4>;
+			using projection_matrix = xns::matrix<double, 4, 4>;
 
 
 			// -- public update methods ---------------------------------------
