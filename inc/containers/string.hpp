@@ -350,28 +350,33 @@ namespace xns {
 			// -- A S S I G N M E N T  O P E R A T O R S ----------------------
 
 			/* copy assignment operator */
-			self& operator=(const self& other) {
-				return assign(other), *this;
+			inline auto operator=(const self& other) -> self& {
+				assign(other);
+				return *this;
 			}
 
 			/* move assignment operator */
-			self& operator=(self&& other) noexcept {
-				return assign(xns::move(other)), *this;
+			inline auto operator=(self&& other) noexcept -> self& {
+				assign(xns::move(other));
+				return *this;
 			}
 
 			/* string view assignment operator */
-			self& operator=(const basic_string_view<char_t>& view) {
-				return assign(view), *this;
+			inline auto operator=(const basic_string_view<char_t>& view) -> self& {
+				assign(view);
+				return *this;
 			}
 
 			/* null-terminated string assignment operator */
-			self& operator=(const_pointer str) {
-				return assign(str, get_len(str)), *this;
+			inline auto operator=(const_pointer str) -> self& {
+				assign(str, get_len(str));
+				return *this;
 			}
 
 			/* character assignment operator */
-			self& operator=(const char_t character) {
-				return assign(character, 1), *this;
+			inline auto operator=(const char_t character) -> self& {
+				assign(character, 1);
+				return *this;
 			}
 
 
