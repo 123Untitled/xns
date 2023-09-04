@@ -5,6 +5,7 @@
 #include "is_signed.hpp"
 #include "numeric_limits.hpp"
 #include "is_scalar.hpp"
+#include "is_comparable.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -46,24 +47,21 @@ namespace xns {
 	// -- M A X ---------------------------------------------------------------
 
 	template <class T, class U>
-	constexpr auto max(const T& a, const U& b) -> decltype(a > b ? a : b)& {
-
-		// assert that T and U are scalar types
-		static_assert(xns::is_scalar<T> && xns::is_scalar<U>, "): TYPES MUST BE SCALAR :(");
-
+	inline constexpr auto max(const T& a, const U& b) -> const decltype(a > b ? a : b)& {
+		// assert that T and U are comparable types
+		static_assert(xns::is_comparable<T, U>, "): MAX: TYPES MUST BE COMPARABLE :(");
 		// return max value
 		return a > b ? a : b;
 	}
 
 
+
 	// -- M I N ---------------------------------------------------------------
 
 	template <class T, class U>
-	constexpr auto min(const T& a, const U& b) -> decltype(a < b ? a : b)& {
-
-		// assert that T and U are scalar types
-		static_assert(xns::is_scalar<T> && xns::is_scalar<U>, "): TYPES MUST BE SCALAR :(");
-
+	inline constexpr auto min(const T& a, const U& b) -> const decltype(a < b ? a : b)& {
+		// assert that T and U are comparable types
+		static_assert(xns::is_comparable<T, U>, "): MIN: TYPES MUST BE COMPARABLE :(");
 		// return min value
 		return a < b ? a : b;
 	}
