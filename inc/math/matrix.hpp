@@ -130,15 +130,17 @@ namespace xns {
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			constexpr self& operator=(const self& other) {
+			constexpr auto operator=(const self& other) -> self& {
 				// call copy assignment and return self reference
-				return assign(other), *this;
+				assign(other);
+				return *this;
 			}
 
 			/* move assignment operator */
-			constexpr self& operator=(self&& other) {
+			constexpr auto operator=(self&& other) -> self& {
 				// call move assignment and return self reference
-				return assign(xns::move(other)), *this;
+				assign(xns::move(other));
+				return *this;
 			}
 
 
