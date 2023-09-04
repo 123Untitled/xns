@@ -17,7 +17,7 @@ namespace xns {
 		/* is convertible implementation */
 		template <typename From, typename To>
 		concept is_convertible = requires {
-			xns::is_same<To, decltype(static_cast<To>(xns::declval<From>()))>;
+			requires xns::is_same<To, decltype(static_cast<To>(xns::declval<From>()))>;
 		};
 
 	}
