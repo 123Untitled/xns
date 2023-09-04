@@ -194,6 +194,8 @@ namespace xns {
 
 
 
+	/* arch address types */
+	using addr_t  = unsign<XNS_ARCH_BYTES>;
 
 
 
@@ -234,6 +236,15 @@ namespace xns {
 
 	/* maximum signed integer type */
 	using smax = sign<XNS_ARCH_BYTES>;
+
+
+	/* floating point types */
+
+	/* lowest floating point type */
+	using f32	 = float;
+
+	/* highest floating point type */
+	using f64	 = double;
 
 
 }
