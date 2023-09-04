@@ -1,23 +1,19 @@
 #ifndef TUPLE_HEADER
 #define TUPLE_HEADER
 
-#include "allocator.hpp"
-
-#include "identity.hpp"
+// local headers
 #include "types.hpp"
-#include "forward.hpp"
 #include "move.hpp"
+#include "forward.hpp"
 #include "is_same.hpp"
+#include "identity.hpp"
 #include "is_all_unique.hpp"
-
 #include "indexed_element.hpp"
-
 #include "type_at.hpp"
-#include "integer_sequence.hpp"
 #include "index_of.hpp"
+#include "integer_sequence.hpp"
 
-#include "function.hpp"
-
+// c++ standard library headers
 #include <iostream>
 
 
@@ -29,7 +25,7 @@ namespace xns {
 	// -- T U P L E  C L A S S ------------------------------------------------
 
 	template <typename... A>
-	class tuple final {
+	class alignas(sizeof(xns::addr_t)) tuple final {
 
 
 		public:
