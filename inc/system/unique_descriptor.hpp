@@ -106,9 +106,11 @@ namespace xns {
 			}
 
 			/* descriptor assignment operator */
-			inline auto operator=(const descriptor& descriptor) noexcept -> void {
+			inline auto operator=(const descriptor& descriptor) noexcept -> self& {
 				// set descriptor
 				_descriptor = check_descriptor(descriptor);
+				// return self reference
+				return *this;
 			}
 
 
