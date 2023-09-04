@@ -10,7 +10,8 @@ extern constinit const char** environ;
 // -- private lifecycle -------------------------------------------------------
 
 /* default constructor */
-xns::env::env(void) {
+xns::env::env(void)
+: _env{} {
 	// initialize environment
 	init(environ);
 }
