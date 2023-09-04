@@ -5,12 +5,15 @@
 #include "stack.hpp"
 #include "types.hpp"
 #include "tuple.hpp"
-#include "allocator.hpp"
 #include "safe_enum.hpp"
-#include "iterators/bst_iterator.hpp"
+#include "bst_iterator.hpp"
 #include "output.hpp"
 #include "escape.hpp"
 #include "terminal.hpp"
+#include "math.hpp"
+#include "memory.hpp"
+#include "swap.hpp"
+
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -20,7 +23,7 @@ namespace xns {
 
 	// -- T R E E -------------------------------------------------------------
 
-	template <class T>
+	template <typename T>
 	class tree {
 
 
@@ -33,11 +36,12 @@ namespace xns {
 			// -- friends -----------------------------------------------------
 
 			/* bst iterator as friend */
-			template <class, xns::traversal_order, bool>
+			template <typename, xns::traversal_order, bool>
 			friend class bst_iterator;
 
 			/* print as friend */
 			friend class printer;
+
 
 
 		public:
@@ -46,34 +50,28 @@ namespace xns {
 			class node;
 
 
-			// -- private types -----------------------------------------------
-
-			/* node type */
-			using node_type    = tree<T>::node;
-
-			/* allocator type */
-			using allocator    = allocator<node_type>;
-
-			/* node pointer */
-			using node_pointer = typename allocator::mutable_pointer;
-
-
-		public:
-
-
 			// -- public types ------------------------------------------------
 
-			/* value type */
-			using value_type      = T;
-
 			/* self type */
-			using self            = tree<value_type>;
+			using self = xns::tree<T>;
+
+			/* value type */
+			using value_type = T;
+
+			/* node type */
+			using node_type = self::node;
+
+			/* allocator type */
+			using allocator = xns::memory::pool<node_type>;
+
+			/* node pointer */
+			using node_pointer = node_type*;
 
 			/* reference type */
-			using reference       = value_type&;
+			using reference = value_type&;
 
 			/* move reference type */
-			using move_reference  = value_type&&;
+			using move_reference = value_type&&;
 
 			/* pointer type */
 			using mutable_pointer = value_type*;
@@ -91,11 +89,11 @@ namespace xns {
 			// -- iterators types ---------------------------------------------
 
 			/* iterator type */
-			template <class O>
+			template <typename O>
 			using iterator = xns::bst_iterator<value_type, O, false>;
 
 			/* const iterator type */
-			template <class O>
+			template <typename O>
 			using const_iterator = xns::bst_iterator<value_type, O, true>;
 
 
@@ -124,122 +122,575 @@ namespace xns {
 			using const_bfs_iterator        = const_iterator<xns::bfs_order>;
 
 
+		private:
+
+			// -- private members ---------------------------------------------
+
+			/* root node */
+			node_pointer _root;
+
+			/* lower node */
+			node_pointer _lower;
+
+			/* upper node */
+			node_pointer _upper;
+
+			/* size */
+			size_type    _size;
+
+
+			// -- private enums -----------------------------------------------
+
+			/* balance factor */
+			enum : xns::s64 {
+				   BALANCED =  0,
+				 LEFT_HEAVY = +1,
+				RIGHT_HEAVY = -1
+			};
+
+
+
+		public:
+
 			// -- constructors ------------------------------------------------
 
 			/* default constructor */
 			tree(void) noexcept
-			: _root{nullptr}, _storage{nullptr}, _size{0} {
-				// do nothing...
-			}
+			: _root{nullptr}, _lower{nullptr}, _upper{nullptr}, _size{0} {}
 
 			/* copy constructor */
 			tree(const self& other)
-			: _root{nullptr}, _storage{nullptr}, _size{0} {
-				// copy other tree
-				//_copy_tree(other);
+			: tree{} {
+
+				for (auto it = other.bfs_begin(); it != nullptr; ++it) {
+					insert(*it);
+				}
 			}
 
 			/* move constructor */
 			tree(self&& other) noexcept
-			: _root{other._root}, _storage{other._storage}, _size{other._size} {
-				// reset other tree
-				other._root    = nullptr;
-				other._storage = nullptr;
-				other._size    = 0;
+			: _root{other._root}, _lower{other._lower}, _upper{other._upper}, _size{other._size} {
+				// invalidate other
+				other.init();
 			}
 
 			/* destructor */
 			~tree(void) noexcept {
-				// destroy and deallocate tree
-				 _free_tree();
-				// deallocate storage
-				_free_storage();
+				// free tree
+				free_tree();
 			}
 
 
+			// -- public assignment operators ---------------------------------
 
-			// -- iterators ---------------------------------------------------
+			/* copy assignment operator */
+			auto operator=(const self& other) -> self& {
+				// check for self-assignment
+				if (this != &other) {
+					free_tree();
+					init();
+					for (auto it = other.bfs_begin(); it != nullptr; ++it) {
+						insert(*it);
+					}
+				} // return self reference
+				return *this;
+			}
+
+			/* move assignment operator */
+			auto operator=(self&& other) noexcept -> self& {
+				// check for self-assignment
+				if (this != &other) {
+					// destroy and deallocate tree
+					free_tree();
+					// move other tree
+					_root    = other._root;
+					_upper   = other._upper;
+					_lower   = other._lower;
+					_size    = other._size;
+					// reset other tree
+					other.init();
+				} // return self reference
+				return *this;
+			}
+
+
+			// -- public iterators --------------------------------------------
 
 			/* pre-order iterator begin */
-			auto pre_order_begin(void) noexcept -> pre_order_iterator {
+			inline auto pre_order_begin(void) noexcept -> pre_order_iterator {
 				// return iterator to root
 				return pre_order_iterator{_root};
 			}
 
 			/* in-order iterator begin */
-			auto in_order_begin(void) noexcept -> in_order_iterator {
+			inline auto in_order_begin(void) noexcept -> in_order_iterator {
 				// return iterator to root
 				return in_order_iterator{_root};
 			}
 
 			/* post-order iterator begin */
-			auto post_order_begin(void) noexcept -> post_order_iterator {
+			inline auto post_order_begin(void) noexcept -> post_order_iterator {
 				// return iterator to root
 				return post_order_iterator{_root};
 			}
 
 			/* bfs iterator begin */
-			auto bfs_begin(void) noexcept -> bfs_iterator {
+			inline auto bfs_begin(void) noexcept -> bfs_iterator {
 				// return iterator to root
 				return bfs_iterator{_root};
 			}
 
 			/* const pre-order iterator begin */
-			auto pre_order_begin(void) const noexcept -> const_pre_order_iterator {
+			inline auto pre_order_begin(void) const noexcept -> const_pre_order_iterator {
 				// return iterator to root
 				return const_pre_order_iterator{_root};
 			}
 
 			/* const in-order iterator begin */
-			auto in_order_begin(void) const noexcept -> const_in_order_iterator {
+			inline auto in_order_begin(void) const noexcept -> const_in_order_iterator {
 				// return iterator to root
 				return const_in_order_iterator{_root};
 			}
 
 			/* const post-order iterator begin */
-			auto post_order_begin(void) const noexcept -> const_post_order_iterator {
+			inline auto post_order_begin(void) const noexcept -> const_post_order_iterator {
 				// return iterator to root
 				return const_post_order_iterator{_root};
 			}
 
 			/* const bfs iterator begin */
-			auto bfs_begin(void) const noexcept -> const_bfs_iterator {
+			inline auto bfs_begin(void) const noexcept -> const_bfs_iterator {
 				// return iterator to root
 				return const_bfs_iterator{_root};
 			}
 
 			/* iterator end */
-			auto end(void) noexcept -> xns::null {
+			inline auto end(void) noexcept -> xns::null {
 				// return iterator to null
 				return nullptr;
 			}
 
 			/* const iterator end */
-			auto end(void) const noexcept -> xns::null {
+			inline auto end(void) const noexcept -> xns::null {
 				// return iterator to null
 				return nullptr;
 			}
 
 
-			// -- accessors ---------------------------------------------------
+			// -- public accessors --------------------------------------------
 
 			/* size */
-			size_type size(void) const noexcept {
+			inline auto size(void) const noexcept -> size_type {
 				// return size of tree
 				return _size;
 			}
 
 			/* empty */
-			bool empty(void) const noexcept {
+			inline auto empty(void) const noexcept -> bool {
 				// return if tree is empty
 				return _size == 0;
 			}
 
 			/* depth */
-			size_type depth(void) const noexcept {
+			inline auto depth(void) const noexcept -> size_type {
 				// return depth of tree
 				return _root ? _root->_depth : 0;
 			}
+
+			/* contains */
+			auto contains(const value_type& value) const noexcept -> bool {
+				// get root node
+				node_pointer node = _root;
+				// loop over tree
+				while (node != nullptr) {
+					// less compare
+					if      (value < node->_value) { node = node->_left;  }
+					// greater compare
+					else if (value > node->_value) { node = node->_right; }
+					// value found
+					else                           { return true; }
+				} // return false
+				return false;
+			}
+
+
+			/* find */
+			template <typename K>
+			auto find(const K& value) noexcept -> node_pointer {
+				// assert K is comparable to T
+				static_assert(xns::is_comparable<K, T>,
+					"): TREE: K must be comparable to T :(");
+				// get root node
+				node_pointer node = _root;
+				// loop over tree
+				while (node != nullptr) {
+					// less compare
+					if      (value < node->_value) { node = node->_left;  }
+					// greater compare
+					else if (value > node->_value) { node = node->_right; }
+					// value found
+					else                           { break; }
+				} // return node
+				return node;
+			}
+
+			/* const find */
+			template <typename K>
+			auto find(const K& value) const noexcept -> const node_pointer {
+				// assert K is comparable to T
+				static_assert(xns::is_comparable<K, T>,
+					"): TREE: K must be comparable to T :(");
+				// get root node
+				node_pointer node = _root;
+				// loop over tree
+				while (node != nullptr) {
+					// less compare
+					if      (value < node->_value) { node = node->_left;  }
+					// greater compare
+					else if (value > node->_value) { node = node->_right; }
+					// value found
+					else                           { break; }
+				} // return node
+				return node;
+			}
+
+
+
+
+		public:
+
+			// -- public modifiers --------------------------------------------
+
+			/* insert */
+			template <typename U = T>
+			auto insert(U&& value) -> void {
+
+				// assert U is same as T
+				static_assert(xns::is_same<xns::remove_reference<U>, T>,
+					"): TREE: BAD INSERT TYPE :(");
+
+
+				if (_root) {
+
+					if (value < _lower->_value) {
+						_lower->_left = new_node(_lower, xns::forward<U>(value));
+						balance(_lower);
+						_lower = _lower->_left;
+						return;
+					}
+					else if (value > _upper->_value) {
+						_upper->_right = new_node(_upper, xns::forward<U>(value));
+						balance(_upper);
+						_upper = _upper->_right;
+						return;
+					}
+
+					// get root address
+					node_type** node = &_root;
+					node_type* parent = nullptr;
+					// loop over tree
+					while (*node != nullptr) {
+						// set parent
+						parent = *node;
+						// less compare
+						if      (value < (*node)->_value) { node = &(*node)->_left;  }
+						// greater compare
+						else if (value > (*node)->_value) { node = &(*node)->_right; }
+						// else equal
+						else { return; }
+					}
+					*node = new_node(parent, xns::forward<U>(value));
+					balance(parent);
+				}
+				else {
+
+					_root = new_node(nullptr, xns::forward<U>(value));
+					_lower = _root;
+					_upper = _root;
+				}
+
+			}
+
+
+
+
+			// -- public subscript operator -----------------------------------
+
+			/* subscript operator */
+			template <typename K>
+			auto operator[](const K& value) noexcept -> reference {
+				static value_type dummy;
+				return dummy;
+				// assert K is comparable to T
+				//static_assert(xns::is_comparable<K, T>,
+				//	"): TREE: K must be comparable to T :(");
+				//// get root address
+				//node_type** node = &_root;
+				//node_type* parent = nullptr;
+				//// loop over tree
+				//while (*node != nullptr) {
+				//	// set parent
+				//	parent = *node;
+				//	// less compare
+				//	if      (value < (*node)->_value) { node = &(*node)->_left;  }
+				//	// greater compare
+				//	else if (value > (*node)->_value) { node = &(*node)->_right; }
+				//	// else equal
+				//	else { return (*node)->_value; }
+				//}
+
+				//*node = new_node();
+				//(*node)->_parent = parent;
+
+				//++_size;
+				//if (parent && parent->is_binary()) {
+				//	return (*node)->_value;
+				//}
+				//balance(parent);
+
+				//// return reference to new value
+				//return (*node)->_value;
+			}
+
+
+			auto full_balance(void) {
+
+				for (auto it = post_order_begin(); it != nullptr; ++it) {
+					it._node->update_depth();
+				}
+
+				for (auto it = post_order_begin(); it != nullptr; ++it) {
+					balance(it._node);
+				}
+			}
+
+			auto is_balanced(void) const {
+
+				for (auto it = pre_order_begin(); it != nullptr; ++it) {
+					if (it._node->balance_factor() > 1 || it._node->balance_factor() < -1) {
+						throw std::runtime_error("tree is not balanced");
+					}
+				}
+				return true;
+			}
+
+			auto is_sorted(void) const {
+
+
+				const value_type* last = nullptr;
+
+				auto it = in_order_begin();
+				if (it) {
+					last = &*it;
+					++it;
+				}
+				while (it) {
+					if (*last > *it) {
+						throw std::runtime_error("tree is not sorted");
+					}
+					last = &*it;
+					++it;
+				}
+				return true;
+			}
+
+
+			//template <typename... A>
+			//auto emplace(A&&... args) -> void {
+			//	// assert T is constructible from A
+			//	static_assert(xns::is_constructible<T, A...>,
+			//		"): TREE: T must be constructible from A... :(");
+			//	// construct node
+			//	node_pointer add = new_node(xns::forward<A>(args)...);
+			//	// get root address
+			//	node_type** node = &_root;
+			//	node_type* parent = nullptr;
+
+			//	while (*node != nullptr) {
+			//		// set parent
+			//		parent = *node;
+			//		// get value
+			//		value_type& _value = (*node)->_value;
+			//		// less compare
+			//		if      (add->_value < _value) { node = &(*node)->_left;  }
+			//		// greater compare
+			//		else if (add->_value > _value) { node = &(*node)->_right; }
+			//		// else equal
+			//		else {
+			//			_store(add);
+			//			return;
+			//		}
+			//	}
+			//	add->_parent = parent;
+			//	*node = add;
+			//	balance(add);
+			//	++_size;
+			//}
+
+
+			/* erase */
+			template <typename K>
+			inline auto erase(const K& value) noexcept -> void {
+				// assert K is comparable to T
+				static_assert(xns::is_comparable<K, T>,
+					"): TREE: K must be comparable to T :(");
+				// search for erase node
+				erase(this->find(value));
+			}
+
+			/* erase from iterator */
+			template <typename O>
+			inline auto erase(const_iterator<O> it) noexcept -> void {
+				// erase node
+				erase(it._node);
+			}
+
+			auto erase(node_pointer node) -> void {
+				// check pointer validity
+				if (node == nullptr) { return; }
+
+				//if (node == _root) {return;}
+
+				node_pointer parent = node->_parent;
+
+
+				// optimized way to check children (minimum number of conditions)
+
+				if (node->has_left()) {
+					// two children case
+					if (node->has_right()) {
+						std::cout << "two children case" << std::endl;
+						node_pointer lhigh = node->_left;
+
+						if (lhigh->_right) {
+							lhigh = lhigh->_right;
+
+							while (lhigh->_right) {
+								lhigh = lhigh->_right;
+							}
+							lhigh->_parent->_right = lhigh->_left;
+
+							if (lhigh->_left) {
+								lhigh->_left->_parent = lhigh->_parent;
+							}
+
+
+							*get_side(node) = lhigh;
+
+							lhigh->_left = node->_left;
+							node->_left->_parent = lhigh;
+
+							lhigh->_right = node->_right;
+							node->_right->_parent = lhigh;
+
+							lhigh->_parent = node->_parent;
+
+						}
+						else {
+							*get_side(node) = lhigh;
+
+							lhigh->_right = node->_right;
+							node->_right->_parent = lhigh;
+
+							lhigh->_parent = node->_parent;
+
+
+						}
+
+						//balance(lhigh);
+
+
+
+				// iterate from bottom to top
+				auto it = post_order_begin();
+
+				while (it) {
+					it._node->update_depth();
+					++it;
+				}
+
+				auto it2 = post_order_begin();
+
+				while (it2) {
+					balance(it2._node);
+					++it2;
+				}
+
+
+
+
+
+						/*
+						// get parent's side
+						*get_side(node) = node->_right;
+
+						// set right child's parent to parent
+						node->_right->_parent = node->_parent;
+
+						node_pointer min = node->_right;
+						// get minimum node
+						while (min->_left) {
+							min = min->_left;
+						}
+
+						min->_left = node->_left;
+						node->_left->_parent = min;
+						*/
+
+					}
+					// only left child case
+					else {
+
+						std::cout << "only left child case" << std::endl;
+						// get parent's side
+						*get_side(node) = node->_left;
+						// set left child's parent to parent
+						node->_left->_parent = node->_parent;
+						balance(node->_left);
+					}
+				}
+				else {
+					// only right child case
+					if (node->has_right()) {
+
+						std::cout << "only right child case" << std::endl;
+						// get parent's side
+						*get_side(node) = node->_right;
+						// set right child's parent to parent
+						node->_right->_parent = node->_parent;
+						balance(node->_right);
+					}
+					// no children case
+					else {
+						std::cout << "no children case" << std::endl;
+						*get_side(node) = nullptr;
+						if (parent) {
+							balance(parent);
+						}
+					}
+				}
+
+
+				_store(node);
+				--_size;
+
+
+
+				/*
+				if (parent != _root) {
+					balance(parent);
+				}*/
+
+			}
+
+
+
+
+
+
+
+
+
 
 			/* iterator depth */
 			template <is_bst_iterator I>
@@ -253,6 +704,7 @@ namespace xns {
 				// return depth of node
 				return node->_depth;
 			}
+
 
 			/* iterator level */
 			template <is_bst_iterator I>
@@ -281,70 +733,82 @@ namespace xns {
 			// -- node creation -----------------------------------------------
 
 			/* new node by copied value */
-			node_pointer new_node(const_reference value) {
+			/*node_pointer new_node(const_reference value) {
 				// declare node
 				node_pointer node = _new_node();
-				// check pointer
-				if (!node) { return nullptr; }
 				// construct node
 				allocator::construct(node, value);
-				// update size
 				++_size;
 				// return node
 				return node;
-			}
+			}*/
 
 			/* new node by moved value */
-			node_pointer new_node(move_reference value) {
+			/*node_pointer new_node(move_reference value) {
 				// declare node
 				node_pointer node = _new_node();
-				// check pointer
-				if (!node) { return nullptr; }
 				// construct node
 				allocator::construct(node, xns::move(value));
-				// update size
 				++_size;
 				// return node
 				return node;
-			}
+			}*/
 
 			/* new node by construct in place */
 			template <class... A>
-			node_pointer new_node(A&&... args) {
-				// declare node
-				node_pointer node = _new_node();
-				// check pointer
-				if (!node) { return nullptr; }
-				// construct node
-				allocator::construct(node, xns::forward<A>(args)...);
-				// update size
-				++_size;
-				// return node
-				return node;
+			node_pointer new_node(node_pointer parent, A&&... args) {
+				++_size; // increment size
+				return allocator::make(parent, xns::forward<A>(args)...);
 			}
 
 
-			// -- insertion ---------------------------------------------------
+			/* balance tree */
+			auto balance(node_pointer node) noexcept -> void {
 
-			/* insert left */
-			void insert_left(node_pointer node, node_pointer child) {
-				   // insert child
-				   node->_left = child;
-				// set parent
-				child->_parent = node;
-				// update depth
-				_update_depth(node);
+				if (node->is_binary()) { return; }
+
+				xns::s64 prev = 0;
+
+				// move up the tree
+				while (node != nullptr) {
+
+					const auto ld = node->left_depth();
+					const auto rd = node->right_depth();
+
+					// update depth
+					node->_depth = xns::max(ld, rd) + 1;
+
+					// get balance factor
+					const xns::s64 balance =
+						static_cast<xns::s64>(ld) -
+						static_cast<xns::s64>(rd);
+
+					// exit if balanced
+					if (balance == BALANCED) { break; }
+
+					 // check for left heavy
+					else if (balance > LEFT_HEAVY) {
+						if (prev !=  1) { lr_rotate(node); }
+						else           { rr_rotate(node); }
+						break;
+					}
+
+					 // check for right heavy
+					else if (balance < RIGHT_HEAVY) {
+						if (prev != -1) { rl_rotate(node); }
+						else           { ll_rotate(node); }
+						break;
+					}
+
+					node = node->_parent;
+					prev = balance;
+				}
 			}
 
-			/* insert right */
-			void insert_right(node_pointer node, node_pointer child) {
-				  // insert child
-				  node->_right = child;
-				// set parent
-				child->_parent = node;
-				// update depth
-				_update_depth(node);
-			}
+
+
+
+
 
 
 			// -- subwidth ----------------------------------------------------
@@ -422,7 +886,8 @@ namespace xns {
 				// declare size
 				size_type count = 0;
 				// loop until end
-				for (const_bfs_iterator it{pos._node}; it; ++it) {
+				for (const_pre_order_iterator it{pos._node}; it; ++it) {
+				//for (const_bfs_iterator it{pos._node}; it; ++it) {
 					// check if node is endpoint
 					count += it.is_endpoint();
 				} // return count
@@ -434,20 +899,25 @@ namespace xns {
 				// declare size
 				size_type count = 0;
 				// loop until end
-				for (const_bfs_iterator it{node}; it; ++it) {
+				for (const_pre_order_iterator it{node}; it; ++it) {
+				//for (const_bfs_iterator it{node}; it; ++it) {
 					// check if node is endpoint
 					count += it.is_endpoint();
 				} // return count
 				return count;
 			}
 
-
-
-			template <class U>
-			xns::tree<U> clone_as(void) {
-				return {};
+			/* get subtree size */
+			auto subsize(const node_pointer& node) const noexcept -> size_type {
+				// declare size
+				size_type count = 0;
+				// loop until end
+				for (const_pre_order_iterator it{node}; it; ++it) {
+					// increment count
+					++count;
+				} // return count
+				return count;
 			}
-
 
 
 
@@ -462,37 +932,55 @@ namespace xns {
 				p.display();
 			}
 
-
-
-
-			/* clear tree */
+			/* clear */
 			void clear(void) noexcept {
-				// destroy tree
-				_destroy_tree();
+				// free tree
+				free_tree();
 				// initialize members
-				_init();
+				init();
 			}
+
+			/* swap */
+			void swap(self& other) noexcept {
+				// swap members
+				xns::swap(_root,  other._root);
+				xns::swap(_lower, other._lower);
+				xns::swap(_upper, other._upper);
+				xns::swap(_size,  other._size);
+			}
+
+
 
 
 
 		private:
 
 
+			/* get side test */
+			auto get_side(node_pointer node) noexcept -> node_type** {
+				// return parent field address
+				return node->_parent != nullptr ?
+					(node->_parent->_left == node ?
+					&node->_parent->_left : &node->_parent->_right)
+					: &_root;
+			}
 
 
 			// -- depth -------------------------------------------------------
 
 			/* update depth */
-			static void _update_depth(node_pointer node) noexcept {
+			static inline void update_depth(node_pointer node) noexcept {
+				// get max depth
+				node->_depth = xns::max(node->left_depth(),
+										node->right_depth()) + 1;
+			}
+
+			/* update depth to root */
+			static void update_depth_to_root(node_pointer node) noexcept {
 				// loop until back to root
-				while (node) {
-					// get left and right depth
-					const size_type left  = node->_left  ? node->_left->_depth  : 0;
-					const size_type right = node->_right ? node->_right->_depth : 0;
+				for (node; node != nullptr; node = node->_parent) {
 					// update depth
-					node->_depth = (left > right) ? left + 1 : right + 1;
-					// move up
-					node = node->_parent;
+					update_depth(node);
 				}
 			}
 
@@ -502,40 +990,17 @@ namespace xns {
 
 
 			/* initialize members */
-			inline void _init(void) noexcept {
+			inline void init(void) noexcept {
 				// initialize members
-				_root = nullptr;
+				_root = _lower = _upper = nullptr;
 				_size = 0;
 			}
 
+
 			// -- memory management -------------------------------------------
 
-			/* new node */
-			inline node_pointer _new_node(void) noexcept {
-				// declare node
-				node_pointer node = nullptr;
-				// check storage
-				if (_storage) {
-						 // unlink from storage
-						 node = _storage;
-					 _storage = node->_left;
-				// else allocate new node
-				} else { node = allocator::allocate(); }
-				// return node
-				return node;
-			}
-
-			/* add to storage */
-			inline void _store(node_pointer node) noexcept {
-				// destroy node
-				allocator::destroy(node); // INFO: null is not checked
-				// link to storage
-				node->_left = _storage;
-				  _storage  = node;
-			}
-
 			/* free tree */ // INFO: this is only used in destructor
-			inline void _free_tree(void) noexcept {
+			inline void free_tree(void) noexcept {
 				// declare post-order iterator
 				post_order_iterator it{_root};
 				// loop until end
@@ -544,54 +1009,139 @@ namespace xns {
 					node_pointer node = it._node;
 					// increment iterator
 					++it;
-					// destroy node
-					allocator::destroy(node);
 					// deallocate node
-					allocator::deallocate(node);
-				}
-			}
-
-			/* free storage */ // INFO: this only used in destructor
-			inline void _free_storage(void) noexcept {
-				// declare node
-				node_pointer node = nullptr;
-				// loop over storage
-				while (_storage) {
-					// unlink node
-					    node = _storage;
-					_storage = node->_left;
-					// deallocate node
-					allocator::deallocate(node);
-				}
-			}
-
-			/* destroy tree */ // INFO: used for clear method
-			inline void _destroy_tree(void) noexcept {
-				// declare post-order iterator
-				post_order_iterator it{_root};
-				// loop until end
-				while (it) {
-					// get node
-					node_pointer node = it._node;
-					// increment iterator
-					++it;
-					// store node
-					_store(node);
+					allocator::store(node);
 				}
 			}
 
 
 
-			// -- private members ---------------------------------------------
+			// -- R O T A T I O N S -------------------------------------------
 
-			/* root node */
-			node_pointer _root;
+			/* right rotation */
+			auto rr_rotate(node_pointer node) noexcept -> void {
+				// std::cout << "\x1b[32mRR ROTATION\x1b[0m" << std::endl;
 
-			/* storage */
-			node_pointer _storage;
+				// left is new root
+				auto root = node->_left;
 
-			/* size */
-			size_type    _size;
+				// connect to parent
+				root->_parent = node->_parent;
+				*get_side(node) = root;
+
+				// handle root right
+				if (root->_right) {
+					root->_right->_parent = node;
+				}   node->_left = root->_right;
+
+				// handle node
+				root->_right = node;
+				node->_parent = root;
+
+				// update depth
+				node->_depth -= 2;
+			}
+
+			/* left rotation */
+			auto ll_rotate(node_pointer node) noexcept -> void {
+				// std::cout << "\x1b[32mLL ROTATION\x1b[0m" << std::endl;
+
+				// right is new root
+				auto root = node->_right;
+
+				// connect to parent
+				root->_parent = node->_parent;
+				*get_side(node) = root;
+
+				// handle root left
+				if (root->_left) {
+					root->_left->_parent = node;
+				}   node->_right = root->_left;
+
+				// handle node
+				root->_left = node;
+				node->_parent = root;
+
+				// update depth
+				node->_depth -= 2;
+			}
+
+			/* left right rotation */
+			auto lr_rotate(node_pointer node) noexcept -> void {
+				// std::cout << "\x1b[31mLR ROTATION\x1b[0m" << std::endl;
+
+
+				auto lnode = node->_left;
+
+				// left right is new root
+				auto root = lnode->_right;
+
+				if (root->_left) {
+					root->_left->_parent = lnode;
+				}   lnode->_right = root->_left;
+
+				root->_left = lnode;
+				lnode->_parent = root;
+
+
+
+				///////////////////////////////
+
+				root->_parent = node->_parent;
+				*get_side(node) = root;
+
+				if (root->_right) {
+					root->_right->_parent = node;
+				}   node->_left = root->_right;
+
+
+				root->_right = node;
+				node->_parent = root;
+
+				--lnode->_depth;
+				++root->_depth;
+				node->_depth -= 2;
+
+
+			}
+
+
+			/* right left rotation */
+			auto rl_rotate(node_pointer node) noexcept -> void {
+				 // std::cout << "\x1b[31mRL ROTATION\x1b[0m" << std::endl;
+
+				auto rnode = node->_right;
+
+				// right left is new root
+				auto root = rnode->_left;
+
+				if (root->_right) {
+					root->_right->_parent = rnode;
+				}   rnode->_left = root->_right;
+
+				root->_right = rnode;
+				rnode->_parent = root;
+
+
+				root->_parent = node->_parent;
+				*get_side(node) = root;
+
+				if (root->_left) {
+					root->_left->_parent = node;
+				}   node->_right = root->_left;
+
+
+				root->_left = node;
+				node->_parent = root;
+
+				--rnode->_depth;
+				++root->_depth;
+				node->_depth -= 2;
+
+
+
+			}
+
 
 
 	};
@@ -599,21 +1149,20 @@ namespace xns {
 
 	// -- N O D E -------------------------------------------------------------
 
-	template <class T>
+	template <typename T>
 	class tree<T>::node {
 
 		// -- friends ---------------------------------------------------------
 
 		/* tree as friend */
-		template <class>
+		template <typename>
 		friend class tree;
 
-		/* allocator as friend */
-		template <class>
-		friend class xns::allocator;
+		/* pool allocator as friend */
+		friend class xns::memory::pool<node>;
 
 		/* bst iterator as friend */
-		template <class, xns::traversal_order, bool>
+		template <typename, xns::traversal_order, bool>
 		friend class xns::bst_iterator;
 
 
@@ -621,130 +1170,159 @@ namespace xns {
 
 			// -- private constructors ----------------------------------------
 
-			/* default constructor */
-			node(void) noexcept
-			:  _value{ },
-			    _left{nullptr},
-			   _right{nullptr},
-			  _parent{nullptr},
-			   _depth{0},
-			   _level{0},
-			     _pos{0} {
-				// do nothing...
-			}
+			/* deleted default constructor */
+			node(void) = delete;
 
-			/* copy constructor */
-			node(const node& other) noexcept
-			:  _value{other._value},
-				_left{other._left},
-			   _right{other._right},
-			  _parent{other._parent},
-			   _depth{other._depth},
-			   _level{other._level},
-			     _pos{other._pos} {
-				// do nothing...
-			}
-
-			/* move constructor */
-			node(node&& other) noexcept
-			:  _value{xns::move(other._value)},
-			    _left{other._left},
-			   _right{other._right},
-			  _parent{other._parent},
-			   _depth{other._depth},
-			   _level{other._level},
-			     _pos{other._pos} {
-				// invalidate other
-				other._init();
-			}
+			/* non-assignable class */
+			NON_ASSIGNABLE(node);
 
 			/* value copy constructor */
-			node(const value_type& value) noexcept
-			:  _value{value},
-			    _left{nullptr},
-			   _right{nullptr},
-			  _parent{nullptr},
-			   _depth{0},
-			   _level{0},
-			     _pos{0} {
-				// do nothing...
-			}
+			inline node(node* parent, const value_type& value)
+			: _left{nullptr}, _right{nullptr}, _parent{parent},
+			_depth{1}, _value{value} {}
 
 			/* value move constructor */
-			node(value_type&& value) noexcept
-			:  _value{xns::move(value)},
-			    _left{nullptr},
-			   _right{nullptr},
-			  _parent{nullptr},
-			   _depth{0},
-			   _level{0},
-			     _pos{0} {
-				// do nothing...
-			}
+			inline node(node* parent, value_type&& value) noexcept
+			: _left{nullptr}, _right{nullptr}, _parent{parent},
+			_depth{1}, _value{xns::move(value)} {}
 
 			/* value emplace constructor */
 			template <class... A>
-			node(A&&... args) noexcept
-			:  _value{xns::forward<A>(args)...},
-				_left{nullptr},
-			   _right{nullptr},
-			  _parent{nullptr},
-			   _depth{0},
-			   _level{0},
-			     _pos{0} {
-				// do nothing...
-			}
+			inline node(node* parent, A&&... args)
+			: _left{nullptr}, _right{nullptr}, _parent{parent},
+			_depth{1}, _value{xns::forward<A>(args)...} {}
 
 			/* destructor */
-			~node(void) noexcept {
-				// reset left pointer (for storage)
-				_left = nullptr;
-			}
+			inline ~node(void) noexcept = default;
 
 
 		public:
 
+			// -- public types ------------------------------------------------
+
+			/* self type */
+			using self = xns::tree<T>::node;
+
+			/* size type */
+			using size_type = xns::size_t;
+
+
 			// -- accessors ---------------------------------------------------
 
+			/* has left child */
+			inline auto has_left(void) const noexcept -> bool {
+				// return if node has left child
+				return _left != nullptr;
+			}
+
+			/* has right child */
+			inline auto has_right(void) const noexcept -> bool {
+				// return if node has right child
+				return _right != nullptr;
+			}
+
+			/* has children */
+			inline auto has_child(void) const noexcept -> bool {
+				// return if node has children
+				return has_left() || has_right();
+			}
+
+			/* has parent */
+			inline auto has_parent(void) const noexcept -> bool {
+				// return if node has parent
+				return _parent != nullptr;
+			}
+
+			/* is left child */
+			inline auto is_left(void) const noexcept -> bool {
+				// return if node is left child
+				return _parent != nullptr && _parent->_left == this;
+			}
+
+			/* is right child */
+			inline auto is_right(void) const noexcept -> bool {
+				// return if node is right child
+				return _parent != nullptr && _parent->_right == this;
+			}
+
+			/* is root */
+			inline auto is_root(void) const noexcept -> bool {
+				// return if node has no parent
+				return _parent == nullptr;
+			}
+
+			/* is disconnected */
+			inline auto is_disconnected(void) const noexcept -> bool {
+				// return if node is disconnected
+				return _parent == nullptr
+						&& _left == nullptr
+						&& _right == nullptr;
+			}
+
+			/* is leaf */
+			inline auto is_leaf(void) const noexcept -> bool {
+				// return if node has no children
+				return has_child() == false;
+			}
+
+			/* is unary */
+			inline auto is_unary(void) const noexcept -> bool {
+				// return if only one child is null
+				return has_left() != has_right();
+			}
+
+			/* is binary */
+			inline bool is_binary(void) const noexcept {
+				// return if node has two children
+				return has_left() && has_right();
+			}
+
+			/* is endpoint */
+			inline bool is_endpoint(void) const noexcept {
+				// return if node is in extremity
+				return is_leaf() || is_unary();
+			}
+
+
 			/* get value */
-			inline reference value(void) noexcept {
+			inline auto value(void) noexcept -> reference {
 				// return value
 				return _value;
 			}
 
 			/* get const value */
-			inline const_reference value(void) const noexcept {
+			inline auto value(void) const noexcept -> const_reference {
 				// return value
 				return _value;
 			}
 
 			/* get left child */
-			inline node_pointer left(void) noexcept {
+			inline auto left(void) noexcept -> node_pointer {
 				// return left
 				return _left;
 			}
 
-			/* get left address */
-			inline node_pointer* left_addr(void) noexcept {
-				// return left address
-				return &_left;
-			}
-
 			/* get right child */
-			inline node_pointer right(void) noexcept {
+			inline auto right(void) noexcept -> node_pointer {
 				// return right
 				return _right;
 			}
 
+			/* get left address */
+			inline auto left_addr(void) noexcept -> node_pointer* {
+				// return left address
+				return &_left;
+			}
+
 			/* get right address */
-			inline node_pointer* right_addr(void) noexcept {
+			inline auto right_addr(void) noexcept -> node_pointer* {
 				// return right address
 				return &_right;
 			}
 
 
 			/* get parent */
-			inline node_pointer parent(void) noexcept {
+			inline auto parent(void) noexcept -> node_pointer {
 				// return parent
 				return _parent;
 			}
@@ -755,18 +1333,31 @@ namespace xns {
 				return _depth;
 			}
 
-			/* get level */
-			inline xns::size_t level(void) const noexcept {
-				// return level
-				return _level;
+
+			/* get left depth */
+			inline auto left_depth(void) const noexcept -> size_type {
+				// return left depth
+				return _left ? _left->_depth : 0;
 			}
 
-			/* get position */
-			inline xns::s64 xpos(void) const noexcept {
-				// return position
-				return _pos;
+			/* get right depth */
+			inline auto right_depth(void) const noexcept -> size_type {
+				// return right depth
+				return _right ? _right->_depth : 0;
 			}
 
+			/* get balance factor */
+			inline auto balance_factor(void) const noexcept -> xns::s64 {
+				// return balance factor
+				return static_cast<xns::s64>(left_depth()) -
+					   static_cast<xns::s64>(right_depth());
+			}
+
+			/* update depth */
+			inline auto update_depth(void) noexcept -> void {
+				// get max depth
+				_depth = xns::max(left_depth(), right_depth()) + 1;
+			}
 
 			// -- setters -----------------------------------------------------
 
@@ -788,8 +1379,6 @@ namespace xns {
 				_left = node;
 				// set parent
 				node->_parent = this;
-				// update depth
-				_update_depth(this);
 			}
 
 			/* set right child */
@@ -798,23 +1387,17 @@ namespace xns {
 				_right = node;
 				// set parent
 				node->_parent = this;
-				// update depth
-				_update_depth(this);
 			}
 
-			/* set right to new left and set new to right */
-			inline void right_to_left(node_pointer node) noexcept {
-				// move right
-				node->_left = _right;
-				// re-set parent
-				_right->_parent = node;
-				// set right
-				_right = node;
-				// set parent
-				node->_parent = this;
-				// update depth
-				_update_depth(this);
+			/* get side */
+			auto get_side(void) noexcept -> self** {
+				// return parent field address
+				return _parent != nullptr ?
+					(_parent->_left == this ?
+					&_parent->_left : &_parent->_right)
+					: nullptr;
 			}
+
 
 
 		private:
@@ -822,33 +1405,26 @@ namespace xns {
 			// -- private methods ---------------------------------------------
 
 			/* initialization */
-			void _init(void) noexcept {
+			void init(void) noexcept {
 				// set links
 				_left   = nullptr;
 				_right  = nullptr;
 				_parent = nullptr;
 				// set depth
 				_depth = 0;
-				// set positions
-				_level = 0;
-				_pos   = 0;
-
 			}
 
 			// -- private members ---------------------------------------------
 
-			/* value */
-			value_type   _value;
 
 			/* links */
 			node_pointer _left, _right, _parent;
 
 			/* utility */
-			xns::size_t  _depth, _level;
+			xns::size_t _depth;
 
-			/* position */
-			xns::s64     _pos;
-
+			/* value */
+			value_type   _value;
 
 	};
 
@@ -874,6 +1450,12 @@ namespace xns {
 				U'\u2570', // BL
 				U'\u256F', // BR
 				U'\u2534'  // BB
+			};
+
+			// multipliers
+			enum : xns::size_t {
+				Y_OFFSET = 3,
+				X_OFFSET = 3
 			};
 
 
@@ -912,119 +1494,161 @@ namespace xns {
 			void display(void) {
 
 
+				struct node_info {
+
+					// -- public lifecycle ------------------------------------
+
+					/* default constructor */
+					node_info(void) noexcept
+					: parent{nullptr}, left{nullptr}, right{nullptr},
+					level{0}, pos{0}, depth{0}, value{} {}
+
+					/* members constructor */
+					node_info(node_info* parent, node_info* left, node_info* right,
+							  xns::size_t level, xns::s64 pos, xns::size_t depth, xns::string value)
+					: parent{parent}, left{left}, right{right},
+					level{level}, pos{pos}, depth{depth}, value{value} {}
+
+					/* non-assignable struct */
+					//NON_ASSIGNABLE(node_info);
+
+					/* destructor */
+					~node_info(void) noexcept = default;
+
+
+					// -- public members --------------------------------------
+
+					node_info* parent;
+					node_info* left;
+					node_info* right;
+
+					xns::size_t level;
+					xns::s64 pos;
+					xns::size_t depth;
+					xns::string value;
+
+				};
+
+
+				xns::vector<node_info> nodes;
+				nodes.reserve(_tree.size());
+
+
 				// check root
 				if (_tree._root == nullptr) { return; }
 
 
-				using pos = decltype(_tree._root->_pos);
+				xns::s64 p_min = 0;
+				xns::s64 p_max = 0;
+
+				xns::size_t levels = 0;
+
+				xns::queue<xns::tuple<node_pointer,
+										node_info*>> queue;
+
+				nodes.emplace_back();
+
+				queue.enqueue(_tree._root, &nodes.back());
 
 
-				// parent pos
-				pos p_pos = 0; // THIS AVOID IMPLICIT CONVERSION ERROR BUT NOT TESTED
+				while (not queue.empty()) {
 
-				// max endpoint width
-				size_type width = 0;
+					auto tuple = queue.next();
+					queue.dequeue();
 
-				xns::s64 smin = 0, smax = 0;
+					auto node = xns::get<node_pointer>(tuple);
+					auto info = xns::get<node_info*>(tuple);
 
-				xns::size_t level = 0;
+					info->value = _vcall.call(node->_value);
+					info->depth = node->_depth;
 
-				_tree._root->_pos = 0;
 
-				// bfs node constructor
-				const_bfs_iterator it{_tree._root};
 
-				// loop over tree (skip root)
-				for (++it; it != nullptr; ++it) {
+					if (node->_left) {
+						auto width = _tree.subsize(node->_left->_right) + 1;
+						auto pos = info->pos - static_cast<xns::s64>(width);
+						nodes.emplace_back( info, // parent
+											nullptr, // left
+											nullptr, // right
+											info->level + 1, // level
+											pos, // position
+											0U, // depth
+											xns::string{});
 
-					// get parent position
-					p_pos = it.parent()->_pos;
-
-					// check node is left child
-					if (it.is_left()) {
-						width = _tree.endpoints(it.right());
-						// AVOID IMPLICIT CONVERSION ERROR BUT NOT TESTED
-						it._node->_pos = p_pos - static_cast<pos>(width + 1);
+						queue.enqueue({ node->_left, &nodes.back() });
+						info->left = &nodes.back();
 					}
-					// else node is right child
-					else {
-						width = _tree.endpoints(it.left());
-						// AVOID IMPLICIT CONVERSION ERROR BUT NOT TESTED
-						it._node->_pos = p_pos + static_cast<pos>(width + 1);
+
+					if (node->_right) {
+						auto width = _tree.subsize(node->_right->_left) + 1;
+						auto pos = info->pos + static_cast<xns::s64>(width);
+						nodes.emplace_back( info, // parent
+											nullptr, // left
+											nullptr, // right
+											info->level + 1, // level
+											pos, // position
+											0U, // depth
+											xns::string{});
+
+						queue.enqueue({ node->_right, &nodes.back() });
+						info->right = &nodes.back();
+
 					}
 
-					// update min position
-					if (it._node->_pos < smin) {
-						smin = it._node->_pos;
-					}
-					// update max position
-					if (it._node->_pos > smax) {
-						smax = it._node->_pos;
-					}
-					level = it._node->_level;
 
+
+					if      (info->pos < p_min) { p_min = info->pos; }
+					else if (info->pos > p_max) { p_max = info->pos; }
+
+					levels = info->level;
 				}
 
 
 
+				p_min *= -1;
+				// compute width
+				xns::size_t width = static_cast<xns::u64>(p_max)
+									+ static_cast<xns::u64>(p_min);
 
 
-				// compensate for negative min
-				smin *= -1;
-				xns::size_t max =
-					static_cast<xns::u64>(smax) +
-					static_cast<xns::u64>(smin);
+				// compute positions
+				for (auto& node : nodes) {
+					node.pos += p_min;
+					node.pos *= X_OFFSET;
+					//node.level *= Y_OFFSET;
+					node.level = (levels+1 - node.depth) * Y_OFFSET;
+				}
+
 
 				// matrix
-				xns::string32 unicode;
-
 				xns::vector<xns::string32> matrix;
 
-				// root start at level 0, so add 1
-				++level;
-
-				++max;
 
 
-				// multipliers
-				enum : size_type {
-					Y_OFFSET = 4,
-					X_OFFSET = 4
-				};
+				levels *= Y_OFFSET;
+				width *= X_OFFSET;
+				++width;
+				++levels;
 
-				level *= Y_OFFSET;
-				max *= X_OFFSET;
-
-				//std::cout << "level: " << level << "\n";
-				//std::cout << "max: " << max << "\n";
-
-
-				level -= (Y_OFFSET - 1);
-
-				matrix.reserve(level);
+				matrix.reserve(levels);
 
 				// fill matrix with spaces
-				for (size_type y = 0; y < level; ++y) {
-					matrix.emplace_back(U' ', max);
+				for (size_type y = 0; y < levels; ++y) {
+					matrix.emplace_back(U' ', width);
 				}
 
-				const_bfs_iterator it4{_tree._root};
 
-				// declare all positions
-				size_type x = 0, y = 0, lx = 0, ly = 0, rx = 0, ry = 0;
+				// loop over nodes
+				for (auto& node : nodes) {
 
-				for (; it4 != nullptr; ++it4) {
-
-					// get node position
-					x = static_cast<size_type>((it4.xpos() + smin)) * X_OFFSET;
-					y = it4.level()         * Y_OFFSET;
+					size_type x = node.pos;
+					size_type y = node.level;
 
 					// check if left
-					if (it4.has_left()) {
+					if (node.left != nullptr) {
 
-						// get left position
-						lx = static_cast<size_type>((it4.left()->xpos() + smin)) * X_OFFSET;
-						ly = it4.left()->level()         * Y_OFFSET;
+						size_type lx = node.left->pos;
+						size_type ly = node.left->level;
 
 						// draw horizontal line
 						for (size_type i = lx + 1; i < x + 1; ++i) {
@@ -1038,11 +1662,11 @@ namespace xns {
 						matrix[y + 1][lx] = _branch[TL];
 					}
 
-					if (it4.has_right()) {
 
-						// get right position
-						rx = static_cast<size_type>((it4.right()->xpos() + smin)) * X_OFFSET;
-						ry = it4.right()->level()         * Y_OFFSET;
+					if (node.right != nullptr) {
+
+						size_type rx = node.right->pos;
+						size_type ry = node.right->level;
 
 						// draw horizontal line
 						for (size_type i = x + 1; i < rx; ++i) {
@@ -1056,23 +1680,24 @@ namespace xns {
 						matrix[y + 1][rx] = _branch[TR];
 					}
 
-					if (it4.has_child()) {
 
-						if (it4.is_binary()) {
+					if (node.left != nullptr || node.right != nullptr) {
+
+						if (node.left != nullptr && node.right != nullptr) {
 							matrix[y + 1][x] = _branch[BB];
 						}
-						else if (it4.has_left()) {
+						else if (node.left != nullptr) {
 							matrix[y + 1][x] = _branch[BR];
 						}
-						else if (it4.has_right()) {
+						else if (node.right != nullptr) {
 							matrix[y + 1][x] = _branch[BL];
 						}
 					}
 
-
-					xns::string value = _vcall.call(it4._node->_value);
+					auto& value = node.value;
 
 					if (value.size()) {
+
 						size_type size = value.size();
 						size_type offset = size / 2;
 
@@ -1091,6 +1716,7 @@ namespace xns {
 					else {
 						matrix[y][x] = '_';
 					}
+
 				}
 
 
@@ -1099,14 +1725,224 @@ namespace xns {
 
 				// print matrix
 				for (xns::vector<xns::string>::size_type _ = 0; _ < matrix.size(); ++_) {
-					xns::out::write(matrix[_]);
-					xns::out::newline();
+					xns::print(matrix[_], '\n');
 				}
 				xns::out::render();
 
-				return;
 
 			}
+
+
+
+
+
+
+
+
+			// void display(void) {
+			//
+			// 	// check root
+			// 	if (_tree._root == nullptr) { return; }
+			//
+			//
+			// 	using pos = decltype(_tree._root->_pos);
+			//
+			// 	// parent pos
+			// 	pos p_pos = 0;
+			//
+			// 	xns::s64 smin = 0, smax = 0;
+			//
+			// 	xns::size_t level = 0;
+			//
+			// 	_tree._root->_pos = 0;
+			//
+			//
+			// 	{
+			// 		// bfs node constructor
+			// 		const_pre_order_iterator it{_tree._root};
+			//
+			// 		// loop over tree (skip root)
+			// 		for (++it; it != nullptr; ++it) {
+			//
+			// 			// get parent position
+			// 			p_pos = it.parent()->_pos;
+			//
+			// 			// check node is left child
+			// 			if (it.is_left()) {
+			// 				auto width = _tree.subsize(it.right());
+			// 				it._node->_pos = p_pos - static_cast<pos>(width + 1);
+			// 			}
+			// 			// check node is right child
+			// 			else if (it.is_right()) {
+			// 				auto width = _tree.subsize(it.left());
+			// 				it._node->_pos = p_pos + static_cast<pos>(width + 1);
+			// 			}
+			//
+			// 			// update min position
+			// 			if (it._node->_pos < smin) {
+			// 				smin = it._node->_pos;
+			// 			}
+			// 			// update max position
+			// 			if (it._node->_pos > smax) {
+			// 				smax = it._node->_pos;
+			// 			}
+			// 			//level = it._node->_level;
+			//
+			// 		}
+			//
+			// 	}
+			//
+			//
+			// 	// compensate for negative min
+			// 	smin *= -1;
+			// 	xns::size_t max =
+			// 		static_cast<xns::u64>(smax) +
+			// 		static_cast<xns::u64>(smin);
+			//
+			// 	// matrix
+			// 	xns::string32 unicode;
+			//
+			// 	xns::vector<xns::string32> matrix;
+			//
+			// 	// root start at level 0, so add 1
+			// 	//++level;
+			//
+			// 	level = _tree._root->_depth;
+			//
+			// 	++max;
+			//
+			// 	level *= Y_OFFSET;
+			// 	max *= X_OFFSET;
+			//
+			// 	level -= (Y_OFFSET - 1);
+			//
+			// 	matrix.reserve(level);
+			//
+			// 	// fill matrix with spaces
+			// 	for (size_type y = 0; y < level; ++y) {
+			// 		matrix.emplace_back(U' ', max);
+			// 	}
+			//
+			//
+			// 	// declare all positions
+			// 	size_type x = 0, y = 0, lx = 0, ly = 0, rx = 0, ry = 0;
+			//
+			//
+			// 	const_bfs_iterator it{_tree._root};
+			//
+			// 	for (; it != nullptr; ++it) {
+			//
+			// 		// get node position
+			// 		x = static_cast<size_type>((it.xpos() + smin)) * X_OFFSET;
+			// 		// y = it.level()         * Y_OFFSET;
+			// 		y = (_tree._root->_depth - it.depth())         * Y_OFFSET;
+			//
+			// 		// check if left
+			// 		if (it.has_left()) {
+			//
+			// 			// get left position
+			// 			lx = static_cast<size_type>((it.left()->xpos() + smin)) * X_OFFSET;
+			// 			// ly = it.left()->level()         * Y_OFFSET;
+			// 			ly = (_tree._root->_depth - it.left()->depth())         * Y_OFFSET;
+			//
+			//
+			// 			// draw horizontal line
+			// 			for (size_type i = lx + 1; i < x + 1; ++i) {
+			// 				matrix[y + 1][i] = _branch[HL];
+			// 			}
+			// 			// draw vertical line
+			// 			for (size_type i = y + 2; i < ly; ++i) {
+			// 				matrix[i][lx] = _branch[VL];
+			// 			}
+			// 			// draw left corner
+			// 			matrix[y + 1][lx] = _branch[TL];
+			// 		}
+			//
+			// 		if (it.has_right()) {
+			//
+			// 			// get right position
+			// 			rx = static_cast<size_type>((it.right()->xpos() + smin)) * X_OFFSET;
+			// 			// ry = it.right()->level()         * Y_OFFSET;
+			// 			ry = (_tree._root->_depth - it.right()->depth())         * Y_OFFSET;
+			//
+			// 			// draw horizontal line
+			// 			for (size_type i = x + 1; i < rx; ++i) {
+			// 				matrix[y + 1][i] = _branch[HL];
+			// 			}
+			// 			// draw vertical line
+			// 			for (size_type i = y + 2; i < ry; ++i) {
+			// 				matrix[i][rx] = _branch[VL];
+			// 			}
+			// 			// draw right corner
+			// 			matrix[y + 1][rx] = _branch[TR];
+			// 		}
+			//
+			// 		if (it.has_child()) {
+			//
+			// 			if (it.is_binary()) {
+			// 				matrix[y + 1][x] = _branch[BB];
+			// 			}
+			// 			else if (it.has_left()) {
+			// 				matrix[y + 1][x] = _branch[BR];
+			// 			}
+			// 			else if (it.has_right()) {
+			// 				matrix[y + 1][x] = _branch[BL];
+			// 			}
+			// 		}
+			// 		else {
+			// 			// move y down to align all leaf nodes
+			// 			/*for (size_type i = y; i < level - 1; ++i) {
+			// 				matrix[i][x] = _branch[VL];
+			// 			}
+			// 			y += level - y - 1;
+			// 			*/
+			//
+			// 		}
+			//
+			//
+			// 		xns::string value = _vcall.call(it._node->_value);
+			// 		//xns::string value;
+			// 		//auto npos = it4._node->_pos;
+			// 		//auto npos = _tree.endpoints(ptr);
+			// 		//value.to_string(it._node->balance_factor());
+			// 		/*
+			// 		   value.to_string(it._node->_level);
+			// 		   */
+			// 		//value.to_string(_tree._root->_depth - it.depth());
+			// 		//value.append(" ");
+			// 		//xns::string d;
+			// 		//value.to_string(it._node->_depth);
+			// 		//value.append(d);
+			//
+			//
+			// 		if (value.size()) {
+			// 			size_type size = value.size();
+			// 			size_type offset = size / 2;
+			//
+			// 			if (x > offset) {
+			// 				for (size_type i = 0; i < size; ++i) {
+			// 					matrix[y][x - offset + i] = static_cast<char32_t>(value[i]);
+			// 				}
+			// 			}
+			// 			else {
+			// 				for (size_type i = 0; i < size; ++i) {
+			// 					matrix[y][i] = static_cast<char32_t>(value[i]);
+			// 				}
+			// 			}
+			//
+			// 		}
+			// 		else {
+			// 			matrix[y][x] = '_';
+			// 		}
+			// 	}
+			//
+			// 	// print matrix
+			// 	for (xns::vector<xns::string>::size_type _ = 0; _ < matrix.size(); ++_) {
+			// 		xns::out::write(matrix[_]);
+			// 		xns::out::newline();
+			// 	}
+			// 	xns::out::render();
+			// }
 
 
 		private:
@@ -1130,3 +1966,7 @@ namespace xns {
 
 
 #endif
+
+
+
+
