@@ -69,7 +69,7 @@ namespace xns {
 				str.reverse();
 
 				return str;
-			};
+			}
 
 
 			template <xns::is_unsigned N>
@@ -95,7 +95,7 @@ namespace xns {
 				str.reverse();
 
 				return str;
-			};
+			}
 
 
 		template <xns::is_string S, is_integral I>
@@ -186,6 +186,6 @@ namespace xns {
 
 
 
-};
+}
 
 #endif
