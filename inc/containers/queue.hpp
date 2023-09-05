@@ -1,13 +1,15 @@
 #ifndef QUEUE_HEADER
 #define QUEUE_HEADER
 
-// -- imports ----------------------------------------------------------------
-
-#include <iostream>
+// local headers
 #include "types.hpp"
 #include "allocator.hpp"
+#include "memory.hpp"
 #include "move.hpp"
 #include "forward.hpp"
+
+// c++ standard library headers
+#include <iostream>
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -25,11 +27,11 @@ namespace xns {
 
 			// -- public types ------------------------------------------------
 
+			/* self type */
+			using self            = queue<T>;
+
 			/* value type */
 			using value_type      = T;
-
-			/* self type */
-			using self            = queue<value_type>;
 
 			/* reference type */
 			using reference       = value_type&;
@@ -54,20 +56,20 @@ namespace xns {
 
 			// -- forwared declarations ---------------------------------------
 
-			/* node type */
-			struct node;
+			/* node class */
+			class node;
 
 
 			// -- private types -----------------------------------------------
 
 			/* node type */
-			using node_type       = queue<value_type>::node;
+			using node_type       = self::node;
 
 			/* allocator type */
-			using allocator       = xns::allocator<node_type>;
+			using allocator       = xns::memory::pool<node_type>;
 
 			/* node pointer type */
-			using node_pointer    = typename allocator::mutable_pointer;
+			using node_pointer    = node_type*;
 
 
 			// -- private members ---------------------------------------------
@@ -78,9 +80,6 @@ namespace xns {
 			/* tail pointer */
 			node_pointer _tail;
 
-			/* storage */
-			node_pointer _storage;
-
 			/* size */
 			size_type _size;
 
@@ -90,86 +89,71 @@ namespace xns {
 			// -- public constructors -----------------------------------------
 
 			/* default constructor */
-			queue(void) noexcept
-			: _head{nullptr}, _tail{nullptr}, _storage{nullptr}, _size{0} {
-				// nothing to do...
-			}
+			inline queue(void) noexcept
+			: _head{nullptr}, _tail{nullptr}, _size{0} {}
 
 			/* copy constructor */
-			queue(const self& other) noexcept
-			: _head{nullptr}, _tail{nullptr}, _storage{nullptr}, _size{0} {
+			queue(const self& other)
+			: _head{nullptr}, _tail{nullptr}, _size{0} {
 				// declare node
 				node_pointer node = other._head;
 				// loop over other queue
 				while (node != nullptr) {
 					// enqueue copy of value
-					enqueue(node->value);
+					enqueue(node->_value);
 					// move to next node
-					node = node->next;
+					node = node->_next;
 				}
-				// INFO: optimization possible by copying storage
-				// implement custom method for copying storage
-				// update size only at the end
+				// update size only at the end (optimization)
 			}
 
 			/* move constructor */
-			queue(self&& other) noexcept
-			: _head{other._head}, _tail{other._tail}, _storage{other._storage}, _size{other._size} {
+			inline queue(self&& other) noexcept
+			: _head{other._head}, _tail{other._tail}, _size{other._size} {
 				// invalidate other
-				other._init();
-				// invalidate storage
-				other._storage = nullptr;
+				other.init();
 			}
 
 			/* destructor */
-			~queue(void) noexcept {
-				// destroy and deallocate queue
-				 _free_queue();
-				// deallocate storage
-				_free_storage();
+			inline ~queue(void) noexcept {
+				// deallocate queue
+				free_queue();
 			}
 
 
-			// -- assignments -------------------------------------------------
-
-			/* INFO: optimization possible by copying storage
-			 * implement custom method for copying storage
-			 * update size only at the end
-			 */
+			// -- public assignment -------------------------------------------
 
 			/* copy assignment */
-			void assign(const self& other) noexcept {
+			auto assign(const self& other) -> void {
 				// check for self assignment
 				if (this != &other) {
-					// destroy self queue
-					_destroy_queue();
+					// deallocate queue
+					free_queue();
+					init();
 					// get other head
 					node_pointer node = other._head;
 					// loop over other queue
 					while (node != nullptr) {
 						// enqueue value by copy
-						enqueue(node->value);
+						enqueue(node->_value);
 						// move to next node
-						node = node->next; }
+						node = node->_next;
+					}
 				}
 			}
 
-			/* INFO: storage is not moved!
-			 * (simple linked list reason)
-			 */
-
 			/* move assignment */
-			void assign(self&& other) noexcept {
+			auto assign(self&& other) noexcept -> void {
 				// check for self assignment
 				if (this != &other) {
-					// destroy self queue
-					_destroy_queue();
-					// move other
+					// deallocate queue
+					free_queue();
+					// move other members
 					_head = other._head;
 					_tail = other._tail;
 					_size = other._size;
-					// invalidate other queue
-					other._init();
+					// invalidate other
+					other.init();
 				}
 			}
 
@@ -177,7 +161,7 @@ namespace xns {
 			// -- assignment operators ----------------------------------------
 
 			/* copy assignment operator */
-			self& operator=(const self& other) {
+			inline auto operator=(const self& other) -> self& {
 				// call copy assignment
 				assign(other);
 				// return self reference
@@ -185,7 +169,7 @@ namespace xns {
 			}
 
 			/* move assignment operator */
-			self& operator=(self&& other) noexcept {
+			inline auto operator=(self&& other) noexcept -> self& {
 				// call move assignment
 				assign(xns::move(other));
 				// return self reference
@@ -193,251 +177,166 @@ namespace xns {
 			}
 
 
-			// -- accessors ---------------------------------------------------
+			// -- public accessors --------------------------------------------
 
 			/* get size */
-			size_type size(void) const noexcept {
+			inline auto size(void) const noexcept -> size_type {
 				// return size
 				return _size;
 			}
 
 			/* is empty */
-			bool empty(void) const noexcept {
+			inline auto empty(void) const noexcept -> bool {
 				// return empty
 				return _size == 0;
 			}
 
 			/* get first enqueued element */
-			reference next(void) noexcept {
+			inline auto next(void) noexcept -> reference {
 				// return front
-				return _head->value;
+				return _head->_value;
 			}
 
 			/* get first enqueued const element */
-			const_reference next(void) const noexcept {
+			inline auto next(void) const noexcept -> const_reference {
 				// return front
-				return _head->value;
+				return _head->_value;
 			}
 
 
-			// -- modifiers ---------------------------------------------------
+			// -- public modifiers --------------------------------------------
 
-			/* enqueue copied element */
-			void enqueue(const_reference value) noexcept {
-				// create new node
-				node_pointer node = _new_node();
-				// check pointer
-				if (node == nullptr) { return; }
-				// construct node
-				allocator::construct(node, value);
-				// link node to queue
-				_link(node);
-				// update size
-				++_size;
+			/* enqueue */
+			template <typename U>
+			auto enqueue(U&& value) -> void {
+				// assert that U is same as value_type
+				static_assert(xns::is_same<xns::remove_cvr<U>, value_type>,
+						"): QUEUE: U MUST BE SAME AS T :(");
+				// allocate node
+				node_pointer node = allocator::make(xns::forward<U>(value));
+				// link node
+				link(node);
 			}
 
-			/* enqueue moved element */
-			void enqueue(move_reference value) noexcept {
-				// create new node
-				node_pointer node = _new_node();
-				// check pointer
-				if (node == nullptr) { return; }
-				// construct node
-				allocator::construct(node, xns::move(value));
-				// link node to queue
-				_link(node);
-				// update size
-				++_size;
-			}
-
-			/* enqueue in-place constructed element */
+			/* emplace */
 			template <class... A>
-			void enqueue(A&&... args) noexcept {
-				// create new node
-				node_pointer node = _new_node();
-				// check pointer
-				if (node == nullptr) { return; }
-				// construct node
-				allocator::construct(node, xns::forward<A>(args)...);
-				// link node to queue
-				_link(node);
-				// update size
-				++_size;
+			auto emplace(A&&... args) -> void {
+				// assert that T is constructible from A
+				static_assert(xns::is_constructible<value_type, A...>,
+						"): QUEUE: T MUST BE CONSTRUCTIBLE FROM A... :(");
+				// allocate node
+				node_pointer node = allocator::make(xns::forward<A>(args)...);
+				// link node
+				link(node);
 			}
 
-			/* dequeue element */
+			/* dequeue */
 			void dequeue(void) noexcept {
-				// check size
-				if (_size == 0) { return; }
-				// get first enqueued node
-				node_pointer node = _head;
-				// unlink node
-				_head = _head->next;
-				// check for empty queue
-				if (!_head) { _tail = nullptr; }
-				// store node (object destroyed in store method)
-				_store(node);
-				// decrement size
-				--_size;
+				// check for non-empty queue
+				if (_head != nullptr) {
+					// get first enqueued node
+					node_pointer node = _head;
+					// unlink node
+					_head = _head->_next;
+					// deallocate node
+					allocator::store(node);
+					// decrement size
+					--_size;
+				}
 			}
 
 			/* clear queue */
-			void clear(void) noexcept {
-				// destroy queue
-				_destroy_queue();
+			inline auto clear(void) noexcept -> void {
+				// deallocate queue
+				free_queue();
 				// initialize members
-				_init();
+				init();
 			}
 
 
 		private:
 
-			/* new node */
-			inline node_pointer _new_node(void) noexcept {
-				// declare node
-				node_pointer node = nullptr;
-				// check storage
-				if (_storage) {
-					// unlink from storage
-						node = _storage;
-					_storage = node->next;
-				// else allocate new node
-				} else { node = allocator::allocate(); }
-				// return node
-				return node;
-			}
+			// -- private modifiers -------------------------------------------
 
 			/* link node */
-			inline void _link(node_pointer node) noexcept {
-				// check tail
-				if (_tail != nullptr) {
+			inline void link(node_pointer node) noexcept {
+				// check head
+				_head != nullptr ?
 					// link to tail
-					_tail->next = node;
-				// else link to head
-				} else { _head = node; }
+					_tail->_next = node
+					// else link to head
+					: _head = node;
 				// update tail
 				_tail = node;
+				// update size
+				++_size;
 			}
 
-			/* add to storage */
-			inline void _store(node_pointer node) noexcept {
-				// destroy node
-				allocator::destroy(node);
-				// link to storage
-				node->next = _storage;
-				  _storage = node;
-			}
-
-			/* initialize members */
-			inline void _init(void) noexcept {
+			/* init members */
+			inline auto init(void) noexcept -> void {
 				// initialize members
-				_head = nullptr;
-				_tail = nullptr;
+				_head = _tail = nullptr;
 				_size = 0;
 			}
 
-			/* free queue */ // INFO: this is only used in destructor
-			inline void _free_queue(void) noexcept {
-				// declare node
-				node_pointer node = nullptr;
+			/* free queue */
+			auto free_queue(void) noexcept -> void {
+				// get head node
+				node_pointer node = _head;
 				// loop over queue
-				while (_head) {
-					// unlink node
-					node = _head;
-					// set head to next node
-					_head = node->next;
-					// destroy node
-					allocator::destroy(node);
+				while (node) {
+					// get next node
+					node_pointer next = node->_next;
 					// deallocate node
-					allocator::deallocate(node);
+					allocator::store(node);
+					// set node to next
+					node = next;
 				}
 			}
-
-			/* free storage */ // INFO: this only used in destructor
-			inline void _free_storage(void) noexcept {
-				// declare node
-				node_pointer node = nullptr;
-				// loop over storage
-				while (_storage) {
-					// unlink node
-					    node = _storage;
-					_storage = node->next;
-					// deallocate node
-					allocator::deallocate(node);
-				}
-			}
-
-			/* destroy queue */
-			inline void _destroy_queue(void) noexcept {
-				// declare node
-				node_pointer node = nullptr;
-				// loop over queue
-				while (_head) {
-					// unlink node
-					 node = _head;
-					_head = node->next;
-					// store node (object destroyed in store method)
-					_store(node);
-				}
-			}
-
-
-
-
-
 
 	};
 
 
-	// -- N O D E -------------------------------------------------------------
+	// -- N O D E  C L A S S --------------------------------------------------
 
 	template <class T>
-	struct queue<T>::node {
+	class xns::queue<T>::node final {
 
-		// -- members ---------------------------------------------------------
+		public:
 
-		/* value */
-		value_type   value;
+			// -- public lifecycle --------------------------------------------
 
-		/* next pointer */
-		node_pointer next;
+			/* default constructor */
+			inline node(void) noexcept
+			: _next{nullptr} {}
+
+			/* non-assignable class */
+			NON_ASSIGNABLE(node);
+
+			/* value copy constructor */
+			inline explicit node(queue<T>::const_reference value)
+			: _value{value}, _next{nullptr} {}
+
+			/* value move constructor */
+			inline explicit node(queue<T>::move_reference value) noexcept
+			: _value{xns::move(value)}, _next{nullptr} {}
+
+			/* value emplace constructor */
+			template <typename... A>
+			inline explicit node(A&&... args)
+			: _value{xns::forward<A>(args)...}, _next{nullptr} {}
+
+			/* destructor */
+			inline ~node(void) noexcept = default;
 
 
-		// -- constructors ----------------------------------------------------
+			// -- public members ----------------------------------------------
 
-		/* default constructor */
-		node(void) noexcept : value{}, next{nullptr} {
-			// nothing to do...
-		}
+			/* value */
+			queue<T>::value_type _value;
 
-		/* copy value constructor */
-		node(const_reference value) noexcept
-		: value{value}, next{nullptr} {
-			// nothing to do...
-		}
-
-		/* move value constructor */
-		node(move_reference value) noexcept
-		: value{xns::move(value)}, next{nullptr} {
-			// nothing to do...
-		}
-
-		/* forward value constructor */
-		template <class... A>
-		node(A&&... args) noexcept
-		: value{xns::forward<A>(args)...}, next{nullptr} {
-			// nothing to do...
-		}
-
-		/* non-assignable struct */
-		NON_ASSIGNABLE(node);
-
-		/* destructor */
-		~node(void) noexcept {
-			// reset next pointer (for storage)
-			next = nullptr;
-		}
-
+			/* next */
+			queue<T>::node_pointer _next;
 
 	};
 

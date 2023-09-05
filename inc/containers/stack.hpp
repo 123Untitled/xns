@@ -101,7 +101,7 @@ namespace xns {
 
 			/* destructor */
 			inline ~stack(void) noexcept {
-				// free stack
+				// deallocate stack
 				free_stack();
 			}
 
@@ -202,7 +202,7 @@ namespace xns {
 
 			/* pop */
 			auto pop(void) noexcept -> void {
-				// check if stack is not empty
+				// check for non-empty stack
 				if (_top) {
 					// get top node
 					node_pointer node = _top;
@@ -223,8 +223,10 @@ namespace xns {
 
 			/* clear */
 			auto clear(void) noexcept -> void {
-				// free stack
-				free_stack(); init();
+				// deallocate stack
+				free_stack();
+				// initialize members
+				init();
 			}
 
 			/* print stack */
@@ -320,7 +322,6 @@ namespace xns {
 
 			/* next */
 			stack<T>::node_pointer _next;
-
 
 	};
 
