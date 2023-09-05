@@ -238,13 +238,13 @@ inline std::ostream& operator<<(std::ostream& os, const X<U, CNAME, TNAME>& x) {
 }
 
 
-using B = X<bool,  "B", "bool">;
-using C = X<char,  "C", "char">;
-using I = X<int,   "I", "int">;
-using L = X<long,  "L", "long">;
-using F = X<float, "F", "float">;
-using D = X<double,"D", "double">;
-using S = X<std::string, "S", "string">;
+//using B = X<bool,  "B", "bool">;
+//using C = X<char,  "C", "char">;
+//using I = X<int,   "I", "int">;
+//using L = X<long,  "L", "long">;
+//using F = X<float, "F", "float">;
+//using D = X<double,"D", "double">;
+//using S = X<std::string, "S", "string">;
 
 
 
