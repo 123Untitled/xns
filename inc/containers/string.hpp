@@ -65,13 +65,13 @@ namespace xns {
 	using wstring   = basic_string<wchar_t>;
 
 	/* utf-8 string type */
-	using string8   = basic_string<char8_t>;
+	using u8string   = basic_string<char8_t>;
 
 	/* utf-16 string type */
-	using string16  = basic_string<char16_t>;
+	using u16string  = basic_string<char16_t>;
 
 	/* utf-32 string type */
-	using string32  = basic_string<char32_t>;
+	using u32string  = basic_string<char32_t>;
 
 
 	// -- I S  S T R I N G  ---------------------------------------------------
@@ -1489,13 +1489,13 @@ namespace xns {
 
 
 	template <xns::is_char T>
-	auto char32_to(const xns::string32& u32str) -> xns::basic_string<T> {
+	auto char32_to(const xns::u32string& u32str) -> xns::basic_string<T> {
 
 		// assertion
 		static_assert(sizeof(T) == 1, "CHAR32_TO() ONLY SUPPORTS 8-BIT CHAR TYPES");
 
 		// size alias
-		using size_type = xns::string32::size_type;
+		using size_type = xns::u32string::size_type;
 		// declare char string
 		xns::string result;
 		// reserve space
@@ -1917,20 +1917,26 @@ namespace xns {
 
 			/* pointer assignment operator */
 			inline constexpr auto operator=(const_pointer str) noexcept -> self& {
-				// return pointer assignment
-				return assign(str), *this;
+				// call pointer assignment
+				assign(str);
+				// return self reference
+				return *this;
 			}
 
 			/* copy assignment operator */
 			inline constexpr auto operator=(const self& other) noexcept -> self& {
-				// return copy assignment
-				return assign(other), *this;
+				// call copy assignment
+				assign(other);
+				// return self reference
+				return *this;
 			}
 
 			/* move assignment operator */
 			inline constexpr auto operator=(self&& other) noexcept -> self& {
-				// return move assignment
-				return assign(other), *this;
+				// call move assignment
+				assign(xns::move(other));
+				// return self reference
+				return *this;
 			}
 
 
