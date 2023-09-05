@@ -18,10 +18,22 @@ namespace xns {
 
 	// -- M A P  C L A S S ----------------------------------------------------
 
-	template <class K, class V>
+	template <typename K, typename V>
 	class map final {
 
-		static_assert(xns::is_comparable<K>, "): MAP: KEY TYPE MUST BE COMPARABLE :(");
+
+		// assert that K is comparable
+		static_assert(xns::is_comparable<K>,
+				"): MAP: KEY TYPE MUST BE COMPARABLE :(");
+
+
+		private:
+
+			// -- forward declarations ----------------------------------------
+
+			/* key value */
+			class key_value;
+
 
 		public:
 
@@ -52,11 +64,11 @@ namespace xns {
 			using const_pointer = const value_type*;
 
 
-			/* pair type */
-			using pair_type = xns::pair<key_type, value_type>;
-
 			/* tree type */
-			using tree_type = xns::tree<pair_type>;
+			using tree_type = xns::tree<key_value>;
+
+			/* node type */
+			using node = typename tree_type::node;
 
 			/* node pointer type */
 			using node_pointer = typename tree_type::node_pointer;
@@ -71,58 +83,219 @@ namespace xns {
 			tree_type _tree;
 
 
+
+			// -- private classes ---------------------------------------------
+
+			class key_value final {
+
+
+				public:
+
+					// -- public types ----------------------------------------
+
+					/* self type */
+					using self = xns::map<K, V>::key_value;
+
+
+					// -- public lifecycle ------------------------------------
+
+					/* default constructor */
+					inline constexpr key_value(void)
+					: _key{}, _value{} {}
+
+					/* copy key_value constructor */
+					inline constexpr key_value(const key_type& key, const value_type& value)
+					: _key{key}, _value{value} {}
+
+					/* forward constructor */
+					template <typename T = key_type, typename U = value_type>
+					inline constexpr key_value(T&& key, U&& value)
+					: _key{xns::forward<T>(key)}, _value{xns::forward<U>(value)} {}
+
+					/* copy constructor */
+					inline constexpr key_value(const self& other)
+					: _key{other._key}, _value{other._value} {}
+
+					/* move constructor */
+					inline constexpr key_value(self&& other) noexcept
+					: _key{xns::move(other._key)}, _value{xns::move(other._value)} {}
+
+					/* destructor */
+					inline constexpr ~key_value(void) noexcept = default;
+
+
+					// -- public assignment operators -------------------------
+
+					/* copy operator */
+					inline constexpr auto operator=(const self& other) -> self& {
+						// copy key object
+						_key = other._key;
+						// copy value object
+						_value = other._value;
+						// return self reference
+						return *this;
+					}
+
+					/* move operator */
+					inline constexpr auto operator=(self&& other) noexcept -> self& {
+						// move key object
+						_key = xns::move(other._key);
+						// move value object
+						_value = xns::move(other._value);
+						// return self reference
+						return *this;
+					}
+
+
+					// -- public comparison operators -------------------------
+
+					/* equality operator */
+					inline constexpr auto operator==(const self& other) const -> bool {
+						// return equality
+						return _key == other._key;
+					}
+
+					/* inequality operator */
+					inline constexpr auto operator!=(const self& other) const -> bool {
+						// return inequality
+						return _key != other._key;
+					}
+
+					/* less than operator */
+					inline constexpr auto operator<(const self& other) const -> bool {
+						// return less than
+						return _key < other._key;
+					}
+
+					/* greater than operator */
+					inline constexpr auto operator>(const self& other) const -> bool {
+						// return greater than
+						return _key > other._key;
+					}
+
+					/* less than or equal to operator */
+					inline constexpr auto operator<=(const self& other) const -> bool {
+						// return less than or equal to
+						return _key <= other._key;
+					}
+
+					/* greater than or equal to operator */
+					inline constexpr auto operator>=(const self& other) const -> bool {
+						// return greater than or equal to
+						return _key >= other._key;
+					}
+
+
+					// -- public accessors ------------------------------------
+
+					/* key accessor */
+					inline constexpr auto key(void) -> key_type& {
+						// return key
+						return _key;
+					}
+
+					/* const key accessor */
+					inline constexpr auto key(void) const -> const key_type& {
+						// return key
+						return _key;
+					}
+
+					/* value accessor */
+					inline constexpr auto value(void) -> value_type& {
+						// return value
+						return _value;
+					}
+
+					/* const value accessor */
+					inline constexpr auto value(void) const -> const value_type& {
+						// return value
+						return _value;
+					}
+
+
+				private:
+
+					// -- private members -------------------------------------
+
+					/* key */
+					key_type _key;
+
+					/* value */
+					value_type _value;
+
+			};
+
+
+
+
 		public:
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			map(void)
-			: _tree{} {
-				// nothing to do...
+			inline map(void)
+			: _tree{} {}
+
+			/* copy constructor */
+			inline map(const map& other)
+			: _tree{other._tree} {}
+
+			/* move constructor */
+			inline map(map&& other) noexcept
+			: _tree{xns::move(other._tree)} {}
+
+			/* destructor */
+			inline ~map(void) noexcept = default;
+
+
+			// -- public assignment operators ---------------------------------
+
+			/* copy assignment operator */
+			inline auto operator=(const map& other) -> map& {
+				// copy tree
+				_tree = other._tree;
+				// return self reference
+				return *this;
+			}
+
+			/* move assignment operator */
+			inline auto operator=(map&& other) noexcept -> map& {
+				// move tree
+				_tree = xns::move(other._tree);
+				// return self reference
+				return *this;
 			}
 
 
-			// -- I N S E R T -------------------------------------------------
+			// -- public accessors --------------------------------------------
+
+			/* size */
+			inline auto size(void) const -> size_type {
+				// return size
+				return _tree.size();
+			}
+
+			/* empty */
+			inline auto empty(void) const -> bool {
+				// return empty
+				return _tree.empty();
+			}
+
+			/* find */
+			inline auto find(const key_type& key) -> node_pointer {
+				return nullptr;
+			}
+
+			inline auto contains(const key_type& key) -> bool {
+				return false;
+			}
 
 
-			/* copy insert */
-			void insert(const key_type& key, const value_type& value) {
+			// -- public modifiers --------------------------------------------
 
-				node_pointer node = _tree.root();
-
-				node_pointer parent  = nullptr;
-
-				// loop until node is null
-				while (node) {
-					pair_type& pair = node->value();
-
-					// less compare
-					if      (key < pair._first) {
-						parent = node;
-						node = node->left();
-					}
-					// greater compare
-					else if (key > pair._first) {
-						parent = node;
-						node = node->right();
-					}
-					// else equal
-					else { return; }
-				}
-
-				// create new node
-				node = _tree.new_node(pair_type{key, value});
-
-				if (parent == nullptr) {
-					_tree.root(node);
-				}
-				else if (key < parent->value()._first) {
-					parent->set_left(node);
-				}
-				else {
-					parent->set_right(node);
-				}
-
+			/* insert */
+			inline auto insert(const key_type& key, const value_type& value) -> void {
+				_tree.insert(key_value{key, value});
 			}
 
 
@@ -137,29 +310,44 @@ namespace xns {
 				// code here...
 			}
 
-			static xns::string vcall(const pair_type& pair) {
-				return xns::string{pair._first};
+
+
+
+			auto clear(void) -> void {
 			}
 
-			static xns::size_t scall(const pair_type& pair) {
-				return pair._first.size();
+			auto insert_or_assign(const key_type& key, const value_type& value) -> void {
+			}
+
+			template <typename... A>
+			auto emplace(const key_type& key, A&&... args) -> void {
+			}
+
+			auto erase(const key_type& key) -> void {
+			}
+
+			auto swap(map& other) -> void {
+			}
+
+
+			auto operator[](const key_type& key) -> void {
+			}
+
+
+
+			static xns::string vcall(const key_value& data) {
+				xns::string str;
+				str.to_string(data.key());
+				return str;
+			}
+
+			static xns::size_t scall(const key_value& data) {
+				xns::string str;
+				str.to_string(data.key());
+				return str.size();
 			}
 
 		void print(void) {
-
-			auto b = _tree.bfs_begin();
-			while (b) { ++b; }
-
-			auto i = _tree.in_order_begin();
-			while (i) { ++i; }
-
-			auto p = _tree.pre_order_begin();
-			while (p) { ++p; }
-
-			auto o = _tree.post_order_begin();
-			while (o) { ++o; }
-
-
 			_tree.print(scall, vcall);
 		}
 
@@ -168,9 +356,26 @@ namespace xns {
 
 		private:
 
+	};
+
+
+
+
+	template <typename T, typename U = T>
+	class value_compare {
+
+		public:
+
+			// -- public types --------------------------------------------
+
+			static inline auto compare(const T& lhs, const U& rhs) -> bool {
+				return lhs < rhs;
+			}
 
 
 	};
+
+
 
 };
 
