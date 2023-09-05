@@ -10,6 +10,9 @@
 // c++ standard library headers
 #include <iostream>
 
+// simd headers
+#include <arm_neon.h>
+
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -85,25 +88,25 @@ namespace xns {
 			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			vector(void)
-			// initializations
+			inline vector(void) noexcept
 			: _vector{nullptr}, _capacity{0}, _size{0} {}
 
 
-		private:
 
 			/* copy constructor */
 			explicit vector(const self& other)
-			// initializations
-			: vector{} {
-				// reserve other size
-				reserve(other._size);
+			: _vector{nullptr}, _capacity{other._capacity}, _size{other._size} {
+
+				if (other._vector == nullptr) { return; }
+
+				// allocate memory
+				_vector = allocator::allocate(_capacity);
+
 				// loop through other vector
-				for (size_type x = 0; x < other._size; ++x) {
+				for (size_type x = 0; x < _size; ++x) {
 					// construct value by copy
 					allocator::construct(_vector + x, other._vector[x]);
-				} // set size
-				_size = other._size;
+				}
 			}
 
 
@@ -119,14 +122,12 @@ namespace xns {
 			}
 
 			/* destructor */
-			~vector(void) {
-				// check pointer
-				if (_vector) {
-					// clear vector
-					clear();
-					// deallocate memory
+			inline ~vector(void) {
+				// clear vector
+				clear();
+				// deallocate memory
+				if (_vector)
 					allocator::deallocate(_vector);
-				}
 			}
 
 
@@ -233,61 +234,55 @@ namespace xns {
 			// -- public accessors --------------------------------------------
 
 			/* empty */
-			auto empty(void) const -> bool {
+			auto empty(void) const noexcept -> bool {
 				// return result
 				return _size == 0;
 			}
 
 			/* size */
-			auto size(void) const -> size_type {
+			auto size(void) const noexcept -> size_type {
 				// return size
 				return _size;
 			}
 
 			/* capacity */
-			auto capacity(void) const -> size_type {
+			auto capacity(void) const noexcept -> size_type {
 				// return capacity
 				return _capacity;
 			}
 
-			/* max size */
-			auto max_size(void) const -> size_type {
-				// return max size
-				return allocator::max_size();
-			}
-
 			/* front */
-			auto front(void) -> reference {
+			auto front(void) noexcept -> reference {
 				// return reference
 				return *_vector;
 			}
 
 			/* const front */
-			auto front(void) const -> const_reference {
+			auto front(void) const noexcept -> const_reference {
 				// return reference
 				return *_vector;
 			}
 
 			/* back */
-			auto back(void) -> reference {
+			auto back(void) noexcept -> reference {
 				// return reference
 				return *(_vector + (_size - 1));
 			}
 
 			/* const back */
-			auto back(void) const -> const_reference {
+			auto back(void) const noexcept -> const_reference {
 				// return reference
 				return *(_vector + (_size - 1));
 			}
 
 			/* data */
-			auto data(void) -> pointer {
+			auto data(void) noexcept -> pointer {
 				// return pointer
 				return _vector;
 			}
 
 			/* const data */
-			auto data(void) const -> const_pointer {
+			auto data(void) const noexcept -> const_pointer {
 				// return pointer
 				return _vector;
 			}
@@ -300,23 +295,49 @@ namespace xns {
 			/* reserve */
 			auto reserve(const size_type capacity) -> void {
 				// check capacity
-				if (capacity > _capacity) {
-					// allocate memory
-					pointer tmp = allocator::allocate(capacity);
-					// check pointer
-					if (_vector != nullptr) {
-						// loop through vector
-						for (size_type x = 0; x < _size; ++x) {
-							// move elements
-							allocator::construct(tmp + x, xns::move(_vector[x]));
-							allocator::destroy(_vector + x);
-						} // deallocate memory
-						allocator::deallocate(_vector);
-					} // assign capacity
-					_capacity = capacity;
-					// assign pointer
-					_vector = tmp;
+				if (capacity <= _capacity) { return; }
+				// allocate memory
+				pointer tmp = allocator::allocate(capacity);
+				// loop through vector
+				for (size_type x = 0; x < _size; ++x) {
+					// move element
+					allocator::construct(tmp + x, xns::move(_vector[x]));
+					// destroy element
+					allocator::destroy(_vector + x);
+				} // deallocate old memory
+				allocator::deallocate(_vector); // INFO: do not check for nullptr
+				// assign capacity
+				_capacity = capacity;
+				// assign pointer
+				_vector = tmp;
+			}
+
+			/* resize */
+			auto resize(const size_type size) -> void {
+
+				// check size
+				if (size < _size) {
+					// loop through vector
+					for (size_type x = size; x < _size; ++x) {
+						// destroy elements
+						allocator::destroy(_vector + x);
+					}
 				}
+				else if (size > _size) {
+					// check capacity
+					if (size > _capacity) {
+						// reserve size
+						reserve(size);
+					} // loop through vector
+					for (size_type x = _size; x < size; ++x) {
+						// construct elements
+						allocator::construct(_vector + x);
+					}
+				}
+				// assign size
+				_size = size;
+
+
 			}
 
 
@@ -324,8 +345,8 @@ namespace xns {
 			// -- public modifiers --------------------------------------------
 
 			/* clear */
-			auto clear(void) -> void {
-				// loop through vector
+			auto clear(void) noexcept -> void {
+				// loop over vector
 				for (size_type x = 0; x < _size; ++x) {
 					// destroy object
 					allocator::destroy(_vector + x);
@@ -334,8 +355,8 @@ namespace xns {
 			}
 
 			/* emplace */
-			template <typename... Args>
-			auto emplace(size_type pos, Args&&... args) -> void {
+			template <typename... A>
+			auto emplace(size_type pos, A&&... args) -> void {
 				// check position
 				if (pos > _size) { return; }
 				// check capacity
@@ -347,7 +368,7 @@ namespace xns {
 					// move element
 					_vector[x] = xns::move(_vector[x - 1]);
 				} // construct element
-				allocator::construct(_vector + pos, xns::forward<Args>(args)...);
+				allocator::construct(_vector + pos, xns::forward<A>(args)...);
 				// increment size
 				++_size;
 			}
@@ -366,49 +387,27 @@ namespace xns {
 			}
 
 			/* push back */
-			auto push_back(void) -> void {
+			template <typename U>
+			auto push_back(U&& value) -> void {
+				// assert U is same as value_type
+				static_assert(xns::is_same<xns::remove_cvr<U>, value_type>,
+						"): VECTOR: PUSH BACK TYPE MISMATCH :(");
 				// check capacity
 				if (!available()) {
 					// double capacity
 					reserve(grow());
 				} // construct element
-				allocator::construct(_vector + _size);
-				// increment size
-				++_size;
-			}
-
-			/* copy push back */
-			auto copy_back(const value_type& value) -> void {
-				// check capacity
-				if (!available()) {
-					// double capacity
-					reserve(grow());
-				} // construct element
-				allocator::construct(_vector + _size, value);
-				// increment size
-				++_size;
-			}
-
-			/* move back */ // INFO: this is preferred over move push back
-			auto move_back(value_type&& value) -> void {
-				// check capacity
-				if (!available()) {
-					// double capacity
-					reserve(grow());
-				} // construct element
-				allocator::construct(_vector + _size, xns::move(value));
+				allocator::construct(_vector + _size, xns::forward<U>(value));
 				// increment size
 				++_size;
 			}
 
 			/* pop back */
-			auto pop_back(void) -> void {
+			inline auto pop_back(void) noexcept -> void {
 				// check size
-				if (!_size) { return; }
+				if (not _size) { return; }
 				// destroy object
-				allocator::destroy(_vector + (_size - 1));
-				// decrement size
-				--_size;
+				allocator::destroy(_vector + (--_size));
 			}
 
 
@@ -429,13 +428,11 @@ namespace xns {
 			}
 
 			/* erase */
-			auto erase(const iterator& pos) -> void {
+			inline auto erase(const iterator& pos) -> void {
 				// check position
 				if (pos._ptr < _vector) { return; }
 				// compute position (pointers subtraction gives a signed type (ptrdiff_t))
-				size_type x = static_cast<size_type>(pos._ptr - _vector);
-				// call erase
-				erase(x);
+				erase(static_cast<size_type>(pos._ptr - _vector));
 			}
 
 
@@ -521,8 +518,8 @@ namespace xns {
 				requires (xns::is_comparable<value_type>) {
 
 				// check if U is comparable to value_type
-				//static_assert(is_comparable<value_type, value_type>,
-				//	"): TYPE ARE NOT COMPARABLE IN DICHOTOMIC INSERT :(");
+				static_assert(is_comparable<value_type>,
+					"): TYPE ARE NOT COMPARABLE IN DICHOTOMIC INSERT :(");
 
 
 				// initialize bounds
@@ -531,7 +528,7 @@ namespace xns {
 
 
 				// check size
-				if (!_size) { return copy_back(value); }
+				if (!_size) { return push_back(value); }
 
 				// loop
 				while (lower <= upper) {
@@ -631,18 +628,13 @@ namespace xns {
 		// allocate memory
 		vec._vector = allocator::allocate(sizeof...(A));
 
-		// check allocation success
-		if (vec._vector != nullptr) {
+		typename vector<T>::size_type x = 0;
+		// fold expression to construct by forwarding
+		(allocator::construct(&vec._vector[x++], xns::forward<A>(args)), ...);
 
-			typename vector<T>::size_type x = 0;
+		// assign sizes
+		vec._size = vec._capacity = sizeof...(A);
 
-			// fold expression to construct by forwarding
-			(allocator::construct(&vec._vector[x++], xns::forward<A>(args)), ...);
-
-			// assign sizes
-			vec._size = vec._capacity = sizeof...(args);
-
-		}
 		return vec;
 	}
 
@@ -713,7 +705,8 @@ namespace xns {
 			inline vector_iterator(const vector_type::const_iterator& other) noexcept
 			: _ptr{other._ptr} {
 				// assert invalid conversion
-				static_assert(_const, "): CANNOT CONVERT CONST TO NON-CONST LIST ITERATOR");
+				static_assert(_const,
+						"): CANNOT CONVERT CONST TO NON-CONST VECTOR ITERATOR :(");
 			}
 
 			/* move constructor (non-const) */
@@ -741,7 +734,8 @@ namespace xns {
 			/* copy assignment operator (const) */
 			inline self& operator=(const vector_type::const_iterator& other) noexcept {
 				// assert invalid conversion
-				static_assert(_const, "): CANNOT CONVERT CONST TO NON-CONST LIST ITERATOR");
+				static_assert(_const,
+						"): CANNOT CONVERT CONST TO NON-CONST VECTOR ITERATOR :(");
 				// copy pointer
 				_ptr = other._ptr;
 				// return self reference
@@ -835,13 +829,13 @@ namespace xns {
 			}
 
 			/* null equality operator */
-			inline bool operator==(std::nullptr_t) const noexcept {
+			inline bool operator==(xns::null) const noexcept {
 				// return pointer invalidity
 				return _ptr == nullptr;
 			}
 
 			/* null inequality operator */
-			inline bool operator!=(std::nullptr_t) const noexcept {
+			inline bool operator!=(xns::null) const noexcept {
 				// return pointer validity
 				return _ptr != nullptr;
 			}
