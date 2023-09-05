@@ -3,32 +3,13 @@
 
 #include "types.hpp"
 #include "is_integral.hpp"
+#include "memcpy.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
 
-
-	// -- M E M C P Y ---------------------------------------------------------
-
-	/* memcpy */
-	inline void memcpy(void* dst, const void* src, const xns::size_t size) {
-
-		// check pointers validity
-		if (dst == nullptr || src == nullptr) { return; }
-
-		// cast pointers to byte pointers
-		xns::ubyte* dst_ptr = static_cast<xns::ubyte*>(dst);
-
-		const xns::ubyte* src_ptr = static_cast<const xns::ubyte*>(src);
-
-		// loop over size
-		for (xns::size_t x = 0; x < size; ++x) {
-			// copy byte from source to destination
-			dst_ptr[x] = src_ptr[x];
-		}
-	}
 
 
 	// -- B I T  C A S T ------------------------------------------------------
