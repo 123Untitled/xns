@@ -9,9 +9,13 @@
 #include "string.hpp"
 #include "string_literal.hpp"
 #include "conversions.hpp"
+#include "is_floating.hpp"
 
 // operating system headers
 #include <unistd.h>
+
+// c++ standard library headers
+#include <sstream>
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -60,6 +64,16 @@ namespace xns {
 				_instance._buffer.append(ch);
 			}
 
+			/* write float / double */
+			template <xns::is_floating T>
+			static void write(const T& number) {
+				std::stringstream ss;
+
+				ss << number;
+				_instance._buffer.append(ss.str().c_str(), ss.str().size());
+
+			}
+
 			/* write string */
 			static void write(const xns::string& str);
 
@@ -67,7 +81,7 @@ namespace xns {
 			static void write(const xns::string_view& str);
 
 			/* write string32 */
-			static void write(const xns::string32& str);
+			static void write(const xns::u32string& str);
 
 			/* render */
 			template <xns::basic_string_literal L = "stdout">
@@ -114,6 +128,17 @@ namespace xns {
 
 		private:
 
+			// -- friends -----------------------------------------------------
+
+			/* print as friend */
+			template <typename... A>
+			friend auto print(const A&... args) -> void;
+
+			/* println as friend */
+			template <typename... A>
+			friend auto println(const A&... args) -> void;
+
+
 			// -- P R I V A T E  E N U M S ------------------------------------
 
 			/* buffer size */
@@ -135,10 +160,20 @@ namespace xns {
 	};
 
 
-	template <class... A>
-	void print(const A&... args) {
+	template <typename... A>
+	auto print(const A&... args) -> void {
 		// write each argument
 		(out::write(args), ...);
+	}
+
+	template <typename... A>
+	auto println(const A&... args) -> void {
+		// write each argument
+		(out::write(args), ...);
+		// get out instance
+		auto& out = out::_instance;
+		// append new line
+		out._buffer.append('\n');
 	}
 
 
