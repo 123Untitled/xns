@@ -197,6 +197,8 @@ namespace xns {
 	/* arch address types */
 	using addr_t  = unsign<XNS_ARCH_BYTES>;
 
+	/* uintptr types */
+	using uptr_t  = unsign<XNS_ARCH_BYTES>;
 
 
 	/* pointer types */
