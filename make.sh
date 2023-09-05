@@ -191,8 +191,9 @@ TEST_INCS=("${TEST_INCS[@]/#/-I}")
 BREW_CXX='/opt/homebrew/opt/llvm/bin/clang++'
 
 # compiler
-#COMPILER=$BREW_CXX
-COMPILER=$(which clang++)
+COMPILER=$BREW_CXX
+#COMPILER='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
+#COMPILER=$(which clang++)
 
 # linker
 LINKER=$COMPILER
@@ -204,7 +205,7 @@ ARCHIVER=$(which ar)
 ARFLAGS='-rcs'
 
 # c++ standard
-STANDARD='-std=c++2a'
+STANDARD='-std=c++2b'
 
 # debug mode
 DEBUG='-g3'
@@ -231,10 +232,10 @@ CXXFLAGS+=('-Wno-unused' '-Wno-unused-variable' '-Wno-unused-parameter')
 CXXFLAGS+=('-Winline')
 
 # type conversion
-CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
+#CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
 
 # shadowing
-CXXFLAGS+=('-Wshadow')
+#CXXFLAGS+=('-Wshadow')
 
 # linker flags
 LDFLAGS=''
