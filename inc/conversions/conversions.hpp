@@ -176,12 +176,56 @@ namespace xns {
 			return true;
 		}
 
-
-
-
-
-
 	};
+
+
+	/* to basic string */
+	template <typename C, typename T>
+	auto to_basic_string(const T& value) -> xns::basic_string<C> {
+
+		// temporary assert string type
+		static_assert(xns::is_same<C, char>, "ONLY CHAR STRING IS SUPPORTED, FOR NOW");
+		// temporary assert T is integral
+		static_assert(xns::is_integral<T>, "ONLY INTEGRAL TYPES ARE SUPPORTED, FOR NOW");
+
+		if constexpr (xns::is_integral<T>) {
+			return conversion::integer_to_string(value);
+		}
+
+	}
+
+
+	/* to c-string ascii */
+	template <typename T>
+	inline auto to_string(const T& value) -> xns::string {
+		return to_basic_string<typename xns::string::char_t, T>(value);
+	}
+
+	/* to wide string */
+	template <typename T>
+	inline auto to_wstring(const T& value) -> xns::wstring {
+		return to_basic_string<typename xns::wstring::char_t, T>(value);
+	}
+
+	/* to utf-8 string */
+	template <typename T>
+	inline auto to_u8string(const T& value) -> xns::u8string {
+		return to_basic_string<typename xns::u8string::char_t, T>(value);
+	}
+
+	/* to utf-16 string */
+	template <typename T>
+	inline auto to_u16string(const T& value) -> xns::u16string {
+		return to_basic_string<typename xns::u16string::char_t, T>(value);
+	}
+
+	/* to utf-32 string */
+	template <typename T>
+	inline auto to_u32string(const T& value) -> xns::u32string {
+		return to_basic_string<typename xns::u32string::char_t, T>(value);
+	}
+
+
 
 
 
