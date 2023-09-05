@@ -43,37 +43,35 @@ namespace xns {
 
 
 			/* random integer */
-			template <xns::is_arithmetic T>
-			static auto random_int(void) -> T {
+			template <typename T>
+			static auto integral(void) -> xns::remove_cvr<T> {
 
+				// remove const and reference
+				using type = xns::remove_cvr<T>;
+
+				// check for integral type
+				static_assert(xns::is_integral<type>,
+						"): RANDOM: INTEGRAL TYPE REQUIRED :(");
 
 				// get random number
-				xns::u64 rnd = xns::xorshift::next64();
+				xns::size_t rnd = xns::xorshift::next64();
 
-				if constexpr (xns::is_floating<T>) {
-					T res = static_cast<T>(rnd) / static_cast<T>(xns::limits::max<xns::u64>());
-					return (T)(rnd % 10) + res;
-					//return static_cast<T>(rnd);
+				// handle boolean type
+				if constexpr (xns::is_same<type, bool>) {
+					return rnd % 2;
 				}
 
-				if constexpr (xns::is_same<T, decltype(rnd)>) { return rnd; }
+				else {
+					rnd %= (xns::limits::max<
+							xns::make_unsigned<type>>());// + 1);
 
-
-				if constexpr (xns::is_unsigned<T>) {
-					return static_cast<T>(rnd % (xns::limits::max<T>() + 1));
+					if constexpr (xns::is_signed<type>) {
+						return reinterpret_cast<type&>(rnd);
+					}
+					else {
+						return static_cast<type>(rnd);
+					}
 				}
-
-
-				/*
-				using unsigned_type = xns::make_unsigned<T>;
-
-				xns::u64 red = rnd % (xns::max<unsigned_type>() + 1);
-				xns::s64 sgn = red - xns::min<T>();
-
-
-				return static_cast<T>(sgn);
-				*/
-				return static_cast<T>(rnd);
 			}
 
 
