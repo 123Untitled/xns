@@ -227,6 +227,94 @@ namespace xns {
 
 			};
 
+
+
+
+			class req_pos final {
+
+				public:
+
+					static bool request(size_type& x, size_type& y) {
+
+						// create request
+						req_pos req{x, y};
+
+
+						// return success
+						return true;
+					}
+
+
+
+				private:
+
+					// -- private enums ---------------------------------------
+
+					enum : size_type {
+						BASE = 10,
+						ZERO = 48
+					};
+
+					// -- private lifecycle -----------------------------------
+
+					/* size constructor */
+					req_pos(size_type& x, size_type& y)
+					: _state{nullptr}, _c{0}, _n{&y}, _x{x}, _y{y} {
+					};
+
+					/* destructor */
+					~req_pos(void) = default;
+
+					bool escape(void) {
+						return _c == '\x1b'
+							? _state = &req_pos::bracket, true
+							: false;
+					}
+
+					bool bracket(void) {
+						return _c == '['
+							? _state = &req_pos::number, true
+							: false;
+					}
+
+					bool number(void) {
+						if ((_c ^ 48) < 10) {
+							*_n = (*_n * BASE) + (static_cast<size_type>(_c) - ZERO);
+							return true;
+						}
+						else if (_c == ';') {
+							_n = &_x;
+							return true;
+						}
+						return false;
+					}
+
+					using proto = bool(req_pos::*)(void);
+
+
+					// -- private members -------------------------------------
+
+					proto _state;
+
+					/* current character */
+					char _c;
+
+					/* current number */
+					size_type* _n;
+
+					/* x position */
+					size_type& _x;
+
+					/* y position */
+					size_type& _y;
+
+
+
+			};
+
+
+
+
 	};
 
 }
