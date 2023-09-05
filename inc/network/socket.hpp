@@ -92,8 +92,9 @@ namespace xns {
 				}
 
 				/* descriptor assignment operator */
-				inline auto operator=(const descriptor& socket) noexcept -> void {
+				inline auto operator=(const descriptor& socket) noexcept -> self& {
 					unique_descriptor::operator=(socket);
+					return *this;
 				}
 
 
