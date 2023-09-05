@@ -18,7 +18,7 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = exception;
+			using self = xns::exception;
 
 			/* error code type */
 			using code = xns::s32;
@@ -30,13 +30,22 @@ namespace xns {
 			// -- constructors ------------------------------------------------
 
 			/* default constructor */
-			exception(void) = default;
+			exception(void) = delete;
+
+			/* copy constructor */
+			exception(const self& e) = default;
 
 			/* code and message constructor */
-			exception(const code& c, const message& m) : _code(c), _message(m) {}
+			exception(const code& c, message m) : _code(c), _message(m) {}
 
 			/* destructor */
 			virtual ~exception(void) = default;
+
+
+			// -- public assignment operators ---------------------------------
+
+			/* copy assignment operator */
+			self& operator=(const self& e) = default;
 
 
 			// -- public methods ----------------------------------------------
