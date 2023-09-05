@@ -4,34 +4,15 @@
 #include "time.hpp"
 #include "numeric_limits.hpp"
 #include "input.hpp"
-
-xns::size_t tpsc(const char& c) {
-	return 1;
-}
-
-xns::string tpvc(const char& c) {
-	return xns::string(&c, 1);
-}
-
-xns::size_t intsize(const int& i) {
-	xns::string str;
-	str.to_string(i);
-	return str.size();
-}
-
-xns::string intstr(const int& i) {
-	xns::string str;
-	str.to_string(i);
-	return str;
-}
-
-xns::size_t strsize(const xns::string& str) {
-	return str.size();
-}
-
-xns::string strstr(const xns::string& str) {
-	return str;
-}
+#include <set>
+#include <unordered_set>
+#include <iostream>
+#include <vector>
+#include <unistd.h>
+#include <map>
+#include "escape.hpp"
+#include "memcpy.hpp"
+#include "benchmark.hpp"
 
 
 
@@ -47,7 +28,7 @@ xns::tree<char> generate_tree(const xns::size_t size) {
 	// loop to allocate nodes
 	for (xns::size_t i = 0; i < size; ++i) {
 		char c = (xns::random::integral<unsigned char>() % 94) + 33;
-		nodes.copy_back(ast.new_node(nullptr, c));
+		nodes.push_back(ast.new_node(nullptr, c));
 	}
 	// set root node
 	ast.root(ast.new_node(nullptr, 'r'));
@@ -73,267 +54,62 @@ xns::tree<char> generate_tree(const xns::size_t size) {
 		} while (true);
 	}
 
-	ast.print(tpsc, tpvc);
+	//ast.print();
 
 	return ast;
 }
 
 
-
-#include <set>
-#include <chrono>
-#include <iostream>
-#include <vector>
-#include <unistd.h>
-#include <map>
-
-auto now(void) -> long long {
-	return std::chrono::duration_cast<std::chrono::nanoseconds>(
-		std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-}
+static xns::size_t NSIZE = 0;
 
 
-class benchmark final {
-
-	public:
-		benchmark(void) = default;
-		~benchmark(void) = default;
 
 
-		template <typename F, typename... A>
-		static auto run(const char* msg, F&& func, A&&... args) -> void {
-			// time of benchmark (5s in nanoseconds)
-			xns::size_t alpha = 5'000'000'000;
+static void benchmark01(void) {
 
 
-			xns::size_t count = 0;
+	xns::benchmark<5> bench;
 
-			constexpr xns::size_t max = xns::limits::max<xns::size_t>();
 
-			auto start = xns::time::now();
+	// xns::memory::pool<xns::tree<xns::size_t>::node>::init();
 
-			// no cursor
-			::write(1, "\x1b[?25l", 6);
+	xns::tree<xns::size_t> tree;
+	std::set<xns::size_t> set;
 
-			while (((xns::time::now() - start) < alpha) && (count < max)) {
-				std::cout << count << " operations\r";
-				func(xns::forward<A>(args)...);
-				++count;
+
+	bench.run("xns::tree insert", [&tree]() -> void {
+			for (std::size_t i = 0; i < NSIZE; ++i) {
+				tree.insert(xns::random::integral<xns::size_t>());
 			}
+			tree.clear();
+	});
 
-			// cursor on
-			::write(1, "\x1b[?25h", 6);
-
-			auto end = xns::time::now();
-
-			std::cout << "\n" << msg << " : "
-					  << count << " function calls in " << (end - start) / 1'000'000 << " ms"
-					  << " (avg " << ((end - start) / count) << " ns)\n";
-		}
-
-	private:
-
-
-};
-
-
-static void benchmark2(void) {
-
-	xns::size_t size{100'000'000U};
-	//xns::size_t size{1000U};
-	std::vector<xns::size_t> nvec;
-	std::cout << "filling vector with [" << size << "] random numbers..." << std::endl;
-	for (xns::size_t i = 0; i < size; ++i) {
-		nvec.push_back(xns::random::integral<xns::size_t>());
-	}
-	std::cout << "done." << std::endl;
-
-	{
-
-		xns::size_t index = 0;
-
-
-		benchmark::run("xns::tree insert", [&nvec]() -> void {
-			xns::size_t N = 1000;
-			xns::tree<xns::size_t> tree;
-			for (std::size_t i = 0; i < N; ++i) {
-				tree.insert(nvec[i]);
+	bench.run("std::set insert", [&set]() -> void {
+			for (std::size_t i = 0; i < NSIZE; ++i) {
+				set.insert(xns::random::integral<xns::size_t>());
 			}
-		});
+			set.clear();
+	});
 
-		benchmark::run("std::set insert", [&nvec]() -> void {
-			xns::size_t N = 1000;
-			std::set<xns::size_t> set;
-			for (std::size_t i = 0; i < N; ++i) {
-				set.insert(nvec[i]);
+	bench.result("insert");
+
+
+	bench.run("xns::tree contains", [&tree]() -> void {
+			for (std::size_t i = 0; i < NSIZE; ++i) {
+				tree.contains(xns::random::integral<xns::size_t>());
 			}
-		});
+	});
 
 
-
-
-	}
-	return;
-
-
-
-	return;
-
-
-
-
-	//std::vector<int> vec;
-
-	//for (int i = 0; i < 1000000; ++i) {
-	//	vec.push_back(xns::random::integral<int>());
-	//}
-
-
-
-	//benchmark::run("std::set insert", []() -> void {
-	//	std::set<int> tree;
-	//	for (int i = 0; i < 1000000; ++i) {
-	//		tree.insert(i);
-	//	}
-	//});
-
-	//benchmark::run("xns::tree insert", []() -> void {
-	//	xns::tree<int> tree;
-	//	for (int i = 0; i < 1000000; ++i) {
-	//		tree.insert(i);
-	//	}
-	//});
-
-	////xns::tree<int> tree;
-	////std::set<int> set;
-	//for (auto& i : vec) {
-	//	tree.insert(i);
-	//	set.insert(i);
-	//}
-
-	//benchmark::run("std::set contains", [](std::set<int>& set, std::vector<int>& vec) -> void {
-	//	for (auto& i : vec) {
-	//		set.contains(i);
-	//	}
-	//}, set, vec);
-
-	//benchmark::run("xns::tree contains", [](xns::tree<int>& tree, std::vector<int>& vec) -> void {
-	//	for (auto& i : vec) {
-	//		tree.contains(i);
-	//	}
-	//}, tree, vec);
-
-
-
-
-
-}
-
-
-
-
-static auto benchmark(void) -> void {
-
-	using type = std::size_t;
-
-
-	// print lambda
-	auto print = [](const char* msg, long long time) -> void {
-		std::cout << msg << (double)time / (double)1000000 << " ms" << std::endl;
-	};
-
-
-	type ns[] = {100,
-				1000,
-				10000,
-				100000,
-				1000000};
-				//10000000};
-
-
-	// setup vector of random numbers
-	std::vector<type> _vec;
-	for (type i = 0; i < ns[sizeof(ns) / sizeof(type) - 1]; ++i) {
-		_vec.push_back(xns::random::integral<type>());
-	}
-
-
-	// loop over N values
-	for (type& N : ns) {
-
-		std::cout << "\nBenchmarking with N = \x1b[32m" << N << "\x1b[0m" << std::endl;
-
-		std::set<type> stree;
-		xns::tree<type> xtree;
-
-
-		xns::size_t std_time = 0;
-		xns::size_t xns_time = 0;
-			// insert
-			{
-				//auto start = now();
-				auto start = xns::time::now();
-				for (type i = 0; i < N; ++i) {
-					stree.insert(_vec[i]);
-				}
-				//auto end = now();
-				auto end = xns::time::now();
-				print("  insert std::set  -> ", end - start);
-				std_time = end - start;
+	bench.run("std::set contains", [&set]() -> void {
+			for (std::size_t i = 0; i < NSIZE; ++i) {
+				set.contains(xns::random::integral<xns::size_t>());
 			}
-			{
-				//auto start = now();
-				auto start = xns::time::now();
-				for (type i = 0; i < N; ++i) {
-					xtree.insert(_vec[i]);
-				}
-				//auto end = now();
-				auto end = xns::time::now();
-				print("  insert xns::tree -> ", end - start);
-				xns_time = end - start;
-			}
+	});
 
-			// calculate ratio
-			if (std_time > xns_time) {
-				std::cout << "  ------------------- \x1b[32m" << (double)std_time / (double)xns_time << "\x1b[0m times faster" << std::endl;
-			}
-			else if (std_time < xns_time) {
-				std::cout << "  ------------------- \x1b[31m" << (double)xns_time / (double)std_time << "\x1b[0m times faster" << std::endl;
-			}
 
-			// contains
-			{
-				//auto start = now();
-				auto start = xns::time::now();
-				for (type i = 0; i < N; ++i) {
-					stree.contains(_vec[i]);
-				}
-				//auto end = now();
-				auto end = xns::time::now();
-				print("  search std::set  -> ", end - start);
-				std_time = end - start;
-			}
-			{
-				//auto start = now();
-				auto start = xns::time::now();
-				for (type i = 0; i < N; ++i) {
-					xtree.contains(_vec[i]);
-				}
-				//auto end = now();
-				auto end = xns::time::now();
-				print("  search xns::tree -> ", end - start);
-				xns_time = end - start;
-			}
+	bench.result("contains");
 
-			// calculate ratio
-			if (std_time > xns_time) {
-				std::cout << "  ------------------- \x1b[32m" << (double)std_time / (double)xns_time << "\x1b[0m times faster" << std::endl;
-			}
-			else if (std_time < xns_time) {
-				std::cout << "  ------------------- \x1b[31m" << (double)xns_time / (double)std_time << "\x1b[0m times faster" << std::endl;
-			}
-
-	}
 
 }
 
@@ -344,6 +120,7 @@ static auto insert(void) -> void {
 
 
 	xns::tree<int> tree;
+
 	xns::vector<int> vec;
 
 	unsigned int n = (xns::random::integral<unsigned int>() % 20) + 30;
@@ -353,7 +130,7 @@ static auto insert(void) -> void {
 	for (unsigned int i = 0; i < n; ++i) {
 		int r = xns::random::integral<int>() % 100;
 		//int r = xns::random::integral<int>();
-		vec.copy_back(r);
+		vec.push_back(r);
 	}
 
 
@@ -361,14 +138,26 @@ static auto insert(void) -> void {
 	for (auto& i : vec) {
 		//std::cout << "\x1b[32m" << i << "\x1b[0m" << std::endl;
 		//std::cout << std::endl;
-		//usleep(10000);
 		tree.insert(i);
-		//tree.is_balanced();
-		//tree.is_sorted();
+		tree.print();
+		usleep(10000);
 		// std::cout << "tree depth: " << tree.depth() << std::endl;
 		// std::cout << "tree size: " << tree.size() << std::endl << std::endl;
 	}
-	tree.print(intsize, intstr);
+		check_tree(tree);
+	return ;
+
+	for (auto& i : vec) {
+		tree.print();
+		std::cout << "erasing: \x1b[31m" << i << "\x1b[0m" << std::endl;
+		tree.erase(i);
+		check_tree(tree);
+		usleep(10000);
+	}
+	tree.print();
+
+
+
 
 
 	//std::cout << "END OF TEST" << std::endl;
@@ -380,7 +169,7 @@ static auto interactive(void) -> void {
 
 	xns::terminal::raw_terminal();
 	xns::print(xns::escape::enter_screen(),
-			xns::escape::move_home());
+	xns::escape::move_home());
 	xns::out::render();
 
 
@@ -398,17 +187,12 @@ static auto interactive(void) -> void {
 		if (input == "\x1b[C") {
 			xns::print(xns::escape::erase_screen(), xns::escape::move_home());
 			xns::out::render();
-			if (tree.is_balanced() == false) {
-				std::cout << "\x1b[35mNOT BALANCED!\x1b[0m" << std::endl;
-			}
-			else {
 				std::cout << "\x1b[32mINSERT\x1b[0m" << std::endl;
 				int i = xns::random::integral<int>() % 100;
 				vec.push_back(i);
 				tree.insert(i);
-			}
 
-			tree.print(intsize, intstr);
+			tree.print();
 			balanced = false;
 		}
 		// check for up arrow
@@ -416,8 +200,7 @@ static auto interactive(void) -> void {
 			xns::print(xns::escape::erase_screen(), xns::escape::move_home());
 			xns::out::render();
 			std::cout << "\x1b[31mBALANCE\x1b[0m" << std::endl;
-			tree.full_balance();
-			tree.print(intsize, intstr);
+			tree.print();
 			balanced = true;
 		}
 		// check for down arrow
@@ -429,11 +212,10 @@ static auto interactive(void) -> void {
 
 			for (std::vector<int>::size_type i = 0; i < vec.size() - 1; ++i) {
 				tree.insert(vec[i]);
-				tree.full_balance();
 			}
 			tree.insert(vec.back());
 			balanced = false;
-			tree.print(intsize, intstr);
+			tree.print();
 
 
 		}
@@ -451,38 +233,30 @@ static auto interactive(void) -> void {
 
 }
 
-#include "memory.hpp"
 
 template <>
 bool UT::unit_tests<"tree">(void) {
 
-	xns::memory::pool<xns::tree<xns::size_t>::node>::init();
 
-	insert();
+	benchmark01();
 	return true;
-	benchmark2();
+	insert();
 	return true;
 	interactive();
 	return true;
 
-
-	xns::tree<char> tr = generate_tree(20);
-
-	auto it = tr.in_order_begin();
-	tr.print(tpsc, tpvc);
-
-	while (it != tr.end()) {
-		std::cout << *it << " ";
-		++it;
-	}
-	std::cout << std::endl;
-
-
-	return true;
 }
 
 
-int main(void) {
-	UT::unit_tests<"tree">();
-	return 0;
+int main(int ac, char** av) {
+
+
+
+
+	if (ac == 2) {
+		// atoi
+		NSIZE = atoi(av[1]);
+	}
+	return UT::unit_tests<"tree">()
+		? EXIT_SUCCESS : EXIT_FAILURE;
 }

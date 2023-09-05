@@ -8,3 +8,7 @@ bool UT::unit_tests<"camera">(void) {
 	return false;
 }
 
+int main(void) {
+
+	return UT::unit_tests<"camera">() ? EXIT_SUCCESS : EXIT_FAILURE;
+}
