@@ -33,6 +33,9 @@ namespace xns {
 			/* self type */
 			using self = xns::time;
 
+			/* size type */
+			using size_type = xns::size_t;
+
 
 			// -- public static methods ---------------------------------------
 
