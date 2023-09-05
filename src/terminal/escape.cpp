@@ -140,6 +140,26 @@ xns::escape::string xns::escape::move_down(const size_type cells) {
 #define BACKGROUND				false
 
 
+
+
+
+
+
+
+
+static bool bracket(const char c) {
+	return false;
+}
+
+
+using proto = bool(*)(const char);
+
+static constexpr proto _table[1] {
+	&bracket
+};
+
+
+
 bool xns::escape::request_position(size_type& x, size_type& y) {
 
 	size_type* num     = &y;
@@ -346,6 +366,11 @@ xns::escape::string xns::escape::rgb_color(xns::u8 r, xns::u8 g, xns::u8 b, cons
 	} // append escape sequence to buffer
 	return xns::string((char*)escape, 19);
 }
+
+
+
+
+
 
 
 
