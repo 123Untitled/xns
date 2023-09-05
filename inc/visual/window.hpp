@@ -1,48 +1,50 @@
 #ifndef WINDOW_HEADER
 #define WINDOW_HEADER
 
-//#include "color.hpp"
-//#include "types.hpp"
-//#include "escape.hpp"
-//#include "terminal.hpp"
-//#include "vector.hpp"
-//#include "border.hpp"
-//#include "rect.hpp"
-//#include "event.hpp"
-//#include "unique.hpp"
-//#include "window_traits.hpp"
-//#include "debug.hpp"
-//#include "shared_ptr.hpp"
-//#include "list.hpp"
-//
-//#include <iostream>
+#include "color.hpp"
+#include "types.hpp"
+#include "escape.hpp"
+#include "terminal.hpp"
+#include "vector.hpp"
+#include "border.hpp"
+#include "rect.hpp"
+#include "event.hpp"
+#include "unique_ptr.hpp"
+#include "window_traits.hpp"
+#include "debug.hpp"
+#include "shared_ptr.hpp"
+#include "list.hpp"
+
+#include <iostream>
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-//namespace Xf {
-//
-//	/* forward declaration */
-//
-//	struct WindowBase;
-//	template <pane_c P, split_c S>
-//	struct Window;
-//	template <split_c S>
-//	struct SplitWindow;
-//
-//
-//
-//
-//	// -- W I N D O W  M A N A G E R ------------------------------------------
-//
-//	class WindowManager final {
+namespace xns {
+
+	/* forward declaration */
+
+	struct WindowBase;
+
+	template <is_pane P, is_split S>
+	struct Window;
+
+	template <is_split S>
+	struct SplitWindow;
+
+
+
+
+	// -- W I N D O W  M A N A G E R ------------------------------------------
+
+//	class window_manager final {
 //
 //		public:
 //
-//			// -- C O N S T R U C T O R S -------------------------------------
+//			// -- public lifecycle --------------------------------------------
 //
 //			/* non-instanciable class */
-//			NON_INSTANCIABLE(WindowManager);
+//			NON_INSTANCIABLE(window_manager);
 //
 //
 //			// -- M E T H O D S -----------------------------------------------
@@ -59,15 +61,15 @@
 //
 //			static void new_root(void) noexcept;
 //
-//			template <split_c S>
+//			template <is_split S>
 //			static void new_split(void) {
 //				// code here...
-//				Term::Wsize width, height;
-//				Term::get_terminal_size(width, height);
+//				xns::terminal::term_size width, height;
+//				xns::terminal::get_terminal_size(width, height);
 //
 //				using Split = SplitWindow<S>;
 //
-//				_root.make<Split>(Xf::Rect{0, 0, width, height});
+//				_root = xns::make_unique<Split>(xns::rect<term_size>{0, 0, width, height});
 //
 //			}
 //
@@ -82,7 +84,7 @@
 //
 //			// -- P R I V A T E  M E M B E R S --------------------------------
 //
-//			static UniquePtr<WindowBase> _root;
+//			static xns::unique_ptr<WindowBase> _root;
 //
 //
 //	};
@@ -611,14 +613,14 @@
 //			/* parent */
 //			Win* _parent;
 //	};
-//
-//
-//
-//
-//
-//
-//
-//
-//}
+
+
+
+
+
+
+
+
+}
 
 #endif
