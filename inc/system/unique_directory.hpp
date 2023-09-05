@@ -47,18 +47,16 @@ namespace xns {
 
 			/* string constructor */
 			template <typename T>
-			inline explicit unique_directory(const T& path) noexcept {
+			inline explicit unique_directory(const T& path) noexcept
+			: _directory{::opendir(path.data())} {
 				// check T is a string type
 				static_assert(xns::is_string<T>,
 					"): UNIQUE_DIRECTORY: T must be a string type :(");
-				// open directory
-				_directory = ::opendir(path.data());
 			}
 
 			/* pointer constructor */
-			inline explicit unique_directory(const char* path) noexcept {
-				// open directory
-				_directory = ::opendir(path);
+			inline explicit unique_directory(const char* path) noexcept
+			: _directory{::opendir(path)} {
 			}
 
 			/* move constructor */
