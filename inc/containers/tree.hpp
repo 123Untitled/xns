@@ -13,6 +13,7 @@
 #include "math.hpp"
 #include "memory.hpp"
 #include "swap.hpp"
+#include "conversions.hpp"
 
 
 
@@ -53,25 +54,25 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = xns::tree<T>;
+			using self            = xns::tree<T>;
 
 			/* value type */
-			using value_type = T;
+			using value_type      = T;
 
 			/* node type */
-			using node_type = self::node;
+			using node_type       = self::node;
 
 			/* allocator type */
-			using allocator = xns::memory::pool<node_type>;
+			using allocator       = xns::memory::pool<node_type>;
 
 			/* node pointer */
-			using node_pointer = node_type*;
+			using node_pointer    = node_type*;
 
 			/* reference type */
-			using reference = value_type&;
+			using reference       = value_type&;
 
 			/* move reference type */
-			using move_reference = value_type&&;
+			using move_reference  = value_type&&;
 
 			/* pointer type */
 			using mutable_pointer = value_type*;
@@ -103,6 +104,9 @@ namespace xns {
 			/* in-order iterator */
 			using in_order_iterator         = iterator<xns::in_order>;
 
+			/* reverse in-order iterator */
+			using reverse_in_order_iterator = iterator<xns::rev_in_order>;
+
 			/* post-order iterator */
 			using post_order_iterator       = iterator<xns::post_order>;
 
@@ -114,6 +118,9 @@ namespace xns {
 
 			/* const in-order iterator */
 			using const_in_order_iterator   = const_iterator<xns::in_order>;
+
+			/* const reverse in-order iterator */
+			using const_reverse_in_order_iterator = const_iterator<xns::rev_in_order>;
 
 			/* const post-order iterator */
 			using const_post_order_iterator = const_iterator<xns::post_order>;
@@ -200,9 +207,9 @@ namespace xns {
 			auto operator=(self&& other) noexcept -> self& {
 				// check for self-assignment
 				if (this != &other) {
-					// destroy and deallocate tree
+					// deallocate tree
 					free_tree();
-					// move other tree
+					// move other members
 					_root    = other._root;
 					_upper   = other._upper;
 					_lower   = other._lower;
@@ -228,6 +235,12 @@ namespace xns {
 				return in_order_iterator{_root};
 			}
 
+			/* reverse in-order iterator begin */
+			inline auto reverse_in_order_begin(void) noexcept -> reverse_in_order_iterator {
+				// return iterator to root
+				return reverse_in_order_iterator{_root};
+			}
+
 			/* post-order iterator begin */
 			inline auto post_order_begin(void) noexcept -> post_order_iterator {
 				// return iterator to root
@@ -250,6 +263,12 @@ namespace xns {
 			inline auto in_order_begin(void) const noexcept -> const_in_order_iterator {
 				// return iterator to root
 				return const_in_order_iterator{_root};
+			}
+
+			/* const reverse in-order iterator begin */
+			inline auto reverse_in_order_begin(void) const noexcept -> const_reverse_in_order_iterator {
+				// return iterator to root
+				return const_reverse_in_order_iterator{_root};
 			}
 
 			/* const post-order iterator begin */
@@ -335,24 +354,24 @@ namespace xns {
 			}
 
 			/* const find */
-			template <typename K>
-			auto find(const K& value) const noexcept -> const node_pointer {
-				// assert K is comparable to T
-				static_assert(xns::is_comparable<K, T>,
-					"): TREE: K must be comparable to T :(");
-				// get root node
-				node_pointer node = _root;
-				// loop over tree
-				while (node != nullptr) {
-					// less compare
-					if      (value < node->_value) { node = node->_left;  }
-					// greater compare
-					else if (value > node->_value) { node = node->_right; }
-					// value found
-					else                           { break; }
-				} // return node
-				return node;
-			}
+			//template <typename K>
+			//auto find(const K& value) const noexcept -> const node_pointer {
+			//	// assert K is comparable to T
+			//	static_assert(xns::is_comparable<K, T>,
+			//		"): TREE: K must be comparable to T :(");
+			//	// get root node
+			//	node_pointer node = _root;
+			//	// loop over tree
+			//	while (node != nullptr) {
+			//		// less compare
+			//		if      (value < node->_value) { node = node->_left;  }
+			//		// greater compare
+			//		else if (value > node->_value) { node = node->_right; }
+			//		// value found
+			//		else                           { break; }
+			//	} // return node
+			//	return node;
+			//}
 
 
 
@@ -366,7 +385,7 @@ namespace xns {
 			auto insert(U&& value) -> void {
 
 				// assert U is same as T
-				static_assert(xns::is_same<xns::remove_reference<U>, T>,
+				static_assert(xns::is_same<xns::remove_cvr<U>, T>,
 					"): TREE: BAD INSERT TYPE :(");
 
 
@@ -453,47 +472,6 @@ namespace xns {
 			}
 
 
-			auto full_balance(void) {
-
-				for (auto it = post_order_begin(); it != nullptr; ++it) {
-					it._node->update_depth();
-				}
-
-				for (auto it = post_order_begin(); it != nullptr; ++it) {
-					balance(it._node);
-				}
-			}
-
-			auto is_balanced(void) const {
-
-				for (auto it = pre_order_begin(); it != nullptr; ++it) {
-					if (it._node->balance_factor() > 1 || it._node->balance_factor() < -1) {
-						throw std::runtime_error("tree is not balanced");
-					}
-				}
-				return true;
-			}
-
-			auto is_sorted(void) const {
-
-
-				const value_type* last = nullptr;
-
-				auto it = in_order_begin();
-				if (it) {
-					last = &*it;
-					++it;
-				}
-				while (it) {
-					if (*last > *it) {
-						throw std::runtime_error("tree is not sorted");
-					}
-					last = &*it;
-					++it;
-				}
-				return true;
-			}
-
 
 			//template <typename... A>
 			//auto emplace(A&&... args) -> void {
@@ -549,8 +527,6 @@ namespace xns {
 				// check pointer validity
 				if (node == nullptr) { return; }
 
-				//if (node == _root) {return;}
-
 				node_pointer parent = node->_parent;
 
 
@@ -559,6 +535,7 @@ namespace xns {
 				if (node->has_left()) {
 					// two children case
 					if (node->has_right()) {
+						return;
 						std::cout << "two children case" << std::endl;
 						node_pointer lhigh = node->_left;
 
@@ -597,26 +574,6 @@ namespace xns {
 
 						}
 
-						//balance(lhigh);
-
-
-
-				// iterate from bottom to top
-				auto it = post_order_begin();
-
-				while (it) {
-					it._node->update_depth();
-					++it;
-				}
-
-				auto it2 = post_order_begin();
-
-				while (it2) {
-					balance(it2._node);
-					++it2;
-				}
-
-
 
 
 
@@ -640,25 +597,27 @@ namespace xns {
 					}
 					// only left child case
 					else {
+						return;
 
 						std::cout << "only left child case" << std::endl;
 						// get parent's side
 						*get_side(node) = node->_left;
 						// set left child's parent to parent
 						node->_left->_parent = node->_parent;
-						balance(node->_left);
+						//balance(node->_left);
 					}
 				}
 				else {
 					// only right child case
 					if (node->has_right()) {
+						return;
 
 						std::cout << "only right child case" << std::endl;
 						// get parent's side
 						*get_side(node) = node->_right;
 						// set right child's parent to parent
 						node->_right->_parent = node->_parent;
-						balance(node->_right);
+						//balance(node->_right);
 					}
 					// no children case
 					else {
@@ -667,57 +626,19 @@ namespace xns {
 						if (parent) {
 							balance(parent);
 						}
+						exit(0);
 					}
 				}
 
-
-				_store(node);
+				allocator::store(node);
 				--_size;
-
-
-
-				/*
-				if (parent != _root) {
-					balance(parent);
-				}*/
-
+				std::cout << "\x1b[32mEND OF ERASE\x1b[0m" << std::endl;
 			}
 
 
 
 
 
-
-
-
-
-
-			/* iterator depth */
-			template <is_bst_iterator I>
-			size_type depth(const I& it) const noexcept {
-				// return depth of iterator
-				return it._node->_depth;
-			}
-
-			/* node depth */
-			size_type depth(const node_pointer& node) const noexcept {
-				// return depth of node
-				return node->_depth;
-			}
-
-
-			/* iterator level */
-			template <is_bst_iterator I>
-			size_type level(const I& it) const noexcept {
-				// return level of iterator
-				return it._node->_level;
-			}
-
-			/* node level */
-			size_type level(const node_pointer& node) const noexcept {
-				// return level of node
-				return node->_level;
-			}
 
 			/* get root */
 			node_pointer root(void) noexcept {
@@ -782,6 +703,8 @@ namespace xns {
 					const xns::s64 balance =
 						static_cast<xns::s64>(ld) -
 						static_cast<xns::s64>(rd);
+
+					// std::cout << "balance: " << balance << " | " << node->_value << std::endl;
 
 					// exit if balanced
 					if (balance == BALANCED) { break; }
@@ -924,12 +847,9 @@ namespace xns {
 			// -- display -----------------------------------------------------
 
 			/* print tree */
-			void print(typename printer::scallback scall,
-					   typename printer::vcallback vcall) noexcept {
+			inline auto print(void) -> void {
 				// instantiate printer
-				class printer p{*this, scall, vcall};
-				// display tree
-				p.display();
+				printer{*this}.display();
 			}
 
 			/* clear */
@@ -982,10 +902,6 @@ namespace xns {
 					// update depth
 					update_depth(node);
 				}
-			}
-
-			/* update level */
-			static void _update_level(node_pointer node) noexcept {
 			}
 
 
@@ -1084,9 +1000,6 @@ namespace xns {
 				lnode->_parent = root;
 
 
-
-				///////////////////////////////
-
 				root->_parent = node->_parent;
 				*get_side(node) = root;
 
@@ -1108,7 +1021,7 @@ namespace xns {
 
 			/* right left rotation */
 			auto rl_rotate(node_pointer node) noexcept -> void {
-				 // std::cout << "\x1b[31mRL ROTATION\x1b[0m" << std::endl;
+				// std::cout << "\x1b[31mRL ROTATION\x1b[0m" << std::endl;
 
 				auto rnode = node->_right;
 
@@ -1466,76 +1379,32 @@ namespace xns {
 			/* tree type */
 			using tree_type = xns::tree<T>;
 
-			/* size callback */
-			using scallback = xns::function<xns::size_t(const_reference)>;
 
-			/* value callback */
-			using vcallback = xns::function<xns::string(const_reference)>;
-
-
-			// -- constructors ------------------------------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* deleted default constructor */
 			printer(void) = delete;
 
 			/* tree constructor */
-			printer(xns::tree<T>& tree, scallback size, vcallback value)
-			: _tree{tree}, _scall{size}, _vcall{value} {
-				// do nothing...
-			}
+			inline printer(xns::tree<T>& tree) noexcept
+			: _tree{tree}, _nodes{}, _matrix{} {}
 
 			/* non-assignable class */
 			NON_ASSIGNABLE(printer);
 
 			/* destructor */
-			~printer(void) noexcept = default;
+			inline ~printer(void) noexcept = default;
 
 
+			// -- public methods ----------------------------------------------
+
+			/* display tree */
 			void display(void) {
-
-
-				struct node_info {
-
-					// -- public lifecycle ------------------------------------
-
-					/* default constructor */
-					node_info(void) noexcept
-					: parent{nullptr}, left{nullptr}, right{nullptr},
-					level{0}, pos{0}, depth{0}, value{} {}
-
-					/* members constructor */
-					node_info(node_info* parent, node_info* left, node_info* right,
-							  xns::size_t level, xns::s64 pos, xns::size_t depth, xns::string value)
-					: parent{parent}, left{left}, right{right},
-					level{level}, pos{pos}, depth{depth}, value{value} {}
-
-					/* non-assignable struct */
-					//NON_ASSIGNABLE(node_info);
-
-					/* destructor */
-					~node_info(void) noexcept = default;
-
-
-					// -- public members --------------------------------------
-
-					node_info* parent;
-					node_info* left;
-					node_info* right;
-
-					xns::size_t level;
-					xns::s64 pos;
-					xns::size_t depth;
-					xns::string value;
-
-				};
-
-
-				xns::vector<node_info> nodes;
-				nodes.reserve(_tree.size());
-
 
 				// check root
 				if (_tree._root == nullptr) { return; }
+
+				_nodes.reserve(_tree.size());
 
 
 				xns::s64 p_min = 0;
@@ -1543,12 +1412,11 @@ namespace xns {
 
 				xns::size_t levels = 0;
 
-				xns::queue<xns::tuple<node_pointer,
-										node_info*>> queue;
+				xns::queue<xns::tuple<node_pointer, node_info*>> queue;
 
-				nodes.emplace_back();
+				_nodes.emplace_back();
 
-				queue.enqueue(_tree._root, &nodes.back());
+				queue.emplace(_tree._root, &_nodes.back());
 
 
 				while (not queue.empty()) {
@@ -1559,7 +1427,7 @@ namespace xns {
 					auto node = xns::get<node_pointer>(tuple);
 					auto info = xns::get<node_info*>(tuple);
 
-					info->value = _vcall.call(node->_value);
+					info->value = xns::to_string(node->_value);
 					info->depth = node->_depth;
 
 
@@ -1567,7 +1435,7 @@ namespace xns {
 					if (node->_left) {
 						auto width = _tree.subsize(node->_left->_right) + 1;
 						auto pos = info->pos - static_cast<xns::s64>(width);
-						nodes.emplace_back( info, // parent
+						_nodes.emplace_back( info, // parent
 											nullptr, // left
 											nullptr, // right
 											info->level + 1, // level
@@ -1575,14 +1443,14 @@ namespace xns {
 											0U, // depth
 											xns::string{});
 
-						queue.enqueue({ node->_left, &nodes.back() });
-						info->left = &nodes.back();
+						queue.emplace(node->_left, &_nodes.back());
+						info->left = &_nodes.back();
 					}
 
 					if (node->_right) {
 						auto width = _tree.subsize(node->_right->_left) + 1;
 						auto pos = info->pos + static_cast<xns::s64>(width);
-						nodes.emplace_back( info, // parent
+						_nodes.emplace_back( info, // parent
 											nullptr, // left
 											nullptr, // right
 											info->level + 1, // level
@@ -1590,8 +1458,8 @@ namespace xns {
 											0U, // depth
 											xns::string{});
 
-						queue.enqueue({ node->_right, &nodes.back() });
-						info->right = &nodes.back();
+						queue.emplace(node->_right, &_nodes.back());
+						info->right = &_nodes.back();
 
 					}
 
@@ -1612,34 +1480,38 @@ namespace xns {
 
 
 				// compute positions
-				for (auto& node : nodes) {
+				for (auto& node : _nodes) {
 					node.pos += p_min;
 					node.pos *= X_OFFSET;
 					//node.level *= Y_OFFSET;
-					node.level = (levels+1 - node.depth) * Y_OFFSET;
+					node.level = (levels + 1 - node.depth) * Y_OFFSET;
 				}
-
-
-				// matrix
-				xns::vector<xns::string32> matrix;
-
 
 
 				levels *= Y_OFFSET;
-				width *= X_OFFSET;
+				width  *= X_OFFSET;
 				++width;
 				++levels;
 
-				matrix.reserve(levels);
+				_matrix.reserve(levels);
 
 				// fill matrix with spaces
 				for (size_type y = 0; y < levels; ++y) {
-					matrix.emplace_back(U' ', width);
+					_matrix.emplace_back(U' ', width);
 				}
 
 
+				fill_matrix();
+				render();
+			}
+
+
+			/* fill matrix */
+			auto fill_matrix(void) -> void {
+
+
 				// loop over nodes
-				for (auto& node : nodes) {
+				for (auto& node : _nodes) {
 
 					size_type x = node.pos;
 					size_type y = node.level;
@@ -1652,14 +1524,14 @@ namespace xns {
 
 						// draw horizontal line
 						for (size_type i = lx + 1; i < x + 1; ++i) {
-							matrix[y + 1][i] = _branch[HL];
+							_matrix[y + 1][i] = _branch[HL];
 						}
 						// draw vertical line
 						for (size_type i = y + 2; i < ly; ++i) {
-							matrix[i][lx] = _branch[VL];
+							_matrix[i][lx] = _branch[VL];
 						}
 						// draw left corner
-						matrix[y + 1][lx] = _branch[TL];
+						_matrix[y + 1][lx] = _branch[TL];
 					}
 
 
@@ -1670,296 +1542,146 @@ namespace xns {
 
 						// draw horizontal line
 						for (size_type i = x + 1; i < rx; ++i) {
-							matrix[y + 1][i] = _branch[HL];
+							_matrix[y + 1][i] = _branch[HL];
 						}
 						// draw vertical line
 						for (size_type i = y + 2; i < ry; ++i) {
-							matrix[i][rx] = _branch[VL];
+							_matrix[i][rx] = _branch[VL];
 						}
 						// draw right corner
-						matrix[y + 1][rx] = _branch[TR];
+						_matrix[y + 1][rx] = _branch[TR];
 					}
 
 
 					if (node.left != nullptr || node.right != nullptr) {
 
 						if (node.left != nullptr && node.right != nullptr) {
-							matrix[y + 1][x] = _branch[BB];
+							_matrix[y + 1][x] = _branch[BB];
 						}
 						else if (node.left != nullptr) {
-							matrix[y + 1][x] = _branch[BR];
+							_matrix[y + 1][x] = _branch[BR];
 						}
 						else if (node.right != nullptr) {
-							matrix[y + 1][x] = _branch[BL];
+							_matrix[y + 1][x] = _branch[BL];
 						}
 					}
 
 					auto& value = node.value;
 
-					if (value.size()) {
+					if (value.empty() == true) {
+						_matrix[y][x] = '?';
+						continue;
+					}
 
-						size_type size = value.size();
-						size_type offset = size / 2;
 
-						if (x > offset) {
-							for (size_type i = 0; i < size; ++i) {
-								matrix[y][x - offset + i] = static_cast<char32_t>(value[i]);
-							}
+					size_type size = value.size();
+					size_type offset = size / 2;
+
+					if (x > offset) {
+						for (size_type i = 0; i < size; ++i) {
+							_matrix[y][x - offset + i] = static_cast<char32_t>(value[i]);
 						}
-						else {
-							for (size_type i = 0; i < size; ++i) {
-								matrix[y][i] = static_cast<char32_t>(value[i]);
-							}
-						}
-
 					}
 					else {
-						matrix[y][x] = '_';
+						for (size_type i = 0; i < size; ++i) {
+							_matrix[y][i] = static_cast<char32_t>(value[i]);
+						}
 					}
-
 				}
-
-
-
-
-
-				// print matrix
-				for (xns::vector<xns::string>::size_type _ = 0; _ < matrix.size(); ++_) {
-					xns::print(matrix[_], '\n');
-				}
-				xns::out::render();
-
-
 			}
 
 
 
+			/* render */
+			inline auto render(void) -> void {
+				// print matrix
+				for (const xns::u32string& line : _matrix) {
+					xns::print(line, '\n');
+				} // render
+				xns::out::render();
+			}
 
-
-
-
-
-			// void display(void) {
-			//
-			// 	// check root
-			// 	if (_tree._root == nullptr) { return; }
-			//
-			//
-			// 	using pos = decltype(_tree._root->_pos);
-			//
-			// 	// parent pos
-			// 	pos p_pos = 0;
-			//
-			// 	xns::s64 smin = 0, smax = 0;
-			//
-			// 	xns::size_t level = 0;
-			//
-			// 	_tree._root->_pos = 0;
-			//
-			//
-			// 	{
-			// 		// bfs node constructor
-			// 		const_pre_order_iterator it{_tree._root};
-			//
-			// 		// loop over tree (skip root)
-			// 		for (++it; it != nullptr; ++it) {
-			//
-			// 			// get parent position
-			// 			p_pos = it.parent()->_pos;
-			//
-			// 			// check node is left child
-			// 			if (it.is_left()) {
-			// 				auto width = _tree.subsize(it.right());
-			// 				it._node->_pos = p_pos - static_cast<pos>(width + 1);
-			// 			}
-			// 			// check node is right child
-			// 			else if (it.is_right()) {
-			// 				auto width = _tree.subsize(it.left());
-			// 				it._node->_pos = p_pos + static_cast<pos>(width + 1);
-			// 			}
-			//
-			// 			// update min position
-			// 			if (it._node->_pos < smin) {
-			// 				smin = it._node->_pos;
-			// 			}
-			// 			// update max position
-			// 			if (it._node->_pos > smax) {
-			// 				smax = it._node->_pos;
-			// 			}
-			// 			//level = it._node->_level;
-			//
-			// 		}
-			//
-			// 	}
-			//
-			//
-			// 	// compensate for negative min
-			// 	smin *= -1;
-			// 	xns::size_t max =
-			// 		static_cast<xns::u64>(smax) +
-			// 		static_cast<xns::u64>(smin);
-			//
-			// 	// matrix
-			// 	xns::string32 unicode;
-			//
-			// 	xns::vector<xns::string32> matrix;
-			//
-			// 	// root start at level 0, so add 1
-			// 	//++level;
-			//
-			// 	level = _tree._root->_depth;
-			//
-			// 	++max;
-			//
-			// 	level *= Y_OFFSET;
-			// 	max *= X_OFFSET;
-			//
-			// 	level -= (Y_OFFSET - 1);
-			//
-			// 	matrix.reserve(level);
-			//
-			// 	// fill matrix with spaces
-			// 	for (size_type y = 0; y < level; ++y) {
-			// 		matrix.emplace_back(U' ', max);
-			// 	}
-			//
-			//
-			// 	// declare all positions
-			// 	size_type x = 0, y = 0, lx = 0, ly = 0, rx = 0, ry = 0;
-			//
-			//
-			// 	const_bfs_iterator it{_tree._root};
-			//
-			// 	for (; it != nullptr; ++it) {
-			//
-			// 		// get node position
-			// 		x = static_cast<size_type>((it.xpos() + smin)) * X_OFFSET;
-			// 		// y = it.level()         * Y_OFFSET;
-			// 		y = (_tree._root->_depth - it.depth())         * Y_OFFSET;
-			//
-			// 		// check if left
-			// 		if (it.has_left()) {
-			//
-			// 			// get left position
-			// 			lx = static_cast<size_type>((it.left()->xpos() + smin)) * X_OFFSET;
-			// 			// ly = it.left()->level()         * Y_OFFSET;
-			// 			ly = (_tree._root->_depth - it.left()->depth())         * Y_OFFSET;
-			//
-			//
-			// 			// draw horizontal line
-			// 			for (size_type i = lx + 1; i < x + 1; ++i) {
-			// 				matrix[y + 1][i] = _branch[HL];
-			// 			}
-			// 			// draw vertical line
-			// 			for (size_type i = y + 2; i < ly; ++i) {
-			// 				matrix[i][lx] = _branch[VL];
-			// 			}
-			// 			// draw left corner
-			// 			matrix[y + 1][lx] = _branch[TL];
-			// 		}
-			//
-			// 		if (it.has_right()) {
-			//
-			// 			// get right position
-			// 			rx = static_cast<size_type>((it.right()->xpos() + smin)) * X_OFFSET;
-			// 			// ry = it.right()->level()         * Y_OFFSET;
-			// 			ry = (_tree._root->_depth - it.right()->depth())         * Y_OFFSET;
-			//
-			// 			// draw horizontal line
-			// 			for (size_type i = x + 1; i < rx; ++i) {
-			// 				matrix[y + 1][i] = _branch[HL];
-			// 			}
-			// 			// draw vertical line
-			// 			for (size_type i = y + 2; i < ry; ++i) {
-			// 				matrix[i][rx] = _branch[VL];
-			// 			}
-			// 			// draw right corner
-			// 			matrix[y + 1][rx] = _branch[TR];
-			// 		}
-			//
-			// 		if (it.has_child()) {
-			//
-			// 			if (it.is_binary()) {
-			// 				matrix[y + 1][x] = _branch[BB];
-			// 			}
-			// 			else if (it.has_left()) {
-			// 				matrix[y + 1][x] = _branch[BR];
-			// 			}
-			// 			else if (it.has_right()) {
-			// 				matrix[y + 1][x] = _branch[BL];
-			// 			}
-			// 		}
-			// 		else {
-			// 			// move y down to align all leaf nodes
-			// 			/*for (size_type i = y; i < level - 1; ++i) {
-			// 				matrix[i][x] = _branch[VL];
-			// 			}
-			// 			y += level - y - 1;
-			// 			*/
-			//
-			// 		}
-			//
-			//
-			// 		xns::string value = _vcall.call(it._node->_value);
-			// 		//xns::string value;
-			// 		//auto npos = it4._node->_pos;
-			// 		//auto npos = _tree.endpoints(ptr);
-			// 		//value.to_string(it._node->balance_factor());
-			// 		/*
-			// 		   value.to_string(it._node->_level);
-			// 		   */
-			// 		//value.to_string(_tree._root->_depth - it.depth());
-			// 		//value.append(" ");
-			// 		//xns::string d;
-			// 		//value.to_string(it._node->_depth);
-			// 		//value.append(d);
-			//
-			//
-			// 		if (value.size()) {
-			// 			size_type size = value.size();
-			// 			size_type offset = size / 2;
-			//
-			// 			if (x > offset) {
-			// 				for (size_type i = 0; i < size; ++i) {
-			// 					matrix[y][x - offset + i] = static_cast<char32_t>(value[i]);
-			// 				}
-			// 			}
-			// 			else {
-			// 				for (size_type i = 0; i < size; ++i) {
-			// 					matrix[y][i] = static_cast<char32_t>(value[i]);
-			// 				}
-			// 			}
-			//
-			// 		}
-			// 		else {
-			// 			matrix[y][x] = '_';
-			// 		}
-			// 	}
-			//
-			// 	// print matrix
-			// 	for (xns::vector<xns::string>::size_type _ = 0; _ < matrix.size(); ++_) {
-			// 		xns::out::write(matrix[_]);
-			// 		xns::out::newline();
-			// 	}
-			// 	xns::out::render();
-			// }
 
 
 		private:
+
+
+			// -- private structs ---------------------------------------------
+
+			/* node info */
+			struct node_info final {
+
+				// -- public lifecycle ------------------------------------
+
+				/* default constructor */
+				node_info(void) noexcept
+				: parent{nullptr}, left{nullptr}, right{nullptr},
+				level{0}, pos{0}, depth{0}, value{} {}
+
+				/* members constructor */
+				node_info(node_info* parent, node_info* left, node_info* right,
+							xns::size_t level, xns::s64 pos, xns::size_t depth, xns::string value)
+				: parent{parent}, left{left}, right{right},
+				level{level}, pos{pos}, depth{depth}, value{value} {}
+
+				/* move constructor */
+				node_info(node_info&& other) noexcept = default;
+
+				/* non-copyable struct */
+				NON_COPYABLE(node_info);
+
+				/* destructor */
+				~node_info(void) noexcept = default;
+
+
+				// -- public members --------------------------------------
+
+				node_info* parent;
+				node_info* left;
+				node_info* right;
+
+				xns::size_t level;
+				xns::s64 pos;
+				xns::size_t depth;
+				xns::string value;
+
+			};
+
 
 			// -- private members ---------------------------------------------
 
 			/* tree reference */
 			xns::tree<T>& _tree;
 
-			/* size callback */
-			scallback _scall;
+			/* nodes */
+			xns::vector<node_info> _nodes;
 
-			/* value callback */
-			vcallback _vcall;
-
+			/* matrix */
+			xns::vector<xns::u32string> _matrix;
 
 	};
+
+
+	template <typename T>
+	auto check_tree(const xns::tree<T>& tree) -> void {
+		std::cout << "check tree\n";
+		// check balance factor
+		for (auto it = tree.pre_order_begin(); it != nullptr; ++it) {
+			if (it.balance_factor() > 1
+				|| it.balance_factor() < -1)
+				throw std::runtime_error("tree is not balanced");
+		}
+		// check sorted
+		const T* last = nullptr;
+		auto it = tree.in_order_begin();
+		if (it) { last = &*it; ++it; }
+		while (it) {
+			if (*last > *it)
+				throw std::runtime_error("tree is not sorted");
+			last = &*it;
+			++it;
+		}
+	}
 
 
 }
