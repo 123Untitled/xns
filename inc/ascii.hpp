@@ -65,7 +65,7 @@ namespace xns {
 		private:
 
 			/* whitespace map */ // 'space', 'tab', 'line feed', 'vertical tab', 'form feed', 'carriage return'
-			static constexpr xns::literal_map<char,
+			/*static constexpr xns::literal_map<char,
 							 "space",
 							 "tab",
 							 "line feed",
@@ -75,11 +75,12 @@ namespace xns {
 								 ' ', '\t', '\n', '\v', '\f', '\r'
 
 							 };
+							 */
 
 			template <class T>
 			void test(void) {
 
-				std::cout << _whitespaces.get<"space">() << std::endl;
+				//std::cout << _whitespaces.get<"space">() << std::endl;
 
 
 			}
