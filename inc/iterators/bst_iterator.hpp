@@ -26,6 +26,9 @@ namespace xns {
 	/* in-order traversal */
 	struct in_order   final {};
 
+	/* reverse in-order traversal */
+	struct rev_in_order final {};
+
 	/* pre-order traversal */
 	struct pre_order  final {};
 
@@ -38,7 +41,8 @@ namespace xns {
 
 	/* traversal order concept */
 	template <class T>
-	concept traversal_order = xns::is_one_of<T, pre_order, in_order, post_order, bfs_order>;
+	concept traversal_order = xns::is_one_of<T, pre_order, in_order, rev_in_order,
+			post_order, bfs_order>;
 
 
 	// -- tree iterator traits ------------------------------------------------
@@ -117,55 +121,53 @@ namespace xns {
 			// -- constructors ------------------------------------------------
 
 			/* default constructor */
-			bst_iterator(void) noexcept
-			: _node{nullptr}, _container{} {
-				// nothing to do...
-			}
+			inline bst_iterator(void) noexcept
+			: _node{nullptr}, _container{} {}
 
 			/* const copy constructor */
-			bst_iterator(const bst_iterator<T, O, true>& other) noexcept
+			inline bst_iterator(const bst_iterator<T, O, true>& other)
 			: _node{other._node}, _container{other._container} {
 				// assert invalid conversion
 				static_assert(_const, "): CAN'T COPY CONST BTS ITERATOR TO NON-CONST :(");
 			}
 
 			/* non-const copy constructor */
-			bst_iterator(const bst_iterator<T, O, false>& other) noexcept
-			: _node{other._node}, _container{other._container} {
-				// nothing to do...
-			}
+			inline bst_iterator(const bst_iterator<T, O, false>& other)
+			: _node{other._node}, _container{other._container} {}
 
 			/* const move constructor */
-			bst_iterator(bst_iterator<T, O, true>&& other) noexcept
+			inline bst_iterator(bst_iterator<T, O, true>&& other) noexcept
 			: _node{other._node}, _container{xns::move(other._container)} {
 				// assert invalid conversion
 				static_assert(_const, "): CAN'T MOVE CONST BTS ITERATOR TO NON-CONST :(");
+				// invalidate other
+				other._node = nullptr;
 			}
 
 			/* non-const move constructor */
-			bst_iterator(bst_iterator<T, O, false>&& other) noexcept
+			inline bst_iterator(bst_iterator<T, O, false>&& other) noexcept
 			: _node{other._node}, _container{xns::move(other._container)} {
-				// nothing to do...
+				// invalidate other
+				other._node = nullptr;
 			}
 
 
 
-			/* node pre-order constructor */
-			bst_iterator(node_pointer node) noexcept requires(xns::is_same<order_type, pre_order>)
+			/* pre-order constructor */
+			bst_iterator(node_pointer node)
+				requires(xns::is_same<order_type, pre_order>)
 			: _node{node}, _container{} {
-				// stack nodes
-				if (_node) {
-					if (_node->_right != nullptr) {
-						_container.push(_node->_right);
-					}
-					if (_node->_left != nullptr) {
-						_container.push(_node->_left);
-					}
-				}
+				// check for null node
+				if (_node == nullptr) return;
+				// push right
+				if (_node->_right != nullptr) { _container.push(_node->_right); }
+				// push left
+				if (_node->_left != nullptr)  { _container.push(_node->_left);  }
 			}
 
-			/* node in-order constructor */
-			bst_iterator(node_pointer node) noexcept requires(xns::is_same<order_type, in_order>)
+			/* in-order constructor */
+			bst_iterator(node_pointer node)
+				requires(xns::is_same<order_type, in_order>)
 			: _node{node}, _container{} {
 
 				// check for null node
@@ -188,8 +190,9 @@ namespace xns {
 
 			}
 
-			/* node post-order constructor */
-			bst_iterator(node_pointer node) noexcept requires(xns::is_same<order_type, post_order>)
+			/* post-order constructor */
+			bst_iterator(node_pointer node)
+				requires(xns::is_same<order_type, post_order>)
 			: _node{node}, _container{} {
 
 				// check for null node
@@ -208,47 +211,65 @@ namespace xns {
 				_container.pop();
 			}
 
-			/* node breadth-first constructor */
-			bst_iterator(node_pointer node) noexcept requires(xns::is_same<order_type, bfs_order>)
+			/* breadth-first constructor */
+			bst_iterator(node_pointer node)
+				requires(xns::is_same<order_type, bfs_order>)
 			: _node{node}, _container{} {
-				// enqueue nodes
-				if (_node) {
-					if (_node->_left != nullptr) {
-						_node->_left->_level = _node->_level + 1;
-						_container.enqueue(_node->_left);
-					}
-					if (_node->_right != nullptr) {
-						_node->_right->_level = _node->_level + 1;
-						_container.enqueue(_node->_right);
-					}
+				// check for null node
+				if (_node == nullptr) return;
+				// enqueue left
+				if (_node->_left != nullptr)  { _container.enqueue(_node->_left);  }
+				// enqueue right
+				if (_node->_right != nullptr) { _container.enqueue(_node->_right); }
+			}
+
+
+			/* reverse in-order constructor */
+			bst_iterator(node_pointer node)
+				requires(xns::is_same<order_type, rev_in_order>)
+			: _node{node}, _container{} {
+
+				// check for null node
+				if (_node == nullptr) return;
+
+				// stack nodes
+				while (_node != nullptr) {
+					_container.push(_node);
+					_node = _node->_right;
+				}
+				_node = _container.top();
+				_container.pop();
+
+				node_pointer tmp = _node->_left;
+				while (tmp != nullptr) {
+					_container.push(tmp);
+					tmp = tmp->_right;
 				}
 			}
 
+
+
 			/* destructor */
-			~bst_iterator(void) noexcept = default;
+			inline ~bst_iterator(void) noexcept = default;
 
 
-			// -- assignment operators ----------------------------------------
+			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			self& operator=(const self& other) noexcept {
-				// check for self-assignment
-				if (this != &other) {
-					// copy data
-					 _node = other._node;
-					_container = other._container;
-				} // return self reference
+			inline auto operator=(const self& other) -> self& {
+				// copy data
+				_node = other._node;
+				_container = other._container;
+				// return self reference
 				return *this;
 			}
 
 			/* move assignment operator */
-			self& operator=(self&& other) noexcept {
-				// check for self-assignment
-				if (this != &other) {
-					// move data
-					 _node = other._node;
-					_container = xns::move(other._container);
-				} // return self reference
+			inline auto operator=(self&& other) noexcept -> self& {
+				// move data
+				_node = other._node;
+				_container = xns::move(other._container);
+				// return self reference
 				return *this;
 			}
 
@@ -256,31 +277,30 @@ namespace xns {
 			// -- increment operators -----------------------------------------
 
 			/* pre-increment pre-order operator */
-			self& operator++(void) noexcept requires(xns::is_same<order_type, pre_order>) {
+			auto operator++(void) -> self&
+				requires(xns::is_same<order_type, pre_order>) {
 
-				// check if stack is empty
-				if (_container.empty()) { _node = nullptr; }
-				else {
+				// check if stack is not empty
+				if (not _container.empty()) {
 					// get top node
 					_node = _container.top();
 					// pop node
 					_container.pop();
 
 					// push right child
-					if (_node->_right != nullptr) {
-						_container.push(_node->_right);
-					}
+					if (_node->_right != nullptr) { _container.push(_node->_right); }
 					// push left child
-					if (_node->_left != nullptr) {
-						_container.push(_node->_left);
-					}
+					if (_node->_left != nullptr)  { _container.push(_node->_left);  }
 				}
+				else _node = nullptr;
+				// return self reference
 				return *this;
 			}
 
 
 			/* pre-increment in-order operator */
-			self& operator++(void) noexcept requires(xns::is_same<order_type, in_order>) {
+			auto operator++(void) -> self&
+				requires(xns::is_same<order_type, in_order>) {
 
 				// check if stack is empty
 				if (_container.empty()) { _node = nullptr; }
@@ -302,7 +322,8 @@ namespace xns {
 
 
 			/* pre-increment post-order operator */
-			self& operator++(void) noexcept requires(xns::is_same<order_type, post_order>) {
+			auto operator++(void) -> self&
+				requires(xns::is_same<order_type, post_order>) {
 
 				// check if stack is empty
 				if (_container.empty()) { _node = nullptr; }
@@ -321,96 +342,103 @@ namespace xns {
 							else
 								node = node->_right;
 						}
-						//_node = _container.top();
-						//_container.pop();
 					}
-					//else {
-						_node = _container.top();
-						_container.pop();
-					//}
+					_node = _container.top();
+					_container.pop();
 				}
 
 				return *this;
 			}
 
 
-			/* post-increment breadth operator */
-			self& operator++(void) noexcept requires(xns::is_same<order_type, bfs_order>) {
-				// check if queue is empty
-				if (_container.empty()) { _node = nullptr; }
-				else {
+			/* pre-increment breadth-first operator */
+			auto operator++(void) -> self&
+				requires(xns::is_same<order_type, bfs_order>) {
+
+				// check if queue not empty
+				if (not _container.empty()) {
+
 					// get next node
 					_node = _container.next();
 					// dequeue node
 					_container.dequeue();
 
 					// enqueue left
-					if (_node->_left != nullptr) {
-						_node->_left->_level = _node->_level + 1;
-						_container.enqueue(_node->_left);
-					}
+					if (_node->_left != nullptr)  { _container.enqueue(_node->_left); }
 					// enqueue right
-					if (_node->_right != nullptr) {
-						_node->_right->_level = _node->_level + 1;
-						_container.enqueue(_node->_right);
-					}
-				} // return self reference
+					if (_node->_right != nullptr) { _container.enqueue(_node->_right); }
+
+				}
+				else _node = nullptr;
+				// return self reference
 				return *this;
 			}
 
 
+			/* pre-increment reverse in-order operator */
+			auto operator++(void) -> self&
+				requires(xns::is_same<order_type, rev_in_order>) {
 
-			/* post-increment operator */
-			self operator++(int) noexcept {
-				// copy iterator (also copies stack)
-				self tmp{*this};
-				// increment this
-				operator++();
-				// return copy
-				return tmp;
+				// check if stack is empty
+				if (_container.empty()) { _node = nullptr; }
+				else {
+					// get top node
+					_node = _container.top();
+					// pop node
+					_container.pop();
+
+					node_pointer node = _node->_left;
+
+					while (node != nullptr) {
+						_container.push(node);
+						node = node->_right;
+					}
+				}
+				return *this;
 			}
 
 
-			// -- self compare operators --------------------------------------
+			/* delete post-increment operator (forbid) */
+			auto operator++(int) -> self = delete;
+
+
+			// -- public comparison operators ---------------------------------
 
 			/* equality operator */
-			bool operator==(const self& other) const noexcept {
+			inline auto operator==(const self& other) const noexcept -> bool {
 				// compare nodes
 				return _node == other._node;
 			}
 
 			/* inequality operator */
-			bool operator!=(const self& other) const noexcept {
+			inline auto operator!=(const self& other) const noexcept -> bool {
 				// compare nodes
 				return _node != other._node;
 			}
 
-
-			// -- null pointer compare operators ------------------------------
-
 			/* null pointer equality */
-			bool operator==(xns::null) const noexcept {
+			inline auto operator==(xns::null) const noexcept -> bool {
 				// compare node
 				return _node == nullptr;
 			}
 
 			/* null pointer inequality */
-			bool operator!=(xns::null) const noexcept {
+			inline auto operator!=(xns::null) const noexcept -> bool {
 				// compare node
 				return _node != nullptr;
 			}
 
 
-			// -- boolean operators -------------------------------------------
+			// -- public boolean operators ------------------------------------
 
 			/* boolean operator */
-			operator bool(void) const noexcept {
+			inline explicit operator bool(void) const noexcept {
 				// return node
 				return _node != nullptr;
 			}
 
 			/* not operator */
-			bool operator!(void) const noexcept {
+			inline auto operator!(void) const noexcept -> bool {
 				// return node
 				return _node == nullptr;
 			}
@@ -419,13 +447,13 @@ namespace xns {
 			// -- dereference operators ---------------------------------------
 
 			/* dereference operator */
-			reference operator*(void) const noexcept {
+			inline auto operator*(void) const noexcept -> reference {
 				// return value reference
 				return _node->_value;
 			}
 
 			/* dereference operator */
-			pointer operator->(void) const noexcept {
+			inline auto operator->(void) const noexcept -> pointer {
 				// return value pointer
 				return &_node->_value;
 			}
@@ -506,7 +534,6 @@ namespace xns {
 			}
 
 
-
 			// -- node access -------------------------------------------------
 
 			/* address of node */
@@ -539,20 +566,11 @@ namespace xns {
 				return _node->_depth;
 			}
 
-			/* level */
-			inline size_type level(void) const noexcept {
-				// return level
-				return _node->_level;
+			/* balance factor */
+			inline auto balance_factor(void) const noexcept -> auto {
+				// return balance factor
+				return _node->balance_factor();
 			}
-
-			/* x position */
-			inline xns::s64 xpos(void) const noexcept {
-				// return position
-				return _node->_pos;
-			}
-
-
-
 
 
 		private:
