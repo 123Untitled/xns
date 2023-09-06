@@ -90,6 +90,7 @@ namespace xns {
 	using wchar_seq  = character_seq<wchar_t, C...>;
 
 
+
 	// -- M A K E  C H A R A C T E R  S E Q U E N C E -------------------------
 
 	// -- detail --------------------------------------------------------------
@@ -128,23 +129,24 @@ namespace xns {
 
 
 			private:
+			public:
 
 				// -- private implementation --------------------------------------
 
 				/* forward declaration */
-				template <char_t... SEQ>
-				struct impl;
+				template <char_t...>
+				struct implementation;
 
 				/* specialization for I == E, end of recursion */
 				template <size_t I, char_t... SEQ> requires (I == E)
-				struct impl<I, SEQ...> final {
-					using type = character_seq<char_t, SEQ...>;
+				struct implementation<I, SEQ...> final {
+					using type = xns::character_seq<char_t, SEQ...>;
 				};
 
 				/* specialization for I < E, continue recursion */
 				template <size_t I, char_t... SEQ> requires (I < E)
-				struct impl<I, SEQ...> final {
-					using type = typename impl<I + 1, SEQ..., lit._data[I]>::type;
+				struct implementation<I, SEQ...> final {
+					using type = typename implementation<I + 1, SEQ..., lit._data[I]>::type;
 				};
 
 
@@ -156,7 +158,7 @@ namespace xns {
 				using self = make_character_seq<char_t, B, E, lit>;
 
 				/* character sequence type */
-				using type = typename impl<B>::type;
+				using type = typename implementation<B>::type;
 
 		};
 
@@ -196,54 +198,6 @@ namespace xns {
 	using make_wchar_seq  = typename impl::make_character_seq<wchar_t, B, E, lit>::type;
 
 
-	/* forward declaration */
-	template <class... A>
-	class static_tokenizer : public A... {
-
-		public:
-			using self = static_tokenizer<A...>;
-
-
-
-	};
-
-
-
-
-	// -- S P L I T  S T R I N G  L I T E R A L -------------------------------
-
-	// -- detail --------------------------------------------------------------
-
-	namespace impl {
-
-
-		template <xns::basic_string_literal lit>
-		class split {
-
-			/* character type */
-			using char_t = typename decltype(lit)::char_t;
-
-			/* size type */
-			using size_t = xns::size_t;
-
-
-
-			template <size_t I, class P1, class P2> requires (lit._data[I] == '/')
-			struct impl {
-				using type = impl<I + 1, P1, P2>;
-			};
-
-			/* specialization for eos, end of recursion */
-
-
-
-
-		};
-
-	}
-
-
 }
 
-
-#endif /* CHAR_SEQUENCE_HEADER */
+#endif // CHAR_SEQUENCE_HEADER
