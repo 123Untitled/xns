@@ -212,7 +212,7 @@ STANDARD='-std=c++2a'
 DEBUG='-g3'
 
 # optimization level
-OPTIMIZATION='-O0'
+OPTIMIZATION='-O3 -pg'
 
 # compiler flags
 CXXFLAGS=()
@@ -230,7 +230,7 @@ CXXFLAGS+=('-Wpedantic' '-Weffc++')
 CXXFLAGS+=('-Wno-unused' '-Wno-unused-variable' '-Wno-unused-parameter')
 
 # optimization
-CXXFLAGS+=('-Winline')
+#CXXFLAGS+=('-Winline')
 
 # type conversion
 #CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
@@ -239,7 +239,7 @@ CXXFLAGS+=('-Winline')
 #CXXFLAGS+=('-Wshadow')
 
 # linker flags
-LDFLAGS=''
+LDFLAGS='-pg'
 
 # make directories
 MK=($(which mkdir) '-pv')
@@ -510,7 +510,7 @@ function generate_ninja {
 	if [[ $MODE == 'test' ]]; then
 		# link
 		echo "rule link" >> $NINJAFILE
-		echo "  command = \$cxx \$in -o \$out" >> $NINJAFILE
+		echo "  command = \$cxx \$ldflags \$in -o \$out" >> $NINJAFILE
 		echo "  description = linking \$out\n" >> $NINJAFILE
 	fi
 
