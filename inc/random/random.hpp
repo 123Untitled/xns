@@ -65,12 +65,7 @@ namespace xns {
 					rnd %= (xns::limits::max<
 							xns::make_unsigned<type>>());// + 1);
 
-					if constexpr (xns::is_signed<type>) {
-						return reinterpret_cast<type&>(rnd);
-					}
-					else {
-						return static_cast<type>(rnd);
-					}
+					return static_cast<type>(rnd);
 				}
 			}
 
