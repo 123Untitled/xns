@@ -375,7 +375,7 @@ namespace xns {
 		subscribers.emplace_back(method, instance);
 	}
 
-};
+}
 
 
 

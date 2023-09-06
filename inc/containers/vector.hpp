@@ -867,6 +867,6 @@ namespace xns {
 
 
 
-};
+}
 
 #endif

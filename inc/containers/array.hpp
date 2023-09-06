@@ -305,7 +305,7 @@ namespace xns {
 	array(A...) -> array<xns::common_type<A...>, sizeof...(A)>;
 
 
-};
+}
 
 #endif
 

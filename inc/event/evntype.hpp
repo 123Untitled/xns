@@ -158,6 +158,6 @@ namespace xns {
 		EVNT_MAX
 	};
 
-};
+}
 
 #endif

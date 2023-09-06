@@ -225,9 +225,6 @@ namespace xns {
 
 	};
 
-};
-
-
-
+}
 
 #endif

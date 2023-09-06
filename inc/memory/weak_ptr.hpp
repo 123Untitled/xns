@@ -353,6 +353,6 @@ namespace xns {
 	};
 
 
-};
+}
 
 #endif

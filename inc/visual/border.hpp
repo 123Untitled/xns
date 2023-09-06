@@ -127,7 +127,6 @@ namespace xns {
 
 	};
 
-};
-
+}
 
 #endif
