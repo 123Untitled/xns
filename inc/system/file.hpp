@@ -3,7 +3,6 @@
 
 // local headers
 #include "string.hpp"
-#include "draw.hpp"
 #include "unique_descriptor.hpp"
 
 // operating system headers
@@ -43,15 +42,45 @@ namespace xns {
 			NON_COPYABLE(file);
 
 			/* destructor */
-			inline ~file(void) noexcept {
-				// code here...
+			inline ~file(void) noexcept = default;
+
+
+			// -- public accessors --------------------------------------------
+
+			/* is open */
+			inline auto is_open(void) const noexcept -> bool {
+				return unique_descriptor::valid();
 			}
 
 
-
-
 			/* get file content */
-			void content(void);
+			inline auto content(void) -> xns::string {
+
+				// check if file is open
+				if (!is_open()) {
+					return {};
+				}
+
+				// get file size
+				struct ::stat stat;
+
+				if (::fstat(_descriptor, &stat) == -1) {
+					return {};
+				}
+
+				// allocate buffer
+				xns::string content{};
+
+				content.resize(stat.st_size);
+
+				// read file
+				if (::read(_descriptor, content.data(), stat.st_size) == -1) {
+					return {};
+				}
+
+				// return content
+				return content;
+			}
 
 
 		private:
