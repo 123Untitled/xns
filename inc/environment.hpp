@@ -63,7 +63,7 @@ namespace xns {
 			// -- private modifiers -------------------------------------------
 
 			/* initialize environment */
-			auto init(const char**) -> void;
+			auto init(char**) -> void;
 
 
 			// -- private static accessors ------------------------------------

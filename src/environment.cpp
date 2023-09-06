@@ -1,7 +1,7 @@
 #include "environment.hpp"
 
 // environ
-extern constinit const char** environ;
+extern constinit char** environ;
 
 
 // -- E N V I R O N M E N T ---------------------------------------------------
@@ -20,7 +20,7 @@ xns::env::env(void)
 // -- private modifiers -------------------------------------------------------
 
 /* initialize environment */
-auto xns::env::init(const char** envp) -> void {
+auto xns::env::init(char** envp) -> void {
 
 	// check pointer validity
 	if (envp == nullptr || _env.empty() == false) { return; }
