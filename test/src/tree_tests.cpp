@@ -13,6 +13,7 @@
 #include "escape.hpp"
 #include "memcpy.hpp"
 #include "benchmark.hpp"
+#include "file.hpp"
 
 
 
@@ -67,48 +68,93 @@ static xns::size_t NSIZE = 0;
 
 static void benchmark01(void) {
 
+	int fd = open("/dev/urandom", O_RDONLY);
+	if (fd == -1) {
+		std::cout << "error opening /dev/urandom" << std::endl;
+		return ;
+	}
 
-	xns::benchmark<5> bench;
 
+	xns::benchmark<10> bench;
+
+	using type = xns::size_t;
 
 	// xns::memory::pool<xns::tree<xns::size_t>::node>::init();
 
-	xns::tree<xns::size_t> tree;
-	std::set<xns::size_t> set;
+	xns::vector<bool> res;
+	xns::tree<type> tree;
+	std::set<type> set;
 
 
-	bench.run("xns::tree insert", [&tree]() -> void {
-			for (std::size_t i = 0; i < NSIZE; ++i) {
-				tree.insert(xns::random::integral<xns::size_t>());
+	bench.run("xns::tree insert", [&tree, &fd]() -> void {
+
+			for (xns::size_t i = 0; i < NSIZE; ++i) {
+				type n = 0;
+				::read(fd, &n, sizeof(type));
+
+				tree.insert(n);
 			}
-			tree.clear();
 	});
 
-	bench.run("std::set insert", [&set]() -> void {
-			for (std::size_t i = 0; i < NSIZE; ++i) {
-				set.insert(xns::random::integral<xns::size_t>());
+	bench.run("std::set insert", [&set, &fd]() -> void {
+
+			for (xns::size_t i = 0; i < NSIZE; ++i) {
+				type n = 0;
+				::read(fd, &n, sizeof(type));
+
+				set.insert(n);
 			}
-			set.clear();
 	});
 
 	bench.result("insert");
+	std::cout << "tree size: " << tree.size() << std::endl;
+	std::cout << "set size: " << set.size() << std::endl;
 
 
-	bench.run("xns::tree contains", [&tree]() -> void {
-			for (std::size_t i = 0; i < NSIZE; ++i) {
-				tree.contains(xns::random::integral<xns::size_t>());
+	bench.run("xns::tree contains", [&tree, &fd, &res]() -> void {
+
+			for (xns::size_t i = 0; i < NSIZE; ++i) {
+				type n = 0;
+				::read(fd, &n, sizeof(type));
+
+				res.push_back(tree.contains(n));
 			}
 	});
 
 
-	bench.run("std::set contains", [&set]() -> void {
-			for (std::size_t i = 0; i < NSIZE; ++i) {
-				set.contains(xns::random::integral<xns::size_t>());
+
+	bench.run("std::set contains", [&set, &fd, &res]() -> void {
+
+			for (xns::size_t i = 0; i < NSIZE; ++i) {
+				type n = 0;
+				::read(fd, &n, sizeof(type));
+
+				res.push_back(set.contains(n));
 			}
 	});
+
 
 
 	bench.result("contains");
+
+
+	int fdr = open("results.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+
+	if (fdr == -1) {
+		std::cout << "error opening results.txt" << std::endl;
+		return ;
+	}
+
+	for (xns::size_t i = 0; i < NSIZE; ++i) {
+		if (res[i]) { ::write(fdr, "1", 1); }
+		else { ::write(fdr, "0", 1); }
+	}
+
+	close(fd);
+	close(fdr);
+
+
 
 
 }
