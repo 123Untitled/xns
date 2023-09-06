@@ -263,8 +263,10 @@ namespace xns {
 	constexpr auto get(xns::tuple<T...>&& tuple) noexcept -> xns::indexed_element<I, xns::tuple<T...>>&& {
 		// check if index is in range
 		static_assert(I < sizeof...(T), "): GET: INDEX OUT OF RANGE! :(");
+		// get tuple element type
+		using elem_t = typename xns::tuple<T...>::template element_at<I>;
 		// return a rvalue reference to the tuple element
-		return xns::move(tuple._impl.template element<I, typename xns::tuple<T...>::template indexed<I>>::value);
+		return xns::move(tuple._impl.elem_t::value);
 	}
 
 	/* get constant tuple element reference */
@@ -272,8 +274,10 @@ namespace xns {
 	constexpr auto get(const xns::tuple<T...>& tuple) noexcept -> const xns::indexed_element<I, xns::tuple<T...>>& {
 		// check if index is in range
 		static_assert(I < sizeof...(T), "): INDEX OUT OF RANGE! :(");
+		// get tuple element type
+		using elem_t = typename xns::tuple<T...>::template element_at<I>;
 		// return a constant reference to the tuple element
-		return tuple._impl.template element<I, typename xns::tuple<T...>::template indexed<I>>::value;
+		return tuple._impl.elem_t::value;
 	}
 
 	/* get constant tuple element rvalue reference */
@@ -281,8 +285,10 @@ namespace xns {
 	constexpr auto get(const xns::tuple<T...>&& tuple) noexcept -> const xns::indexed_element<I, xns::tuple<T...>>&& {
 		// check if index is in range
 		static_assert(I < sizeof...(T), "): INDEX OUT OF RANGE! :(");
+		// get tuple element type
+		using elem_t = typename xns::tuple<T...>::template element_at<I>;
 		// return a constant rvalue reference to the tuple element
-		return xns::move(tuple._impl.template element<I, typename xns::tuple<T...>::template indexed<I>>::value);
+		return xns::move(tuple._impl.elem_t::value);
 	}
 
 
