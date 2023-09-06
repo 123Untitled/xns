@@ -62,7 +62,7 @@ namespace xns {
 
 				data_t data{};
 				data._msg = msg;
-				data._time = end - start / 1'000'000;
+				data._time = (end - start) / 1'000'000;
 				data._cycle = count;
 				data._average = (end - start) / count;
 
