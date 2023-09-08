@@ -20,9 +20,9 @@
 namespace xns {
 
 
-	// -- V A R I A N T  C L A S S --------------------------------------------
+	// -- V A R I A N T -------------------------------------------------------
 
-	template <class... A>
+	template <typename... A>
 	class variant final {
 
 
@@ -39,6 +39,13 @@ namespace xns {
 
 		private:
 
+			// -- private types -----------------------------------------------
+
+			/* storage type */
+			using storage = xns::aligned_storage<size_of_max<A...>(),
+												align_of_max<A...>()>;
+
+
 			// -- private enums -----------------------------------------------
 
 			/* null index */
@@ -50,7 +57,7 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self */
-			using self = variant<A...>;
+			using self = xns::variant<A...>;
 
 
 			// -- public lifecycle --------------------------------------------
@@ -65,8 +72,7 @@ namespace xns {
 			: _storage{}, _index{xns::index_of<T, A...>()} {
 				// call allocator constructor
 				xns::allocator<T>::construct(
-						_storage.template to_pointer<T>(),
-						value
+					xns::ptr<T>(_storage), value
 				);
 			}
 
@@ -76,8 +82,7 @@ namespace xns {
 			: _storage{}, _index{xns::index_of<T, A...>()} {
 				// call allocator constructor
 				xns::allocator<T>::construct(
-						_storage.template to_pointer<T>(),
-						xns::move(value)
+					xns::ptr<T>(_storage), xns::move(value)
 				);
 			}
 
@@ -87,8 +92,7 @@ namespace xns {
 			: _storage{}, _index{xns::index_of<T, A...>()} {
 				// call allocator constructor
 				xns::allocator<T>::construct(
-						_storage.template to_pointer<T>(),
-						xns::forward<U>(args)...
+					xns::ptr<T>(_storage), xns::forward<U>(args)...
 				);
 			}
 
@@ -100,8 +104,7 @@ namespace xns {
 				using T = xns::type_at<I, A...>;
 				// call allocator constructor
 				xns::allocator<T>::construct(
-						_storage.template to_pointer<T>(),
-						xns::forward<U>(args)...
+					xns::ptr<T>(_storage), xns::forward<U>(args)...
 				);
 			}
 
@@ -109,20 +112,20 @@ namespace xns {
 			constexpr variant(const self& other)
 			: _storage{}, _index{other._index} {
 				// call indexed copy constructor
-				_copies[CONSTRUCT][_index](other._storage._data, _storage._data);
+				_copies[CONSTRUCT][_index](_storage, other._storage);
 			}
 
 			/* move constructor */
 			inline constexpr variant(self&& other) noexcept
 			: _storage{}, _index{other._index} {
 				// call indexed move constructor
-				_moves[CONSTRUCT][_index](other._storage._data, _storage._data);
+				_moves[CONSTRUCT][_index](_storage, other._storage);
 			}
 
 			/* destructor */
 			inline constexpr ~variant(void) noexcept {
 				// call indexed destructor
-				_destructors[_index](_storage._data);
+				_destructors[_index](_storage);
 			}
 
 
@@ -133,14 +136,14 @@ namespace xns {
 				// check if type is same as current type
 				if (_index == other._index) {
 					// call indexed copy assignment
-					_copies[ASSIGN][_index](other._storage._data, _storage._data);
+					_copies[ASSIGN][_index](_storage, other._storage);
 					return *this; }
 				// call indexed destructor
-				_destructors[_index](_storage._data);
+				_destructors[_index](_storage);
 				// set index
 				_index = other._index;
 				// call indexed copy constructor
-				_copies[CONSTRUCT][_index](other._storage._data, _storage._data);
+				_copies[CONSTRUCT][_index](_storage, other._storage);
 
 				return *this;
 			}
@@ -150,14 +153,14 @@ namespace xns {
 				// check if type is same as current type
 				if (_index == other._index) {
 					// call indexed move assignment
-					_moves[ASSIGN][_index](other._storage._data, _storage._data);
+					_moves[ASSIGN][_index](_storage, other._storage);
 					return *this; }
 				// call indexed destructor
-				_destructors[_index](_storage._data);
+				_destructors[_index](_storage);
 				// set index
 				_index = other._index;
 				// call indexed move constructor
-				_moves[CONSTRUCT][_index](other._storage._data, _storage._data);
+				_moves[CONSTRUCT][_index](_storage, other._storage);
 
 				return *this;
 			}
@@ -172,21 +175,20 @@ namespace xns {
 				static_assert(xns::is_one_of<T, A...>,
 						"): VARIANT: TYPE NOT IN CONTAINER :(");
 				// call indexed destructor
-				_destructors[_index](_storage._data);
+				_destructors[_index](_storage);
 				// set index
 				_index = xns::index_of<T, A...>();
 
 				// call allocator emplace constructor
 				xns::allocator<T>::construct(
-						_storage.template to_pointer<T>(),
-						xns::forward<U>(args)...
+					xns::ptr<T>(_storage), xns::forward<U>(args)...
 				);
 			}
 
 			/* reset value */
 			inline constexpr auto reset(void) noexcept -> void {
 				// call indexed destructor
-				_destructors[_index](_storage._data);
+				_destructors[_index](_storage);
 				// set null index
 				_index = NULL_INDEX;
 			}
@@ -241,55 +243,64 @@ namespace xns {
 
 			/* custom copy constructor */
 			template <typename T>
-			static constexpr inline auto copy_construct(const void* src, void* dst) -> void {
+			static inline constexpr auto copy_construct(storage& dst, const storage& src) -> void {
 				// call allocator copy constructor
-				xns::allocator<T>::construct(static_cast<T*>(dst), *static_cast<const T*>(src));
+				xns::allocator<T>::construct(
+					xns::ptr<T>(dst), xns::ref<T>(src)
+				);
 			}
 
 			/* custom move constructor */
 			template <typename T>
-			static constexpr inline auto move_construct(void* src, void* dst) noexcept -> void {
+			static inline constexpr auto move_construct(storage& dst, storage& src) noexcept -> void {
 				// call allocator move constructor
-				xns::allocator<T>::construct(static_cast<T*>(dst), xns::move(*static_cast<T*>(src)));
+				xns::allocator<T>::construct(
+					xns::ptr<T>(dst), xns::move(xns::ref<T>(src))
+				);
 			}
 
 			/* custom copy assignment */
 			template <typename T>
-			static constexpr inline auto copy_assign(const void* src, void* dst) -> void {
+			static inline constexpr auto copy_assign(storage& dst, const storage& src) -> void {
 				// call allocator copy assignment
-				xns::allocator<T>::assign(*static_cast<T*>(dst), *static_cast<const T*>(src));
+				xns::allocator<T>::assign(
+					xns::ref<T>(dst), xns::ref<T>(src)
+				);
 			}
 
 			/* custom move assignment */
 			template <typename T>
-			static constexpr inline auto move_assign(void* src, void* dst) noexcept -> void {
+			static inline constexpr auto move_assign(storage& dst, storage& src) noexcept -> void {
 				// call allocator move assignment
-				xns::allocator<T>::assign(*static_cast<T*>(dst), xns::move(*static_cast<T*>(src)));
+				xns::allocator<T>::assign(
+					xns::ref<T>(dst), xns::move(xns::ref<T>(src))
+				);
 			}
 
 			/* custom destructor */
 			template <typename T>
-			static constexpr inline auto destructor(void* obj) noexcept -> void {
+			static inline constexpr auto destructor(storage& obj) noexcept -> void {
 				// call allocator destructor
-				xns::allocator<T>::destroy(static_cast<T*>(obj));
+				xns::allocator<T>::destroy(
+					xns::ptr<T>(obj)
+				);
 			}
 
 
-			/* empty destructor */
-			static inline constexpr auto nope(void*) noexcept -> void {}
+			/* empty kill */
+			static inline constexpr auto nope(storage&) noexcept -> void {}
 
-			/* empty assignment */
-			static inline constexpr auto nope(void*, void*) noexcept -> void {}
+			/* empty move */
+			static inline constexpr auto nope(storage&, storage&) noexcept -> void {}
 
-			/* empty const assignment */
-			static inline constexpr auto nope(const void*, void*) noexcept -> void {}
+			/* empty copy */
+			static inline constexpr auto nope(storage&, const storage&) noexcept -> void {}
 
 
 			// -- private members ---------------------------------------------
 
 			/* storage */
-			aligned_storage<size_of_max<A...>(),
-							align_of_max<A...>()> _storage;
+			self::storage _storage;
 
 			/* type index */
 			xns::size_t _index;
@@ -298,13 +309,13 @@ namespace xns {
 			// -- private types -----------------------------------------------
 
 			/* copy prototype */
-			using copy_proto = void(*)(const void*, void*);
+			using copy_proto = auto(*)(self::storage&, const self::storage&) -> void;
 
 			/* move prototype */
-			using move_proto = void(*)(void*, void*);
+			using move_proto = auto(*)(self::storage&, self::storage&) noexcept -> void;
 
 			/* destructor prototype */
-			using kill_proto = void(*)(void*);
+			using kill_proto = auto(*)(self::storage&) noexcept -> void;
 
 
 			// -- private constants -------------------------------------------
@@ -379,7 +390,7 @@ namespace xns {
 		static_assert(xns::is_one_of<T, A...>,
 				"): VARIANT: TYPE NOT IN CONTAINER :(");
 		// return mutable reference
-		return variant._storage.template to_reference<T>();
+		return xns::ref<T>(variant._storage);
 	}
 
 	/* get mutable rvalue reference */
@@ -389,7 +400,7 @@ namespace xns {
 		static_assert(xns::is_one_of<T, A...>,
 				"): VARIANT: TYPE NOT IN CONTAINER :(");
 		// return mutable rvalue reference
-		return xns::move(variant._storage.template to_reference<T>());
+		return xns::move(xns::ref<T>(variant._storage));
 	}
 
 	/* get const reference */
@@ -399,7 +410,7 @@ namespace xns {
 		static_assert(xns::is_one_of<T, A...>,
 				"): VARIANT: TYPE NOT IN CONTAINER :(");
 		// return const reference
-		return variant._storage.template to_reference<T>();
+		return xns::ref<T>(variant._storage);
 	}
 
 	/* get const rvalue reference */
@@ -409,7 +420,7 @@ namespace xns {
 		static_assert(xns::is_one_of<T, A...>,
 				"): VARIANT: TYPE NOT IN CONTAINER :(");
 		// return const rvalue reference
-		return xns::move(variant._storage.template to_reference<T>());
+		return xns::move(xns::ref<T>(variant._storage));
 	}
 
 
@@ -420,7 +431,7 @@ namespace xns {
 		static_assert(I < sizeof...(T),
 				"): VARIANT: INDEX OUT OF BOUNDS :(");
 		// return mutable reference
-		return variant._storage.template to_reference<xns::type_at<I, T...>>();
+		return xns::ref<xns::type_at<I, T...>>(variant._storage);
 	}
 
 	/* get indexed mutable rvalue reference */
@@ -430,7 +441,7 @@ namespace xns {
 		static_assert(I < sizeof...(T),
 				"): VARIANT: INDEX OUT OF BOUNDS :(");
 		// return mutable rvalue reference
-		return xns::move(variant._storage.template to_reference<xns::type_at<I, T...>>());
+		return xns::move(xns::ref<xns::type_at<I, T...>>(variant._storage));
 	}
 
 	/* get indexed const reference */
@@ -440,7 +451,7 @@ namespace xns {
 		static_assert(I < sizeof...(T),
 				"): VARIANT: INDEX OUT OF BOUNDS :(");
 		// return const reference
-		return variant._storage.template to_reference<xns::type_at<I, T...>>();
+		return xns::ref<xns::type_at<I, T...>>(variant._storage);
 	}
 
 	/* get indexed const rvalue reference */
@@ -450,7 +461,7 @@ namespace xns {
 		static_assert(I < sizeof...(T),
 				"): VARIANT: INDEX OUT OF BOUNDS :(");
 		// return const rvalue reference
-		return xns::move(variant._storage.template to_reference<xns::type_at<I, T...>>());
+		return xns::move(xns::ref<xns::type_at<I, T...>>(variant._storage));
 	}
 
 }
