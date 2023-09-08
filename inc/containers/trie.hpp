@@ -23,7 +23,11 @@ namespace xns {
 	 * class do not check if the key is only printable ascii characters
 	 */
 
-	template <class T>
+	/* update: this class now uses a 256 lookup table
+	 * no need to check if the key is only printable ascii characters
+	 */
+
+	template <typename T>
 	class trie final {
 
 		public:
@@ -48,10 +52,7 @@ namespace xns {
 			// -- private enum ------------------------------------------------
 
 			/* lookup table size */
-			enum : xns::ubyte {
-				OFFSET = 32,
-				LOOKUP_SIZE = 95
-			};
+			enum : xns::size_t { LOOKUP_SIZE = 256, };
 
 
 			/* forward declaration */
@@ -72,13 +73,18 @@ namespace xns {
 			/* value pointer type */
 			using shared_value = xns::shared_ptr<value_type>;
 
+			/* node pointer type */
+			using node_ptr = node*;
 
 
-			// -- N O D E  S T R U C T ----------------------------------------
 
+			// -- private structs ---------------------------------------------
+
+			/* node */
 			struct node final {
 
-				// -- M E M B E R S -------------------------------------------
+
+				// -- members -------------------------------------------------
 
 				/* childs */
 				table _table;
@@ -87,24 +93,18 @@ namespace xns {
 				shared_value _value;
 
 
-				// -- C O N S T R U C T O R S ---------------------------------
+				// -- lifecycle -----------------------------------------------
 
 				/* default constructor */
-				node(void)
-				: _table{}, _value{} {
-					// code here...
-				}
+				inline node(void) noexcept
+				: _table{}, _value{} {}
 
 				/* value constructor */
-				node(value_type* value)
-				: _table{}, _value{value} {
-					// code here...
-				}
+				inline node(value_type* value)
+				: _table{}, _value{value} {}
 
 				/* destructor */
-				~node(void) {
-					// code here...
-				}
+				inline ~node(void) noexcept = default;
 
 			};
 
@@ -113,51 +113,32 @@ namespace xns {
 
 		public:
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			trie(void)
-			: _root{ } {
-				// code here...
-			}
+			inline trie(void) noexcept
+			: _root{} {}
 
 			/* destructor */
-			~trie(void) {
-				// code here...
-			}
+			inline ~trie(void) noexcept = default;
 
 
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
-			/* default insert */
-			void insert(const xns::string& key) {
+			/* insert */
+			template <typename U>
+			void insert(const xns::string& key, U&& value) {
 				// insert key
-				node* node = _insert(key);
+				node_ptr node = insert_impl(key);
 				// allocate default value
-				node->_value = xns::make_shared<value_type>();
+				node->_value = xns::make_shared<value_type>(xns::forward<U>(value));
 			}
 
-			/* copy insert */
-			void insert(const xns::string& key, const value_type& value) {
-				// insert key
-				node* node = _insert(key);
-				// allocate copied value
-				node->_value = xns::make_shared<value_type>(value);
-			}
-
-			/* move insert */
-			void insert(const xns::string& key, value_type&& value) {
-				// insert key
-				node* node = _insert(key);
-				// allocate moved value
-				node->_value = xns::make_shared<value_type>(xns::move(value));
-			}
-
-			/* variadic insert */
+			/* emplace insert */
 			template <class... A>
-			void insert(const xns::string& key, A&&... args) {
+			void emplace_insert(const xns::string& key, A&&... args) {
 				// insert key
-				node* node = _insert(key);
+				node_ptr node = insert_impl(key);
 				// allocate value
 				node->_value = xns::make_shared<value_type>(xns::forward<A>(args)...);
 			}
@@ -166,7 +147,7 @@ namespace xns {
 			template <class D> requires (xns::is_derived_from<D, value_type>)
 			void insert(const xns::string& key) {
 				// insert key
-				node* node = _insert(key);
+				node_ptr node = insert_impl(key);
 				// allocate default value
 				node->_value = xns::make_shared<D>();
 			}
@@ -175,7 +156,7 @@ namespace xns {
 			template <class D> requires (xns::is_derived_from<D, value_type>)
 			void insert(const xns::string& key, const D& value) {
 				// insert key
-				node* node = _insert(key);
+				node* node = insert_impl(key);
 				// allocate copied value
 				node->_value = xns::make_shared<D>(value);
 			}
@@ -184,7 +165,7 @@ namespace xns {
 			template <class D> requires (xns::is_derived_from<D, value_type>)
 			void insert(const xns::string& key, D&& value) {
 				// insert key
-				node* node = _insert(key);
+				node* node = insert_impl(key);
 				// allocate moved value
 				node->_value = xns::make_shared<D>(xns::move(value));
 			}
@@ -193,12 +174,11 @@ namespace xns {
 			template <class D, class... A> requires (xns::is_derived_from<D, value_type>)
 			void insert(const xns::string& key, A&&... args) {
 				// insert key
-				node* node = _insert(key);
+				node* node = insert_impl(key);
 				// allocate value
 				node->_value = xns::make_shared<D>(xns::forward<A>(args)...);
 			}
 
-			using KeyVector = xns::vector<xns::string>;
 
 
 			/* derived multi insert */
@@ -223,73 +203,47 @@ namespace xns {
 				// loop through alias
 				for (typename xns::vector<S>::size_type x = 0; x < alias.size(); ++x) {
 					// insert key
-					node* node = _insert(alias[x]);
+					node* node = insert_impl(alias[x]);
 					// allocate value
 					node->_value = value;
 				}
 			}
 
-			/*template <class D, class... A> requires (xns::is_base_of_c<T, D>)
-			void insert(const KeyVector& alias, A&&... args) {
-				// instanciate value
-				shared_value value = xns::make_shared<D>(xns::forward<A>(args)...);
-				// loop through alias
-				for (KeyVector::size_type x = 0; x < alias.size(); ++x) {
-					// insert key
-					node* node = _insert(alias[x]);
-					// allocate value
-					node->_value = value;
-				}
-			}*/
-
-			/* variadic multi insert */
-			/*template <class... A>
-			void insert(const KeyVector& alias, A&&... args) {
-				// instanciate value
-				shared_value value = xns::make_shared<value_type>(xns::forward<A>(args)...);
-				// loop through alias
-				for (KeyVector::size_type x = 0; x < alias.size(); ++x) {
-					// insert key
-					node* node = _insert(alias[x]);
-					// allocate value
-					node->_value = value;
-				}
-			}*/
 
 			/* find */
-			weak_value find(const xns::string& str) {
+			auto find(const xns::string& str) -> weak_value {
 				// get root node
-				node* node = &_root;
+				node_ptr node = &_root;
 				// loop through string
 				for (xns::string::size_type x = 0; x < str.size(); ++x) {
-					const size_type index = to_index(str[x]);
-					if (node->_table.at(index) != nullptr) {
+					// get index
+					const size_type idx = to_idx(str[x]);
+					// check indexed node validity
+					if (node->_table[idx] != nullptr)
 						// enter in node
-						node = &(*node->_table.at(index));
-					}
+						node = &(*node->_table[idx]);
 					// else return nullptr
-					else { return nullptr; }
-				}
-				// return value
-				return node->_value;
+					else return nullptr;
+				} // return value
+				return weak_value{node->_value};
 			}
 
 			/* find */
-			weak_value find(const xns::string_view& str) {
+			auto find(const xns::string_view& str) -> weak_value {
 				// get root node
-				node* node = &_root;
+				node_ptr node = &_root;
 				// loop through string
 				for (xns::string_view::size_type x = 0; x < str.size(); ++x) {
-					const size_type index = to_index(str[x]);
-					if (node->_table.at(index) != nullptr) {
+					// get index
+					const auto idx = to_idx(str[x]);
+					// check indexed node validity
+					if (node->_table[idx] != nullptr)
 						// enter in node
-						node = &(*node->_table.at(index));
-					}
+						node = &(*node->_table[idx]);
 					// else return nullptr
-					else { return nullptr; }
-				}
-				// return value
-				return node->_value;
+					else return nullptr;
+				} // return value
+				return weak_value{node->_value};
 			}
 
 
@@ -303,32 +257,32 @@ namespace xns {
 
 			/* _insert */
 			template <xns::is_string S>
-			node* _insert(const S& str) {
+			auto insert_impl(const S& str) -> node_ptr {
 				// get root node
-				node* nde = &_root;
+				node_ptr node = &_root;
 				// loop through string
 				for (typename S::size_type x = 0; x < str.size(); ++x) {
-					// get character index
-					const size_type index = to_index(str[x]);
+					// get index
+					const auto idx = to_idx(str[x]);
 					// check indexed node validity
-					if (nde->_table.at(index) == nullptr) {
+					if (node->_table[idx] == nullptr) {
 						// make new node
-						nde->_table.at(index) = xns::make_unique<node>();
+						node->_table[idx] = xns::make_unique<self::node>();
 					} // move to node
-					nde = &(*nde->_table.at(index));
+					node = &(*node->_table[idx]);
 				} // return node
-				return nde;
+				return node;
 			}
 
 			/* to index */
-			template <class C>
-			size_type to_index(const C c) const {
+			template <typename C>
+			inline static auto to_idx(const C c) -> xns::ubyte {
 				static_assert(sizeof(C) == 1, "): TYPE C MUST BE SINGLE BYTE :(");
-				return (static_cast<size_type>(c)) - OFFSET;
+				return static_cast<xns::ubyte>(c);
 			}
 
 
-			// -- P R I V A T E  M E M B E R S --------------------------------
+			// -- private members ---------------------------------------------
 
 			/* root children */
 			node _root;
