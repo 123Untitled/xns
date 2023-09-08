@@ -2,7 +2,86 @@
 #include "list.hpp"
 
 #include <unistd.h>
-#include <vector>
+//#include <vector>
+#include <list>
+
+#include "benchmark.hpp"
+#include "random.hpp"
+
+
+static xns::size_t NSIZE = 100000;
+static xns::size_t check_sum = 0;
+
+static auto benchmark(void) -> void {
+
+	xns::benchmark<5> bench{};
+
+	xns::list<int> xlist;
+	for (xns::size_t i = 0; i < NSIZE; ++i)
+		xlist.push_back(xns::random::integral<int>());
+	std::list<int> slist;
+	for (xns::size_t i = 0; i < NSIZE; ++i)
+		slist.push_back(xns::random::integral<int>());
+
+
+	bench.run("xns::list push_back", []() -> void {
+
+		xns::list<int> local_list;
+		for (xns::size_t i = 0; i < NSIZE; ++i) {
+			local_list.push_back(xns::random::integral<int>());
+			check_sum ^= local_list.back();
+		}
+	});
+
+	bench.run("std::list push_back", []() -> void {
+
+		std::list<int> local_list;
+		for (xns::size_t i = 0; i < NSIZE; ++i) {
+			local_list.push_back(xns::random::integral<int>());
+			check_sum ^= local_list.back();
+		}
+	});
+
+	bench.result("push_back");
+
+	bench.run("xns::list reverse", [&xlist]() -> void {
+
+			xlist.reverse();
+			check_sum ^= xlist.front();
+	});
+
+	bench.run("std::list reverse", [&slist]() -> void {
+
+			slist.reverse();
+			check_sum ^= slist.front();
+	});
+
+	bench.result("reverse");
+
+
+	bench.run("xns::list copy", [&xlist]() -> void {
+			xns::list<int> local_list{xlist};
+			check_sum ^= local_list.front();
+	});
+
+	bench.run("std::list copy", [&slist]() -> void {
+			std::list<int> local_list{slist};
+			check_sum ^= local_list.front();
+	});
+
+	bench.result("copy");
+
+
+
+
+	std::cout << "check_sum: " << check_sum << std::endl;
+
+
+
+
+
+}
+
 
 /* unit test */
 template <>
@@ -19,9 +98,15 @@ bool UT::unit_tests<"list">(void) {
 
 
 	for (const auto& ref : list) {
-
 		const int& ref2 = ref;
+		std::cout << ref2 << std::endl;
+	}
 
+	list.reverse();
+	std::cout << "reverse" << std::endl;
+
+	for (const auto& ref : list) {
+		const int& ref2 = ref;
 		std::cout << ref2 << std::endl;
 	}
 
@@ -95,3 +180,12 @@ bool UT::unit_tests<"list">(void) {
 	return false;
 }
 
+int main(void) {
+	benchmark();
+
+	return 0;
+
+	UT::unit_tests<"list">();
+	return 0;
+
+}

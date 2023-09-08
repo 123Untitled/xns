@@ -1,10 +1,20 @@
 #include "unit_tests.hpp"
 #include "aligned_storage.hpp"
 
+#define SIZEOF_ALIGNOF(T) std::cout<< sizeof(T) << '/' << alignof(T) << std::endl
+
+
 /* unit test */
 template <>
 bool UT::unit_tests<"aligned_storage">(void) {
-	// code here...
+
+
+	xns::aligned_storage<sizeof(int), alignof(int)> storage;
+
+	char& ref = xns::ref<char>(storage);
+	int* ptr = xns::ptr<int>(storage);
+
+
 	return false;
 }
 

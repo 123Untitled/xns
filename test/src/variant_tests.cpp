@@ -5,69 +5,65 @@
 #include "reference.hpp"
 #include "testclass.hpp"
 
+#include "random.hpp"
+#include "benchmark.hpp"
+
 #include <string>
 #include <vector>
 #include <chrono>
 
 
-template <typename T>
+static size_t check_sum = 0;
+
 void benchmark(void) {
 
-	using variant = T;
-
-	// get time in nanoseconds
-	auto get_time = []() -> auto {
-		return std::chrono::duration_cast<std::chrono::nanoseconds>(
-			std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-	};
-
-	// get time in nanoseconds
-	auto start = get_time();
-
-	constexpr std::size_t N = 1000000;
-
-	std::vector<variant> vec;
-
-	for (std::size_t i = 0; i < N; ++i) {
-		vec.push_back(variant{});
-	}
-
-	for (std::size_t i = 0; i < N; ++i) {
-		variant& var = vec[i];
-		var.template emplace<std::size_t>(i);
-	}
-
-	for (std::size_t i = 0; i < N; ++i) {
-		variant& var = vec[i];
-		var.template emplace<float>(123.456f);
-	}
-
-	for (std::size_t i = 0; i < N; ++i) {
-		variant& var = vec[i];
-		var.template emplace<std::string>("hello world");
-	}
+	using xvariant = xns::variant<std::vector<xns::size_t>, std::string, int>;
+	using svariant = std::variant<std::vector<xns::size_t>, std::string, int>;
 
 
-	std::vector<variant> vec2;
+	constexpr xns::size_t N = 10000;
+	xns::benchmark<3> bench;
 
-	for (std::size_t i = 0; i < N; ++i) {
-		vec2.push_back(vec[i]);
-	}
 
-	std::vector<variant> vec3;
+	bench.run("xns::variant", []() {
 
-	for (std::size_t i = 0; i < N; ++i) {
-		vec3.push_back(std::move(vec[i]));
-	}
 
-	// get time in nanoseconds
-	auto end = get_time();
+		for (xns::size_t i = 0; i < N; ++i) {
+			xvariant var{xns::in_place_type<int>{}, xns::random::integral<int>()};
 
-	long long ms = (end - start);
-	// / 1000000.0);
+			var.emplace<std::vector<xns::size_t>>(std::initializer_list<xns::size_t>{1, 2, 3, 4, 5, 6, 7, 8, 9});
+			if (var.has<std::vector<xns::size_t>>()) {
+				check_sum ^= xns::get<std::vector<xns::size_t>>(var)[xns::random::integral<xns::size_t>() % 9];
+			}
+			var.emplace<std::string>("hello world");
+			if (var.has<std::string>()) {
+				check_sum ^= xns::get<std::string>(var)[xns::random::integral<xns::size_t>() % 11];
+			}
+		}
+	});
 
-	// print time in milliseconds
-	std::cout << "time: " << ms << " ns" << std::endl;
+	bench.run("std::variant", []() {
+
+
+		for (xns::size_t i = 0; i < N; ++i) {
+			svariant var{std::in_place_type<int>, xns::random::integral<int>()};
+
+			var.emplace<std::vector<xns::size_t>>(std::initializer_list<xns::size_t>{1, 2, 3, 4, 5, 6, 7, 8, 9});
+			if (std::holds_alternative<std::vector<xns::size_t>>(var)) {
+				check_sum ^= std::get<std::vector<xns::size_t>>(var)[xns::random::integral<xns::size_t>() % 9];
+			}
+			var.emplace<std::string>("hello world");
+			if (std::holds_alternative<std::string>(var)) {
+				check_sum ^= std::get<std::string>(var)[xns::random::integral<xns::size_t>() % 11];
+			}
+		}
+	});
+
+
+	bench.result("variant");
+
+	std::cout << "check_sum: " << check_sum << std::endl;
+
 
 }
 
@@ -82,7 +78,7 @@ bool UT::unit_tests<"variant">(void) {
 	v0.emplace<C>('c');
 
 
-	auto c = xns::get<3>(xns::move(v0));
+	auto c = xns::get<B>(xns::move(v0));
 
 
 
@@ -94,9 +90,9 @@ bool UT::unit_tests<"variant">(void) {
 
 int main(void) {
 
-	//benchmark<xns::variant<std::string, std::size_t, float>>();
-	//benchmark<std::variant<std::string, std::size_t, float>>();
+	benchmark();
 
+	return 0;
 
 
 	return UT::unit_tests<"variant">()

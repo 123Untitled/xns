@@ -68,16 +68,15 @@ static xns::size_t NSIZE = 0;
 
 static void benchmark01(void) {
 
-	int fd = open("/dev/urandom", O_RDONLY);
-	if (fd == -1) {
-		std::cout << "error opening /dev/urandom" << std::endl;
-		return ;
-	}
-
-
-	xns::benchmark<10> bench;
-
 	using type = xns::size_t;
+
+	xns::vector<bool> tvec;
+	xns::vector<bool> svec;
+
+
+
+	xns::benchmark<5> bench;
+
 
 	// xns::memory::pool<xns::tree<xns::size_t>::node>::init();
 
@@ -85,75 +84,67 @@ static void benchmark01(void) {
 	xns::tree<type> tree;
 	std::set<type> set;
 
+	bench.run("std::set insert", [&set]() -> void {
+			set.clear();
 
-	bench.run("xns::tree insert", [&tree, &fd]() -> void {
-
-			for (xns::size_t i = 0; i < NSIZE; ++i) {
-				type n = 0;
-				::read(fd, &n, sizeof(type));
-
-				tree.insert(n);
-			}
+		for (xns::size_t i = 0; i < NSIZE; ++i) {
+			set.insert(xns::random::integral<type>() % 100);
+		}
 	});
 
-	bench.run("std::set insert", [&set, &fd]() -> void {
+	bench.run("xns::tree insert", [&tree]() -> void {
+		tree.clear();
 
-			for (xns::size_t i = 0; i < NSIZE; ++i) {
-				type n = 0;
-				::read(fd, &n, sizeof(type));
-
-				set.insert(n);
-			}
+		for (xns::size_t i = 0; i < NSIZE; ++i) {
+			tree.insert(xns::random::integral<type>() % 100);
+		}
 	});
+
 
 	bench.result("insert");
-	std::cout << "tree size: " << tree.size() << std::endl;
-	std::cout << "set size: " << set.size() << std::endl;
+
+	tvec.reserve(tree.size()*2);
+	svec.reserve(set.size()*2);
 
 
-	bench.run("xns::tree contains", [&tree, &fd, &res]() -> void {
+	bench.run("std::set contains", [&set, &svec]() -> void {
 
-			for (xns::size_t i = 0; i < NSIZE; ++i) {
-				type n = 0;
-				::read(fd, &n, sizeof(type));
-
-				res.push_back(tree.contains(n));
+		// for (xns::size_t i = 0; i < NSIZE; ++i) {
+			for (const auto& it : set) {
+				svec.push_back(set.contains(it));
 			}
+			// svec.push_back(set.contains(xns::random::integral<type>() % 100));
+		// }
 	});
 
+	bench.run("xns::tree contains", [&tree, &tvec]() -> void {
 
-
-	bench.run("std::set contains", [&set, &fd, &res]() -> void {
-
-			for (xns::size_t i = 0; i < NSIZE; ++i) {
-				type n = 0;
-				::read(fd, &n, sizeof(type));
-
-				res.push_back(set.contains(n));
+			for(auto it = tree.in_order_begin(); it; ++it) {
+				tvec.push_back(tree.contains(*it));
 			}
+		// for (xns::size_t i = 0; i < NSIZE; ++i) {
+			// tvec.push_back(tree.contains(xns::random::integral<type>() % 100));
+		// }
 	});
+
 
 
 
 	bench.result("contains");
 
 
-	int fdr = open("results.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
-
-	if (fdr == -1) {
-		std::cout << "error opening results.txt" << std::endl;
-		return ;
+	int fd = open("random.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd == -1) {
+		std::cout << "open failed" << std::endl;
+		return;
 	}
 
-	for (xns::size_t i = 0; i < NSIZE; ++i) {
-		if (res[i]) { ::write(fdr, "1", 1); }
-		else { ::write(fdr, "0", 1); }
-	}
+	::write(fd, tvec.data(), tvec.size());
+	::write(fd, svec.data(), svec.size());
+
 
 	close(fd);
-	close(fdr);
-
 
 
 
@@ -169,13 +160,13 @@ static auto insert(void) -> void {
 
 	xns::vector<int> vec;
 
-	unsigned int n = (xns::random::integral<unsigned int>() % 20) + 30;
+	 unsigned int n = (xns::random::integral<unsigned int>() % 20) + 30;
 	//unsigned int n = 3;
-	//unsigned int n = 100000;
+	// unsigned int n = 1000000;
 
 	for (unsigned int i = 0; i < n; ++i) {
 		int r = xns::random::integral<int>() % 100;
-		//int r = xns::random::integral<int>();
+		// int r = xns::random::integral<int>();
 		vec.push_back(r);
 	}
 
@@ -185,21 +176,32 @@ static auto insert(void) -> void {
 		//std::cout << "\x1b[32m" << i << "\x1b[0m" << std::endl;
 		//std::cout << std::endl;
 		tree.insert(i);
-		tree.print();
-		usleep(10000);
+		// tree.print();
+		// usleep(10000);
 		// std::cout << "tree depth: " << tree.depth() << std::endl;
 		// std::cout << "tree size: " << tree.size() << std::endl << std::endl;
 	}
-		check_tree(tree);
-	return ;
+
+	check_tree(tree);
+
+	std::cout << "START ERASING" << std::endl;
 
 	for (auto& i : vec) {
 		tree.print();
 		std::cout << "erasing: \x1b[31m" << i << "\x1b[0m" << std::endl;
 		tree.erase(i);
-		check_tree(tree);
+		/*
+		try {
+			check_tree(tree);
+		} catch (std::exception& e) {
+			std::cout << e.what() << std::endl;
+			tree.print();
+			return;
+		}
+		*/
 		usleep(10000);
 	}
+	check_tree(tree);
 	tree.print();
 
 
@@ -283,19 +285,39 @@ static auto interactive(void) -> void {
 template <>
 bool UT::unit_tests<"tree">(void) {
 
-
-	benchmark01();
-	return true;
 	insert();
 	return true;
+	benchmark01();
+	return true;
+
+
 	interactive();
 	return true;
+
 
 }
 
 
 int main(int ac, char** av) {
 
+
+	/*
+	xns::string s{};
+	int fd = open("random.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	double mb = 0.0;
+	while (mb < 1000.0) {
+		xns::size_t n = xns::random::integral<xns::size_t>();
+		s.append(xns::conversion::integer_to_string(n));
+		s.append('\n');
+		// calculate writed size in megabytes
+		mb = (double)s.size() / (double)1'000'000.0;
+		std::cout << "\r" << mb << " MB";
+	}
+	::write(fd, s.data(), s.size());
+
+	close(fd);
+	return 0;
+	*/
 
 
 

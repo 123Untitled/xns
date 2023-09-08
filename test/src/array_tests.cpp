@@ -1,5 +1,8 @@
 #include "unit_tests.hpp"
 #include "array.hpp"
+#include "swap.hpp"
+#include "benchmark.hpp"
+#include <array>
 
 
 template <>
@@ -65,4 +68,12 @@ bool UT::unit_tests<"array">(void) {
 	return true;
 
 
+}
+
+
+int main(void) {
+
+
+
+	return 0;
 }

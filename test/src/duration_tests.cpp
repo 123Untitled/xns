@@ -305,3 +305,11 @@ bool UT::unit_tests<"duration">(void) {
 
 	return 0;
 }
+
+
+int main(void) {
+
+	UT::unit_tests<"duration">();
+
+	return 0;
+}
