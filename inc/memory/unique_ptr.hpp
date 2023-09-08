@@ -5,6 +5,7 @@
 #include "allocator.hpp"
 #include "inheritance.hpp"
 #include "is_same.hpp"
+#include "memory.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -12,291 +13,292 @@
 namespace xns {
 
 
-	// -- U N I Q U E  P O I N T E R  C L A S S -------------------------------
+	// -- U N I Q U E  P T R --------------------------------------------------
 
-	template <class T>
+	template <typename T>
 	class unique_ptr final {
+
+
+		// -- friends ---------------------------------------------------------
+
+		/* weak pointer as friend */
+		template <typename>
+		friend class weak_ptr;
+
+		/* derived types as friend */
+		template <typename>
+		friend class unique_ptr;
+
+		/* make unique as friend */
+		template <typename U, typename... A>
+		friend auto make_unique(A&&...) -> xns::unique_ptr<U>;
+
 
 		public:
 
-			// -- P U B L I C  A L I A S E S ----------------------------------
-
-			/* value type */
-			using value_type      = T;
+			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self            = unique_ptr<value_type>;
+			using self       = xns::unique_ptr<T>;
+
+			/* value type */
+			using type       = T;
 
 			/* reference type */
-			using reference       = value_type&;
+			using mut_ref    = type&;
 
 			/* move reference type */
-			using move_reference  = value_type&&;
-
-			/* pointer type */
-			using mutable_pointer = value_type*;
+			using move_ref   = type&&;
 
 			/* const reference type */
-			using const_reference = const value_type&;
+			using const_ref  = const type&;
+
+			/* pointer type */
+			using mut_ptr    = type*;
 
 			/* const pointer type */
-			using const_pointer   = const value_type*;
+			using const_ptr  = const type*;
+
+
+		private:
+
+			// -- private types -----------------------------------------------
 
 			/* allocator type */
-			using allocator       = xns::allocator<value_type>;
+			using allocator  = xns::memory::pool<type>;
 
 
-			// -- F R I E N D S -----------------------------------------------
+		public:
 
-			/* weak pointer as friend */
-			template <class>
-			friend class weak_ptr;
-
-			/* derived types as friend */
-			template <class>
-			friend class unique_ptr;
-
-			/* make unique pointer as friend */
-			template <class U, class... A>
-			friend unique_ptr<U> make_unique(A&&... args);
-
-
-			// -- P U B L I C  C O N S T R U C T O R S ------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			unique_ptr(void) noexcept
-			: _data{nullptr} {
-				// code here...
-			}
+			inline unique_ptr(void) noexcept
+			: _data{nullptr} {}
 
 			/* nullptr constructor */
-			unique_ptr(xns::null) noexcept
-			: unique_ptr{ } {
-				// code here...
-			}
+			inline unique_ptr(xns::null) noexcept
+			: unique_ptr{} {}
 
 			/* non-copyable class */
 			NON_COPYABLE(unique_ptr);
 
 			/* self move constructor */
-			unique_ptr(self&& other) noexcept
+			inline unique_ptr(self&& other) noexcept
 			: _data(other._data) {
 				// invalidate other
 				other._data = nullptr;
 			}
 
 			/* derived move constructor */
-			template <class D> requires (xns::is_derived_from<D, value_type>)
-			unique_ptr(unique_ptr<D>&& other) noexcept
+			template <typename D> requires (xns::is_derived_from<D, type>)
+			inline unique_ptr(xns::unique_ptr<D>&& other) noexcept
 			: _data(other._data) {
 				// invalidate other
 				other._data = nullptr;
 			}
 
 			/* destructor */
-			~unique_ptr(void) {
-				// check pointer validity
-				if (_data != nullptr) {
-					// destroy object
-					allocator::destroy(_data);
-					// deallocate memory
-					allocator::deallocate(_data);
-				}
+			inline ~unique_ptr(void) noexcept {
+				// deallocate memory
+				free_ptr();
 			}
 
 
-			// -- P U B L I C  A S S I G N M E N T ----------------------------
+			// -- public assignments ------------------------------------------
 
 			/* nullptr assignment */
-			self& assign(xns::null) {
+			inline auto assign(xns::null) noexcept -> void {
 				// clean up
 				reset();
-				// return self reference
-				return *this;
 			}
 
 			/* self move assignment */
-			self& assign(self&& other) {
+			auto assign(self&& other) noexcept -> void {
 				// check for self assignment
 				if (this != &other) {
 					// deallocate memory
-					this->~unique_ptr();
-					// initialize pointer
+					free_ptr();
+					// move other
 					_data = other._data;
 					// invalidate other
-					other._data = nullptr;
-				} // return self reference
-				return *this;
+					other._data = nullptr; }
 			}
 
 			/* derived move assignment */
-			template <class D> requires (xns::is_derived_from<D, value_type>)
-			self& assign(unique_ptr<D>&& other) {
+			template <class D> requires (xns::is_derived_from<D, type>)
+			auto assign(unique_ptr<D>&& other) noexcept -> void {
 				// check for self assignment
 				if (this != reinterpret_cast<self*>(&other)) {
 					// deallocate memory
-					this->~unique_ptr();
-					// initialize pointer
+					free_ptr();
+					// move other
 					_data = other._data;
 					// invalidate other
-					other._data = nullptr;
-				} // return self reference
+					other._data = nullptr; }
+			}
+
+
+			// -- public assignment operators ---------------------------------
+
+			/* nullptr assignment operator */
+			inline auto operator=(xns::null) noexcept -> self& {
+				// call nullptr assignment
+				assign(nullptr);
+				return *this;
+			}
+
+			/* self move assignment operator */
+			inline auto operator=(self&& other) noexcept -> self& {
+				// call self move assignment
+				assign(xns::move(other));
+				return *this;
+			}
+
+			/* derived move assignment operator */
+			template <typename D> requires (xns::is_derived_from<D, type>)
+			inline auto operator=(xns::unique_ptr<D>&& other) noexcept -> self& {
+				// call derived move assignment
+				assign(xns::move(other));
 				return *this;
 			}
 
 
-			// -- P U B L I C  A S S I G N M E N T  O P E R A T O R S ---------
-
-			/* nullptr assignment operator */
-			self& operator=(xns::null) {
-				// return nullptr assignment
-				return assign(nullptr);
-			}
-
-			/* self move assignment operator */
-			self& operator=(self&& other) {
-				// return self move assignment
-				return assign(xns::move(other));
-			}
-
-			/* derived move assignment operator */
-			template <class D> requires (xns::is_derived_from<D, value_type>)
-			self& operator=(unique_ptr<D>&& other) {
-				// return derived move assignment
-				return assign(xns::move(other));
-			}
-
-
-			// -- P U B L I C  A C C E S S O R S  O P E R A T O R S -----------
+			// -- public accessors --------------------------------------------
 
 			/* dereference operator */
-			reference operator*(void) {
-				// return reference
+			inline auto operator*(void) noexcept -> mut_ref {
 				return *_data;
 			}
 
 			/* const dereference operator */
-			const_reference operator*(void) const {
-				// return const reference
+			inline auto operator*(void) const noexcept -> const_ref {
 				return *_data;
 			}
 
 			/* arrow operator */
-			mutable_pointer operator->(void) {
-				// return pointer
+			inline auto operator->(void) noexcept -> mut_ptr {
 				return _data;
 			}
 
 			/* const arrow operator */
-			const_pointer operator->(void) const {
-				// return const pointer
+			inline auto operator->(void) const noexcept -> const_ptr {
 				return _data;
 			}
 
 
-			// -- B O O L E A N  O P E R A T O R S ----------------------------
+			// -- public boolean operators ------------------------------------
 
 			/* boolean operator */
-			operator bool(void) const {
-				// return pointer validity
+			inline operator bool(void) const noexcept {
 				return _data != nullptr;
 			}
 
 			/* not operator */
-			bool operator!(void) const {
-				// return pointer invalidity
+			inline auto operator!(void) const noexcept -> bool {
 				return _data == nullptr;
 			}
 
 
-			// -- P U B L I C  C O M P A R I S O N  O P E R A T O R S ---------
+			// -- public comparison operators ---------------------------------
 
 			/* equality operator */
-			bool operator==(const self& other) const noexcept {
+			inline auto operator==(const self& other) const noexcept -> bool {
 				// return pointer equality
 				return _data == other._data;
 			}
 
 			/* inequality operator */
-			bool operator!=(const self& other) const noexcept {
+			inline auto operator!=(const self& other) const noexcept -> bool {
 				// return pointer inequality
 				return _data != other._data;
 			}
 
 			/* nullptr equality operator */
-			bool operator==(xns::null) const noexcept {
+			inline auto operator==(xns::null) const noexcept -> bool {
 				// return pointer invalidity
 				return _data == nullptr;
 			}
 
 			/* nullptr inequality operator */
-			bool operator!=(xns::null) const noexcept {
+			inline auto operator!=(xns::null) const noexcept -> bool {
 				// return pointer validity
 				return _data != nullptr;
 			}
 
 
-			// -- P U B L I C  M E T H O D S ----------------------------------
+			// -- public modifiers --------------------------------------------
 
 			/* reset pointer */
-			void reset(void) {
+			inline auto reset(void) noexcept -> void {
+				free_ptr();
+				init();
+			}
+
+
+			// -- public conversion -------------------------------------------
+
+			/* base reference cast */
+			template <typename B>
+			inline auto as(void) noexcept -> xns::unique_ptr<B>& {
+				static_assert(xns::is_base_of<B, type>, "WOOO, THIS CAST IS NOT ALLOWED");
+				// return casted reference
+				return reinterpret_cast<unique_ptr<B>&>(*this);
+			}
+
+			/* base const reference cast */
+			template <typename B>
+			inline auto as(void) const noexcept -> const unique_ptr<B>& {
+				static_assert(xns::is_base_of<B, type>, "WOOO, THIS CAST IS NOT ALLOWED");
+				// return casted const reference
+				return reinterpret_cast<const unique_ptr<B>&>(*this);
+			}
+
+
+		private:
+
+
+			// -- private methods ---------------------------------------------
+
+			/* init */
+			inline auto init(void) noexcept -> void {
+				// initialize pointer
+				_data = nullptr;
+			}
+
+			/* deallocate memory */
+			inline auto free_ptr(void) noexcept -> void {
 				// check pointer validity
 				if (_data != nullptr) {
 					// destroy object
 					allocator::destroy(_data);
 					// deallocate memory
 					allocator::deallocate(_data);
-					// invalidate pointer
-					_data = nullptr;
 				}
 			}
 
-			/* base reference cast */
-			template <class B>
-			unique_ptr<B>& as(void) {
-				static_assert(xns::is_base_of<B, value_type>, "WOOO, THIS CAST IS NOT ALLOWED");
-				// return casted reference
-				return reinterpret_cast<unique_ptr<B>&>(*this);
-			}
 
-			/* base const reference cast */
-			template <class B>
-			const unique_ptr<B>& as(void) const {
-				static_assert(xns::is_base_of<B, value_type>, "WOOO, THIS CAST IS NOT ALLOWED");
-				// return casted const reference
-				return reinterpret_cast<const unique_ptr<B>&>(*this);
-			}
-
-			// is this secure?
-			// answer: no, it is not secure
-			// why? because it is possible to cast a unique_ptr<T> to a unique_ptr<U>
-			// where U is not derived from T, and then call this method
-
-		private:
-
-			// -- P R I V A T E  M E M B E R S --------------------------------
+			// -- private members ---------------------------------------------
 
 			/* data */
-			mutable_pointer _data;
+			self::mut_ptr _data;
 
 
 	};
 
 
-	// -- F R I E N D  F U N C T I O N S --------------------------------------
+	// -- non-member functions ------------------------------------------------
 
-	/* make unique pointer */
-	template <class T, class... A>
-	unique_ptr<T> make_unique(A&&... args) {
+	/* make unique */
+	template <typename T, typename... A>
+	auto make_unique(A&&... args) -> xns::unique_ptr<T> {
 		// instantiate unique pointer
 		unique_ptr<T> ptr;
 		// allocate memory
 		ptr._data = unique_ptr<T>::allocator::allocate();
-		// check allocation success
-		if (ptr._data) {
-			// construct object by forwarding arguments
-			unique_ptr<T>::allocator::construct(ptr._data, xns::forward<A>(args)...);
-		} // return instance
+		// construct object by forwarding arguments
+		unique_ptr<T>::allocator::construct(ptr._data, xns::forward<A>(args)...);
+		// return unique pointer
 		return ptr;
 	}
 
