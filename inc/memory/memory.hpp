@@ -225,10 +225,10 @@ namespace xns {
 					inline ~pool_impl(void) noexcept(false) {
 						// get head page
 						typename page::pointer page = _head;
-						std::cout << "pool destructor [" << N << "]" << std::endl;
+						// std::cout << "pool destructor [" << N << "]" << std::endl;
 						// loop over pages
 						while (page != nullptr) {
-							std::cout << "deallocate page: " << page->size << std::endl;
+							// std::cout << "deallocate page: " << page->size << std::endl;
 							typename page::pointer next = page->next;
 							xns::memory::unmap(page, page->size);
 							page = next; }
@@ -317,25 +317,25 @@ namespace xns {
 					// -- public types ----------------------------------------
 
 					/* self type */
-					using self            = xns::memory::pool<T>;
+					using self      = xns::memory::pool<T>;
 
 					/* value type */
-					using value_type      = T;
+					using type      = T;
 
 					/* reference type */
-					using reference       = T&;
-
-					/* const reference type */
-					using const_reference = const T&;
+					using mut_ref   = type&;
 
 					/* move reference type */
-					using move_reference  = T&&;
+					using move_ref  = type&&;
+
+					/* const reference type */
+					using const_ref = const type&;
 
 					/* pointer type */
-					using mutable_pointer = T*;
+					using mut_ptr   = type*;
 
 					/* const pointer type */
-					using const_pointer   = const T*;
+					using const_ptr = const type*;
 
 
 					// -- public lifecycle ------------------------------------
@@ -351,27 +351,76 @@ namespace xns {
 						allocator::shared();
 					}
 
-					/* make */
-					template <typename... A>
-					static inline auto make(A&&... args) -> mutable_pointer {
 
-						static_assert(xns::is_constructible<value_type, A...>,
-							"TYPE IS NOT CONSTRUCTIBLE");
 
-						return static_cast<mutable_pointer>(new (allocator::allocate()) value_type{args...});
+					// -- public allocation methods ---------------------------
+
+					/* allocate */
+					static inline auto allocate(void) -> mut_ptr {
+						return static_cast<mut_ptr>(allocator::allocate());
 					}
 
-					/* delete */
-					static auto store(mutable_pointer addrs) noexcept -> void {
+					/* deallocate */
+					static inline auto deallocate(mut_ptr addr) noexcept -> void {
+						allocator::deallocate(addr);
+					}
+
+
+					// -- public construction methods -------------------------
+
+					/* copy construct */
+					static inline auto construct(mut_ptr addr, const_ref value) -> void {
+						// check type is copy constructible
+						static_assert(xns::is_copy_constructible<type>,
+							"TYPE IS NOT CONSTRUCTIBLE");
+						// construct object by copy
+						new (addr) type{value};
+					}
+
+					/* move construct */
+					static inline auto construct(mut_ptr addr, move_ref value) -> void {
+						// check type is move constructible
+						static_assert(xns::is_move_constructible<type>,
+							"TYPE IS NOT CONSTRUCTIBLE");
+						// construct object by move
+						new (addr) type{xns::move(value)};
+					}
+
+					/* forward construct */
+					template <typename... A>
+					static inline auto construct(mut_ptr addr, A&&... args) -> void {
+						// check type is constructible
+						static_assert(xns::is_constructible<type, A...>,
+							"TYPE IS NOT CONSTRUCTIBLE");
+						// construct object by forwarding arguments
+						new (addr) type{xns::forward<A>(args)...};
+					}
+
+					/* destroy */
+					static inline auto destroy(mut_ptr addr) noexcept -> void {
 						// check type is trivially destructible
-						if constexpr (xns::is_trivially_destructible<value_type> == false) {
+						if constexpr (xns::is_trivially_destructible<type> == false) {
 							// check type is destructible
-							static_assert(xns::is_destructible<value_type>,
+							static_assert(xns::is_destructible<type>,
 									"TYPE IS NOT DESTRUCTIBLE");
 							// call object destructor
-							addrs->~value_type();
+							addr->~type();
 						}
-						allocator::deallocate(addrs);
+					}
+
+
+					/* make */
+					template <typename... A>
+					static inline auto make(A&&... args) -> mut_ptr {
+						mut_ptr addr = allocate();
+						construct(addr, xns::forward<A>(args)...);
+						return addr;
+					}
+
+					/* store */
+					static auto store(mut_ptr addrs) noexcept -> void {
+						destroy(addrs);
+						deallocate(addrs);
 					}
 
 			};
