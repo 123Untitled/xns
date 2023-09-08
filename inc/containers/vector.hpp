@@ -6,6 +6,8 @@
 #include "allocator.hpp"
 #include "array.hpp"
 #include "is_comparable.hpp"
+#include "is_trivially_destructible.hpp"
+#include "swap.hpp"
 
 // c++ standard library headers
 #include <iostream>
@@ -19,9 +21,10 @@
 
 namespace xns {
 
+
 	// -- V E C T O R  C L A S S ----------------------------------------------
 
-	template <class T>
+	template <typename T>
 	class vector final {
 
 
@@ -41,7 +44,7 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = vector<T>;
+			using self = xns::vector<T>;
 
 			/* value type */
 			using value_type = T;
@@ -77,12 +80,8 @@ namespace xns {
 			// -- friends -----------------------------------------------------
 
 			/* make vector as friend */
-			template <class U, class... A>
-			friend auto make_vector(A&&...) -> vector<U>;
-
-			/* make copy as friend */
-			template <class U>
-			friend auto make_copy(const U&) -> U;
+			template <typename U, typename... A>
+			friend auto make_vector(A&&...) -> xns::vector<U>;
 
 
 			// -- public lifecycle --------------------------------------------
@@ -109,20 +108,15 @@ namespace xns {
 				}
 			}
 
-
-		public:
-
 			/* move constructor */
-			vector(self&& other) noexcept
-			// initializations
+			inline vector(self&& other) noexcept
 			: _vector{other._vector}, _capacity{other._capacity}, _size{other._size} {
-
-				// invalidate other vector
-				other.initialize_members();
+				// invalidate other
+				other.init();
 			}
 
 			/* destructor */
-			inline ~vector(void) {
+			inline ~vector(void) noexcept {
 				// clear vector
 				clear();
 				// deallocate memory
@@ -134,23 +128,23 @@ namespace xns {
 			// -- public iterators --------------------------------------------
 
 			/* begin */
-			auto begin(void) noexcept -> iterator {
-				return iterator{_vector};
+			inline auto begin(void) noexcept -> iterator {
+				return self::iterator{_vector};
 			}
 
 			/* const begin */
-			auto begin(void) const noexcept -> const_iterator {
-				return const_iterator{_vector};
+			inline auto begin(void) const noexcept -> const_iterator {
+				return self::const_iterator{_vector};
 			}
 
 			/* end */
-			auto end(void) noexcept -> iterator {
-				return iterator{_vector + _size};
+			inline auto end(void) noexcept -> iterator {
+				return self::iterator{_vector + _size};
 			}
 
 			/* const end */
-			auto end(void) const noexcept -> const_iterator {
-				return const_iterator{_vector + _size};
+			inline auto end(void) const noexcept -> const_iterator {
+				return self::const_iterator{_vector + _size};
 			}
 
 
@@ -201,32 +195,28 @@ namespace xns {
 					// move other size
 					_size = other._size;
 					// invalidate other vector
-					other.initialize_members();
+					other.init();
 				} // return self reference
 				return *this;
 			}
 
 			/* subscript operator */
-			auto operator[](const size_type index) -> reference {
-				// return reference
+			inline auto operator[](const size_type index) -> reference {
 				return _vector[index];
 			}
 
 			/* const subscript operator */
-			auto operator[](const size_type index) const -> const_reference {
-				// return reference
+			inline auto operator[](const size_type index) const -> const_reference {
 				return _vector[index];
 			}
 
 			/* at */
 			auto at(const size_type index) -> reference {
-				// return reference
 				return _vector[index];
 			}
 
 			/* const at */
 			auto at(const size_type index) const -> const_reference {
-				// return reference
 				return _vector[index];
 			}
 
@@ -234,56 +224,47 @@ namespace xns {
 			// -- public accessors --------------------------------------------
 
 			/* empty */
-			auto empty(void) const noexcept -> bool {
-				// return result
+			inline auto empty(void) const noexcept -> bool {
 				return _size == 0;
 			}
 
 			/* size */
-			auto size(void) const noexcept -> size_type {
-				// return size
+			inline auto size(void) const noexcept -> size_type {
 				return _size;
 			}
 
 			/* capacity */
-			auto capacity(void) const noexcept -> size_type {
-				// return capacity
+			inline auto capacity(void) const noexcept -> size_type {
 				return _capacity;
 			}
 
 			/* front */
-			auto front(void) noexcept -> reference {
-				// return reference
+			inline auto front(void) noexcept -> reference {
 				return *_vector;
 			}
 
 			/* const front */
-			auto front(void) const noexcept -> const_reference {
-				// return reference
+			inline auto front(void) const noexcept -> const_reference {
 				return *_vector;
 			}
 
 			/* back */
-			auto back(void) noexcept -> reference {
-				// return reference
+			inline auto back(void) noexcept -> reference {
 				return *(_vector + (_size - 1));
 			}
 
 			/* const back */
-			auto back(void) const noexcept -> const_reference {
-				// return reference
+			inline auto back(void) const noexcept -> const_reference {
 				return *(_vector + (_size - 1));
 			}
 
 			/* data */
-			auto data(void) noexcept -> pointer {
-				// return pointer
+			inline auto data(void) noexcept -> pointer {
 				return _vector;
 			}
 
 			/* const data */
-			auto data(void) const noexcept -> const_pointer {
-				// return pointer
+			inline auto data(void) const noexcept -> const_pointer {
 				return _vector;
 			}
 
@@ -344,13 +325,20 @@ namespace xns {
 
 			// -- public modifiers --------------------------------------------
 
-			/* clear */
-			auto clear(void) noexcept -> void {
+			/* clear (non-trivially destructible) */
+			auto clear(void) noexcept -> void
+				requires (xns::is_trivially_destructible<T> == false) {
 				// loop over vector
 				for (size_type x = 0; x < _size; ++x) {
 					// destroy object
 					allocator::destroy(_vector + x);
 				} // reset size
+				_size = 0;
+			}
+
+			/* clear (trivially destructible) */
+			inline auto clear(void) noexcept -> void
+				requires (xns::is_trivially_destructible<T> == true) {
 				_size = 0;
 			}
 
@@ -393,7 +381,7 @@ namespace xns {
 				static_assert(xns::is_same<xns::remove_cvr<U>, value_type>,
 						"): VECTOR: PUSH BACK TYPE MISMATCH :(");
 				// check capacity
-				if (!available()) {
+				if (not available()) {
 					// double capacity
 					reserve(grow());
 				} // construct element
@@ -402,19 +390,33 @@ namespace xns {
 				++_size;
 			}
 
-			/* pop back */
-			inline auto pop_back(void) noexcept -> void {
+			/* pop back (non-trivially destructible) */
+			inline auto pop_back(void) noexcept -> void
+				requires (xns::is_trivially_destructible<T> == false) {
 				// check size
 				if (not _size) { return; }
 				// destroy object
 				allocator::destroy(_vector + (--_size));
 			}
 
+			/* pop back (trivially destructible) */
+			inline auto pop_back(void) noexcept -> void
+				requires (xns::is_trivially_destructible<T> == true) {
+				// decrement size
+				_size -= (_size > 0);
+			}
 
-			// -- E R A S E ---------------------------------------------------
 
 			/* erase */
-			auto erase(const size_type pos) -> void {
+			inline auto erase(const iterator& pos) noexcept -> void {
+				// check position
+				if (pos._ptr < _vector) { return; }
+				// compute position (pointers subtraction gives a signed type (ptrdiff_t))
+				erase(static_cast<size_type>(pos._ptr - _vector));
+			}
+
+			/* erase */
+			auto erase(const size_type pos) noexcept -> void {
 				// check position
 				if (pos >= _size) { return; }
 				// move elements
@@ -427,14 +429,16 @@ namespace xns {
 				allocator::destroy(_vector + _size);
 			}
 
-			/* erase */
-			inline auto erase(const iterator& pos) -> void {
-				// check position
-				if (pos._ptr < _vector) { return; }
-				// compute position (pointers subtraction gives a signed type (ptrdiff_t))
-				erase(static_cast<size_type>(pos._ptr - _vector));
-			}
 
+			/* swap */
+			auto swap(self& other) noexcept -> void {
+				// swap pointers
+				xns::swap(_vector, other._vector);
+				// swap capacities
+				xns::swap(_capacity, other._capacity);
+				// swap sizes
+				xns::swap(_size, other._size);
+			}
 
 
 			/* filter */ //requires is_comparable<U, value>
@@ -477,17 +481,17 @@ namespace xns {
 						return;
 					}
 				} // push back
-				copy_back(value);
+				push_back(value);
 			}
 
 			/* dichotomic search */
-			template <class U>
-			auto dichotomic_search(const U& value) -> iterator
+			template <typename U>
+			auto dichotomic_search(const U& value) noexcept -> iterator
 				requires (xns::is_comparable<U, value_type>) {
 
 				// check if U is comparable to value_type
-				//static_assert(is_comparable<U, value_type>,
-				//	"): TYPE ARE NOT COMPARABLE IN DICHOTOMIC SEARCH :(");
+				static_assert(is_comparable<U, value_type>,
+					"): TYPE ARE NOT COMPARABLE IN DICHOTOMIC SEARCH :(");
 
 				// check size
 				if (!_size) { return end(); }
@@ -507,9 +511,9 @@ namespace xns {
 					// check value is lower
 					else if (value < _vector[middle]) { upper = middle - 1; }
 					// else value is equal
-					else    { return iterator(_vector + middle);            }
+					else    { return self::iterator(_vector + middle);            }
 				} // not found
-				return end();
+				return self::iterator(_vector + _size);
 
 			}
 
@@ -574,24 +578,21 @@ namespace xns {
 
 			// -- private methods ---------------------------------------------
 
-			/* initialize members */
-			auto initialize_members(void) -> void {
-				// initialize pointer
-				_vector = nullptr;
-				// initialize capacity
-				_capacity = 0;
-				// initialize size
-				_size = 0;
+			/* init */
+			inline auto init(void) noexcept -> void {
+				// initialize members
+				_vector   = nullptr;
+				_capacity = _size = 0;
 			}
 
 			/* available */
-			auto available(void) const -> size_type {
+			inline auto available(void) const noexcept -> size_type {
 				// return available memory
 				return _capacity - _size;
 			}
 
 			/* check capacity */
-			inline auto grow(void) const -> size_type {
+			inline auto grow(void) const noexcept -> size_type {
 				return (_capacity * 2) + (_capacity == 0);
 			}
 
