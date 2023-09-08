@@ -10,7 +10,7 @@
 #include "is_void.hpp"
 #include "forward.hpp"
 #include "is_convertible.hpp"
-
+#include "swap.hpp"
 #include "safe_enum.hpp"
 
 #include <iostream>
@@ -34,8 +34,9 @@ namespace xns {
 
 	// -- A R R A Y -----------------------------------------------------------
 
-	template <class T, xns::size_t... N>
-	class array final {
+	template <typename T, xns::size_t... N>
+	class alignas(sizeof(xns::addr_t))
+	array final {
 
 
 		public:
@@ -43,25 +44,25 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self            = array<T, N...>;
+			using self       = array<T, N...>;
 
 			/* value type */
-			using value_type      = T;
+			using value_type = T;
 
 			/* reference type */
-			using reference       = value_type&;
-
-			/* pointer type */
-			using mut_pointer     = value_type*;
+			using mut_ref    = value_type&;
 
 			/* const reference type */
-			using const_reference = const value_type&;
+			using const_ref  = const value_type&;
+
+			/* pointer type */
+			using mut_ptr    = value_type*;
 
 			/* const pointer type */
-			using const_pointer   = const value_type*;
+			using const_ptr  = const value_type*;
 
 			/* size type */
-			using size_type       = xns::size_t;
+			using size_type  = xns::size_t;
 
 
 		private:
@@ -101,8 +102,8 @@ namespace xns {
 			// -- public assignments ------------------------------------------
 
 			/* variadic assignment */
-			template <class... A>
-			constexpr void assign(A&&... args) {
+			template <typename... A>
+			constexpr auto assign(A&&... args) -> void {
 				// check number of arguments is valid
 				static_assert(sizeof...(A) == _size, "): WRONG NUMBER OF ARGUMENTS :(");
 				// declare index
@@ -112,11 +113,28 @@ namespace xns {
 			}
 
 
+			// -- public modifiers --------------------------------------------
+
+			/* swap */
+			constexpr auto swap(self& other) noexcept -> void {
+				// loop over elements
+				for (size_type i = 0; i < _size; ++i)
+					xns::swap(_data[i], other._data[i]);
+			}
+
+			/* fill */
+			constexpr auto fill(const value_type& value) -> void {
+				// loop over elements
+				for (size_type i = 0; i < _size; ++i)
+					_data[i] = value;
+			}
+
+
 			// -- public subscript operators ----------------------------------
 
 			/* subscript operator (for 1D array) */
-			template <class I>
-			constexpr reference operator[](const I& index) {
+			template <typename I>
+			constexpr auto operator[](const I& index) noexcept -> mut_ref {
 				// check index is integral
 				static_assert(xns::is_index<I>, "): I MUST BE INDEX TYPE :("); // TODO: fix this
 				// return reference to indexed element
@@ -124,8 +142,8 @@ namespace xns {
 			}
 
 			/* const subscript operator */
-			template <class I>
-			constexpr const_reference operator[](const I& index) const {
+			template <typename I>
+			constexpr auto operator[](const I& index) const noexcept -> const_ref {
 				// check index is integral
 				static_assert(xns::is_index<I>, "): I MUST BE INDEX TYPE :("); // TODO: fix this
 				// return constant reference to indexed element
@@ -135,97 +153,98 @@ namespace xns {
 
 			// -- public accessors --------------------------------------------
 
+			/* at (compile time) */
+			template <size_type... I>
+			constexpr auto at(void) noexcept -> mut_ref {
+				// check number of indices is valid
+				static_assert(sizeof...(I) == _ndim, "): WRONG NUMBER OF INDICES :(");
+				// return reference to element indexed by linearized indices
+				return _data[sub<I...>()];
+			}
+
+			/* const at (compile time) */
+			template <size_type... I>
+			constexpr auto at(void) const noexcept -> const_ref {
+				// check number of indices is valid
+				static_assert(sizeof...(I) == _ndim, "): WRONG NUMBER OF INDICES :(");
+				// return reference to element indexed by linearized indices
+				return _data[sub<I...>()];
+			}
+
+
 			/* at */
-			template <class... I>
-			constexpr reference at(I&&... indexs) {
+			template <typename... I>
+			constexpr auto at(I&&... indexs) noexcept -> mut_ref {
 				// check all indices are integral
 				static_assert((xns::is_index<I> && ...), "): I MUST BE INDEX TYPE :("); // TODO: fix this
 				// check number of indices is valid
-				static_assert(sizeof...(I) == _ndim,        "): WRONG NUMBER OF INDICES :(");
+				static_assert(sizeof...(I) == _ndim, "): WRONG NUMBER OF INDICES :(");
 				// return reference to element indexed by linearized indices
-				return _data[_subscript(xns::forward<I>(indexs)...)];
+				return _data[sub(xns::forward<I>(indexs)...)];
 			}
 
 			/* const at */
-			template <class... I>
-			constexpr const_reference at(I&&... indexs) const {
+			template <typename... I>
+			constexpr auto at(I&&... indexs) const noexcept -> const_ref {
 				// check all indices are integral
 				static_assert((xns::is_index<I> && ...), "): I MUST BE INDEX TYPE :("); // TODO: fix this
 				// check number of indices is valid
 				static_assert(sizeof...(I) == _ndim,        "): WRONG NUMBER OF INDICES :(");
 				// return reference to element indexed by linearized indices
-				return _data[_subscript(xns::forward<I>(indexs)...)];
+				return _data[sub(xns::forward<I>(indexs)...)];
 			}
 
 			/* dimensions */
-			constexpr size_type dimensions(void) const {
+			constexpr auto dimensions(void) const noexcept -> size_type {
 				// return number of dimensions
 				return _ndim;
 			}
 
-			/* capacity */
-			constexpr size_type capacity(void) const {
-				// return number of elements
-				return _size;
-			}
-
 			/* size */
-			constexpr size_type size(void) const {
+			constexpr auto size(void) const noexcept -> size_type {
 				// return number of elements
 				return _size;
 			}
 
 			/* size of dimension */
 			template <size_type IDX>
-			constexpr size_type size(void) const {
+			constexpr auto size(void) const noexcept -> size_type {
 				// return size of dimension indexed by IDX
 				return _dims[IDX];
 			}
 
 			/* front */
-			constexpr reference front(void) {
+			constexpr auto front(void) noexcept -> mut_ref {
 				// return reference to first element
 				return _data[0];
 			}
 
 			/* const front */
-			constexpr const_reference front(void) const {
+			constexpr auto front(void) const noexcept -> const_ref {
 				// return constant reference to first element
 				return _data[0];
 			}
 
 			/* back */
-			constexpr reference back(void) {
+			constexpr auto back(void) noexcept -> mut_ref {
 				// return reference to last element
 				return _data[_size - 1];
 			}
 
 			/* const back */
-			constexpr const_reference back(void) const {
+			constexpr auto back(void) const noexcept -> const_ref {
 				// return constant reference to last element
 				return _data[_size - 1];
 			}
 
-			/* pointer */
-			constexpr mut_pointer pointer(void) {
-				// return pointer to data
-				return _data;
-			}
-
-			/* const pointer */
-			constexpr const_pointer pointer(void) const {
-				// return constant pointer to data
-				return _data;
-			}
-
 			/* data */
-			constexpr mut_pointer data(void) {
+			constexpr auto data(void) noexcept -> mut_ptr {
 				// return pointer to data
 				return _data;
 			}
 
 			/* const data */
-			constexpr const_pointer data(void) const {
+			constexpr auto data(void) const noexcept -> const_ptr {
 				// return constant pointer to data
 				return _data;
 			}
@@ -246,14 +265,22 @@ namespace xns {
 			// -- loop methods ------------------------------------------------
 
 			/* for each */
-			template <class F>
+			template <typename F>
 			constexpr void for_each(F&& func) {
-				// loop over elements
-				for (size_type i = 0; i < _size; ++i) {
-					// apply function to element
+				// loop over array
+				for (size_type i = 0; i < _size; ++i)
 					func(_data[i]);
-				}
 			}
+
+			/* const for each */
+			template <typename F>
+			constexpr void for_each(F&& func) const {
+				// loop over array
+				for (size_type i = 0; i < _size; ++i)
+					func(_data[i]);
+			}
+
+
 
 
 		private:
@@ -262,9 +289,22 @@ namespace xns {
 
 			// WARNING: this function has to be debugged
 
+			template <size_type... I>
+			static consteval auto sub(void) noexcept -> size_type {
+				constexpr size_type index_arr[_ndim] = { I... };
+				size_type linear = 0;
+				size_type stride = 1;
+				for (int i = _ndim - 1; i >= 0; --i) {
+					linear += index_arr[i] * stride;
+					stride *= _dims[i];
+				} return linear;
+			}
+
+
+
 			/* helper function for subscript operator */
 			template <class... I> requires (_ndim > 2)
-			inline constexpr size_type _subscript(I&&... indexs) const {
+			inline constexpr auto sub(I&&... indexs) const noexcept -> size_type {
 				// initialize array with indexs casted to Size
 				size_type index_arr[_ndim] = { static_cast<size_type>(indexs)... };
 				// linear index declaration
@@ -274,23 +314,23 @@ namespace xns {
 				// loop over dimensions
 				for (int i = _ndim - 1; i >= 0; --i) {
 					// compute linear index
-					linear += index_arr[i] * stride;
+					linear += (index_arr[i] * stride);
 					// update stride
-					stride *= _dims[i];
+					stride *= (_dims[i]);
 				} // return linear index
 				return linear;
 			}
 
 			/* subscript for 1D array */
-			template <class I> requires (_ndim == 1)
-			inline constexpr size_type _subscript(const I& index) const {
+			template <typename I> requires (_ndim == 1)
+			inline constexpr auto sub(const I& index) const noexcept -> size_type {
 				// return linear index
 				return static_cast<size_type>(index);
 			}
 
 			/* subscript for 2D array */
-			template <class Y, class X> requires (_ndim == 2)
-			inline constexpr size_type _subscript(const Y& y, const X& x) const {
+			template <typename Y, typename X> requires (_ndim == 2)
+			inline constexpr auto sub(const Y& y, const X& x) const noexcept -> size_type {
 				// return linear index
 				return (static_cast<size_type>(y) * _dims[1])
 					  + static_cast<size_type>(x);
@@ -301,8 +341,8 @@ namespace xns {
 
 
 	/* deduction guide */
-	template <class... A>
-	array(A...) -> array<xns::common_type<A...>, sizeof...(A)>;
+	template <typename... A>
+	array(A&&...) -> array<xns::common_type<A...>, sizeof...(A)>;
 
 
 }
