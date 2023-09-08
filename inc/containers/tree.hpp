@@ -15,11 +15,28 @@
 #include "swap.hpp"
 #include "conversions.hpp"
 
+#include "is_convertible.hpp"
+
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
+
+
+
+	/* has arithmetic operators concept */
+	template <typename T>
+	concept has_arithmetic_operators = requires(T a, T b) {
+		{ a + b } -> xns::is_convertible<T>;
+		{ a - b } -> xns::is_convertible<T>;
+		{ a * b } -> xns::is_convertible<T>;
+		{ a / b } -> xns::is_convertible<T>;
+		{ a % b } -> xns::is_convertible<T>;
+	};
+
+
+
 
 
 	// -- T R E E -------------------------------------------------------------
@@ -162,7 +179,7 @@ namespace xns {
 			// -- constructors ------------------------------------------------
 
 			/* default constructor */
-			tree(void) noexcept
+			inline tree(void) noexcept
 			: _root{nullptr}, _lower{nullptr}, _upper{nullptr}, _size{0} {}
 
 			/* copy constructor */
@@ -175,7 +192,7 @@ namespace xns {
 			}
 
 			/* move constructor */
-			tree(self&& other) noexcept
+			inline tree(self&& other) noexcept
 			: _root{other._root}, _lower{other._lower}, _upper{other._upper}, _size{other._size} {
 				// invalidate other
 				other.init();
@@ -317,7 +334,17 @@ namespace xns {
 			}
 
 			/* contains */
-			auto contains(const value_type& value) const noexcept -> bool {
+			inline auto contains(const value_type& value) const noexcept -> bool {
+
+				/*
+				if (not _root
+					|| value < _lower->_value
+					|| value > _upper->_value
+
+						) { return false; }
+						*/
+
+
 				// get root node
 				node_pointer node = _root;
 				// loop over tree
@@ -331,6 +358,9 @@ namespace xns {
 				} // return false
 				return false;
 			}
+
+
+
 
 
 			/* find */
@@ -429,6 +459,7 @@ namespace xns {
 				}
 
 			}
+
 
 
 
@@ -533,6 +564,7 @@ namespace xns {
 				// optimized way to check children (minimum number of conditions)
 
 				if (node->has_left()) {
+					return;
 					// two children case
 					if (node->has_right()) {
 						return;
@@ -598,40 +630,49 @@ namespace xns {
 					// only left child case
 					else {
 						return;
-
 						std::cout << "only left child case" << std::endl;
 						// get parent's side
 						*get_side(node) = node->_left;
 						// set left child's parent to parent
 						node->_left->_parent = node->_parent;
-						//balance(node->_left);
+						erase_balance(parent);
 					}
 				}
 				else {
 					// only right child case
 					if (node->has_right()) {
 						return;
-
 						std::cout << "only right child case" << std::endl;
 						// get parent's side
 						*get_side(node) = node->_right;
 						// set right child's parent to parent
 						node->_right->_parent = node->_parent;
-						//balance(node->_right);
+						erase_balance(parent);
+						print();
+						check_tree(*this);
 					}
 					// no children case
 					else {
 						std::cout << "no children case" << std::endl;
 						*get_side(node) = nullptr;
-						if (parent) {
-							balance(parent);
+						erase_balance(parent);
+						try {
+							check_tree(*this);
 						}
-						exit(0);
+						catch (const std::exception& e) {
+							std::cout << e.what() << std::endl;
+							print();
+							exit(1);
+						}
+						print();
+
 					}
 				}
 
 				allocator::store(node);
 				--_size;
+				// print();
+				// throw std::runtime_error("test");
 				std::cout << "\x1b[32mEND OF ERASE\x1b[0m" << std::endl;
 			}
 
@@ -686,7 +727,8 @@ namespace xns {
 			/* balance tree */
 			auto balance(node_pointer node) noexcept -> void {
 
-				if (node->is_binary()) { return; }
+				// number of iterations does not depend on this condition
+				if (node->is_binary()) { return; } // here for avoid unnecessary checks
 
 				xns::s64 prev = 0;
 
@@ -704,8 +746,6 @@ namespace xns {
 						static_cast<xns::s64>(ld) -
 						static_cast<xns::s64>(rd);
 
-					// std::cout << "balance: " << balance << " | " << node->_value << std::endl;
-
 					// exit if balanced
 					if (balance == BALANCED) { break; }
 
@@ -713,14 +753,14 @@ namespace xns {
 					else if (balance > LEFT_HEAVY) {
 						if (prev !=  1) { lr_rotate(node); }
 						else           { rr_rotate(node); }
-						break;
+						return;
 					}
 
 					 // check for right heavy
 					else if (balance < RIGHT_HEAVY) {
 						if (prev != -1) { rl_rotate(node); }
 						else           { ll_rotate(node); }
-						break;
+						return;
 					}
 
 					node = node->_parent;
@@ -728,7 +768,80 @@ namespace xns {
 				}
 			}
 
+			/* erase balance */
+			auto erase_balance(node_pointer node) noexcept -> bool {
 
+
+				xns::s64 prev = 0;
+
+				// move up the tree
+				while (node != nullptr) {
+
+					const auto ld = node->left_depth();
+					const auto rd = node->right_depth();
+
+					// update depth
+					node->_depth = xns::max(ld, rd) + 1;
+
+					std::cout << "new depth: " << node->_depth << " [" << node->_value << "]" << std::endl;
+
+					// get balance factor
+					const xns::s64 balance =
+						static_cast<xns::s64>(ld) -
+						static_cast<xns::s64>(rd);
+
+					std::cout << "new balance: " << balance << " [" << node->_value << "]" << std::endl;
+
+					// std::cout << "balance: " << balance << " | " << node->_value << std::endl;
+
+					// exit if balanced
+					if (balance == BALANCED) { break; }
+
+					 // check for left heavy
+					else if (balance > LEFT_HEAVY) {
+						// rr_rotate(node);
+						// break;
+						// if (node->_left->_right) {
+						// 	lr_rotate(node);
+						// }
+						// else {
+						// 	ll_rotate(node);
+						// }
+
+
+
+						if (prev !=  1) { lr_rotate(node); }
+						else           { rr_rotate(node); }
+					}
+
+					 // check for right heavy
+					else if (balance < RIGHT_HEAVY) {
+						// ll_rotate(node);
+						// break;
+						// if (node->_right->_left) {
+						// 	rl_rotate(node);
+						// }
+						// else {
+						// 	rr_rotate(node);
+						// }
+
+						if (prev != -1) { rl_rotate(node); }
+						else           { ll_rotate(node); }
+					}
+
+					node = node->_parent;
+					prev = balance;
+				}
+
+				return true;
+			}
+
+			auto full_balance(void) -> void {
+
+				for (auto it = post_order_begin(); it != nullptr; ++it) {
+					balance(it._node);
+				}
+			}
 
 
 
@@ -1050,8 +1163,6 @@ namespace xns {
 				--rnode->_depth;
 				++root->_depth;
 				node->_depth -= 2;
-
-
 
 			}
 
@@ -1401,6 +1512,7 @@ namespace xns {
 			/* display tree */
 			void display(void) {
 
+				std::cout << "START OF PRINT" << std::endl;
 				// check root
 				if (_tree._root == nullptr) { return; }
 
@@ -1503,6 +1615,7 @@ namespace xns {
 
 				fill_matrix();
 				render();
+				std::cout << "END OF PRINT" << std::endl;
 			}
 
 
