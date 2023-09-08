@@ -11,20 +11,31 @@
 #include "is_trivially_destructible.hpp"
 #include "allocator.hpp"
 
+// c++ standard headers library
+#include <iostream>
+
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
 
 
-	// -- N U L L O P T  S T R U C T ------------------------------------------
+
+	class optional_bad_access final {
+
+		public:
+
+	};
+
+
+	// -- N U L L O P T -------------------------------------------------------
 
 	struct nullopt { constexpr nullopt(void) = default; };
 
 
-	// -- O P T I O N A L  C L A S S ------------------------------------------
+	// -- O P T I O N A L -----------------------------------------------------
 
-	template <class T>
+	template <typename T>
 	class optional {
 
 
@@ -33,107 +44,170 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = optional<T>;
+			using self = xns::optional<T>;
 
 			/* value type */
-			using value_type = T;
+			using type = T;
 
-			/* allocator type */
-			using allocator = xns::allocator<value_type>;
+			/* reference type */
+			using mut_ref = type&;
+
+			/* move reference type */
+			using move_ref = type&&;
+
+			/* const reference type */
+			using const_ref = const type&;
+
+			/* const move reference type */
+			using const_move_ref = const type&&;
 
 
 			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			constexpr optional(void) noexcept
-			: _storage{}, _active{false} {}
+			inline constexpr optional(void) noexcept
+			: _storage{}, _active{INACTIVE} {}
 
 			/* nullopt constructor */
-			constexpr optional(nullopt) noexcept
-			: _storage{}, _active{false} {}
+			explicit inline constexpr optional(xns::nullopt) noexcept
+			: _storage{}, _active{INACTIVE} {}
 
 			/* value copy constructor */
-			constexpr optional(const value_type& value) noexcept
-			: _storage{}, _active{true} {
-
-				/* copy construct */
+			explicit inline constexpr optional(const_ref value)
+			: _storage{}, _active{ACTIVE} {
+				// construct value by copy
 				allocator::construct(
-					_storage.template to_pointer<value_type>(),
-					value
+					xns::ptr<type>(_storage), value
 				);
 			}
 
 			/* value move constructor */
-			constexpr optional(value_type&& value) noexcept
-			: _storage{}, _active{true} {
-
-				/* move construct */
+			explicit inline constexpr optional(move_ref value) noexcept
+			: _storage{}, _active{ACTIVE} {
+				// construct value by move
 				allocator::construct(
-					_storage.template to_pointer<value_type>(),
-					xns::move(value)
+					xns::ptr<type>(_storage), xns::move(value)
 				);
 			}
 
 			/* emplace constructor */
-			template <class... A>
-			constexpr optional(A&&... args) noexcept
-			: _storage{}, _active{true} {
-
-				/* emplace construct */
+			template <typename... A>
+			inline constexpr optional(A&&... args)
+			: _storage{}, _active{ACTIVE} {
+				// construct value in place
 				allocator::construct(
-					_storage.template to_pointer<value_type>(),
-					xns::forward<A>(args)...
+					xns::ptr<type>(_storage), xns::forward<A>(args)...
 				);
 			}
 
 			/* copy constructor */
-			constexpr optional(const self& other) noexcept
+			inline constexpr optional(const self& other)
 			: _storage{}, _active{other._active} {
+				// check state
+				switch (_active) {
+					case ACTIVE:
+						// construct value by copy
+						allocator::construct(
+							xns::ptr<type>(_storage), xns::ref<type>(other._storage)
+						);
+					default: break;
+				}
 
-				if (_active == false) { return; }
-
-				/* copy construct */
-				allocator::construct(
-					_storage.template to_pointer<value_type>(),
-					other._storage.template to_reference<value_type>()
-				);
 			}
 
 			/* move constructor */
-			constexpr optional(self&& other) noexcept
+			inline constexpr optional(self&& other) noexcept
 			: _storage{}, _active{other._active} {
-
-				if (_active == false) { return; }
-
-				/* move construct */
-				allocator::construct(
-					_storage.template to_pointer<value_type>(),
-					xns::move(other._storage.template to_reference<value_type>())
-				);
+				// check state
+				switch (_active) {
+					case ACTIVE:
+						// construct value by move
+						allocator::construct(
+							xns::ptr<type>(_storage), xns::move(xns::ref<type>(other._storage))
+						);
+					default: break;
+				}
 			}
 
 			/* destructor */
-			constexpr ~optional(void) noexcept {
+			inline constexpr ~optional(void) noexcept {
+				// check state
+				switch (_active) {
+					case ACTIVE:
+						// destroy value
+						allocator::destroy(
+							xns::ptr<type>(_storage)
+						);
+					default: break;
+				}
+			}
 
-				if (_active == false) { return; }
 
-				allocator::destroy(
-					_storage.template to_pointer<value_type>()
-				);
+			// -- public assignment operators ---------------------------------
 
+			/* deleted copy assignment operator */
+			auto operator=(const self& other) -> self& = delete;
+
+
+			/* deleted move assignment operator */
+			auto operator=(self&& other) noexcept -> self& = delete;
+
+
+
+			// -- public accessors --------------------------------------------
+
+			/* has value */
+			constexpr auto has_value(void) const noexcept -> bool {
+				return _active == ACTIVE;
+			}
+
+			/* get lvalue reference */
+			inline constexpr auto value(void) & -> mut_ref {
+				return xns::ref<type>(_storage);
+			}
+
+			/* get const lvalue reference */
+			inline constexpr auto value(void) const & -> const_ref {
+				return xns::ref<type>(_storage);
+			}
+
+			/* get rvalue reference */
+			inline constexpr auto value(void) && -> move_ref {
+				return xns::move(xns::ref<type>(_storage));
+			}
+
+			/* get const rvalue reference */
+			inline constexpr auto value(void) const && -> const_move_ref {
+				return xns::move(xns::ref<type>(_storage));
 			}
 
 
 		private:
 
+			// -- private enums -----------------------------------------------
+
+			/* active state */
+			enum state : xns::size_t { INACTIVE = 0, ACTIVE = 1 };
+
+
+			// -- private types -----------------------------------------------
+
+			/* storage type */
+			using storage = xns::aligned_storage<sizeof(T), alignof(T)>;
+
+			/* allocator type */
+			using allocator = xns::allocator<type>;
+
+
+
+
 			// -- private members ---------------------------------------------
 
 			/* storage */
-			xns::aligned_storage<sizeof(T),
-								alignof(T)> _storage;
+			self::storage _storage;
 
 			/* is active */
-			bool _active;
+			self::state _active;
 
 
 	};
