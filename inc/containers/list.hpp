@@ -1,13 +1,19 @@
 #ifndef LIST_HEADER
 #define LIST_HEADER
 
+// local headers
 #include "types.hpp"
 #include "move.hpp"
 #include "forward.hpp"
-#include <iostream>
 #include "macro.hpp"
 #include "allocator.hpp"
 #include "common_type.hpp"
+#include "swap.hpp"
+#include "memory.hpp"
+
+// c++ standard library headers
+#include <iostream>
+#include <memory>
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -15,10 +21,10 @@
 namespace xns {
 
 
-	// -- L I S T -------------------------------------------------------------
+	// -- L I S T  C L A S S --------------------------------------------------
 
-	template <class T>
-	class list final {
+	template <typename T>
+	class alignas(sizeof(xns::addr_t)) list final {
 
 
 		private:
@@ -26,7 +32,7 @@ namespace xns {
 			// -- private forward declarations --------------------------------
 
 			/* node */
-			struct node;
+			class node;
 
 			/* iterator */
 			template <bool>
@@ -35,11 +41,14 @@ namespace xns {
 
 			// -- private types -----------------------------------------------
 
+			/* node type */
+			using node_type   = xns::list<T>::node;
+
 			/* node pointer type */
-			using node_pointer    = node*;
+			using node_ptr    = node_type*;
 
 			/* allocator type */
-			using allocator       = xns::allocator<node>;
+			using allocator   = xns::memory::pool<node>;
 
 
 		public:
@@ -80,81 +89,76 @@ namespace xns {
 			// -- public constructors -----------------------------------------
 
 			/* default constructor */
-			list(void) noexcept
-			: _head{nullptr}, _tail{nullptr}, _storage{nullptr}, _size{0} {}
+			inline list(void) noexcept
+			: _head{nullptr}, _tail{nullptr}, _size{0} {}
 
 			/* copy constructor */
 			list(const self& other)
-			: list{} {
+			: _head{nullptr}, _tail{nullptr}, _size{other._size} {
 				// declare node pointer
-				node_pointer node = other._head;
+				node_ptr node = other._head;
+				node_ptr prev = nullptr;
+				node_type** addr = &_head;
+
 				// loop over other list
 				while (node) {
-					// push back value by copy
-					push_back(node->_value);
-					// get next node
+					*addr = new_node(node->_value, prev);
+					prev = *addr;
+					addr = &(*addr)->_next;
 					node = node->_next;
-				}
+				} // set tail
+				_tail = prev;
 			}
 
+
 			/* move constructor */
-			list(self&& other) noexcept
-			: _head{other._head}, _tail{other._tail}, _storage{other._storage}, _size{other._size} {
-				// invalidate other list
-				other._init();
-				// invalidate other storage
-				other._storage = nullptr;
+			inline list(self&& other) noexcept
+			: _head{other._head}, _tail{other._tail}, _size{other._size} {
+				// invalidate other
+				other.init();
 			}
 
 			/* destructor */
-			~list(void) noexcept {
-				// destroy and deallocate list
-				_free_list();
-				// deallocate storage
-				_free_storage();
+			inline ~list(void) noexcept {
+				// deallocate list
+				free_list();
 			}
 
 
 			// -- public assignment methods -----------------------------------
 
-			/* INFO: optimization possible by copying storage
-			 * implement custom method for copying storage
-			 * update size only at the end
-			 */
-
-			/* copy assignment */
-			void assign(const self& other) {
+			/* copy assignment */ // INFO: not optimized !
+			auto assign(const self& other) -> void {
 				// check for self assignment
 				if (this != &other) {
-					// destroy self list
-					_destroy_list();
+					// deallocate list
+					free_list();
+					init();
 					// get other head
-					node_pointer node = other._head;
+					node_ptr node = other._head;
 					// loop over other list
 					while (node) {
-						// push back value by copy
-						push_back(node->_value);
+						// push node copy
+						back_link(new_node(node->_value));
 						// move to next node
 						node = node->_next; }
+					// set list size
+					_size = other._size;
 				}
 			}
 
-			/* INFO: storage is not moved!
-			 * (simple linked list reason)
-			 */
-
 			/* move assignment */
-			void assign(self&& other) noexcept {
+			auto assign(self&& other) noexcept -> void {
 				// check for self assignment
 				if (this != &other) {
-					// destroy self list
-					_destroy_list();
-					// move other
+					// deallocate list
+					free_list();
+					// move other members
 					_head = other._head;
 					_tail = other._tail;
 					_size = other._size;
-					// invalidate other list
-					other._init();
+					// invalidate other
+					other.init();
 				}
 			}
 
@@ -162,7 +166,7 @@ namespace xns {
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			list& operator=(const self& other) {
+			inline auto operator=(const self& other) -> self& {
 				// call copy assignment
 				assign(other);
 				// return self reference
@@ -170,7 +174,7 @@ namespace xns {
 			}
 
 			/* move assignment operator */
-			self& operator=(self&& other) noexcept {
+			inline auto operator=(self&& other) noexcept -> self& {
 				// call move assignment
 				assign(xns::move(other));
 				// return self reference
@@ -181,345 +185,286 @@ namespace xns {
 			// -- public accessors --------------------------------------------
 
 			/* size */
-			size_type size(void) const noexcept {
-				// return list size
+			inline auto size(void) const noexcept -> size_type {
 				return _size;
 			}
 
 			/* empty */
-			bool empty(void) const noexcept {
-				// return list empty
+			inline auto empty(void) const noexcept -> bool {
 				return _size == 0;
 			}
 
 			/* front */
-			mut_reference front(void) noexcept {
-				// return front element
+			inline auto front(void) noexcept -> mut_reference {
 				return _head->_value;
 			}
 
 			/* const front */
-			const_reference front(void) const {
-				// return front element
+			inline auto front(void) const -> const_reference {
 				return _head->_value;
 			}
 
 			/* back */
-			mut_reference back(void) noexcept {
-				// return back element
+			inline auto back(void) noexcept -> mut_reference {
 				return _tail->_value;
 			}
 
 			/* const back */
-			const_reference back(void) const {
-				// return back element
+			inline auto back(void) const noexcept -> const_reference {
 				return _tail->_value;
 			}
 
 
 			// -- public modifiers --------------------------------------------
 
-
 			/* push front */
-			void push_front(const_reference value) {
+			inline auto push_front(const_reference value) -> void {
 				// allocate new node
-				node_pointer node = new_node();
-				// construct node
-				allocator::construct(node, value);
+				node_ptr node = new_node(value);
 				// link node to front
 				front_link(node);
+				// increment list size
+				++_size;
 			}
 
 			/* push front */
-			void push_front(move_reference value) noexcept {
+			inline auto push_front(move_reference value) noexcept -> void {
 				// allocate new node
-				node_pointer node = new_node();
-				// construct node
-				allocator::construct(node, xns::move(value));
+				node_ptr node = new_node(xns::move(value));
 				// link node to front
 				front_link(node);
+				// increment list size
+				++_size;
 			}
 
 			/* emplace front */
 			template <typename... A>
-			void emplace_front(A&&... args) {
+			inline auto emplace_front(A&&... args) -> void {
 				// allocate new node
-				node_pointer node = new_node();
-				// construct node
-				allocator::construct(node, xns::forward<A>(args)...);
+				node_ptr node = new_node(xns::forward<A>(args)...);
 				// link node to front
 				front_link(node);
+				// increment list size
+				++_size;
 			}
 
 
 			/* push back */
-			void push_back(const_reference value) {
+			inline auto push_back(const_reference value) -> void {
 				// allocate new node
-				node_pointer node = new_node();
-				// construct node
-				allocator::construct(node, value);
+				node_ptr node = new_node(value);
 				// link node to back
 				back_link(node);
+				// increment list size
+				++_size;
 			}
 
 			/* push back */
-			void push_back(move_reference value) noexcept {
+			inline auto push_back(move_reference value) noexcept -> void {
 				// allocate new node
-				node_pointer node = new_node();
-				// construct node
-				allocator::construct(node, xns::move(value));
+				node_ptr node = new_node(xns::move(value));
 				// link node to back
 				back_link(node);
+				// increment list size
+				++_size;
 			}
 
 			/* emplace back */
 			template <typename... A>
-			void emplace_back(A&&... args) {
+			inline auto emplace_back(A&&... args) -> void {
 				// allocate new node
-				node_pointer node = new_node();
-				// construct node
-				allocator::construct(node, xns::forward<A>(args)...);
+				node_ptr node = new_node(xns::forward<A>(args)...);
 				// link node to back
 				back_link(node);
+				// increment list size
+				++_size;
 			}
 
 			/* pop front */
-			void pop_front(void) {
+			auto pop_front(void) noexcept -> void {
 				// check if list is empty
-				if (!_head) { return; }
+				if (not _head) { return; }
 				// get head node
-				node_pointer node = _head;
+				node_ptr node = _head;
 				// set new head node
 				_head = _head->_next;
-				// link to storage
-				_store(node);
+				// delete node
+				delete_node(node);
 				// check if list is empty
-				if (!_head) {
-					// set tail node
-					_tail = nullptr;
-				} else {
-					// set head's previous node
-					_head->_prev = nullptr;
-				} // decrement size
+				not _head ? _tail = nullptr : _head->_prev = nullptr;
+				// decrement size
 				--_size;
 			}
 
 			/* pop back */
-			void pop_back(void) {
+			auto pop_back(void) noexcept -> void {
 				// check if list is empty
-				if (!_tail) { return; }
+				if (not _tail) { return; }
 				// get tail node
-				node_pointer node = _tail;
+				node_ptr node = _tail;
 				// set new tail node
 				_tail = _tail->_prev;
-				// link to storage
-				_store(node);
+				// delete node
+				delete_node(node);
 				// check if list is empty
-				if (!_tail) {
-					// set head node
-					_head = nullptr;
-				} else {
-					// set tail's next node
-					_tail->_next = nullptr;
-				} // decrement size
+				not _tail ? _head = nullptr : _tail->_next = nullptr;
+				// decrement size
 				--_size;
 			}
 
+			/* insert */
+			auto insert(const_iterator pos, const_reference value) -> iterator {
+				// not implemented
+				return end();
+			}
+
+			/* insert */
+			auto insert(const_iterator pos, move_reference value) noexcept -> iterator {
+				// not implemented
+				return end();
+			}
+
+
+			/* reverse */
+			auto reverse(void) noexcept -> void {
+				// initialize pointers
+				node_ptr node = _head;
+				node_ptr prev = nullptr;
+				node_ptr next = nullptr;
+
+				// loop over list
+				while (node != nullptr) {
+					next = node->_next;
+					node->_next = prev;
+					node->_prev = next;
+					prev = node;
+					node = next;
+				} // swap head and tail
+				xns::swap(_head, _tail);
+			}
+
+
+
 			/* clear list */
 			void clear(void) noexcept {
-				// destroy list
-				_destroy_list();
+				// deallocate list
+				free_list();
 				// initialize members
-				_init();
+				init();
 			}
 
 
-			// -- public swap -------------------------------------------------
-
-			/* swap lists */
-			void swap(self& other) noexcept {
-				// declare temporary variables
-				node_pointer node;
-				size_type    size;
-				// swap head
-				node        = _head;
-				_head       = other._head;
-				other._head = node;
-				// swap tail
-				node        = _tail;
-				_tail       = other._tail;
-				other._tail = node;
-				// swap size
-				size        = _size;
-				_size       = other._size;
-				other._size = size;
+			/* swap */
+			auto swap(self& other) noexcept -> void {
+				// swap members
+				xns::swap(_head, other._head);
+				xns::swap(_tail, other._tail);
+				xns::swap(_size, other._size);
 			}
 
-			void print(void) {
-				// get head node
-				node_pointer node = _head;
-				// loop over list
-				while (node) {
-					std::cout << node->_value << std::endl;
-					node = node->_next;
-				}
-			}
 
 
 			// -- public iterator methods -------------------------------------
 
 			/* begin */
-			iterator begin(void) noexcept {
-				// return iterator
-				return iterator(_head);
+			inline auto begin(void) noexcept -> iterator {
+				return iterator{_head};
 			}
 
 			/* begin */
-			const_iterator begin(void) const noexcept {
-				// return const iterator
-				return const_iterator(_head);
+			inline auto begin(void) const noexcept -> const_iterator {
+				return const_iterator{_head};
 			}
 
 			/* end */
-			xns::null end(void) const noexcept {
-				// return null
+			inline auto end(void) const noexcept -> xns::null {
 				return nullptr;
 			}
 
 
 		private:
 
-			// -- private members ---------------------------------------------
+			// -- private methods ---------------------------------------------
 
 			/* new node */
-			node_pointer new_node(void) {
-				// check if free node is available
-				if (_storage) {
-					// get free node
-					node_pointer node = _storage;
-					// set storage node
-					_storage = _storage->_next;
-					// return free node
-					return node;
-				} // else allocate new node
-				return allocator::allocate();
+			template <typename... A>
+			inline auto new_node(A&&... args) -> node_ptr {
+				return allocator::make(xns::forward<A>(args)...);
+
+				/* using allocator_traits = std::allocator_traits<std::allocator<node_type>>;
+				typename allocator_traits::allocator_type a;
+				node_ptr node = allocator_traits::allocate(a, 1);
+				allocator_traits::construct(a, node, xns::forward<A>(args)...);
+				return node; */
 			}
 
-			/* link storage */
-			void _store(node_pointer node) {
-				// destroy node
-				allocator::destroy(node);
-				// set node's next node
-				node->_next = _storage;
-				// set storage node
-				_storage = node;
+			/* delete node */
+			inline void delete_node(node_ptr node) noexcept {
+				allocator::store(node);
+
+				/* using allocator_traits = std::allocator_traits<std::allocator<node_type>>;
+				typename allocator_traits::allocator_type a;
+				allocator_traits::destroy(a, node);
+				allocator_traits::deallocate(a, node, 1); */
 			}
+
 
 			/* link node to front */
-			void front_link(node_pointer node) {
+			auto front_link(node_ptr node) noexcept -> void {
 				// check if list is empty
-				if (!_head) {
-					// set tail node
-					_tail = node;
-				// list is not empty
-				} else {
-					// set head's previous node
-					_head->_prev = node;
-					// set new node's next node
-					node->_next = _head;
-				} // in any case, set new head
+				not _head ?
+					_tail = node
+					// list is not empty
+					: _head->_prev = node,
+					   node->_next = _head;
+				// in any case, set new head
 				_head = node;
-				// increment list size
-				++_size;
 			}
 
 			/* link node to back */
-			void back_link(node_pointer node) {
+			auto back_link(node_ptr node) noexcept -> void {
 				// check if list is empty
-				if (!_tail) {
-					// set head node
-					_head = node;
-				// list is not empty
-				} else {
-					// set tail's next node
-					_tail->_next = node;
-					// set new node's previous node
-					node->_prev = _tail;
-				} // in any case, set new tail
+				not _tail ?
+					_head = node
+					// list is not empty
+					: _tail->_next = node,
+					   node->_prev = _tail;
+				// in any case, set new tail
 				_tail = node;
-				// increment list size
-				++_size;
 			}
 
-			/* initialize members */
-			void _init(void) noexcept {
-				// initialize pointers
+			/* init */
+			void init(void) noexcept {
+				// initialize members
 				_head = _tail = nullptr;
-				// initialize size
 				_size = 0;
 			}
 
-			/* free list */ // INFO: this only used in destructor
-			inline void _free_list(void) noexcept {
+			/* free list */
+			inline void free_list(void) noexcept {
 				// get head node
-				node_pointer node = nullptr;
+				node_ptr node = nullptr;
 				// loop over list
 				while (_head) {
 					 // unlink node
 					 node = _head;
 					_head = _head->_next;
-					// destroy node
-					allocator::destroy(node);
-					// deallocate node
-					allocator::deallocate(node);
+					// delete node
+					delete_node(node);
 				}
 			}
-
-			/* free storage */ // INFO: this only used in destructor
-			inline void _free_storage(void) noexcept {
-				// get storage node
-				node_pointer node = nullptr;
-				// loop over storage
-				while (_storage) {
-					    // unlink node
-					    node = _storage;
-					_storage = _storage->_next;
-					// deallocate node
-					allocator::deallocate(node);
-				}
-			}
-
-			/* destroy list */
-			inline void _destroy_list(void) noexcept {
-				// declare node
-				node_pointer node = nullptr;
-				// loop over list
-				while (_head) {
-					 // unlink node
-					 node = _head;
-					_head = _head->_next;
-					// store node (object destroyed in store method)
-					_store(node);
-				} // reset tail and size
-				_tail = nullptr;
-				_size = 0;
-			}
-
 
 
 			// -- private members ---------------------------------------------
 
 			/* head node */
-			node_pointer _head;
+			node_ptr _head;
 
 			/* tail node */
-			node_pointer _tail;
-
-			/* storage */
-			node_pointer _storage;
+			node_ptr _tail;
 
 			/* list size */
-			size_type   _size;
+			size_type _size;
 
 
 	};
@@ -528,57 +473,56 @@ namespace xns {
 	// -- N O D E -------------------------------------------------------------
 
 	template <class T>
-	struct list<T>::node final {
+	class alignas(sizeof(xns::addr_t)) list<T>::node final {
 
 
-		// -- constructors ----------------------------------------------------
+		public:
 
-		/* default constructor */
-		node(void) noexcept
-		: _value{}, _next{nullptr}, _prev{nullptr} {}
+			// -- public lifecycle --------------------------------------------
 
-		/* non-assignable struct */
-		NON_ASSIGNABLE(node);
+			/* default constructor */
+			inline node(void) noexcept
+			: _next{nullptr}, _prev{nullptr}, _value{} {}
 
-		/* value copy constructor */
-		node(const_reference value)
-		: _value{value}, _next{nullptr}, _prev{nullptr} {}
+			/* non-assignable struct */
+			NON_ASSIGNABLE(node);
 
-		/* value move constructor */
-		node(move_reference value) noexcept
-		: _value{xns::move(value)}, _next{nullptr}, _prev{nullptr} {}
+			/* value copy constructor (with previous node) */
+			inline node(const_reference value, node_ptr prev)
+			: _next{nullptr}, _prev{prev}, _value{value} {}
 
-		/* value emplace constructor */
-		template <typename... A>
-		node(A&&... args)
-		: _value{xns::forward<A>(args)...}, _next{nullptr}, _prev{nullptr} { }
+			/* value copy constructor */
+			inline node(const_reference value)
+			: _next{nullptr}, _prev{nullptr}, _value{value} {}
 
-		/* destructor */
-		~node(void) noexcept = default;
+			/* value move constructor */
+			inline node(move_reference value) noexcept
+			: _next{nullptr}, _prev{nullptr}, _value{xns::move(value)} {}
+
+			/* value forward constructor */
+			template <typename... A>
+			inline node(A&&... args) requires (xns::is_constructible<T, A...>)
+			: _next{nullptr}, _prev{nullptr}, _value{xns::forward<A>(args)...} {}
+
+			/* destructor */
+			inline ~node(void) noexcept = default;
 
 
-		// -- members ---------------------------------------------------------
+			// -- public members ----------------------------------------------
 
-		/* value */
-		value_type  _value;
+			/* next node */
+			node_ptr _next;
 
-		/* next node */
-		node_pointer _next;
+			/* previous node */
+			node_ptr _prev;
 
-		/* previous node */
-		node_pointer _prev;
+			/* value */
+			value_type  _value;
 
 	};
 
 
 	// -- non-member functions ------------------------------------------------
-
-	/* swap */
-	template <class T>
-	void swap(xns::list<T>& lhs, xns::list<T>& rhs) noexcept {
-		// swap lists
-		lhs.swap(rhs);
-	}
 
 	/* make list */
 	template <class... A>
@@ -644,7 +588,7 @@ namespace xns {
 			: _node{nullptr} {}
 
 			/* node constructor */
-			list_iterator(list_type::node_pointer node) noexcept
+			list_iterator(list_type::node_ptr node) noexcept
 			: _node{node} {}
 
 			/* copy constructor (non-const) */
@@ -827,7 +771,7 @@ namespace xns {
 			// -- private members ---------------------------------------------
 
 			/* node pointer */
-			xns::list<T>::node_pointer _node;
+			xns::list<T>::node_ptr _node;
 
 	};
 
@@ -836,3 +780,5 @@ namespace xns {
 
 
 #endif
+
+
