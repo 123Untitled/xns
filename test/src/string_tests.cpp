@@ -362,8 +362,8 @@ class sso {
 	};
 
 	union sso_u {
-		big   big;
-		small small;
+		big   _big;
+		small _small;
 	};
 
 	sso_u impl;
@@ -374,8 +374,6 @@ class sso {
 
 		std::cout << "SSO_CAPACITY: " << SSO_CAPACITY << std::endl;
 		std::cout << "sizeof(small::data): " << sizeof(small::data) << std::endl;
-
-
 	}
 
 	static_assert(sizeof(big) == sizeof(small));
@@ -384,7 +382,7 @@ class sso {
 
 
 	sso(void)
-	: impl{.small{{0}, SSO_CAPACITY, 1}} {
+	: impl{._small{{0}, SSO_CAPACITY, 1}} {
 	}
 
 	~sso(void) {
@@ -392,7 +390,7 @@ class sso {
 		if (is_small()) {
 		}
 		else {
-			delete[] impl.big.data;
+			delete[] impl._big.data;
 		}
 	}
 
@@ -402,53 +400,53 @@ class sso {
 
 	auto is_small(void) const -> bool {
 		// extract least significant byte
-		return impl.small.is_small;
+		return impl._small.is_small;
 	}
 
 	xns::size_t available(void) const {
-		return is_small() ? impl.small.available : impl.big.capacity - impl.big.size;
+		return is_small() ? impl._small.available : impl._big.capacity - impl._big.size;
 	}
 
 	xns::size_t capacity(void) const {
-		return is_small() ? SSO_CAPACITY : impl.big.capacity;
+		return is_small() ? SSO_CAPACITY : impl._big.capacity;
 	}
 
 	xns::size_t size(void) const {
-		return is_small() ? SSO_CAPACITY - impl.small.available : impl.big.size;
+		return is_small() ? SSO_CAPACITY - impl._small.available : impl._big.size;
 	}
 
 	void push_back(T c) {
 		if (is_small()) {
 			std::cout << "\x1b[32msmall pushing: " << (char)c << "\x1b[0m\n";
 
-				impl.small.data[size()] = c;
-				--impl.small.available;
-				impl.small.data[size()] = 0;
+				impl._small.data[size()] = c;
+				--impl._small.available;
+				impl._small.data[size()] = 0;
 
-			if (impl.small.available == 0) {
+			if (impl._small.available == 0) {
 				std::cout << "DYNAMIC ALLOCATION\n";
 				char_t* data = new char_t[SSO_CAPACITY * 2];
-				xns::memcpy(data, impl.small.data, SSO_CAPACITY);
-				impl.big.data = data;
-				impl.big.size = SSO_CAPACITY;
-				impl.big.capacity = SSO_CAPACITY * 2;
+				xns::memcpy(data, impl._small.data, SSO_CAPACITY);
+				impl._big.data = data;
+				impl._big.size = SSO_CAPACITY;
+				impl._big.capacity = SSO_CAPACITY * 2;
 			}
 		}
 		else {
 			std::cout << "\x1b[31mbig pushing: " << (char)c << "\x1b[0m\n";
-			if (impl.big.size == impl.big.capacity) {
+			if (impl._big.size == impl._big.capacity) {
 				std::cout << "REALLOCATION\n";
-				char_t* data = new char_t[impl.big.capacity * 2];
-				xns::memcpy(data, impl.big.data, impl.big.size);
-				data[impl.big.size] = c;
-				delete[] impl.big.data;
-				impl.big.data = data;
-				++impl.big.size;
-				impl.big.capacity *= 2;
+				char_t* data = new char_t[impl._big.capacity * 2];
+				xns::memcpy(data, impl._big.data, impl._big.size);
+				data[impl._big.size] = c;
+				delete[] impl._big.data;
+				impl._big.data = data;
+				++impl._big.size;
+				impl._big.capacity *= 2;
 			}
 			else {
-				impl.big.data[impl.big.size] = c;
-				++impl.big.size;
+				impl._big.data[impl._big.size] = c;
+				++impl._big.size;
 			}
 		}
 	}
@@ -463,12 +461,12 @@ class sso {
 		view.print();
 		::write(1, "string: ", 8);
 
-		char_t* data = impl.small.data;
+		char_t* data = impl._small.data;
 
 		if (is_small())
-		  	::write(1, impl.small.data, size());
+		  	::write(1, impl._small.data, size());
 		else
-		 	::write(1, impl.big.data, size());
+		 	::write(1, impl._big.data, size());
 		::write(1, "\n\n\n", 3);
 
 		// for (xns::size_t i = 0; i < size(); ++i) {

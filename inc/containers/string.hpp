@@ -198,8 +198,8 @@ namespace xns {
 
 			/* sso union */
 			union sso final {
-				big   big;
-				small small;
+				big   _big;
+				small _small;
 			};
 
 			/* sso string */
@@ -209,63 +209,63 @@ namespace xns {
 		public:
 
 			sso_string(void)
-			: _sso{.small{{0}, SSO_CAPACITY, 1}} {}
+			: _sso{._small{{0}, SSO_CAPACITY, 1}} {}
 
 			~sso_string(void) {
 				if (not is_small()) {
-					delete[] _sso.big.data;
+					delete[] _sso._big.data;
 				}
 			}
 
 			auto is_small(void) const -> bool {
 				// extract least significant byte
-				return _sso.small.is_small;
+				return _sso._small.is_small;
 			}
 
 			xns::size_t available(void) const {
-				return is_small() ? _sso.small.available : _sso.big.capacity - _sso.big.size;
+				return is_small() ? _sso._small.available : _sso._big.capacity - _sso._big.size;
 			}
 
 			xns::size_t capacity(void) const {
-				return is_small() ? SSO_CAPACITY : _sso.big.capacity;
+				return is_small() ? SSO_CAPACITY : _sso._big.capacity;
 			}
 
 			xns::size_t size(void) const {
-				return is_small() ? SSO_CAPACITY - _sso.small.available : _sso.big.size;
+				return is_small() ? SSO_CAPACITY - _sso._small.available : _sso._big.size;
 			}
 
 			void push_back(T c) {
 				if (is_small()) {
 					// std::cout << "\x1b[32msmall pushing: " << (char)c << "\x1b[0m\n";
 
-						_sso.small.data[size()] = c;
-						--_sso.small.available;
-						_sso.small.data[size()] = 0;
+						_sso._small.data[size()] = c;
+						--_sso._small.available;
+						_sso._small.data[size()] = 0;
 
-					if (_sso.small.available == 0) {
+					if (_sso._small.available == 0) {
 						// std::cout << "DYNAMIC ALLOCATION\n";
 						char_t* data = new char_t[SSO_CAPACITY * 2];
-						xns::memcpy(data, _sso.small.data, SSO_CAPACITY);
-						_sso.big.data = data;
-						_sso.big.size = SSO_CAPACITY;
-						_sso.big.capacity = SSO_CAPACITY * 2;
+						xns::memcpy(data, _sso._small.data, SSO_CAPACITY);
+						_sso._big.data = data;
+						_sso._big.size = SSO_CAPACITY;
+						_sso._big.capacity = SSO_CAPACITY * 2;
 					}
 				}
 				else {
 					// std::cout << "\x1b[31mbig pushing: " << (char)c << "\x1b[0m\n";
-					if (_sso.big.size == _sso.big.capacity) {
+					if (_sso._big.size == _sso._big.capacity) {
 						// std::cout << "REALLOCATION\n";
-						char_t* data = new char_t[_sso.big.capacity * 2];
-						xns::memcpy(data, _sso.big.data, _sso.big.size);
-						data[_sso.big.size] = c;
-						delete[] _sso.big.data;
-						_sso.big.data = data;
-						++_sso.big.size;
-						_sso.big.capacity *= 2;
+						char_t* data = new char_t[_sso._big.capacity * 2];
+						xns::memcpy(data, _sso._big.data, _sso._big.size);
+						data[_sso._big.size] = c;
+						delete[] _sso._big.data;
+						_sso._big.data = data;
+						++_sso._big.size;
+						_sso._big.capacity *= 2;
 					}
 					else {
-						_sso.big.data[_sso.big.size] = c;
-						++_sso.big.size;
+						_sso._big.data[_sso._big.size] = c;
+						++_sso._big.size;
 					}
 				}
 			}
@@ -1661,7 +1661,8 @@ namespace xns {
 			: _str{other._str}, _size{other._size} {}
 
 			/* move constructor */
-			inline constexpr basic_string_view(self&& other) noexcept = default;
+			inline constexpr basic_string_view(self&& other) noexcept
+			: basic_string_view(other) {}
 
 			/* destructor */
 			inline ~basic_string_view(void) noexcept = default;
@@ -2089,6 +2090,7 @@ namespace xns {
 			constexpr formated_string_iterator(const S& string, const xns::size_t size) noexcept
 			: _min{string.data()},
 			  _max{string.data() + string.size()},
+			  _size{size},
 			  _view{} {
 				*this += size;
 			}

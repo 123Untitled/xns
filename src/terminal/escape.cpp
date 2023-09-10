@@ -288,7 +288,7 @@ const xns::escape::string& xns::escape::move_x(size_type x) {
 
 	// compile time buffer size
 	constexpr const xns::size_t size = sizeof("\x1b[G")
-								+ xns::limits::digits<xns::term_size>();
+									 + xns::limits::digits<size_type>();
 	// buffer
 	char_t buffer[size];
 
@@ -296,7 +296,7 @@ const xns::escape::string& xns::escape::move_x(size_type x) {
 	xns::size_t i = size - 1;
 
 	// increment x if not max
-	x += (x != xns::limits::max<xns::term_size>());
+	x += (x != xns::limits::max<size_type>());
 
 	// last character
 	buffer[i] = 'G';
