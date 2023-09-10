@@ -13,89 +13,91 @@
 namespace xns {
 
 
-	// -- I N T E G E R  T O  S T R I N G -------------------------------------
 
-	class conversion {
+	/* to basic string (signed integer) */
+	template <typename C, typename T>
+	auto to_basic_string(T vlue) -> xns::basic_string<C>
+		// requirements
+		requires(xns::is_signed_integral<T>) {
 
-		public:
+		T value = vlue;
+		xns::basic_string<C> str;
 
-			// -- public constructors -----------------------------------------
+		str.reserve(xns::limits::digits<T>() + 1); // INFO: +1 for negative sign
 
-			/* non-instanciable class */
-			NON_INSTANCIABLE(conversion);
+		constexpr T type_min = xns::limits::min<T>();
 
+		T base = 10;
 
-			// -- public static methods ---------------------------------------
+		bool negative = false;
 
-			template <xns::is_signed N>
-			static xns::string integer_to_string(N number) {
-				xns::string str;
+		xns::string::size_type x = 0;
 
-				str.reserve(xns::limits::digits<N>() + 1); // INFO: +1 for negative sign
+		// check negative
+		if (value < 0) {
+			// set negative flag
+			negative = true;
 
-				constexpr N type_min = xns::limits::min<N>();
-
-				N base = 10;
-
-				bool negative = false;
-
-				xns::string::size_type x = 0;
-
-				// check negative
-				if (number < 0) {
-					// set negative flag
-					negative = true;
-
-					if (number == type_min) {
-						// INFO: this is a special case
-					}
-					else {
-						// inverse number
-						number = -number;
-					}
-				}
-
-				do {
-					N rem = number % base;
-					//_str[x] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
-					str._str[x] = (number % 10) + '0';
-					++x;
-				} while ((number /= base));
-
-				if (negative) { str._str[x++] = '-'; }
-
-				str._size_and_terminator(x);
-				// reverse all characters
-				str.reverse();
-
-				return str;
+			if (value == type_min) {
+				// INFO: this is a special case
 			}
-
-
-			template <xns::is_unsigned N>
-			static xns::string integer_to_string(N number) {
-
-				xns::string str;
-
-				str.reserve(xns::limits::digits<N>());
-
-				// declare size type
-				xns::string::size_type x = 0;
-
-				// loop through number
-				do {
-					str._str[x] = (number % 10) + '0';
-					number /= 10;
-					++x;
-				} while (number);
-
-				str._size_and_terminator(x);
-
-				// reverse all characters
-				str.reverse();
-
-				return str;
+			else {
+				// inverse number
+				value = -value;
 			}
+		}
+
+		do {
+			T rem = value % base;
+			//_str[x] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
+			str._str[x] = (value % 10) + '0';
+			++x;
+		} while ((value /= base));
+
+		if (negative) { str._str[x++] = '-'; }
+
+		str.null_terminator(x);
+		// reverse all characters
+		str.reverse();
+
+		return str;
+	}
+
+
+	/* to basic string (unsigned integer) */
+	template <typename C, typename T>
+	auto to_basic_string(T number) -> xns::basic_string<C>
+		// requirements
+		requires(xns::is_unsigned_integral<T>) {
+
+		using size_type = typename xns::basic_string<C>::size_type;
+
+		xns::basic_string<C> str;
+		constexpr size_type size = xns::limits::digits<T>();
+
+		str._str = str.allocate(size);
+		str._capacity = size;
+
+		// declare iterator
+		size_type x = 0;
+
+		// loop through number
+		do {
+			str._str[x] = (number % 10) + '0';
+			number /= 10;
+			++x;
+		} while (number);
+
+		str._str[x] = static_cast<C>(0);
+		str._size = x;
+
+		// reverse all characters
+		str.reverse();
+
+		return str;
+	}
+
+
 
 
 		template <xns::is_string S, is_integral I>
@@ -176,23 +178,7 @@ namespace xns {
 			return true;
 		}
 
-	};
 
-
-	/* to basic string */
-	template <typename C, typename T>
-	auto to_basic_string(const T& value) -> xns::basic_string<C> {
-
-		// temporary assert string type
-		static_assert(xns::is_same<C, char>, "ONLY CHAR STRING IS SUPPORTED, FOR NOW");
-		// temporary assert T is integral
-		static_assert(xns::is_integral<T>, "ONLY INTEGRAL TYPES ARE SUPPORTED, FOR NOW");
-
-		if constexpr (xns::is_integral<T>) {
-			return conversion::integer_to_string(value);
-		}
-
-	}
 
 
 	/* to c-string ascii */
@@ -233,3 +219,74 @@ namespace xns {
 }
 
 #endif
+
+			// /* unsigned integer to string */
+			// template <xns::is_unsigned N>
+			// void to_string(N number) {
+			// 	// temporary string
+			// 	clear();
+			//
+			// 	constexpr N size = xns::limits::digits<N>();
+			//
+			// 	// WARNING: need to verify class
+			// 	// error doesn't checked with this method
+			// 	reserve(size);
+			//
+			// 	// convert number to string
+			// 	size_type x = 0;
+			// 	// loop through number
+			// 	do {
+			// 		_str[x] = (number % 10) + '0';
+			// 		number /= 10;
+			// 		++x;
+			// 	} while (number);
+			//
+			// 	_size_and_terminator(x);
+			// 	// reverse all characters
+			// 	reverse();
+			// }
+			//
+			//
+			// /* signed integer to string */
+			// template <xns::is_signed N>
+			// void to_string(N number) {
+			// 	// temporary string
+			// 	clear();
+			//
+			// 	constexpr size_type size = xns::limits::digits<N>() + 1; // INFO: +1 for negative sign
+			// 	constexpr N type_min = xns::limits::min<N>();
+			// 	N base = 10;
+			//
+			// 	// WARNING: need to verify class
+			// 	// error doesn't checked with this method
+			// 	reserve(size);
+			// 	bool negative = false;
+			//
+			// 	size_type x = 0;
+			// 	// check negative
+			// 	if (number < 0) {
+			// 		// set negative flag
+			// 		negative = true;
+			//
+			// 		if (number == type_min) {
+			// 			// INFO: this is a special case
+			// 		}
+			// 		else {
+			// 			// inverse number
+			// 			number = -number;
+			// 		}
+			// 	}
+			// 	do {
+			// 		N rem = number % base;
+			// 		//_str[x] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
+			// 		_str[x] = (number % 10) + '0';
+			// 		++x;
+			// 	} while ((number /= base));
+			//
+			// 	if (negative) { _str[x++] = '-'; }
+			//
+			// 	_size_and_terminator(x);
+			// 	// reverse all characters
+			// 	reverse();
+			// }
+			//
