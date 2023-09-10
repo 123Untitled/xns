@@ -1,7 +1,11 @@
 #include "unit_tests.hpp"
+
 #include "string.hpp"
+#include "string_literal.hpp"
 #include "output.hpp"
 
+#include "bit_view.hpp"
+#include "terminal.hpp"
 
 
 
@@ -25,12 +29,12 @@ static void EXPECTED(	const xns::basic_string<T>& str,
 	using xns::string;
 
 	// check pointer diff
-	if ((!str.pointer()) != (!ptr)) ERROR(POINTER);
+	if ((!str.data()) != (!ptr)) ERROR(POINTER);
 	else SUCCESS(POINTER);
 	const char* null = ptr ? "address" : "null";
 	// cast to pointer to print address
-	if (str.pointer() != nullptr)
-		DIFF((void*)str.pointer(), null);
+	if (str.data() != nullptr)
+		DIFF((void*)str.data(), null);
 	else DIFF("null", null);
 	// check size
 	if (str.size() != len) ERROR(SIZE);
@@ -41,8 +45,8 @@ static void EXPECTED(	const xns::basic_string<T>& str,
 	else SUCCESS(CAPACITY);
 	DIFF(str.capacity(), cap);
 	// check if str is null terminated
-	if (str.pointer() != nullptr) {
-		T terminator = str.pointer()[str.size()];
+	if (str.data() != nullptr) {
+		T terminator = str.data()[str.size()];
 		if (terminator != 0) { ERROR(TERMINATOR); DIFF(terminator, "'\\0'"); }
 		else { SUCCESS(TERMINATOR); DIFF("'\\0'", "'\\0'"); }
 	}
@@ -97,61 +101,50 @@ static void reserve_test(void) {
 	}
 }
 
-//// append string test
-//template <typename T>
-//static void append_string_test(void) {
-//
-//	using Str = Xf::String<T>;
-//
-//	{
-//		Str s1{"hello"};
-//		Str s2{" world!"};
-//
-//		EXPECTED(s1, ALLOCATED, 5, 5);
-//		EXPECTED(s2, ALLOCATED, 7, 7);
-//
-//		s1.append(s2);
-//		EXPECTED(s1, ALLOCATED, 12, 12);
-//		EXPECTED(s2, ALLOCATED, 7, 7);
-//	}
-//
-//}
-//
-//// append fill test
-//static void append_fill_test(void) {
-//
-//	{
-//		String s;
-//		EXPECTED(s, false, 0, 0);
-//		s.reserve(2);
-//
-//		s.append('a', 3);
-//		EXPECTED(s, true, 3, 3);
-//		return;
-//	}
-//
-//	{
-//		String s{'x', 2};
-//		EXPECTED(s, true, 2, 3);
-//
-//		s.append('a', 10);
-//		EXPECTED(s, true, 12, 13);
-//	}
-//
-//
-//}
-//	//Xf::String str{"He3ll8o W2or1ld"};
-//
-//	//str._debug_();
-//	//str.filter(Xf::String<>::is_digit);
-//	//str._debug_();
-//	//str.reserve(20);
-//	//str._debug_();
-//
-//
-//
-//	////str.append(str2, str2, str2);
-//
+// append string test
+template <typename T>
+static void append_string_test(void) {
+
+	using Str = xns::basic_string<T>;
+
+	{
+		Str s1{"hello"};
+		Str s2{" world!"};
+
+		EXPECTED(s1, ALLOCATED, 5, 5);
+		EXPECTED(s2, ALLOCATED, 7, 7);
+
+		s1.append(s2);
+		EXPECTED(s1, ALLOCATED, 12, 12);
+		EXPECTED(s2, ALLOCATED, 7, 7);
+	}
+
+}
+
+// append fill test
+static void append_fill_test(void) {
+
+	{
+		xns::string s;
+		EXPECTED(s, false, 0, 0);
+		s.reserve(2);
+
+		s.append('a', 3);
+		EXPECTED(s, true, 3, 3);
+		return;
+	}
+
+	{
+		xns::string s{'x', 2};
+		EXPECTED(s, true, 2, 3);
+
+		s.append('a', 10);
+		EXPECTED(s, true, 12, 13);
+	}
+
+
+}
+
 
 static void subview(void) {
 	xns::string s{"hello world!"};
@@ -218,14 +211,14 @@ bool UT::unit_tests<"string">(void) {
    // sss.forward_remove_duplicates();
 	xns::basic_string<char> s;
 	const unsigned char c = 'a';
-
-	s.to_string(c);
-	for(char x = -11; x < +5'0; ++x) {
-		s.to_string(x);
-		//write(1, "final: ", 7);
-		write(1, s.pointer(), s.size());
-		write(1, "\n", 1);
-	}
+	//
+	// s.to_string(c);
+	// for(char x = -11; x < +5'0; ++x) {
+	// 	s.to_string(x);
+	// 	//write(1, "final: ", 7);
+	// 	write(1, s.data(), s.size());
+	// 	write(1, "\n", 1);
+	// }
 
 	return true;
 
@@ -284,24 +277,23 @@ void test(const char(&ptr)[N]) {
 }*/
 
 
-#include "string_literal.hpp"
 
 struct from_pointer {};
 struct from_array {};
 
-template <std::size_t N>
-void test(from_array, const char(&ptr)[N]) {
-    std::cout << "from const char(&)[" << N << "]\n";
-}
-
-void test(from_pointer, const char* ptr) {
-    std::cout << "from const char*\n";
-}
-
-template <std::size_t N>
-void test2(const xns::basic_string_literal<N>& str) {
-	std::cout << "from string_literal\n";
-}
+//template <std::size_t N>
+//void test(from_array, const char(&ptr)[N]) {
+//    std::cout << "from const char(&)[" << N << "]\n";
+//}
+//
+//void test(from_pointer, const char* ptr) {
+//    std::cout << "from const char*\n";
+//}
+//
+//template <std::size_t N>
+//void test2(const xns::basic_string_literal<N>& str) {
+//	std::cout << "from string_literal\n";
+//}
 
 /*void test2(const char* ptr) {
 	std::cout << "from const char*\n";
@@ -314,18 +306,383 @@ void test2(const char(&ptr)[N]) {
 }*/
 
 
+static auto insert_test(void) -> void {
+
+	xns::string s{"hello world!"};
+	std::cout << s << std::endl;
+	std::cout << "size: " << s.size() << " | capacity: " << s.capacity() << std::endl;
+	std::cout << "inserting 'my ' at index 6" << std::endl;
+	s.insert(6, "my ");
+	std::cout << s << std::endl;
+	std::cout << "size: " << s.size() << " | capacity: " << s.capacity() << std::endl;
+
+
+
+}
+
+namespace xns {
+template <typename T>
+consteval auto bits(void) noexcept -> xns::size_t {
+	return sizeof(T) * XNS_CHAR_BIT;
+}
+}
+
+
+template <typename T>
+class sso {
+
+	public:
+
+	using char_t = T;
+	using mut_ptr = char_t*;
+	using size_type = xns::size_t;
+
+	private:
+
+	enum : size_type {
+		CAPACITY_BITS = xns::bits<size_type>() - 1
+	};
+
+	struct big {
+		mut_ptr   data;
+		size_type size;
+		size_type capacity : CAPACITY_BITS;
+		size_type is_small : 1;
+	};
+
+	enum : size_type {
+		SSO_CAPACITY  = (sizeof(big) / sizeof(char_t)) - 1
+	};
+
+
+	struct small {
+		char_t data[SSO_CAPACITY];
+		size_type available : xns::bits<char_t>() - 1;
+		size_type is_small : 1;
+	};
+
+	union sso_u {
+		big   big;
+		small small;
+	};
+
+	sso_u impl;
+
+	public:
+
+	void debug(void) const {
+
+		std::cout << "SSO_CAPACITY: " << SSO_CAPACITY << std::endl;
+		std::cout << "sizeof(small::data): " << sizeof(small::data) << std::endl;
+
+
+	}
+
+	static_assert(sizeof(big) == sizeof(small));
+
+	using bview = xns::bit_view<typename sso<T>::sso_u>;
+
+
+	sso(void)
+	: impl{.small{{0}, SSO_CAPACITY, 1}} {
+	}
+
+	~sso(void) {
+
+		if (is_small()) {
+		}
+		else {
+			delete[] impl.big.data;
+		}
+	}
+
+
+
+
+
+	auto is_small(void) const -> bool {
+		// extract least significant byte
+		return impl.small.is_small;
+	}
+
+	xns::size_t available(void) const {
+		return is_small() ? impl.small.available : impl.big.capacity - impl.big.size;
+	}
+
+	xns::size_t capacity(void) const {
+		return is_small() ? SSO_CAPACITY : impl.big.capacity;
+	}
+
+	xns::size_t size(void) const {
+		return is_small() ? SSO_CAPACITY - impl.small.available : impl.big.size;
+	}
+
+	void push_back(T c) {
+		if (is_small()) {
+			std::cout << "\x1b[32msmall pushing: " << (char)c << "\x1b[0m\n";
+
+				impl.small.data[size()] = c;
+				--impl.small.available;
+				impl.small.data[size()] = 0;
+
+			if (impl.small.available == 0) {
+				std::cout << "DYNAMIC ALLOCATION\n";
+				char_t* data = new char_t[SSO_CAPACITY * 2];
+				xns::memcpy(data, impl.small.data, SSO_CAPACITY);
+				impl.big.data = data;
+				impl.big.size = SSO_CAPACITY;
+				impl.big.capacity = SSO_CAPACITY * 2;
+			}
+		}
+		else {
+			std::cout << "\x1b[31mbig pushing: " << (char)c << "\x1b[0m\n";
+			if (impl.big.size == impl.big.capacity) {
+				std::cout << "REALLOCATION\n";
+				char_t* data = new char_t[impl.big.capacity * 2];
+				xns::memcpy(data, impl.big.data, impl.big.size);
+				data[impl.big.size] = c;
+				delete[] impl.big.data;
+				impl.big.data = data;
+				++impl.big.size;
+				impl.big.capacity *= 2;
+			}
+			else {
+				impl.big.data[impl.big.size] = c;
+				++impl.big.size;
+			}
+		}
+	}
+
+	void print(void) {
+		std::cout << "\nsize: "      << size()
+				  << "\ncapacity: "  << capacity()
+				  << "\navailable: " << available()
+				  << "\nin small: "  << is_small() << std::endl;
+
+		bview view{impl};
+		view.print();
+		::write(1, "string: ", 8);
+
+		char_t* data = impl.small.data;
+
+		if (is_small())
+		  	::write(1, impl.small.data, size());
+		else
+		 	::write(1, impl.big.data, size());
+		::write(1, "\n\n\n", 3);
+
+		// for (xns::size_t i = 0; i < size(); ++i) {
+		// 	std::cout << "c: " << impl.big.data[i];
+		// }
+		// std::cout << std::endl;
+	}
+
+
+};
+
+#include "input.hpp"
+
+template <typename T>
+void sso_test(const T* msg) {
+	if (msg == nullptr) { return; }
+	sso<T> s;
+
+	xns::terminal::raw_terminal();
+
+	xns::string input;
+
+	s.print();
+	while (input != "q") {
+
+		input = xns::in::read();
+		s.push_back(input.front());
+		s.print();
+	}
+
+
+
+
+
+	xns::terminal::restore_terminal();
+
+	return;
+
+
+	while (*msg) {
+		s.print();
+		s.push_back(*msg);
+		++msg;
+	}
+	s.print();
+
+
+
+}
+
+
+
+#include "benchmark.hpp"
+#include "random.hpp"
+
+
+static auto benchmark(void) {
+
+	xns::size_t check_sum = 0;
+	xns::size_t N = 2000;;
+	xns::benchmark<5> bench;
+
+
+	bench.run("sso::string", [&] {
+		xns::sso_string<char> s;
+		for (xns::size_t i = 0; i < N; ++i) {
+			s.push_back(xns::random::integral<char>());
+		}
+		check_sum += s.size();
+	});
+
+	bench.run("xns::string", [&] {
+		xns::string s;
+		for (xns::size_t i = 0; i < N; ++i) {
+			s.append(xns::random::integral<char>());
+		}
+		check_sum += s.size();
+	});
+
+
+	bench.result("push_back");
+	std::cout << "check_sum: " << check_sum << std::endl;
+}
+
+#include <string.h>
+#include "strcmp.hpp"
+#include "strncmp.hpp"
+
 int main(void) {
 
-	xns::basic_string_literal str{"hello"};
-	str.size();
+	xns::string_view sv{};
 
-	//test2(xns::string_literal{"hello"});
+	std::cout << sv.data() << std::endl;
+	return 0;
+
+
+
+
+	xns::string s0{"My|name|is|tutur|to"};
+	auto v = s0.split<true>("|");
+	for (auto& s : v) {
+		std::cout << s << std::endl;
+	}
+
+
+	return 0;
+
+
+	std::cout << xns::strncmp("hello", "world", 0) << std::endl;
+	std::cout << xns::strncmp("hello", "hellz", 4) << std::endl;
+	std::cout << xns::strcmp("hello", "aorld") << std::endl;
+	std::cout << xns::strcmp("hello", "hello") << std::endl;
+	return 0;
+
+
+
+
+	return 0;
+
+	benchmark();
+	return 0;
+
+	sso_test<char8_t>(u8"");
+	return 0;
+
+	unsigned char arr[4] {0,0,0,0xff};
+	int i = 1;
+
+	xns::bit_view<unsigned char[4]> v1{arr};
+	xns::bit_view<int> v2{i};
+
+	v1.print();
+	v2.print();
+
+	return 0;
+
+
+	std::string s;
+
+	for (char c = 'a'; c < 'z'; ++c) {
+		std::cout << "size: " << s.size() << " | capacity: " << s.capacity() << std::endl;
+		s.push_back(c);
+	}
+
+
+
+
+
+
+
+	auto str = xns::to_string(-42);
+
+	for (auto& c : str) {
+		std::cout << '>' << c << std::endl;
+	}
+
+
+	// for (auto& c : str) {
+		// std::cout << c << std::endl;
+	// }
+
+	std::cout << "size: " << str.size() << std::endl;
+	std::cout << "capacity: " << str.capacity() << std::endl;
+	write(1, str.data(), str.size());
+
+
+	//insert_test();
+	return 0;
+
+	reserve_test<char>();
+	append_string_test<char>();
+	append_fill_test();
+
+
 
 }
 
 
 
 
+
+
+
+//    struct __long
+//    {
+//        pointer   __data_;
+//        size_type __size_;
+//        size_type __cap_ : sizeof(size_type) * CHAR_BIT - 1;
+//        size_type __is_long_ : 1;
+//    };
+//
+//    enum {__min_cap = (sizeof(__long) - 1)/sizeof(value_type) > 2 ?
+//                      (sizeof(__long) - 1)/sizeof(value_type) : 2};
+//
+//    struct __short
+//    {
+//        value_type __data_[__min_cap];
+//        unsigned char __padding_[sizeof(value_type) - 1];
+//        unsigned char __size_ : 7;
+//        unsigned char __is_long_ : 1;
+//    };
+
+// The __endian_factor is required because the field we use to store the size
+// has one fewer bit than it would if it were not a bitfield.
+//
+// If the LSB is used to store the short-flag in the short string representation,
+// we have to multiply the size by two when it is stored and divide it by two when
+// it is loaded to make sure that we always store an even number. In the long string
+// representation, we can ignore this because we can assume that we always allocate
+// an even amount of value_types.
+//
+// If the MSB is used for the short-flag, the max_size() is numeric_limits<size_type>::max() / 2.
+// This does not impact the short string representation, since we never need the MSB
+// for representing the size of a short string anyway.
 
 
 
