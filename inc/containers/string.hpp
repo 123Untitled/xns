@@ -1533,7 +1533,7 @@ namespace xns {
 
 	/* deduction guide for null-terminated constructor */
 	template <typename T>
-	basic_string(const T*) -> xns::basic_string<T>;
+	basic_string(const T*) -> basic_string<T>;
 
 
 
@@ -1927,7 +1927,7 @@ namespace xns {
 
 	/* deduction guide for null-terminated constructor */
 	template <typename T>
-	basic_string_view(const T*) -> xns::basic_string_view<T>;
+	basic_string_view(const T*) -> basic_string_view<T>;
 
 
 	inline std::ostream& operator<<(std::ostream& os, const xns::basic_string_view<char>& string) {
