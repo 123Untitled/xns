@@ -96,7 +96,7 @@ namespace xns {
 				if (_instance._buffer.empty()) { return; }
 
 				// write buffer to file descriptor
-				(void)::write(fd, _instance._buffer.pointer(),
+				(void)::write(fd, _instance._buffer.data(),
 								  _instance._buffer.size());
 
 				// clear buffer
@@ -114,7 +114,7 @@ namespace xns {
 			static void write(const T& number) {
 
 				// convert number to string
-				xns::string str = xns::conversion::integer_to_string(number);
+				xns::string str = xns::to_string(number);
 
 				// write string
 				xns::out::write(str);
