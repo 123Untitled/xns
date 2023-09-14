@@ -176,13 +176,15 @@ static auto insert(void) -> void {
 		//std::cout << "\x1b[32m" << i << "\x1b[0m" << std::endl;
 		//std::cout << std::endl;
 		tree.insert(i);
-		// tree.print();
-		// usleep(10000);
+		 tree.print();
+		 usleep(10000);
 		// std::cout << "tree depth: " << tree.depth() << std::endl;
 		// std::cout << "tree size: " << tree.size() << std::endl << std::endl;
 	}
 
+
 	check_tree(tree);
+	return;
 
 	std::cout << "START ERASING" << std::endl;
 
@@ -287,9 +289,9 @@ bool UT::unit_tests<"tree">(void) {
 
 	insert();
 	return true;
+
 	benchmark01();
 	return true;
-
 
 	interactive();
 	return true;
