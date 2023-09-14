@@ -41,17 +41,17 @@ namespace xns {
 				dst[i] = src[i];
 		}
 
-		/* memcpy simd 16 */
-		inline auto memcpy_simd(xns::ubyte* dst, const xns::ubyte* src, const xns::size_t size) -> void {
-			// std::cout << "memcpy_simd: " << size << std::endl;
-			// loop over bytes
-			for (xns::size_t i = 0; i < size; i += 16) {
-				// load 16 bytes
-				const auto data = vld1q_u8(src + i);
-				// store 16 bytes
-				vst1q_u8(dst + i, data);
-			}
-		}
+		// /* memcpy simd 16 */
+		// inline auto memcpy_simd(xns::ubyte* dst, const xns::ubyte* src, const xns::size_t size) -> void {
+		// 	// std::cout << "memcpy_simd: " << size << std::endl;
+		// 	// loop over bytes
+		// 	for (xns::size_t i = 0; i < size; i += 16) {
+		// 		// load 16 bytes
+		// 		const auto data = vld1q_u8(src + i);
+		// 		// store 16 bytes
+		// 		vst1q_u8(dst + i, data);
+		// 	}
+		// }
 
 
 	}
