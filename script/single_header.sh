@@ -45,7 +45,7 @@ function merge_headers {
 		local HASH=$(shasum -a 1 <<< $header)
 		HASH=${HASH%% *}
 		cp $header $out_dir'/'inc'/'$HASH'.hpp'
-		echo '#include "'$HASH'.hpp"' >> $out_dir'/'$out_file
+		echo '#include "inc/'$HASH'.hpp"' >> $out_dir'/'$out_file
 	done
 }
 
