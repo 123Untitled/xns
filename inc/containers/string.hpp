@@ -15,6 +15,8 @@
 #include "memcpy.hpp"
 #include "memset.hpp"
 #include "memmove.hpp"
+#include "strcmp.hpp"
+#include "strncmp.hpp"
 
 #include "swap.hpp"
 
@@ -453,19 +455,19 @@ namespace xns {
 			// -- public assignments ------------------------------------------
 
 			/* string view assignment */
-			void assign(const self::view& view) {
+			inline auto assign(const self::view& view) -> void {
 				// return buffer assignment
 				assign(view.data(), view.size());
 			}
 
 			/* null-terminated string assignment */
-			void assign(const_ptr str) {
+			inline auto assign(const_ptr str) -> void {
 				// return buffer assignment
 				assign(str, get_len(str));
 			}
 
 			/* buffer assignment */
-			void assign(const_ptr str, const size_type size) {
+			auto assign(const_ptr str, const size_type size) -> void {
 				// check if size or pointer is null
 				if (not size || not str) { clear(); return; }
 				// check if capacity is sufficient
@@ -479,7 +481,7 @@ namespace xns {
 			}
 
 			/* fill assignment */
-			void assign(const char_t character, const size_type size) {
+			auto assign(const char_t character, const size_type size) -> void {
 				// check if size is zero
 				if (not size) { clear(); return; }
 				// check if capacity is sufficient
@@ -494,7 +496,7 @@ namespace xns {
 
 
 			/* copy assignment */
-			void assign(const self& other) {
+			auto assign(const self& other) -> void {
 				// check for other size
 				if (other.empty()) { clear(); return; }
 				// check for self-assignment
@@ -633,6 +635,29 @@ namespace xns {
 				// call compare method
 				return compare(str) == 0;
 			}
+
+			/* less than */
+			bool operator<(const self& str) const {
+				return compare(str) < 0;
+			}
+
+			/* less than or equal */
+			bool operator<=(const self& str) const {
+				return compare(str) <= 0;
+			}
+
+			/* greater than */
+			bool operator>(const self& str) const {
+				return compare(str) > 0;
+			}
+
+			/* greater than or equal */
+			bool operator>=(const self& str) const {
+				return compare(str) >= 0;
+			}
+
+
+
 
 
 			// -- public accessors --------------------------------------------
@@ -1261,73 +1286,35 @@ namespace xns {
 			// need to fix this.
 
 			/* string compare */
-			signed_type compare(const self& str) const {
-				// call null-terminated string compare
-				return compare(str._str);
+			inline auto compare(const self& str) const noexcept -> signed_type {
+				// call strcmp
+				return xns::strcmp(_str, str._str);
 			}
 
 			/* string view compare */
-			signed_type compare(const basic_string_view<char_t>& view) const {
+			inline auto compare(const basic_string_view<char_t>& view) const noexcept -> signed_type {
 				// call null-terminated string compare
 				return compare(view.data());
 			}
 
 			/* null-terminated string compare */
-			signed_type compare(const_ptr str2) const {
-				// temporary pointers
-				const_ptr str1 = _str;
-				// compare nullptr-ness
-				if (!str1) { if (!str2) { return 0; } return -1; }
-				if (!str2) { return 1; }
-				// loop through strings
-				while (*str1 && *str2 && *str1 == *str2) {
-					++str1; ++str2;
-				} // return difference
-				return *str1 - *str2;
+			inline auto compare(const_ptr str) const noexcept -> signed_type {
+				return str != nullptr ? xns::strcmp(_str, str) : 1;
 			}
 
 			/* string size compare */
-			signed compare(const self& str, const size_type size) const {
-				// call null-terminated string size compare
-				return compare(str._str, size);
+			inline auto compare(const self& str, const size_type size) const noexcept -> signed_type {
+				// call strncmp
+				return xns::strncmp(_str, str._str, size);
 			}
 
 			/* null-terminated string size compare */
-			signed compare(const_ptr str2, size_type size) const {
-				// temporary pointers
-				const_ptr str1 = _str;
-				// compare nullptr-ness
-				if (!str1) { if (!str2) { return 0; } return -1; }
-				if (!str2) { return 1; }
-				// loop through strings
-				while (*str1 && *str2 && --size && *str1 == *str2) {
-					++str1; ++str2;
-				} // return difference
-				return *str1 - *str2;
+			inline auto compare(const_ptr str, size_type size) const noexcept -> signed_type {
+				return str != nullptr ? xns::strncmp(_str, str, size) : 1;
 			}
 
 
 			// -- comparison operators ----------------------------------------
-
-			///* less than */
-			//bool operator<(const self& str) const {
-			//	return compare(str) < 0;
-			//}
-
-			///* less than or equal */
-			//bool operator<=(const self& str) const {
-			//	return compare(str) <= 0;
-			//}
-
-			///* greater than */
-			//bool operator>(const self& str) const {
-			//	return compare(str) > 0;
-			//}
-
-			///* greater than or equal */
-			//bool operator>=(const self& str) const {
-			//	return compare(str) >= 0;
-			//}
 
 
 
@@ -1828,8 +1815,9 @@ namespace xns {
 					"): CAN'T COMPARE DIFFERENT STRING TYPES :(");
 
 				// compare nullptr-ness
-				if (!_str)       { if (!other._str) { return 0; } return -1; }
-				if (!other._str) { return 1; }
+				// if (!_str)       { if (!other._str) { return 0; } return -1; }
+				// if (!other._str) { return 1; }
+				// this is not needed because the string or string view is never null
 
 				// compare sizes
 				/*if (_size != other._size) {
@@ -1920,7 +1908,22 @@ namespace xns {
 			// -- private static members --------------------------------------
 
 			/* empty string */
-			static constexpr const_ptr _empty = "";
+			static constexpr const_ptr _empty = []() -> const_ptr {
+					   if constexpr (xns::is_same<char_t, char>) {
+					return   "";
+				} else if constexpr (xns::is_same<char_t, char8_t>) {
+					return u8"";
+				} else if constexpr (xns::is_same<char_t, char16_t>) {
+					return  u"";
+				} else if constexpr (xns::is_same<char_t, char32_t>) {
+					return  U"";
+				} else if constexpr (xns::is_same<char_t, wchar_t>) {
+					return  L"";
+				} else {
+					return nullptr;
+				}
+
+			}();
 
 	};
 
