@@ -7,7 +7,7 @@
 #include "string.hpp"
 
 // macos headers
-#if defined(APPLE_OS)
+#if defined(XNS_APPLE)
 	#include <sys/dir.h>
 // linux headers
 #elif defined(LINUX_OS)
