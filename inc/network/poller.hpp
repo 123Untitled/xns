@@ -153,7 +153,7 @@ namespace xns {
 					if (::kevent(_kqueue.get(), &event, 1, nullptr, 0, nullptr) == -1) {
 						std::cout << "error: " << std::strerror(errno) << std::endl;
 					} // increase buffer size
-					_kevents.push_back(); // INFO need to call resize
+					_kevents.emplace_back(); // INFO need to call resize
 				}
 
 				auto remove_socket(network::socket& socket) noexcept -> void {
