@@ -136,55 +136,55 @@ namespace xns {
 			// -- public static methods ---------------------------------------
 
 			/* to hexcolor */
-			template <bool alpha = false>
-			static inline auto to_hex(const xns::u8 red, const xns::u8 green, const xns::u8 blue) noexcept -> xns::hexcolor {
-				// check if alpha is true
-				if constexpr (alpha == true) {
-					// bitshift the values to the correct position
-					return (0xFF << 24) | (red << 16) | (green << 8) | blue;
-				} // else return the color without alpha
-				else { return (red << 16) | (green << 8) | blue; }
-			}
-
-			/* to hexcolor */
-			static inline auto to_hex(const xns::u8 red,
-									  const xns::u8 green,
-									  const xns::u8 blue,
-									  const xns::u8 alpha) noexcept -> xns::hexcolor {
-				// bitshift the values to the correct position
-				return (alpha << 24) | (red << 16) | (green << 8) | blue;
-			}
-
-			/* to hexcolor */
-			static inline auto to_hex(const rgb& color) noexcept -> xns::hexcolor {
-				// bitshift the values to the correct position
-				return (color.r << 16) | (color.g << 8) | color.b;
-			}
-
-			/* to hexcolor */
-			static inline auto to_hex(const rgba& color) noexcept -> xns::hexcolor {
-				// bitshift the values to the correct position
-				return (color.a << 24) | (color.r << 16) | (color.g << 8) | color.b;
-			}
-
-			/* to rgb */
-			static inline auto to_rgb(const hexcolor color) noexcept -> xns::rgb {
-				// bitshift the values to the correct position
-				return xns::rgb{static_cast<xns::u8>((color >> 16) & 0xFF),
-								static_cast<xns::u8>((color >> 8 ) & 0xFF),
-								static_cast<xns::u8>( color        & 0xFF)
-				};
-			}
-
-			/* to rgba */
-			static inline auto to_rgba(const hexcolor color) noexcept -> xns::rgba {
-				// bitshift the values to the correct position
-				return xns::rgba{static_cast<xns::u8>((color >> 24) & 0xFF),
-								 static_cast<xns::u8>((color >> 16) & 0xFF),
-								 static_cast<xns::u8>((color >> 8 ) & 0xFF),
-								 static_cast<xns::u8>( color        & 0xFF)
-				};
-			}
+			// template <bool alpha = false>
+			// static inline auto to_hex(const xns::u8 red, const xns::u8 green, const xns::u8 blue) noexcept -> xns::hexcolor {
+			// 	// check if alpha is true
+			// 	if constexpr (alpha == true) {
+			// 		// bitshift the values to the correct position
+			// 		return (0xFF << 24) | (red << 16) | (green << 8) | blue;
+			// 	} // else return the color without alpha
+			// 	else { return (red << 16) | (green << 8) | blue; }
+			// }
+			//
+			// /* to hexcolor */
+			// static inline auto to_hex(const xns::u8 red,
+			// 						  const xns::u8 green,
+			// 						  const xns::u8 blue,
+			// 						  const xns::u8 alpha) noexcept -> xns::hexcolor {
+			// 	// bitshift the values to the correct position
+			// 	return (alpha << 24) | (red << 16) | (green << 8) | blue;
+			// }
+			//
+			// /* to hexcolor */
+			// static inline auto to_hex(const rgb& color) noexcept -> xns::hexcolor {
+			// 	// bitshift the values to the correct position
+			// 	return (color.r << 16) | (color.g << 8) | color.b;
+			// }
+			//
+			// /* to hexcolor */
+			// static inline auto to_hex(const rgba& color) noexcept -> xns::hexcolor {
+			// 	// bitshift the values to the correct position
+			// 	return (color.a << 24) | (color.r << 16) | (color.g << 8) | color.b;
+			// }
+			//
+			// /* to rgb */
+			// static inline auto to_rgb(const hexcolor color) noexcept -> xns::rgb {
+			// 	// bitshift the values to the correct position
+			// 	return xns::rgb{static_cast<xns::u8>((color >> 16) & 0xFF),
+			// 					static_cast<xns::u8>((color >> 8 ) & 0xFF),
+			// 					static_cast<xns::u8>( color        & 0xFF)
+			// 	};
+			// }
+			//
+			// /* to rgba */
+			// static inline auto to_rgba(const hexcolor color) noexcept -> xns::rgba {
+			// 	// bitshift the values to the correct position
+			// 	return xns::rgba{static_cast<xns::u8>((color >> 24) & 0xFF),
+			// 					 static_cast<xns::u8>((color >> 16) & 0xFF),
+			// 					 static_cast<xns::u8>((color >> 8 ) & 0xFF),
+			// 					 static_cast<xns::u8>( color        & 0xFF)
+			// 	};
+			// }
 
 
 
