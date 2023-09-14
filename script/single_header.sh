@@ -4,17 +4,18 @@
 
 
 # main color
-color='\x1b[32m'
-error='\x1b[31m'
-reset='\x1b[0m'
-erase='\x1b[1F\x1b[0J'
+SUCCESS='\x1b[32m'
+ERROR='\x1b[31m'
+RESET='\x1b[0m'
+ERASE='\x1b[1F\x1b[0J'
 
 
 
 # -- C H E C K  R E Q U I R E D  P R O G R A M S ------------------------------
 
 # required programs
-programs=('clang++' 'tsort')
+programs=('shasum' 'mkdir')
+#'clang++' 'tsort')
 # loop through all required commands
 for cmd in $programs; do
 	# check if command is installed
@@ -28,19 +29,59 @@ for cmd in $programs; do
 done
 
 
+
+function merge_headers {
+
+	local inc_dir='inc'
+	local out_file='xns.hpp'
+	local out_dir='xns'
+	# get all header files
+	local headers=($inc_dir'/'**'/'*'.hpp'(.N))
+
+	mkdir -p $out_dir $out_dir/'inc'
+
+	for header in $headers; do
+		# hash path
+		local HASH=$(shasum -a 1 <<< $header)
+		HASH=${HASH%% *}
+		cp $header $out_dir'/'inc'/'$HASH'.hpp'
+		echo '#include "'$HASH'.hpp"' >> $out_dir'/'$out_file
+	done
+}
+
+merge_headers
+
+exit 0
+
+# -- S I N G L E  H E A D E R  G E N E R A T O R ------------------------------
+
+
+
+
+# mkdir -p 'single_header_tmp'
+
+
 # -- G E T  A L L  H E A D E R  F I L E S -------------------------------------
 
 # get all subdirectories in inc
-INC_DIRS=($(find 'inc' -type d))
+INC_DIRS=('inc'/**/*(/N) 'inc')
 
 # get all header files in inc
-HEADERS=($(find 'inc' -type f -name '*.hpp'))
+HEADERS=('inc'/**/*.'hpp'(.N))
 
 INCLUDES=()
 # add -I flag for each header file
-for header in ${INC_DIRS[@]}; do
+for header in $INC_DIRS; do
 	INCLUDES+=("-I$header")
 done
+
+# for header in $HEADERS; do
+# 	cpp -x c++ $INCLUDES -P $header -o 'single_header_tmp/'${header:t}
+# done
+#
+# exit 0
+
+# -- P R E P R O C E S S  H E A D E R  F I L E S ------------------------------
 
 
 FORMATED=
