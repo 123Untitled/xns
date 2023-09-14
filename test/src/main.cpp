@@ -23,7 +23,6 @@
 #include "input.hpp"
 #include "terminal.hpp"
 #include "link.hpp"
-#include "utilities.hpp"
 #include "environment.hpp"
 
 void start(void);
@@ -32,8 +31,6 @@ void start(void);
 int main(const int ac, const char** av, const char** env) {
 
 
-	// setup environment
-	xns::env::init(env);
 	// start main function
 	try { UT::launcher(); }
 	// catch memory errors
