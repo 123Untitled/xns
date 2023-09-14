@@ -56,6 +56,8 @@ namespace xns {
 			/* get file content */
 			inline auto content(void) -> xns::string {
 
+				using size_type = xns::string::size_type;
+
 				// check if file is open
 				if (!is_open()) {
 					return {};
@@ -64,17 +66,19 @@ namespace xns {
 				// get file size
 				struct ::stat stat;
 
-				if (::fstat(_descriptor, &stat) == -1) {
+				if (::fstat(_descriptor, &stat) < 0) {
 					return {};
 				}
 
 				// allocate buffer
 				xns::string content{};
 
-				content.resize(stat.st_size);
+				content.resize(static_cast<size_type>(stat.st_size));
 
 				// read file
-				if (::read(_descriptor, content.data(), stat.st_size) == -1) {
+				if (::read(_descriptor,
+							content.data(),
+							static_cast<size_type>(stat.st_size)) == -1) {
 					return {};
 				}
 
