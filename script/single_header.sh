@@ -173,6 +173,7 @@ function generate_single_header {
 
 	# add include guard
 	echo -E '#ifndef XNS_SINGLE_HEADER' > $OUT_FILE
+	echo -E '#define XNS_SINGLE_HEADER' >> $OUT_FILE
 
 	for _FILE in $FINAL; do
 		# get file content
@@ -192,7 +193,7 @@ function generate_single_header {
 	done
 
 	# end include guard
-	echo -E '#define XNS_SINGLE_HEADER' >> $OUT_FILE
+	echo -E '#endif' >> $output
 
 }
 
