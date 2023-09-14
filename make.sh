@@ -158,7 +158,7 @@ TEST_SRCDIR=$TESTDIR/'src'
 TEST_INCDIR=$TESTDIR/'inc'
 
 # get recursively all source files in testdir
-TEST_SRCS=()
+TEST_SRCS=($TEST_SRCDIR/**/*.'cpp'(.N))
 
 # get recursively all subdirectories in testinc
 TEST_INCS=($TEST_INCDIR/**/*(/N) $TEST_INCDIR)
@@ -212,13 +212,13 @@ CXXFLAGS+=('-Wpedantic' '-Weffc++')
 CXXFLAGS+=('-Wno-unused' '-Wno-unused-variable' '-Wno-unused-parameter')
 
 # optimization
-#CXXFLAGS+=('-Winline')
+CXXFLAGS+=('-Winline')
 
 # type conversion
-#CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
+# CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
 
 # shadowing
-#CXXFLAGS+=('-Wshadow')
+# CXXFLAGS+=('-Wshadow')
 
 # linker flags
 LDFLAGS=''
@@ -522,8 +522,8 @@ function generate_ninja {
 		echo -n "\n" >> $NINJAFILE
 
 		# single header
-		echo "\n$(title 'single header')\n" >> $NINJAFILE
-		echo "build $RLSDIR/$SINGLE_HEADER: single_header | $STATIC\n" >> $NINJAFILE
+		# echo "\n$(title 'single header')\n" >> $NINJAFILE
+		# echo "build $RLSDIR/$SINGLE_HEADER: single_header | $STATIC\n" >> $NINJAFILE
 
 
 	# executable build
