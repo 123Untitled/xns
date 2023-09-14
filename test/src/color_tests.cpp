@@ -8,3 +8,8 @@ bool UT::unit_tests<"color">(void) {
 	return false;
 }
 
+int main(void) {
+
+
+	return 0;
+}
