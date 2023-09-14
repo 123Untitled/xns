@@ -555,11 +555,19 @@ static auto benchmark(void) {
 #include "strcmp.hpp"
 #include "strncmp.hpp"
 
+
+
+
+
 int main(void) {
 
-	xns::string_view sv{};
 
-	std::cout << sv.data() << std::endl;
+	xns::u8string_view sv{u8"hello world!"};
+	xns::string_view sv2{"hello world!"};
+
+	std::cout << xns::strcmp(sv.data(), sv2.data()) << std::endl;
+
+	//std::cout << sv.data() << std::endl;
 	return 0;
 
 
