@@ -30,38 +30,41 @@ done
 
 
 
-function merge_headers {
+#function merge_headers {
+#
+#	local inc_dir='inc'
+#	local out_file='xns.hpp'
+#	local out_dir='xns'
+#	# get all header files
+#	local headers=($inc_dir'/'**'/'*'.hpp'(.N))
+#
+#	mkdir -p $out_dir $out_dir/'inc'
+#
+#	for header in $headers; do
+#		# hash path
+#		local HASH=$(shasum -a 1 <<< $header)
+#		HASH=${HASH%% *}
+#		cp $header $out_dir'/'inc'/'$HASH'.hpp'
+#		echo '#include "inc/'$HASH'.hpp"' >> $out_dir'/'$out_file
+#	done
+#}
+#
+#merge_headers
+#
+#exit 0
 
-	local inc_dir='inc'
-	local out_file='xns.hpp'
-	local out_dir='xns'
-	# get all header files
-	local headers=($inc_dir'/'**'/'*'.hpp'(.N))
-
-	mkdir -p $out_dir $out_dir/'inc'
-
-	for header in $headers; do
-		# hash path
-		local HASH=$(shasum -a 1 <<< $header)
-		HASH=${HASH%% *}
-		cp $header $out_dir'/'inc'/'$HASH'.hpp'
-		echo '#include "inc/'$HASH'.hpp"' >> $out_dir'/'$out_file
-	done
-}
-
-merge_headers
-
-exit 0
-
-# -- S I N G L E  H E A D E R  G E N E R A T O R ------------------------------
-
-
-
-
-# mkdir -p 'single_header_tmp'
 
 
 # -- G E T  A L L  H E A D E R  F I L E S -------------------------------------
+
+
+# output directory
+OUT_DIR='xns'
+
+mkdir -p $OUT_DIR
+
+# output file
+OUT_FILE=$OUT_DIR'/xns.hpp'
 
 # get all subdirectories in inc
 INC_DIRS=('inc'/**/*(/N) 'inc')
@@ -75,11 +78,6 @@ for header in $INC_DIRS; do
 	INCLUDES+=("-I$header")
 done
 
-# for header in $HEADERS; do
-# 	cpp -x c++ $INCLUDES -P $header -o 'single_header_tmp/'${header:t}
-# done
-#
-# exit 0
 
 # -- P R E P R O C E S S  H E A D E R  F I L E S ------------------------------
 
@@ -140,26 +138,23 @@ echo -n '\x1b[?25h'
 
 echo '['$color'ok'$reset']'
 
+
 # get tsort stdout and stderr in one variable without printing
-
-
-
 TSORTED=$(echo $FORMATED | tsort 2>&1)
+
 
 # check if tsort failed
 if [[ $? -ne 0 ]]; then
 	# print error message
 	echo $error'Error:'$reset 'failed to sort header files.'
-	# exit script
-	#exit 1
+	exit 1
 fi
 
 # check regex patter 'tsort: cycle in data'
 if [[ $TSORTED =~ 'tsort: cycle in data' ]]; then
 	# print error message
-	echo $error'Error:'$reset 'failed to sort header files.'
-	# exit script
-	#exit 1
+	echo $error'Error:'$reset 'cyclic dependency in header files.'
+	exit 1
 fi
 
 
@@ -174,6 +169,37 @@ for ((i = $#lines; i > 0; --i)); do
 done
 
 
+function generate_single_header {
+
+	# add include guard
+	echo -E '#ifndef XNS_SINGLE_HEADER' > $OUT_FILE
+
+	for _FILE in $FINAL; do
+		# get file content
+		local _CONTENT=$(<$_FILE)
+		# split by line
+		local _LINES=( ${(@f)_CONTENT} )
+
+		for _LINE in $_LINES; do
+			# search match '#include "..."
+			if [[ $_LINE =~ '^[[:space:]]*#[[:space:]]*include[[:space:]]*\".*\"' ]]; then
+				continue
+			fi
+			echo -E $_LINE >> $OUT_FILE
+
+		done
+
+	done
+
+	# end include guard
+	echo -E '#define XNS_SINGLE_HEADER' >> $OUT_FILE
+
+}
+
+
+generate_single_header
+
+exit 0
 
 # -- G E N E R A T E  S I N G L E  H E A D E R --------------------------------
 
@@ -203,8 +229,6 @@ done
 
 # -- G E N E R A T E  S I N G L E  H E A D E R --------------------------------
 
-# output file
-output='xns.hpp'
 
 
 file='namespace xns {'
