@@ -1,3 +1,7 @@
+# xmake
+.xmake/
+# release output directory
+xns/
 
 doc/
 # ignore executable
