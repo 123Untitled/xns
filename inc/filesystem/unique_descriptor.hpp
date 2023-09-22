@@ -4,7 +4,7 @@
 // local headers
 #include "types.hpp"
 #include "allocator.hpp"
-#include "macro.hpp"
+#include "macros.hpp"
 #include "string.hpp"
 
 // operating system headers

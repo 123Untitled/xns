@@ -15,7 +15,7 @@
 
 // xns headers
 #include "types.hpp"
-#include "macro.hpp"
+#include "macros.hpp"
 #include "event.hpp"
 #include "is_unsigned.hpp"
 

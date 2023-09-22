@@ -3,7 +3,7 @@
 
 // local headers
 #include "types.hpp"
-#include "macro.hpp"
+#include "macros.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

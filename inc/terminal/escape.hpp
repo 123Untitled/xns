@@ -6,7 +6,7 @@
 #include "types.hpp"
 #include "color.hpp"
 #include "output.hpp"
-#include "macro.hpp"
+#include "macros.hpp"
 #include "array.hpp"
 #include "string.hpp"
 #include "numeric_limits.hpp"
