@@ -3,7 +3,7 @@
 
 #include "array.hpp"
 #include "types.hpp"
-#include "macro.hpp"
+#include "macros.hpp"
 #include "rect.hpp"
 #include "escape.hpp"
 #include "allocator.hpp"
