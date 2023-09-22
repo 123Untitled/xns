@@ -3,7 +3,7 @@
 
 // local headers
 #include "types.hpp"
-#include "macro.hpp"
+#include "macros.hpp"
 #include "unique_descriptor.hpp"
 
 // c++ standard headers

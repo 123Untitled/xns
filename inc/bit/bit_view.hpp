@@ -3,11 +3,8 @@
 
 // local headers
 #include "types.hpp"
-#include "array.hpp"
 #include "endianness.hpp"
-#include "integer_sequence.hpp"
 
-#include <iostream>
 #include <unistd.h>
 
 

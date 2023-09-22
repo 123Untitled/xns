@@ -1,11 +1,11 @@
-#ifndef CONVERSIONS_HEADER
-#define CONVERSIONS_HEADER
+#ifndef TO_STRING_HEADER
+#define TO_STRING_HEADER
 
 #include "string.hpp"
 #include "types.hpp"
 #include "is_signed.hpp"
 #include "numeric_limits.hpp"
-#include "macro.hpp"
+#include "macros.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

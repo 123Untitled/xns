@@ -302,6 +302,7 @@ namespace xns {
 
 						int nev = ::epoll_wait(_epoll.get(), _events.data(),
 											static_cast<int>(_events.size()), -1);
+						// CHECK NEV IS GREATER THAN VECTOR SIZE
 
 						if (nev < 0) {
 							std::cout << "error: " << std::strerror(errno) << std::endl;

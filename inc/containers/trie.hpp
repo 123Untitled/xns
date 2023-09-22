@@ -30,18 +30,28 @@ namespace xns {
 	template <typename T>
 	class trie final {
 
+
 		public:
 
-			// -- P U B L I C  A L I A S E S ----------------------------------
+			// -- public types ------------------------------------------------
 
 			/* value type */
-			using value_type = T;
+			using type = T;
 
 			/* self type */
-			using self = trie<value_type>;
+			using self = trie<type>;
+
+			/* reference type */
+			using mut_ref = type&;
+
+			/* move reference type */
+			using move_ref = type&&;
+
+			/* const reference type */
+			using const_ref = const type&;
 
 			/* weak value type */
-			using weak_value = xns::weak_ptr<value_type>;
+			using weak_value = xns::weak_ptr<type>;
 
 			/* size type */
 			using size_type = xns::size_t;
@@ -70,18 +80,18 @@ namespace xns {
 			/* node pointer type */
 			using weak_node = xns::weak_ptr<node>;
 
-			/* value pointer type */
-			using shared_value = xns::shared_ptr<value_type>;
-
 			/* node pointer type */
 			using node_ptr = node*;
+
+			/* node address type */
+			using node_addr = node**;
 
 
 
 			// -- private structs ---------------------------------------------
 
 			/* node */
-			struct node final {
+			struct node {
 
 
 				// -- members -------------------------------------------------
@@ -89,25 +99,68 @@ namespace xns {
 				/* childs */
 				table _table;
 
-				/* value */
-				shared_value _value;
-
 
 				// -- lifecycle -----------------------------------------------
 
 				/* default constructor */
 				inline node(void) noexcept
-				: _table{}, _value{} {}
+				: _table{} {}
 
-				/* value constructor */
-				inline node(value_type* value)
-				: _table{}, _value{value} {}
+				/* non-assignable class */
+				NON_ASSIGNABLE(node);
 
 				/* destructor */
-				inline ~node(void) noexcept = default;
+				virtual inline ~node(void) noexcept = default;
+
+
+				// -- interface -----------------------------------------------
+
+				/* has value */
+				virtual inline consteval auto has_value(void) const noexcept -> bool {
+					return false;
+				}
+
+				/* get value */
+				[[noreturn]]
+				virtual inline consteval auto value(void) -> mut_ref {
+					throw;
+				}
+
 
 			};
 
+
+			/* value node */
+			struct value_node final : public node {
+
+
+				// -- lifecycle -----------------------------------------------
+
+				/* default constructor */
+				inline value_node(void) noexcept
+				: node{} {}
+
+
+				// -- members -------------------------------------------------
+
+				/* value */
+				type _value;
+
+
+				// -- overrides -----------------------------------------------
+
+				/* has value */
+				inline consteval auto has_value(void) const noexcept -> bool override {
+					return true;
+				}
+
+				/* get value */
+				inline consteval auto value(void) -> mut_ref override {
+					return _value;
+				}
+
+
+			};
 
 
 
@@ -131,84 +184,84 @@ namespace xns {
 				// insert key
 				node_ptr node = insert_impl(key);
 				// allocate default value
-				node->_value = xns::make_shared<value_type>(xns::forward<U>(value));
+				// node->_value = xns::make_shared<value_type>(xns::forward<U>(value));
 			}
 
 			/* emplace insert */
-			template <class... A>
-			void emplace_insert(const xns::string& key, A&&... args) {
-				// insert key
-				node_ptr node = insert_impl(key);
-				// allocate value
-				node->_value = xns::make_shared<value_type>(xns::forward<A>(args)...);
-			}
+			//template <class... A>
+			//void emplace_insert(const xns::string& key, A&&... args) {
+			//	// insert key
+			//	node_ptr node = insert_impl(key);
+			//	// allocate value
+			//	// node->_value = xns::make_shared<value_type>(xns::forward<A>(args)...);
+			//}
 
 			/* derived default insert */
-			template <class D> requires (xns::is_derived_from<D, value_type>)
-			void insert(const xns::string& key) {
-				// insert key
-				node_ptr node = insert_impl(key);
-				// allocate default value
-				node->_value = xns::make_shared<D>();
-			}
+			//template <class D> requires (xns::is_derived_from<D, value_type>)
+			//void insert(const xns::string& key) {
+			//	// insert key
+			//	node_ptr node = insert_impl(key);
+			//	// allocate default value
+			//	node->_value = xns::make_shared<D>();
+			//}
 
-			/* derived copy insert */
-			template <class D> requires (xns::is_derived_from<D, value_type>)
-			void insert(const xns::string& key, const D& value) {
-				// insert key
-				node* node = insert_impl(key);
-				// allocate copied value
-				node->_value = xns::make_shared<D>(value);
-			}
-
-			/* derived move insert */
-			template <class D> requires (xns::is_derived_from<D, value_type>)
-			void insert(const xns::string& key, D&& value) {
-				// insert key
-				node* node = insert_impl(key);
-				// allocate moved value
-				node->_value = xns::make_shared<D>(xns::move(value));
-			}
-
-			/* derived variadic insert */
-			template <class D, class... A> requires (xns::is_derived_from<D, value_type>)
-			void insert(const xns::string& key, A&&... args) {
-				// insert key
-				node* node = insert_impl(key);
-				// allocate value
-				node->_value = xns::make_shared<D>(xns::forward<A>(args)...);
-			}
-
-
-
-			/* derived multi insert */
-			template <xns::is_string S, class D, class... A> requires (xns::is_derived_from<D, value_type>)
-			void insert(const xns::vector<S>& alias, A&&... args) {
-				// instanciate value
-				shared_value value = xns::make_shared<D>(xns::forward<A>(args)...);
-				// loop through alias
-				for (typename xns::vector<S>::size_type x = 0; x < alias.size(); ++x) {
-					// insert key
-					node* node = _insert(alias[x]);
-					// allocate value
-					node->_value = value;
-				}
-			}
-
-			/* variadic multi insert */
-			template <xns::is_string S, class... A>
-			void insert(const xns::vector<S>& alias, A&&... args) {
-				// instanciate value
-				shared_value value = xns::make_shared<value_type>(xns::forward<A>(args)...);
-				// loop through alias
-				for (typename xns::vector<S>::size_type x = 0; x < alias.size(); ++x) {
-					// insert key
-					node* node = insert_impl(alias[x]);
-					// allocate value
-					node->_value = value;
-				}
-			}
-
+			// /* derived copy insert */
+			// template <class D> requires (xns::is_derived_from<D, value_type>)
+			// void insert(const xns::string& key, const D& value) {
+			// 	// insert key
+			// 	node* node = insert_impl(key);
+			// 	// allocate copied value
+			// 	node->_value = xns::make_shared<D>(value);
+			// }
+			//
+			// /* derived move insert */
+			// template <class D> requires (xns::is_derived_from<D, value_type>)
+			// void insert(const xns::string& key, D&& value) {
+			// 	// insert key
+			// 	node* node = insert_impl(key);
+			// 	// allocate moved value
+			// 	node->_value = xns::make_shared<D>(xns::move(value));
+			// }
+			//
+			// /* derived variadic insert */
+			// template <class D, class... A> requires (xns::is_derived_from<D, value_type>)
+			// void insert(const xns::string& key, A&&... args) {
+			// 	// insert key
+			// 	node* node = insert_impl(key);
+			// 	// allocate value
+			// 	node->_value = xns::make_shared<D>(xns::forward<A>(args)...);
+			// }
+			//
+			//
+			//
+			// /* derived multi insert */
+			// template <xns::is_string S, class D, class... A> requires (xns::is_derived_from<D, value_type>)
+			// void insert(const xns::vector<S>& alias, A&&... args) {
+			// 	// instanciate value
+			// 	shared_value value = xns::make_shared<D>(xns::forward<A>(args)...);
+			// 	// loop through alias
+			// 	for (typename xns::vector<S>::size_type x = 0; x < alias.size(); ++x) {
+			// 		// insert key
+			// 		node* node = _insert(alias[x]);
+			// 		// allocate value
+			// 		node->_value = value;
+			// 	}
+			// }
+			//
+			// /* variadic multi insert */
+			// template <xns::is_string S, class... A>
+			// void insert(const xns::vector<S>& alias, A&&... args) {
+			// 	// instanciate value
+			// 	shared_value value = xns::make_shared<value_type>(xns::forward<A>(args)...);
+			// 	// loop through alias
+			// 	for (typename xns::vector<S>::size_type x = 0; x < alias.size(); ++x) {
+			// 		// insert key
+			// 		node* node = insert_impl(alias[x]);
+			// 		// allocate value
+			// 		node->_value = value;
+			// 	}
+			// }
+			//
 
 			/* find */
 			auto find(const xns::string& str) -> weak_value {
@@ -257,7 +310,7 @@ namespace xns {
 
 			/* _insert */
 			template <xns::is_string S>
-			auto insert_impl(const S& str) -> node_ptr {
+			auto insert_impl(const S& str) -> node_addr {
 				// get root node
 				node_ptr node = &_root;
 				// loop through string

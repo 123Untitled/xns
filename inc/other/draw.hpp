@@ -7,7 +7,7 @@
 #include "escape.hpp"
 #include "types.hpp"
 #include "ascii.hpp"
-#include "macro.hpp"
+#include "macros.hpp"
 #include "output.hpp"
 
 /* standard includes */

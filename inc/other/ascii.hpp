@@ -2,7 +2,7 @@
 #define ASCII_HEADER
 
 #include "types.hpp"
-#include "macro.hpp"
+#include "macros.hpp"
 #include "array.hpp"
 #include "string.hpp"
 #include "safe_enum.hpp"

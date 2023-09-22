@@ -23,7 +23,7 @@ add_rules("mode.debug", "mode.release")
 --set_defaultmode("release")
 
 -- set compiler
-set_toolset("clang++")
+set_toolset("g++")
 
 -- set language
 set_languages("cxx20")
@@ -65,6 +65,10 @@ local src = os.files("src/**.cpp")
 
 -- mode release
 if is_mode("release") then
+
+	add_rules("plugin.compile_commands.autoupdate", {
+		outputdir = "."
+	})
 
 	-- library target
 	target("library", function()

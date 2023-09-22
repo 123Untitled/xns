@@ -7,8 +7,6 @@
 #include "forward.hpp"
 #include "memory.hpp"
 #include "swap.hpp"
-#include "is_same.hpp"
-#include "is_constructible.hpp"
 
 #include <iostream>
 
