@@ -40,7 +40,7 @@ auto xns::event::remove_mode(evntmode& mode) -> void {
 	// invalid index
 	mode._state = false;
 	// remove mode
-	_modes.erase(mode._idx);
+	// _modes.erase(mode._idx);
 }
 
 /* set mode */

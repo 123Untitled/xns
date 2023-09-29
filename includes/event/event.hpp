@@ -198,7 +198,7 @@ namespace xns {
 			using mode = xns::pair<input_vector, event_array>;
 
 			/* mode list type */
-			using mode_list = xns::vector<mode>;
+			using mode_list = std::vector<mode>;
 
 
 			/* optional type */
