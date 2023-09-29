@@ -112,7 +112,7 @@ namespace xns {
 			/* character type */
 			using char_t        = typename string_type::char_t;
 			/* const pointer */
-			using const_pointer = typename string_type::const_pointer;
+			using const_pointer = typename string_type::const_ptr;
 
 
 			//const_pointer ptr = str.pointer();
