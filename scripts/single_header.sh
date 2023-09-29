@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh --no-rcs
+#!/usr/bin/env -S zsh --no-rcs --errexit --pipefail
 
 # This script is used to generate a single header file for xns library.
 
@@ -30,88 +30,57 @@ done
 
 
 
-#function merge_headers {
-#
-#	local inc_dir='inc'
-#	local out_file='xns.hpp'
-#	local out_dir='xns'
-#	# get all header files
-#	local headers=($inc_dir'/'**'/'*'.hpp'(.N))
-#
-#	mkdir -p $out_dir $out_dir/'inc'
-#
-#	for header in $headers; do
-#		# hash path
-#		local HASH=$(shasum -a 1 <<< $header)
-#		HASH=${HASH%% *}
-#		cp $header $out_dir'/'inc'/'$HASH'.hpp'
-#		echo '#include "inc/'$HASH'.hpp"' >> $out_dir'/'$out_file
-#	done
-#}
-#
-#merge_headers
-#
-#exit 0
-
-
-
 # -- G E T  A L L  H E A D E R  F I L E S -------------------------------------
 
 
 # output directory
 OUT_DIR='xns'
 
-mkdir -p $OUT_DIR
-
 # output file
 OUT_FILE=$OUT_DIR'/xns.hpp'
 
 # get all subdirectories in inc
-INC_DIRS=('inc'/**/*(/N) 'inc')
+INC_DIRS=('includes'/**/*(/N) 'includes')
 
 # get all header files in inc
-HEADERS=('inc'/**/*.'hpp'(.N))
+HEADERS=('includes'/**/*.'hpp'(.N))
 
 INCLUDES=()
 # add -I flag for each header file
-for header in $INC_DIRS; do
-	INCLUDES+=("-I$header")
+for HEADER in $INC_DIRS; do
+	INCLUDES+=("-I$HEADER")
 done
 
+echo $@
+exit 0
+
+
+mkdir -p $OUT_DIR
 
 # -- P R E P R O C E S S  H E A D E R  F I L E S ------------------------------
 
 
 FORMATED=
 
+
+
+
 function parse {
 
-	local content
-
-	content=$(clang++ ${INCLUDES[@]} $1 -MT $1 -MM)
-	#content=$(clang++ ${INCLUDES[@]} $1 -MT $1 -MM 2> /dev/null)
-
-	if [[ $? -ne 0 ]]; then
-		# print error message
-		echo $error'Error:'$reset 'failed to parse' $error''$header''$reset
-		# exit script
-		exit 1
-	fi
-
-	#echo -n $color'.'$reset
+	local FILE=$1
+	local CONTENT=$(clang++ $INCLUDES $FILE -MT $FILE -MM)
 
 	# split content into array
-	words=(${=content})
+	local WORDS=(${=CONTENT})
 
-	hpp=
+	local HEADER=
 	# loop over array
-	for x in $words; do
+	for W in $WORDS; do
 		# get header file name
-		if [[ $x == *":" ]]; then
-			hpp=${x:0:-1}
-		elif ! [[ $x == *"\\" ]]; then
-			FORMATED+=$hpp' '$x'\n'
-			#echo $hpp' '$x >> parsed.d
+		if [[ $W == *":" ]]; then
+			HEADER=${W:0:-1}
+		elif ! [[ $W == *"\\" ]]; then
+			FORMATED+=$HEADER' '$W'\n'
 		fi
 	done
 }
@@ -123,7 +92,8 @@ I=1
 # disable cursor
 echo -n '\x1b[?25l'
 echo -n 'Generating single header '
-for header in ${HEADERS[@]}; do
+
+for HEADER in $HEADERS; do
 	# print animation
 	echo -n '['${ANIM[$I]}']'
 	# move cursor right 3 characters
@@ -131,12 +101,12 @@ for header in ${HEADERS[@]}; do
 	# increment animation index
 	((++I))
 	[[ $I -eq 5 ]] && I=1
-	parse $header
+	parse $HEADER
 done
 # enable cursor
 echo -n '\x1b[?25h'
 
-echo '['$color'ok'$reset']'
+echo '['$SUCCESS'ok'$RESET']'
 
 
 # get tsort stdout and stderr in one variable without printing
@@ -169,59 +139,55 @@ for ((i = $#lines; i > 0; --i)); do
 done
 
 
-function generate_single_header {
-
-	# add include guard
-	echo -E '#ifndef XNS_SINGLE_HEADER' > $OUT_FILE
-	echo -E '#define XNS_SINGLE_HEADER' >> $OUT_FILE
-
-	for _FILE in $FINAL; do
-		# get file content
-		local _CONTENT=$(<$_FILE)
-		# split by line
-		local _LINES=( ${(@f)_CONTENT} )
-
-		for _LINE in $_LINES; do
-			# search match '#include "..."
-			if [[ $_LINE =~ '^[[:space:]]*#[[:space:]]*include[[:space:]]*\".*\"' ]]; then
-				continue
-			fi
-			echo -E $_LINE >> $OUT_FILE
-
-		done
-
-	done
-
-	# end include guard
-	echo -E '#endif' >> $output
-
-}
-
-
-generate_single_header
-
-exit 0
+# function generate_single_header {
+#
+# 	# add include guard
+# 	echo -E '#ifndef XNS_SINGLE_HEADER' > $OUT_FILE
+# 	echo -E '#define XNS_SINGLE_HEADER' >> $OUT_FILE
+#
+# 	for _FILE in $FINAL; do
+# 		# get file content
+# 		local _CONTENT=$(<$_FILE)
+# 		# split by line
+# 		local _LINES=( ${(@f)_CONTENT} )
+#
+# 		for _LINE in $_LINES; do
+# 			# search match '#include "..."
+# 			if [[ $_LINE =~ '^[[:space:]]*#[[:space:]]*include[[:space:]]*\".*\"' ]]; then
+# 				continue
+# 			fi
+# 			echo -E $_LINE >> $OUT_FILE
+#
+# 		done
+#
+# 	done
+#
+# 	# end include guard
+# 	echo -E '#endif' >> $OUT_FILE
+#
+# }
+#
+#
+# generate_single_header
+#
+# exit 0
 
 # -- G E N E R A T E  S I N G L E  H E A D E R --------------------------------
 
 
 # system header associative array
-typeset -A system
+typeset -A INC_SYSTEM
 
 # loop over all header files
-for header in $FINAL; do
-	# check if file exists
-	if ! [[ -f $header ]]; then
-		continue
-	fi
+for HEADER in $FINAL; do
 
-	local content=$(<$header)
+	local CONTENT=$(<$HEADER)
 
 	# check if header file includes system header
-	while [[ $content =~ '(#[[:space:]]*include[[:space:]]*<([^>]*)>)' ]]; do
-		system[${match[2]}]=1
+	while [[ $CONTENT =~ '(#[[:space:]]*include[[:space:]]*<([^>]*)>)' ]]; do
+		INC_SYSTEM[${match[2]}]=1
 		# add header to system array
-		content=${content/$match[1]/}
+		CONTENT=${CONTENT/$match[1]/}
 	done
 
 done
@@ -275,21 +241,21 @@ file+='}'
 
 
 # add include guard
-echo -E '#ifndef XNS_SINGLE_HEADER' > $output
-echo -E '#define XNS_SINGLE_HEADER' >> $output
+echo -E '#ifndef XNS_SINGLE_HEADER' > $OUT_FILE
+echo -E '#define XNS_SINGLE_HEADER' >> $OUT_FILE
 
 # loop over all system headers
 for header in ${(k)system}; do
 	# add system header to output file
-	echo '#include <'$header'>' >> $output
+	echo '#include <'$header'>' >> $OUT_FILE
 done
 
 # append preprocessed variable to output file
-echo -E $file >> $output
+echo -E $file >> $OUT_FILE
 #echo -E $preprocessed >> $output
 
 # end include guard
-echo -E '#endif' >> $output
+echo -E '#endif' >> $OUT_FILE
 
 
 
