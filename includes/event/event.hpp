@@ -45,27 +45,14 @@ namespace xns {
 
 	class event final {
 
+		// -- friends ---------------------------------------------------------
+
+		/* evntmode as friend */
+		friend class evntmode;
+
+
 		private:
 
-			// -- P R I V A T E  A L I A S E S --------------------------------
-
-			/* object pointer */
-			template <typename C>
-			using pointer = C*;
-
-			/* event prototype */
-			template <typename C>
-			using event_method = void(C::*)(void);
-
-			/* event function prototype */
-			using event_function = void(*)(void);
-
-			/* input prototype */
-			template <typename C>
-			using input_method = void(C::*)(const xns::string&);
-
-			/* input function prototype */
-			using input_function = void(*)(const xns::string&);
 
 
 
@@ -75,16 +62,10 @@ namespace xns {
 			event(void);
 
 			/* non-assignable class */
-			NON_ASSIGNABLE(event);
+			non_assignable(event);
 
 			/* destructor */
 			~event(void);
-
-			/* friend class */
-			friend class evntmode;
-
-
-
 
 
 		public:
@@ -181,6 +162,26 @@ namespace xns {
 
 
 
+			// -- P R I V A T E  A L I A S E S --------------------------------
+
+			/* object pointer */
+			template <typename C>
+			using pointer = C*;
+
+			/* event prototype */
+			template <typename C>
+			using event_method = void(C::*)(void);
+
+			/* event function prototype */
+			using event_function = void(*)(void);
+
+			/* input prototype */
+			template <typename C>
+			using input_method = void(C::*)(const xns::string&);
+
+			/* input function prototype */
+			using input_function = void(*)(const xns::string&);
+
 
 			// -- P R I V A T E  A L I A S E S --------------------------------
 
@@ -198,11 +199,8 @@ namespace xns {
 			using mode = xns::pair<input_vector, event_array>;
 
 			/* mode list type */
-			using mode_list = std::vector<mode>;
+			using mode_list = xns::vector<mode>;
 
-
-			/* optional type */
-			using optional = xns::unique_ptr<xns::size_t>;
 
 
 			// -- P R I V A T E  M E T H O D S --------------------------------
@@ -228,10 +226,10 @@ namespace xns {
 			mode_list _modes;
 
 			/* current mode index */
-			optional _current;
+			const xns::size_t* _current;
 
 			/* mode to apply next loop */
-			optional _next;
+			const xns::size_t* _next;
 
 
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------

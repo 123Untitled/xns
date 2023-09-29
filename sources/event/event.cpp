@@ -40,7 +40,7 @@ auto xns::event::remove_mode(evntmode& mode) -> void {
 	// invalid index
 	mode._state = false;
 	// remove mode
-	// _modes.erase(mode._idx);
+	_modes.erase(mode._idx);
 }
 
 /* set mode */
@@ -50,10 +50,10 @@ auto xns::event::set_mode(const evntmode& mode, const evntopt opt) -> void {
 	// check if mode is forced
 	if (opt == evntopt::FORCE) {
 		// stack current mode
-		_current = xns::make_unique<xns::size_t>(mode._idx);
+		_current = &mode._idx;
 		return;
 	} // set next mode
-	_next = xns::make_unique<xns::size_t>(mode._idx);
+	_next = &mode._idx;
 }
 
 /* apply mode */
