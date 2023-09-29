@@ -130,9 +130,7 @@ namespace xns {
 
 			/* default constructor */
 			path(void)
-			: _segments{}, _type{path_type::UNDEFINED} {
-				// nothing to do...
-			}
+			: _segments{}, _type{path_type::UNDEFINED} {}
 
 			/* path constructor */
 			template <xns::is_string U>
@@ -144,15 +142,11 @@ namespace xns {
 
 			/* copy constructor */
 			path(const path& other)
-			: _segments{other._segments}, _type{other._type} {
-				// nothing to do...
-			}
+			: _segments{other._segments}, _type{other._type} {}
 
 			/* move constructor */
 			path(path&& other) noexcept
-			: _segments{xns::move(other._segments)}, _type{other._type} {
-				// nothing to do...
-			}
+			: _segments{xns::move(other._segments)}, _type{other._type} {}
 
 			/* destructor */
 			~path(void) = default;
@@ -219,13 +213,13 @@ namespace xns {
 			/* get segment string */
 			const string_type& string(const size_type index) const {
 				// return string segment
-				return _segments[index].template get<0>();
+				return xns::get<0>(_segments[index]);
 			}
 
 			/* get segment type */
 			segment_type type(const size_type index) const {
 				// return segment type
-				return _segments[index].template get<1>();
+				return xns::get<1>(_segments[index]);
 			}
 
 
@@ -334,7 +328,7 @@ namespace xns {
 					if (z == 2 && path[x] == CUR && path[x + 1] == CUR) {
 						// check for previous parent segment
 						if (_segments.empty()
-							|| _segments.back().template get<1>() == segment_type::PARENT) {
+							|| xns::get<1>(_segments.back()) == segment_type::PARENT) {
 							// add parent segment
 							_segments.emplace_back(string_type{&path[x], z}, segment_type::PARENT);
 						} // else remove previous segment
