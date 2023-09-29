@@ -32,7 +32,7 @@ VMIN   := $(firstword $(sort $(MAKE_VERSION) $(PREREQ)))
 
 # compare version
 ifneq ($(PREREQ), $(VMIN))
-    $(error $(shell echo "Please use $(C_)GNU Make $(PREREQ)$(R_) or later"))
+    $(error $(shell echo "Please use $(COLOR)GNU Make $(PREREQ)$(RESET) or later"))
 endif
 
 
@@ -301,7 +301,7 @@ clean:
 
 fclean: clean
 	echo $(COLOR)'[x]'$(RESET) 'full cleaned';
-	$(RM) $(EXEC) $(STATIC_LIB) $(RLSDIR) $(COMPILE_COMMANDS) .cache .env
+	$(RM) $(EXEC) $(STATIC_LIB) $(RLSDIR) $(COMPILE_COMMANDS) .cache
 
 
 # -- R E C O M P I L E --------------------------------------------------------
