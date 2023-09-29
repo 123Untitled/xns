@@ -51,8 +51,6 @@ for HEADER in $INC_DIRS; do
 	INCLUDES+=("-I$HEADER")
 done
 
-echo $@
-exit 0
 
 
 mkdir -p $OUT_DIR
@@ -139,39 +137,6 @@ for ((i = $#lines; i > 0; --i)); do
 done
 
 
-# function generate_single_header {
-#
-# 	# add include guard
-# 	echo -E '#ifndef XNS_SINGLE_HEADER' > $OUT_FILE
-# 	echo -E '#define XNS_SINGLE_HEADER' >> $OUT_FILE
-#
-# 	for _FILE in $FINAL; do
-# 		# get file content
-# 		local _CONTENT=$(<$_FILE)
-# 		# split by line
-# 		local _LINES=( ${(@f)_CONTENT} )
-#
-# 		for _LINE in $_LINES; do
-# 			# search match '#include "..."
-# 			if [[ $_LINE =~ '^[[:space:]]*#[[:space:]]*include[[:space:]]*\".*\"' ]]; then
-# 				continue
-# 			fi
-# 			echo -E $_LINE >> $OUT_FILE
-#
-# 		done
-#
-# 	done
-#
-# 	# end include guard
-# 	echo -E '#endif' >> $OUT_FILE
-#
-# }
-#
-#
-# generate_single_header
-#
-# exit 0
-
 # -- G E N E R A T E  S I N G L E  H E A D E R --------------------------------
 
 
@@ -198,68 +163,114 @@ done
 
 
 
-file='namespace xns {'
+OUT=''
 
-# loop over all header files
-for header in $FINAL; do
-	# check if file exists
-	if ! [[ -f $header ]]; then
-		continue
-	fi
 
-	local content=$(<$header)
-	# split by line
-	local lines=( ${(@f)content} )
 
-F=0
-	# loop over all lines
-	for line in $lines; do
 
-		if [[ $F -eq 0 ]]; then
-			if [[ $line =~ '^[[:space:]]*namespace[[:space:]]*xns[[:space:]]*{' ]]; then
-				F=1
-			fi
-		else
-			if [[ $line =~ "^}" ]]; then
-				break
-			else
-				file+=$line$'\n'
-				#echo -E $line >> $output_tmp
-			fi
+function generate_file2 {
+
+	# loop over all header files
+	for HEADER in $FINAL; do
+
+		# check if file exists
+		if ! [[ -f $HEADER ]]; then
+			continue
 		fi
+
+		# get file content
+		local CONTENT=$(<$HEADER)
+		# split by line
+		local STRIPE=(${(@f)CONTENT})
+
+		local REGEX='^[[:space:]]*#[[:space:]]*include[[:space:]]*".*"'
+
+		# skip only local includes (e.g. #include "...")
+		for L in $STRIPE; do
+			if [[ $L =~ $REGEX ]]; then
+				continue;
+			else
+				OUT+=$L$'\n'
+			fi
+		done
 
 	done
 
 
-done
+}
 
-file+='}'
+generate_file2
+
+# add include guard
+echo -E '#ifndef XNS_SINGLE_HEADER' > $OUT_FILE
+echo -E '#define XNS_SINGLE_HEADER' >> $OUT_FILE
+
+echo -E $OUT >> $OUT_FILE
+
+echo -E '#endif' >> $OUT_FILE
+
+exit 0
+
+
+
 
 
 # remove all comments
 #preprocessed=$(clang++ -std=c++2a -E -P -dD -x c++ - <<< "$file")
 
 
-# add include guard
-echo -E '#ifndef XNS_SINGLE_HEADER' > $OUT_FILE
-echo -E '#define XNS_SINGLE_HEADER' >> $OUT_FILE
 
-# loop over all system headers
-for header in ${(k)system}; do
-	# add system header to output file
-	echo '#include <'$header'>' >> $OUT_FILE
-done
+# # loop over all system headers
+# for HEADER in ${(k)INC_SYSTEM}; do
+# 	# add system header to output file
+# 	echo '#include <'$HEADER'>' >> $OUT_FILE
+# done
 
-# append preprocessed variable to output file
-echo -E $file >> $OUT_FILE
-#echo -E $preprocessed >> $output
+# echo -E $file >> $OUT_FILE
 
 # end include guard
-echo -E '#endif' >> $OUT_FILE
 
 
 
 
 
-exit 0
 
+# function generate_file {
+#
+# 	file='namespace xns {'
+#
+# 	# loop over all header files
+# 	for header in $FINAL; do
+# 		# check if file exists
+# 		if ! [[ -f $header ]]; then
+# 			continue
+# 		fi
+#
+# 		local content=$(<$header)
+# 		# split by line
+# 		local lines=( ${(@f)content} )
+#
+# 	F=0
+# 		# loop over all lines
+# 		for line in $lines; do
+#
+# 			if [[ $F -eq 0 ]]; then
+# 				if [[ $line =~ '^[[:space:]]*namespace[[:space:]]*xns[[:space:]]*{' ]]; then
+# 					F=1
+# 				fi
+# 			else
+# 				if [[ $line =~ "^}" ]]; then
+# 					break
+# 				else
+# 					file+=$line$'\n'
+# 					#echo -E $line >> $output_tmp
+# 				fi
+# 			fi
+#
+# 		done
+#
+#
+# 	done
+#
+# 	file+='}'
+# }
