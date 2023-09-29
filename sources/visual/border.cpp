@@ -87,7 +87,7 @@ void xns::border::set(const rect& rect, const xns::hexcolor color) {
 	// avoid namespace pollution
 	using esc = xns::escape;
 
-	if (rect.empty()) { _DBG("empty rect in border set method"); return;}
+	if (rect.empty()) { return; }
 
 	// clear previous border
 	_border.clear();
