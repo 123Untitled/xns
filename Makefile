@@ -242,6 +242,20 @@ EMOJI = 🚀
 BUILD_MODE := release
 
 
+# -- S I N G L E  H E A D E R -------------------------------------------------
+
+define single_header
+	echo '#ifndef XNS_HEADER\n#define XNS_HEADER\n' > $1;
+    for file in $(HDR); do
+		BASE=$${file:t};
+		echo '#include "inc/'$$BASE'"' >> $1;
+	done
+	echo '\n#endif' >> $1;
+	mkdir -p $(RLSDIR)/inc
+	cp $(HDR) $(RLSDIR)/inc
+endef
+
+
 # -- M A I N  T A R G E T S ---------------------------------------------------
 
 all: ascii static
@@ -254,15 +268,9 @@ static: obj $(RLSDIR)/$(STATIC_LIB) $(RLSDIR)/$(SINGLE_HEADER)
 # -- L I B R A R Y  T A R G E T S ---------------------------------------------
 
 $(RLSDIR)/$(SINGLE_HEADER): $(HDR) Makefile | $(RLSDIR)
-	echo '#ifndef XNS_HEADER\n#define XNS_HEADER\n' > $@
-	for file in $(HDR); do
-		BASE=$${file:t};
-		echo '#include "inc/'$$BASE'"' >> $@;
-	done
-	echo '\n#endif' >> $@
-	mkdir -p $(RLSDIR)/inc
-	cp $(HDR) $(RLSDIR)/inc
+	$(call single_header,$@)
 	echo $(COLOR)single header$(RESET) $@;
+	file $(RLSDIR)/$(SINGLE_HEADER) | $(GREP); echo;
 
 
 $(RLSDIR)/$(STATIC_LIB): $(OBJ) $(COMPILE_COMMANDS) | $(RLSDIR)
