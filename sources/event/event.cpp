@@ -5,14 +5,10 @@
 
 /* default constructor */
 xns::event::event(void)
-: _modes{ }, _current{ }, _next{ }, _stack{ } {
-	// code here...
-}
+: _modes{}, _current{}, _next{} {}
 
 /* destructor */
-xns::event::~event(void) {
-	// code here...
-}
+xns::event::~event(void) {}
 
 
 // -- S T A T I C  M E T H O D S ----------------------------------------------
