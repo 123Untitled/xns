@@ -2,7 +2,7 @@
 #define MUTEX_HEADER
 
 // local headers
-#include "macro.hpp"
+#include "macros.hpp"
 #include "types.hpp"
 
 // operating system headers

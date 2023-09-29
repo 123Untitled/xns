@@ -1,7 +1,7 @@
 #ifndef DURATION_HEADER
 #define DURATION_HEADER
 
-#include "macro.hpp"
+#include "macros.hpp"
 #include "types.hpp"
 #include "move.hpp"
 #include "is_arithmetic.hpp"

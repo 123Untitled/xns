@@ -2,7 +2,7 @@
 #define RATIO_HEADER
 
 #include "types.hpp"
-#include "macro.hpp"
+#include "macros.hpp"
 #include "is_same.hpp"
 
 #include "is_integral.hpp"
