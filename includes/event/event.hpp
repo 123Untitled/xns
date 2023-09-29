@@ -118,37 +118,29 @@ namespace xns {
 			// -- S T A T I C  M E T H O D S ----------------------------------
 
 			/* get singleton instance */
-			static event& instance(void);
+			static event& shared(void);
 
 
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* add mode */
-			evntmode new_mode(void);
+			auto new_mode(void) -> evntmode;
 
 			/* remove mode */
-			void remove_mode(evntmode&);
+			auto remove_mode(evntmode&) -> void;
 
 			/* set mode by name */
-			void set_mode(const evntmode&, const evntopt = evntopt::WAIT);
+			auto set_mode(const evntmode&, const evntopt = evntopt::WAIT) -> void;
 
 			/* apply mode */
-			void next_mode(void);
+			auto next_mode(void) -> void;
+
+			/* has mode active */
+			auto has_mode(void) const -> bool;
 
 			/* is mode active */
-			bool is_mode(void) const;
+			auto is_mode(const evntmode&) const -> bool;
 
-			/* is mode active */
-			bool is_mode(const evntmode&) const;
-
-			/* stack current mode */
-			void stack_mode(void);
-
-			/* stack mode */
-			void stack_mode(const evntmode&, const evntopt = evntopt::WAIT);
-
-			/* unstack mode */
-			void unstack_mode(void);
 
 
 
@@ -241,9 +233,6 @@ namespace xns {
 			/* mode to apply next loop */
 			optional _next;
 
-			/* mode index stack */
-			xns::stack<xns::size_t> _stack;
-			//Xf::Stack<Optional> _stack;
 
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------
 
