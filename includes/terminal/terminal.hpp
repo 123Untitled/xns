@@ -18,6 +18,7 @@
 #include "macros.hpp"
 #include "event.hpp"
 #include "is_unsigned.hpp"
+#include "output.hpp"
 
 #include "declval.hpp"
 
