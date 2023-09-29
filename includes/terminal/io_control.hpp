@@ -8,9 +8,13 @@
 // operating system headers
 #include <sys/ioctl.h>
 
+#ifndef KERNEL
 #define KERNEL /* XXX - FREAD and FWRITE ifdef'd KERNEL*/
+#endif
 #include <sys/fcntl.h>
+#ifdef KERNEL
 #undef KERNEL
+#endif
 
 #include <termios.h>
 #include <unistd.h>
