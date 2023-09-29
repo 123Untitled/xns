@@ -54,7 +54,7 @@ namespace xns {
 
 
 			/* get file content */
-			inline auto content(void) -> xns::string {
+			inline auto content(void) const -> xns::string {
 
 				using size_type = xns::string::size_type;
 
