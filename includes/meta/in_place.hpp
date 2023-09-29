@@ -1,5 +1,5 @@
-#ifndef IN_PLACE_HEADER
-#define IN_PLACE_HEADER
+#ifndef XNS_IN_PLACE_HEADER
+#define XNS_IN_PLACE_HEADER
 
 // local headers
 #include "types.hpp"

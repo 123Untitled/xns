@@ -1,5 +1,5 @@
-#ifndef THREAD_HEADER
-#define THREAD_HEADER
+#ifndef XNS_THREAD_HEADER
+#define XNS_THREAD_HEADER
 
 // local headers
 #include "macros.hpp"

@@ -1,5 +1,5 @@
-#ifndef INTEGER_HEADER
-#define INTEGER_HEADER
+#ifndef XNS_INTEGER_HEADER
+#define XNS_INTEGER_HEADER
 
 // local headers
 #include "types.hpp"

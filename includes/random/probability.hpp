@@ -1,5 +1,5 @@
-#ifndef PROBABILITY_HEADER
-#define PROBABILITY_HEADER
+#ifndef XNS_PROBABILITY_HEADER
+#define XNS_PROBABILITY_HEADER
 
 #include "types.hpp"
 #include "vector.hpp"

@@ -1,5 +1,5 @@
-#ifndef CONDITIONAL_HEADER
-#define CONDITIONAL_HEADER
+#ifndef XNS_CONDITIONAL_HEADER
+#define XNS_CONDITIONAL_HEADER
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

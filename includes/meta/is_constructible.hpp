@@ -1,5 +1,5 @@
-#ifndef IS_CONSTRUCTIBLE_HEADER
-#define IS_CONSTRUCTIBLE_HEADER
+#ifndef XNS_IS_CONSTRUCTIBLE_HEADER
+#define XNS_IS_CONSTRUCTIBLE_HEADER
 
 // local headers
 #include "move.hpp"

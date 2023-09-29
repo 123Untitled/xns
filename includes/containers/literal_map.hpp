@@ -1,5 +1,5 @@
-#ifndef LITERAL_MAP_HEADER
-#define LITERAL_MAP_HEADER
+#ifndef XNS_LITERAL_MAP_HEADER
+#define XNS_LITERAL_MAP_HEADER
 
 #include "is_char.hpp"
 #include "is_all_unique.hpp"

@@ -1,5 +1,5 @@
-#ifndef SWAP_HEADER
-#define SWAP_HEADER
+#ifndef XNS_SWAP_HEADER
+#define XNS_SWAP_HEADER
 
 // local headers
 #include "is_convertible.hpp"

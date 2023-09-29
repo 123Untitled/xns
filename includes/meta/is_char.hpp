@@ -1,5 +1,5 @@
-#ifndef IS_CHAR_HEADER
-#define IS_CHAR_HEADER
+#ifndef XNS_IS_CHAR_HEADER
+#define XNS_IS_CHAR_HEADER
 
 #include "integral_constant.hpp"
 #include "remove.hpp"

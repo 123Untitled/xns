@@ -1,5 +1,5 @@
-#ifndef DURATION_HEADER
-#define DURATION_HEADER
+#ifndef XNS_DURATION_HEADER
+#define XNS_DURATION_HEADER
 
 #include "macros.hpp"
 #include "types.hpp"

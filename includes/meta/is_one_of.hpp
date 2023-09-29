@@ -1,5 +1,5 @@
-#ifndef HAS_TYPE_HEADER
-#define HAS_TYPE_HEADER
+#ifndef XNS_HAS_TYPE_HEADER
+#define XNS_HAS_TYPE_HEADER
 
 #include "integral_constant.hpp"
 #include "is_same.hpp"

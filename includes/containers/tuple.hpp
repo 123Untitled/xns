@@ -1,5 +1,5 @@
-#ifndef TUPLE_HEADER
-#define TUPLE_HEADER
+#ifndef XNS_TUPLE_HEADER
+#define XNS_TUPLE_HEADER
 
 // local headers
 #include "types.hpp"

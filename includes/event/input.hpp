@@ -1,5 +1,5 @@
-#ifndef INPUT_HEADER
-#define INPUT_HEADER
+#ifndef XNS_INPUT_HEADER
+#define XNS_INPUT_HEADER
 
 //#include "terminal.hpp"
 

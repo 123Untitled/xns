@@ -1,5 +1,5 @@
-#ifndef SOCKET_HEADER
-#define SOCKET_HEADER
+#ifndef XNS_WORKINP_HEADER
+#define XNS_WORKINP_HEADER
 
 // local headers
 #include "types.hpp"

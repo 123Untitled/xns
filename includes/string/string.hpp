@@ -1,5 +1,5 @@
-#ifndef STRING_HEADER
-#define STRING_HEADER
+#ifndef XNS_STRING_HEADER
+#define XNS_STRING_HEADER
 
 // global includes
 #include <iostream>

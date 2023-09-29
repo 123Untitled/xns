@@ -1,5 +1,5 @@
-#ifndef MUTEX_HEADER
-#define MUTEX_HEADER
+#ifndef XNS_MUTEX_HEADER
+#define XNS_MUTEX_HEADER
 
 // local headers
 #include "macros.hpp"

@@ -1,5 +1,5 @@
-#ifndef COMPARE_HEADER
-#define COMPARE_HEADER
+#ifndef XNS_COMPARE_HEADER
+#define XNS_COMPARE_HEADER
 
 #include "conditional.hpp"
 

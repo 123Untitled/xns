@@ -1,5 +1,5 @@
-#ifndef MEMORY_HEADER
-#define MEMORY_HEADER
+#ifndef XNS_MEMORY_HEADER
+#define XNS_MEMORY_HEADER
 
 // local headers
 #include "os.hpp"

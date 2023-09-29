@@ -1,5 +1,5 @@
-#ifndef STRCMP_HEADER
-#define STRCMP_HEADER
+#ifndef XNS_STRCMP_HEADER
+#define XNS_STRCMP_HEADER
 
 // local headers
 #include "is_char.hpp"

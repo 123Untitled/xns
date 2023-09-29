@@ -1,5 +1,5 @@
-#ifndef ID_HEADER
-#define ID_HEADER
+#ifndef XNS_ID_HEADER
+#define XNS_ID_HEADER
 
 #include "types.hpp"
 #include "macros.hpp"

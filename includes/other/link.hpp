@@ -1,5 +1,5 @@
-#ifndef LINK_HPP
-#define LINK_HPP
+#ifndef XNS_LINK_HPP
+#define XNS_LINK_HPP
 
 // local headers
 #include "vector.hpp"

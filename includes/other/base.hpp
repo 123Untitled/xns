@@ -1,5 +1,5 @@
-#ifndef BASE_HEADER
-#define BASE_HEADER
+#ifndef XNS_BASE_HEADER
+#define XNS_BASE_HEADER
 
 #include "types.hpp"
 #include "integral_constant.hpp"

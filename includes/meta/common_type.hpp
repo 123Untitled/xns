@@ -1,5 +1,5 @@
-#ifndef COMMON_TYPE_HEADER
-#define COMMON_TYPE_HEADER
+#ifndef XNS_COMMON_TYPE_HEADER
+#define XNS_COMMON_TYPE_HEADER
 
 //#include <type_traits>
 

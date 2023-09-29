@@ -1,5 +1,5 @@
-#ifndef PACK_TYPE_HEADER
-#define PACK_TYPE_HEADER
+#ifndef XNS_TYPE_AT_HEADER
+#define XNS_TYPE_AT_HEADER
 
 #include "types.hpp"
 

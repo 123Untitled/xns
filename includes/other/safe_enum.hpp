@@ -1,5 +1,5 @@
-#ifndef SAFE_ENUM_HEADER
-#define SAFE_ENUM_HEADER
+#ifndef XNS_SAFE_ENUM_HEADER
+#define XNS_SAFE_ENUM_HEADER
 
 // local headers
 #include "types.hpp"

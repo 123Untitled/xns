@@ -1,5 +1,5 @@
-#ifndef ARRAY_HEADER
-#define ARRAY_HEADER
+#ifndef XNS_ARRAY_HEADER
+#define XNS_ARRAY_HEADER
 
 // local headers
 #include "types.hpp"

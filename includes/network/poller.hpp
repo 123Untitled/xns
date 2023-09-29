@@ -1,5 +1,5 @@
-#ifndef POLLER_HEADER
-#define POLLER_HEADER
+#ifndef XNS_POLLER_HEADER
+#define XNS_POLLER_HEADER
 
 // local headers
 #include "socket.hpp"

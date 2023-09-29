@@ -1,5 +1,5 @@
-#ifndef IS_CONVERTIBLE_HEADER
-#define IS_CONVERTIBLE_HEADER
+#ifndef XNS_IS_CONVERTIBLE_HEADER
+#define XNS_IS_CONVERTIBLE_HEADER
 
 // local headers
 #include "declval.hpp"

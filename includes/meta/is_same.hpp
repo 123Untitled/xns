@@ -1,5 +1,5 @@
-#ifndef IS_SAME_HEADER
-#define IS_SAME_HEADER
+#ifndef XNS_IS_SAME_HEADER
+#define XNS_IS_SAME_HEADER
 
 #include "identity.hpp"
 #include "integral_constant.hpp"

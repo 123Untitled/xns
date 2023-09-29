@@ -1,5 +1,5 @@
-#ifndef ANY_HEADER
-#define ANY_HEADER
+#ifndef XNS_ANY_HEADER
+#define XNS_ANY_HEADER
 
 #include "macros.hpp"
 #include "allocator.hpp"

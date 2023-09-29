@@ -1,5 +1,5 @@
-#ifndef DEBUG_HEADER
-#define DEBUG_HEADER
+#ifndef XNS_DEBUG_HEADER
+#define XNS_DEBUG_HEADER
 
 // local headers
 #include "types.hpp"

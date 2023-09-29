@@ -1,5 +1,5 @@
-#ifndef RANDOM_HEADER
-#define RANDOM_HEADER
+#ifndef XNS_RANDOM_HEADER
+#define XNS_RANDOM_HEADER
 
 #include <cstdlib>
 #include <ctime>

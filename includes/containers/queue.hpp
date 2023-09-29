@@ -1,5 +1,5 @@
-#ifndef QUEUE_HEADER
-#define QUEUE_HEADER
+#ifndef XNS_QUEUE_HEADER
+#define XNS_QUEUE_HEADER
 
 // local headers
 #include "types.hpp"

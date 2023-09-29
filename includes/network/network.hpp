@@ -1,5 +1,5 @@
-#ifndef NETWORK_HEADER
-#define NETWORK_HEADER
+#ifndef XNS_NETWORK_HEADER
+#define XNS_NETWORK_HEADER
 
 // local headers
 #include "socket.hpp"

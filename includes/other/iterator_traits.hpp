@@ -1,5 +1,5 @@
-#ifndef ITERATOR_TRAITS_HEADER
-#define ITERATOR_TRAITS_HEADER
+#ifndef XNS_ITERATOR_TRAITS_HEADER
+#define XNS_ITERATOR_TRAITS_HEADER
 
 #include "types.hpp"
 #include "conditional.hpp"

@@ -1,5 +1,5 @@
-#ifndef BIT_CAST_HPP
-#define BIT_CAST_HPP
+#ifndef XNS_BIT_CAST_HEADER
+#define XNS_BIT_CAST_HEADER
 
 #include "types.hpp"
 #include "is_integral.hpp"

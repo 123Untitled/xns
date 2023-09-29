@@ -1,5 +1,5 @@
-#ifndef ENV_HEADER
-#define ENV_HEADER
+#ifndef XNS_ENVIRONMENT_HEADER
+#define XNS_ENVIRONMENT_HEADER
 
 #include "string.hpp"
 #include "unique_ptr.hpp"

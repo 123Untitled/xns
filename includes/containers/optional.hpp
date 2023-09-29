@@ -1,5 +1,5 @@
-#ifndef OPTIONAL_HEADER
-#define OPTIONAL_HEADER
+#ifndef XNS_OPTIONAL_HEADER
+#define XNS_OPTIONAL_HEADER
 
 // local headers
 #include "aligned_storage.hpp"

@@ -1,5 +1,5 @@
-#ifndef DECLVAL_HEADER
-#define DECLVAL_HEADER
+#ifndef XNS_DECLVAL_HEADER
+#define XNS_DECLVAL_HEADER
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

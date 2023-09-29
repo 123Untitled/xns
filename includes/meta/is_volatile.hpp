@@ -1,5 +1,5 @@
-#ifndef IS_VOLATILE_HEADER
-#define IS_VOLATILE_HEADER
+#ifndef XNS_IS_VOLATILE_HEADER
+#define XNS_IS_VOLATILE_HEADER
 
 #include "integral_constant.hpp"
 

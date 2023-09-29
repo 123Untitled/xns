@@ -1,5 +1,5 @@
-#ifndef FILE_HEADER
-#define FILE_HEADER
+#ifndef XNS_FILE_HEADER
+#define XNS_FILE_HEADER
 
 // local headers
 #include "string.hpp"

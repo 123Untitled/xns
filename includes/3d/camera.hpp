@@ -1,5 +1,5 @@
-#ifndef CAMERA_HPP
-#define CAMERA_HPP
+#ifndef XNS_CAMERA_HEADER
+#define XNS_CAMERA_HEADER
 
 #include "matrix.hpp"
 #include <cmath>

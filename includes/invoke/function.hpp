@@ -1,5 +1,5 @@
-#ifndef FUNCTION_HEADER
-#define FUNCTION_HEADER
+#ifndef XNS_FUNCTION_HEADER
+#define XNS_FUNCTION_HEADER
 
 #include "forward.hpp"
 #include "macros.hpp"

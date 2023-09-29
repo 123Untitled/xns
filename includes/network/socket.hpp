@@ -1,5 +1,5 @@
-#ifndef UNIQUE_SOCKET_HEADER
-#define UNIQUE_SOCKET_HEADER
+#ifndef XNS_UNIQUE_SOCKET_HEADER
+#define XNS_UNIQUE_SOCKET_HEADER
 
 // local headers
 #include "macros.hpp"

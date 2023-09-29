@@ -1,5 +1,5 @@
-#ifndef UNIQUE_DIRECTORY_HEADER
-#define UNIQUE_DIRECTORY_HEADER
+#ifndef XNS_UNIQUE_DIRECTORY_HEADER
+#define XNS_UNIQUE_DIRECTORY_HEADER
 
 // local headers
 #include "os.hpp"

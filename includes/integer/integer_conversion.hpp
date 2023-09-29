@@ -1,5 +1,5 @@
-#ifndef INTEGER_CONVERSION_HEADER
-#define INTEGER_CONVERSION_HEADER
+#ifndef XNS_INTEGER_CONVERSION_HEADER
+#define XNS_INTEGER_CONVERSION_HEADER
 
 // local headers
 #include "numeric_limits.hpp"

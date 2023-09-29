@@ -1,5 +1,5 @@
-#ifndef STRING_LITERAL_HEADER
-#define STRING_LITERAL_HEADER
+#ifndef XNS_STRING_LITERAL_HEADER
+#define XNS_STRING_LITERAL_HEADER
 
 #include "is_char.hpp"
 #include "types.hpp"

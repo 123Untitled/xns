@@ -1,5 +1,5 @@
-#ifndef DFS_ITERATOR_HEADER
-#define DFS_ITERATOR_HEADER
+#ifndef XNS_DFS_ITERATOR_HEADER
+#define XNS_DFS_ITERATOR_HEADER
 
 #include "stack.hpp"
 #include "queue.hpp"

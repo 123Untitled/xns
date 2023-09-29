@@ -1,5 +1,5 @@
-#ifndef REFERENCE_HEADER
-#define REFERENCE_HEADER
+#ifndef XNS_REFERENCE_HEADER
+#define XNS_REFERENCE_HEADER
 
 // local headers
 #include "move.hpp"

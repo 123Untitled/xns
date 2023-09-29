@@ -1,5 +1,5 @@
-#ifndef BITSET_HPP
-#define BITSET_HPP
+#ifndef XNS_BIT_VIEW_HEADER
+#define XNS_BIT_VIEW_HEADER
 
 // local headers
 #include "types.hpp"

@@ -1,5 +1,5 @@
-#ifndef SYSTEM_HEADER
-#define SYSTEM_HEADER
+#ifndef XNS_SYSTEM_HEADER
+#define XNS_SYSTEM_HEADER
 
 // local headers
 #include "types.hpp"

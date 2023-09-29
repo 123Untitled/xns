@@ -1,5 +1,5 @@
-#ifndef VARIANT_HEADER
-#define VARIANT_HEADER
+#ifndef XNS_VARIANT_HEADER
+#define XNS_VARIANT_HEADER
 
 // local headers
 #include "move.hpp"

@@ -1,5 +1,5 @@
-#ifndef STRNCMP_HEADER
-#define STRNCMP_HEADER
+#ifndef XNS_STRNCMP_HEADER
+#define XNS_STRNCMP_HEADER
 
 // local headers
 #include "types.hpp"

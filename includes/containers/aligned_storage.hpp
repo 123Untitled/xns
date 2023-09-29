@@ -1,5 +1,5 @@
-#ifndef ALIGNED_STORAGE_HEADER
-#define ALIGNED_STORAGE_HEADER
+#ifndef XNS_ALIGNED_STORAGE_HEADER
+#define XNS_ALIGNED_STORAGE_HEADER
 
 // local headers
 #include "types.hpp"

@@ -1,5 +1,5 @@
-#ifndef FIXED_HPP_INCLUDED
-#define FIXED_HPP_INCLUDED
+#ifndef XNS_FIXED_HEADER
+#define XNS_FIXED_HEADER
 
 #include "move.hpp"
 #include "is_integral.hpp"

@@ -1,5 +1,5 @@
-#ifndef ENABLE_IF_HEADER
-#define ENABLE_IF_HEADER
+#ifndef XNS_ENABLE_IF_HEADER
+#define XNS_ENABLE_IF_HEADER
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

@@ -1,5 +1,5 @@
-#ifndef IS_VOID_HEADER
-#define IS_VOID_HEADER
+#ifndef XNS_IS_VOID_HEADER
+#define XNS_IS_VOID_HEADER
 
 #include "is_same.hpp"
 

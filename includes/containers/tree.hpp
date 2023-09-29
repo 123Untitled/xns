@@ -1,5 +1,5 @@
-#ifndef TREE_HEADER
-#define TREE_HEADER
+#ifndef XNS_TREE_HEADER
+#define XNS_TREE_HEADER
 
 #include "string.hpp"
 #include "stack.hpp"

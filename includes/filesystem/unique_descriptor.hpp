@@ -1,5 +1,5 @@
-#ifndef UNIQUE_HPP
-#define UNIQUE_HPP
+#ifndef XNS_UNIQUE_DESCRIPTOR_HEADER
+#define XNS_UNIQUE_DESCRIPTOR_HEADER
 
 // local headers
 #include "types.hpp"

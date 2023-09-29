@@ -1,5 +1,5 @@
-#ifndef TESTCLASS_HEADER
-#define TESTCLASS_HEADER
+#ifndef XNS_TESTCLASS_HEADER
+#define XNS_TESTCLASS_HEADER
 
 #include <iostream>
 #include "string_literal.hpp"

@@ -1,5 +1,5 @@
-#ifndef IS_SCALAR_HEADER
-#define IS_SCALAR_HEADER
+#ifndef XNS_IS_SCALAR_HEADER
+#define XNS_IS_SCALAR_HEADER
 
 #include "is_arithmetic.hpp"
 #include "is_member_pointer.hpp"

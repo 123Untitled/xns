@@ -1,5 +1,5 @@
-#ifndef IS_ARITHMETIC_HEADER
-#define IS_ARITHMETIC_HEADER
+#ifndef XNS_IS_ARITHMETIC_HEADER
+#define XNS_IS_ARITHMETIC_HEADER
 
 #include "is_integral.hpp"
 #include "is_floating.hpp"

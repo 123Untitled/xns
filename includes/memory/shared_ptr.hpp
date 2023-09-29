@@ -1,5 +1,5 @@
-#ifndef SHARED_PTR_HEADER
-#define SHARED_PTR_HEADER
+#ifndef XNS_SHARED_PTR_HEADER
+#define XNS_SHARED_PTR_HEADER
 
 // local headers
 #include "types.hpp"

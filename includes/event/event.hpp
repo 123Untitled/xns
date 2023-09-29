@@ -1,5 +1,5 @@
-#ifndef EVENT_HEADER
-#define EVENT_HEADER
+#ifndef XNS_EVENT_HEADER
+#define XNS_EVENT_HEADER
 
 #include "macros.hpp"
 #include "move.hpp"

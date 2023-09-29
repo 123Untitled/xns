@@ -1,5 +1,5 @@
-#ifndef TYPE_COMPARE_HEADER
-#define TYPE_COMPARE_HEADER
+#ifndef XNS_TYPE_COMPARE_HEADER
+#define XNS_TYPE_COMPARE_HEADER
 
 // local headers
 #include "conditional.hpp"

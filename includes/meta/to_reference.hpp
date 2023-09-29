@@ -1,5 +1,5 @@
-#ifndef TO_REFERENCE_HEADER
-#define TO_REFERENCE_HEADER
+#ifndef XNS_TO_REFERENCE_HEADER
+#define XNS_TO_REFERENCE_HEADER
 
 #include "remove.hpp"
 

@@ -1,5 +1,5 @@
-#ifndef WINDOW_HEADER
-#define WINDOW_HEADER
+#ifndef XNS_WINDOW_HEADER
+#define XNS_WINDOW_HEADER
 
 #include "color.hpp"
 #include "types.hpp"

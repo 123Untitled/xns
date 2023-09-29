@@ -1,5 +1,5 @@
-#ifndef MEMCPY_HEADER
-#define MEMCPY_HEADER
+#ifndef XNS_MEMCPY_HEADER
+#define XNS_MEMCPY_HEADER
 
 // local headers
 #include "os.hpp"

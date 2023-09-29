@@ -1,5 +1,5 @@
-#ifndef SHARED_DESCRIPTOR_HEADER
-#define SHARED_DESCRIPTOR_HEADER
+#ifndef XNS_SHARED_DESCRIPTOR_HEADER
+#define XNS_SHARED_DESCRIPTOR_HEADER
 
 // local headers
 #include "types.hpp"

@@ -1,5 +1,5 @@
-#ifndef DRAW_HEADER
-#define DRAW_HEADER
+#ifndef XNS_DRAW_HEADER
+#define XNS_DRAW_HEADER
 
 #include <unistd.h>
 

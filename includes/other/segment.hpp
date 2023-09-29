@@ -1,5 +1,5 @@
-#ifndef SEGMENT_HEADER
-#define SEGMENT_HEADER
+#ifndef XNS_SEGMENT_HEADER
+#define XNS_SEGMENT_HEADER
 
 // local headers
 #include "types.hpp"

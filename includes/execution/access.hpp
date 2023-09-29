@@ -1,5 +1,5 @@
-#ifndef ACCESS_HPP
-#define ACCESS_HPP
+#ifndef XNS_ACCESS_HEADER
+#define XNS_ACCESS_HEADER
 
 // xns headers
 #include "environment.hpp"

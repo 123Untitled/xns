@@ -1,5 +1,5 @@
-#ifndef LOCK_HEADER
-#define LOCK_HEADER
+#ifndef XNS_LOCK_HEADER
+#define XNS_LOCK_HEADER
 
 // local headers
 #include "mutex.hpp"

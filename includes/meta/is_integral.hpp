@@ -1,5 +1,5 @@
-#ifndef IS_INTEGRAL_HEADER
-#define IS_INTEGRAL_HEADER
+#ifndef XNS_IS_INTEGRAL_HEADER
+#define XNS_IS_INTEGRAL_HEADER
 
 #include "is_one_of.hpp"
 #include "remove.hpp"

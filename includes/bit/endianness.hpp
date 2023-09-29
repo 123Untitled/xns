@@ -1,5 +1,5 @@
-#ifndef ENDIANNESS_HEADER
-#define ENDIANNESS_HEADER
+#ifndef XNS_ENDIANNESS_HEADER
+#define XNS_ENDIANNESS_HEADER
 
 // local headers
 #include "types.hpp"

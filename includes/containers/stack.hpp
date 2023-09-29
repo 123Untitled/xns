@@ -1,5 +1,5 @@
-#ifndef STACK_HEADER
-#define STACK_HEADER
+#ifndef XNS_STACK_HEADER
+#define XNS_STACK_HEADER
 
 // local headers
 #include "types.hpp"

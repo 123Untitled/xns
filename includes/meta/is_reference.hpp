@@ -1,5 +1,5 @@
-#ifndef IS_LVALUE_REFERENCE_HEADER
-#define IS_LVALUE_REFERENCE_HEADER
+#ifndef XNS_IS_LVALUE_REFERENCE_HEADER
+#define XNS_IS_LVALUE_REFERENCE_HEADER
 
 #include "integral_constant.hpp"
 

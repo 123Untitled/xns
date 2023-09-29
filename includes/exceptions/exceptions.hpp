@@ -1,5 +1,5 @@
-#ifndef EXCEPTIONS_HEADER
-#define EXCEPTIONS_HEADER
+#ifndef XNS_EXCEPTIONS_HEADER
+#define XNS_EXCEPTIONS_HEADER
 
 #include "types.hpp"
 

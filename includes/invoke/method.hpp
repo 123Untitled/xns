@@ -1,5 +1,5 @@
-#ifndef METHOD_HEADER
-#define METHOD_HEADER
+#ifndef XNS_METHOD_HEADER
+#define XNS_METHOD_HEADER
 
 #include "types.hpp"
 #include "forward.hpp"

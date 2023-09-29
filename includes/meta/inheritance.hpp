@@ -1,5 +1,5 @@
-#ifndef INHERITANCE_HEADER
-#define INHERITANCE_HEADER
+#ifndef XNS_INHERITANCE_HEADER
+#define XNS_INHERITANCE_HEADER
 
 #include "integral_constant.hpp"
 #include "remove.hpp"

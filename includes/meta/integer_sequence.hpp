@@ -1,5 +1,5 @@
-#ifndef INTEGER_SEQUENCE_HEADER
-#define INTEGER_SEQUENCE_HEADER
+#ifndef XNS_INTEGER_SEQUENCE_HEADER
+#define XNS_INTEGER_SEQUENCE_HEADER
 
 #include "is_integral.hpp"
 

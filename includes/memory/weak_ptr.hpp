@@ -1,5 +1,5 @@
-#ifndef WEAK_POINTER_HEADER
-#define WEAK_POINTER_HEADER
+#ifndef XNS_WEAK_PTR_HEADER
+#define XNS_WEAK_PTR_HEADER
 
 #include "types.hpp"
 #include "allocator.hpp"

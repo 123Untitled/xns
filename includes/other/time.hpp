@@ -1,5 +1,5 @@
-#ifndef TIME_HEADER
-#define TIME_HEADER
+#ifndef XNS_TIME_HEADER
+#define XNS_TIME_HEADER
 
 // local headers
 #include "types.hpp"

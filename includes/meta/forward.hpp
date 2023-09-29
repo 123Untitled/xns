@@ -1,5 +1,5 @@
-#ifndef FORWARD_HEADER
-#define FORWARD_HEADER
+#ifndef XNS_FORWARD_HEADER
+#define XNS_FORWARD_HEADER
 
 #include "to_reference.hpp"
 

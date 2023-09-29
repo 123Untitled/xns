@@ -1,5 +1,5 @@
-#ifndef IS_ENUM_HPP
-#define IS_ENUM_HPP
+#ifndef XNS_IS_ENUM_HEADER
+#define XNS_IS_ENUM_HEADER
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

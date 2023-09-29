@@ -1,5 +1,5 @@
-#ifndef UNIQUE_POINTER_HEADER
-#define UNIQUE_POINTER_HEADER
+#ifndef XNS_UNIQUE_PTR_HEADER
+#define XNS_UNIQUE_PTR_HEADER
 
 #include "types.hpp"
 #include "allocator.hpp"

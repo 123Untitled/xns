@@ -1,5 +1,5 @@
-#ifndef INDEX_OF_HEADER
-#define INDEX_OF_HEADER
+#ifndef XNS_INDEX_OF_HEADER
+#define XNS_INDEX_OF_HEADER
 
 #include "is_same.hpp"
 #include "types.hpp"

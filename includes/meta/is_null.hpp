@@ -1,5 +1,5 @@
-#ifndef IS_NULL_HEADER
-#define IS_NULL_HEADER
+#ifndef XNS_IS_NULL_HEADER
+#define XNS_IS_NULL_HEADER
 
 #include "is_same.hpp"
 #include "types.hpp"

@@ -1,5 +1,5 @@
-#ifndef MATH_HEADER
-#define MATH_HEADER
+#ifndef XNS_MATH_HEADER
+#define XNS_MATH_HEADER
 
 #include "is_arithmetic.hpp"
 #include "is_signed.hpp"

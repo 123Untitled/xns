@@ -1,5 +1,5 @@
-#ifndef ADD_CONST_HEADER
-#define ADD_CONST_HEADER
+#ifndef XNS_ADD_CONST_HEADER
+#define XNS_ADD_CONST_HEADER
 
 
 

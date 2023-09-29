@@ -1,5 +1,5 @@
-#ifndef MEMMOVE_HEADER
-#define MEMMOVE_HEADER
+#ifndef XNS_MEMMOVE_HEADER
+#define XNS_MEMMOVE_HEADER
 
 // local headers
 #include "types.hpp"

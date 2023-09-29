@@ -1,5 +1,5 @@
-#ifndef COLOR_HEADER
-#define COLOR_HEADER
+#ifndef XNS_COLOR_HEADER
+#define XNS_COLOR_HEADER
 
 #include "types.hpp"
 

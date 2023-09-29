@@ -1,5 +1,5 @@
-#ifndef BORDER_HEADER
-#define BORDER_HEADER
+#ifndef XNS_BORDER_HEADER
+#define XNS_BORDER_HEADER
 
 #include "array.hpp"
 #include "types.hpp"

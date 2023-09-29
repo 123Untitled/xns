@@ -1,5 +1,5 @@
-#ifndef IS_FUNCTION_HEADER
-#define IS_FUNCTION_HEADER
+#ifndef XNS_IS_FUNCTION_HEADER
+#define XNS_IS_FUNCTION_HEADER
 
 #include "is_one_of.hpp"
 #include "integral_constant.hpp"

@@ -1,5 +1,5 @@
-#ifndef TERM_HEADER
-#define TERM_HEADER
+#ifndef XNS_TERMINAL_HEADER
+#define XNS_TERMINAL_HEADER
 
 // c++ headers
 #include <iostream>

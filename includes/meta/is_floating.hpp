@@ -1,5 +1,5 @@
-#ifndef IS_FLOATING_HEADER
-#define IS_FLOATING_HEADER
+#ifndef XNS_IS_FLOATING_HEADER
+#define XNS_IS_FLOATING_HEADER
 
 #include "is_one_of.hpp"
 #include "remove.hpp"

@@ -1,5 +1,5 @@
-#ifndef MAKE_SIGNED_HEADER
-#define MAKE_SIGNED_HEADER
+#ifndef XNS_MAKE_SIGNED_HEADER
+#define XNS_MAKE_SIGNED_HEADER
 
 #include "types.hpp"
 

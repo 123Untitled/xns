@@ -1,5 +1,5 @@
-#ifndef CALLABLE_HEADER
-#define CALLABLE_HEADER
+#ifndef XNS_CALLABLE_HEADER
+#define XNS_CALLABLE_HEADER
 
 // local headers
 #include "forward.hpp"

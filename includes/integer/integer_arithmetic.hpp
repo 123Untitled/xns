@@ -1,5 +1,5 @@
-#ifndef INTEGER_ARITHMETIC_HEADER
-#define INTEGER_ARITHMETIC_HEADER
+#ifndef XNS_INTEGER_ARITHMETIC_HEADER
+#define XNS_INTEGER_ARITHMETIC_HEADER
 
 // local headers
 #include "numeric_limits.hpp"

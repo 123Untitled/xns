@@ -1,5 +1,5 @@
-#ifndef NUMERIC_LIMIT_HPP
-#define NUMERIC_LIMIT_HPP
+#ifndef XNS_NUMERIC_LIMITS_HEADER
+#define XNS_NUMERIC_LIMITS_HEADER
 
 #include "base.hpp"
 

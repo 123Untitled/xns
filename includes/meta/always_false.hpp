@@ -1,5 +1,5 @@
-#ifndef ALWAYS_FALSE_HEADER
-#define ALWAYS_FALSE_HEADER
+#ifndef XNS_ALWAYS_FALSE_HEADER
+#define XNS_ALWAYS_FALSE_HEADER
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

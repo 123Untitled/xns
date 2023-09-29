@@ -1,5 +1,5 @@
-#ifndef OS_HEADER
-#define OS_HEADER
+#ifndef XNS_OS_HEADER
+#define XNS_OS_HEADER
 
 
 // -- operating system check --------------------------------------------------

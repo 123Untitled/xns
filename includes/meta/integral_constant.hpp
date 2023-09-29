@@ -1,5 +1,5 @@
-#ifndef INTEGRAL_CONSTANT_HEADER
-#define INTEGRAL_CONSTANT_HEADER
+#ifndef XNS_INTEGRAL_CONSTANT_HEADER
+#define XNS_INTEGRAL_CONSTANT_HEADER
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

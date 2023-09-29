@@ -1,5 +1,5 @@
-#ifndef PATH_HEADER
-#define PATH_HEADER
+#ifndef XNS_PATH_HEADER
+#define XNS_PATH_HEADER
 
 #include "output.hpp"
 #include "types.hpp"

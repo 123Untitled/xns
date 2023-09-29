@@ -1,5 +1,5 @@
-#ifndef ESCAPE_HEADER
-#define ESCAPE_HEADER
+#ifndef XNS_ESCAPE_HEADER
+#define XNS_ESCAPE_HEADER
 
 
 // local headers

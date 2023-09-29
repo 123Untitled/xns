@@ -1,5 +1,5 @@
-#ifndef RATIO_HEADER
-#define RATIO_HEADER
+#ifndef XNS_RATIO_HEADER
+#define XNS_RATIO_HEADER
 
 #include "types.hpp"
 #include "macros.hpp"

@@ -1,5 +1,5 @@
-#ifndef IS_ALL_UNIQUE_HEADER
-#define IS_ALL_UNIQUE_HEADER
+#ifndef XNS_IS_ALL_UNIQUE_HEADER
+#define XNS_IS_ALL_UNIQUE_HEADER
 
 #include "integral_constant.hpp"
 #include "is_one_of.hpp"

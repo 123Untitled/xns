@@ -1,5 +1,5 @@
-#ifndef IS_POINTER_HEADER
-#define IS_POINTER_HEADER
+#ifndef XNS_IS_POINTER_HEADER
+#define XNS_IS_POINTER_HEADER
 
 #include "integral_constant.hpp"
 #include "remove.hpp"

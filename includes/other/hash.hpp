@@ -1,5 +1,5 @@
-#ifndef HASH_HEADER
-#define HASH_HEADER
+#ifndef XNS_HASH_HEADER
+#define XNS_HASH_HEADER
 
 // local headers
 #include "types.hpp"

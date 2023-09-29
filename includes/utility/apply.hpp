@@ -1,5 +1,5 @@
-#ifndef APPLY_HEADER
-#define APPLY_HEADER
+#ifndef XNS_APPLY_HEADER
+#define XNS_APPLY_HEADER
 
 // local headers
 #include "is_function.hpp"

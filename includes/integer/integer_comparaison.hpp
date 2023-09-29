@@ -1,5 +1,5 @@
-#ifndef INTEGER_COMPARAISON
-#define INTEGER_COMPARAISON
+#ifndef XNS_INTEGER_COMPARAISON_HEADER
+#define XNS_INTEGER_COMPARAISON_HEADER
 
 #include "is_integral.hpp"
 #include "is_signed.hpp"

@@ -1,5 +1,5 @@
-#ifndef TYPES_HEADER
-#define TYPES_HEADER
+#ifndef XNS_TYPES_HEADER
+#define XNS_TYPES_HEADER
 
 #include "conditional.hpp"
 #include "is_signed.hpp"

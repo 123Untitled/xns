@@ -1,5 +1,5 @@
-#ifndef MACRO_HEADER
-#define MACRO_HEADER
+#ifndef XNS_MACROS_HEADER
+#define XNS_MACROS_HEADER
 
 namespace xns {
 

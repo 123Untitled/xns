@@ -1,5 +1,5 @@
-#ifndef TO_STRING_HEADER
-#define TO_STRING_HEADER
+#ifndef XNS_TO_STRING_HEADER
+#define XNS_TO_STRING_HEADER
 
 #include "string.hpp"
 #include "types.hpp"

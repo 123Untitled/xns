@@ -1,5 +1,5 @@
-#ifndef UTILITY_HEADER
-#define UTILITY_HEADER
+#ifndef XNS_MOVE_HEADER
+#define XNS_MOVE_HEADER
 
 #include "to_reference.hpp"
 

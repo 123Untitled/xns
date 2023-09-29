@@ -1,5 +1,5 @@
-#ifndef PARAMETER_PACK_HEADER
-#define PARAMETER_PACK_HEADER
+#ifndef XNS_PARAMETER_PACK_HEADER
+#define XNS_PARAMETER_PACK_HEADER
 
 #include <type_traits>
 #include "type_at.hpp"

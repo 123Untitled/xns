@@ -1,5 +1,5 @@
-#ifndef DIRECTORY_HEADER
-#define DIRECTORY_HEADER
+#ifndef XNS_DIRECTORY_HEADER
+#define XNS_DIRECTORY_HEADER
 
 // local headers
 #include "string_literal.hpp"

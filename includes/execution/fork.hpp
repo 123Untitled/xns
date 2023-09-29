@@ -1,5 +1,5 @@
-#ifndef FORK_HPP
-#define FORK_HPP
+#ifndef XNS_FORK_HEADER
+#define XNS_FORK_HEADER
 
 // xns headers
 #include "macros.hpp"

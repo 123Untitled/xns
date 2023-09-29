@@ -1,5 +1,5 @@
-#ifndef BENCHMARK_HEADER
-#define BENCHMARK_HEADER
+#ifndef XNS_BENCHMARK_HEADER
+#define XNS_BENCHMARK_HEADER
 
 // local headers
 #include "types.hpp"

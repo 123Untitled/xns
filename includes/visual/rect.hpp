@@ -1,5 +1,5 @@
-#ifndef RECT_HEADER
-#define RECT_HEADER
+#ifndef XNS_RECT_HEADER
+#define XNS_RECT_HEADER
 
 #include <iostream>
 

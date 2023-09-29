@@ -1,5 +1,5 @@
-#ifndef IS_COMPARABLE_HEADER
-#define IS_COMPARABLE_HEADER
+#ifndef XNS_IS_COMPARABLE_HEADER
+#define XNS_IS_COMPARABLE_HEADER
 
 // local headers
 #include "is_convertible.hpp"

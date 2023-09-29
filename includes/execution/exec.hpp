@@ -1,5 +1,5 @@
-#ifndef EXEC_HEADER
-#define EXEC_HEADER
+#ifndef XNS_EXEC_HEADER
+#define XNS_EXEC_HEADER
 
 #include <unistd.h>
 #include <iostream>

@@ -1,5 +1,5 @@
-#ifndef INDEXED_ELEMENT_HEADER
-#define INDEXED_ELEMENT_HEADER
+#ifndef XNS_INDEXED_ELEMENT_HEADER
+#define XNS_INDEXED_ELEMENT_HEADER
 
 // local headers
 #include "types.hpp"

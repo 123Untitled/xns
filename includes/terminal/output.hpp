@@ -1,5 +1,5 @@
-#ifndef BUFFER_HEADER
-#define BUFFER_HEADER
+#ifndef XNS_OUTPUT_HEADER
+#define XNS_OUTPUT_HEADER
 
 // -- imports -----------------------------------------------------------------
 

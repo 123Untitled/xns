@@ -1,5 +1,5 @@
-#ifndef MAP_HEADER
-#define MAP_HEADER
+#ifndef XNS_MAP_HEADER
+#define XNS_MAP_HEADER
 
 #include "types.hpp"
 #include "allocator.hpp"

@@ -1,5 +1,5 @@
-#ifndef MEMSET_HEADER
-#define MEMSET_HEADER
+#ifndef XNS_MEMSET_HEADER
+#define XNS_MEMSET_HEADER
 
 // local headers
 #include "types.hpp"

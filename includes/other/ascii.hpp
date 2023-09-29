@@ -1,5 +1,5 @@
-#ifndef ASCII_HEADER
-#define ASCII_HEADER
+#ifndef XNS_ASCII_HEADER
+#define XNS_ASCII_HEADER
 
 #include "types.hpp"
 #include "macros.hpp"

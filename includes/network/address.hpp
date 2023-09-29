@@ -1,5 +1,5 @@
-#ifndef ADDRESS_HEADER
-#define ADDRESS_HEADER
+#ifndef XNS_ADDRESS_HEADER
+#define XNS_ADDRESS_HEADER
 
 // local headers
 #include "macros.hpp"

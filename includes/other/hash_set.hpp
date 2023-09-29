@@ -1,5 +1,5 @@
-#ifndef HASH_SET_HEADER
-#define HASH_SET_HEADER
+#ifndef XNS_HASH_SET_HEADER
+#define XNS_HASH_SET_HEADER
 
 // local headers
 #include "vector.hpp"

@@ -1,5 +1,5 @@
-#ifndef VECTOR_HEADER
-#define VECTOR_HEADER
+#ifndef XNS_VECTOR_HEADER
+#define XNS_VECTOR_HEADER
 
 // local headers
 #include "types.hpp"

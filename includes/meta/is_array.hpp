@@ -1,5 +1,5 @@
-#ifndef IS_ARRAY_HEADER
-#define IS_ARRAY_HEADER
+#ifndef XNS_IS_ARRAY_HEADER
+#define XNS_IS_ARRAY_HEADER
 
 #include "integral_constant.hpp"
 #include "types.hpp"

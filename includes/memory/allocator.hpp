@@ -1,5 +1,5 @@
-#ifndef ALLOCATOR_HEADER
-#define ALLOCATOR_HEADER
+#ifndef XNS_ALLOCATOR_HEADER
+#define XNS_ALLOCATOR_HEADER
 
 // local headers
 #include "types.hpp"

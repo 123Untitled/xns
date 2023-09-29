@@ -1,5 +1,5 @@
-#ifndef AST_HEADER
-#define AST_HEADER
+#ifndef XNS_AST_HEADER
+#define XNS_AST_HEADER
 
 // local headers
 #include "vector.hpp"

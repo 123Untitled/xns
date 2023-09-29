@@ -1,5 +1,5 @@
-#ifndef ADDRESSOF_HEADER
-#define ADDRESSOF_HEADER
+#ifndef XNS_ADDRESSOF_HEADER
+#define XNS_ADDRESSOF_HEADER
 
 #include <type_traits>
 

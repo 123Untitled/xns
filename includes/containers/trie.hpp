@@ -1,5 +1,5 @@
-#ifndef TRIE_HEADER
-#define TRIE_HEADER
+#ifndef XNS_TRIE_HEADER
+#define XNS_TRIE_HEADER
 
 #include "types.hpp"
 #include "vector.hpp"

@@ -1,5 +1,5 @@
-#ifndef IO_CONTROL_HEADER
-#define IO_CONTROL_HEADER
+#ifndef XNS_IO_CONTROL_HEADER
+#define XNS_IO_CONTROL_HEADER
 
 // local headers
 #include "string_literal.hpp"

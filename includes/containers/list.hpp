@@ -1,5 +1,5 @@
-#ifndef LIST_HEADER
-#define LIST_HEADER
+#ifndef XNS_LIST_HEADER
+#define XNS_LIST_HEADER
 
 // local headers
 #include "types.hpp"

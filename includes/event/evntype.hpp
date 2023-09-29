@@ -1,5 +1,5 @@
-#ifndef EVNTYPE_HEADER
-#define EVNTYPE_HEADER
+#ifndef XNS_EVNTYPE_HEADER
+#define XNS_EVNTYPE_HEADER
 
 #include "types.hpp"
 #include "macros.hpp"

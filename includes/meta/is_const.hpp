@@ -1,5 +1,5 @@
-#ifndef IS_CONST_HEADER
-#define IS_CONST_HEADER
+#ifndef XNS_IS_CONST_HEADER
+#define XNS_IS_CONST_HEADER
 
 #include "integral_constant.hpp"
 

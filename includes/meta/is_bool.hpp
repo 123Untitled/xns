@@ -1,5 +1,5 @@
-#ifndef IS_BOOL_HEADER
-#define IS_BOOL_HEADER
+#ifndef XNS_IS_BOOL_HEADER
+#define XNS_IS_BOOL_HEADER
 
 #include "is_same.hpp"
 #include "remove.hpp"

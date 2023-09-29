@@ -1,5 +1,5 @@
-#ifndef CHAR_SEQUENCE_HEADER
-#define CHAR_SEQUENCE_HEADER
+#ifndef XNS_CHAR_SEQUENCE_HEADER
+#define XNS_CHAR_SEQUENCE_HEADER
 
 #include "is_char.hpp"
 #include "types.hpp"

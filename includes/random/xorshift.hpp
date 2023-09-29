@@ -1,5 +1,5 @@
-#ifndef XORSHIFT_HEADER
-#define XORSHIFT_HEADER
+#ifndef XNS_XORSHIFT_HEADER
+#define XNS_XORSHIFT_HEADER
 
 #include "types.hpp"
 

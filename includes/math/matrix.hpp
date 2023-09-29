@@ -1,5 +1,5 @@
-#ifndef MATRIX_HEADER
-#define MATRIX_HEADER
+#ifndef XNS_MATRIX_HEADER
+#define XNS_MATRIX_HEADER
 
 #include "types.hpp"
 #include "array.hpp"

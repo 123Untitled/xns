@@ -1,5 +1,5 @@
-#ifndef IS_UNSIGNED_HEADER
-#define IS_UNSIGNED_HEADER
+#ifndef XNS_IS_UNSIGNED_HEADER
+#define XNS_IS_UNSIGNED_HEADER
 
 #include "is_integral.hpp"
 #include "is_arithmetic.hpp"

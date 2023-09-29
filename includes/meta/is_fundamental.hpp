@@ -1,5 +1,5 @@
-#ifndef IS_FUNDAMENTAL_HEADER
-#define IS_FUNDAMENTAL_HEADER
+#ifndef XNS_IS_FUNDAMENTAL_HEADER
+#define XNS_IS_FUNDAMENTAL_HEADER
 
 #include "is_arithmetic.hpp"
 #include "is_void.hpp"

@@ -1,5 +1,5 @@
-#ifndef PAIR_HEADER
-#define PAIR_HEADER
+#ifndef XNS_PAIR_HEADER
+#define XNS_PAIR_HEADER
 
 // local headers
 #include "types.hpp"

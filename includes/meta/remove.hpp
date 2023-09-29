@@ -1,5 +1,5 @@
-#ifndef REMOVE_CV_HEADER
-#define REMOVE_CV_HEADER
+#ifndef XNS_REMOVE_HEADER
+#define XNS_REMOVE_HEADER
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

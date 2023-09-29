@@ -1,5 +1,5 @@
-#ifndef POLICY_HEADER
-#define POLICY_HEADER
+#ifndef XNS_POLICY_HEADER
+#define XNS_POLICY_HEADER
 
 #include "move.hpp"
 #include "forward.hpp"

@@ -1,5 +1,5 @@
-#ifndef WINDOW_TRAITS_HEADER
-#define WINDOW_TRAITS_HEADER
+#ifndef XNS_WINDOW_TRAITS_HEADER
+#define XNS_WINDOW_TRAITS_HEADER
 
 // local headers
 #include "integral_constant.hpp"
