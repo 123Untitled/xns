@@ -11,30 +11,16 @@
 ###############################################################################
 
 
-# dependencies:
-# GNU Make 4.2 or later
-# clang++ 10.0.0 or later
-# zsh 5.7.1 or later
-# GNU ar 2.34 or later
-# GNU find 4.7.0 or later
 
-# set default target
-.DEFAULT_GOAL := all
+# -- F O R M A T T I N G ------------------------------------------------------
 
+# formatting (erase line, move cursor up, set color)
+override COLOR := "\x1b[1;32m"
+override ERASE := "\x1b[1F\x1b[0J"
 
-# -- C O L O R  S E T T I N G S -----------------------------------------------
-
-# set color variables
-override C_ := \x1b[32m
-override R_ := \x1b[0m
-
-
-# -- F E A T U R E  C H E C K -------------------------------------------------
-
-# check recipe prefix feature
-ifeq ($(origin .RECIPEPREFIX), undefined)
-    $(error $(shell echo "$(C_)Recipe prefix$(R_) feature is not supported"))
-endif
+# reset formatting
+override RESET := "\x1b[0m"
+override GREP  := grep --color=auto '^\w\+'
 
 
 
@@ -50,8 +36,11 @@ ifneq ($(PREREQ), $(VMIN))
 endif
 
 
+
 # -- S E T T I N G S ----------------------------------------------------------
 
+# set default target
+.DEFAULT_GOAL := all
 
 # use one shell for all commands
 .ONESHELL:
@@ -91,6 +80,26 @@ else
 endif
 
 
+
+# -- T A R G E T S ------------------------------------------------------------
+
+# project name
+override PROJECT = xns
+
+# main executable
+override EXEC = exec_$(PROJECT)
+
+# static library
+override STATIC_LIB = lib$(PROJECT).a
+
+# single header
+override SINGLE_HEADER = $(PROJECT).hpp
+
+# compile commands for clangd
+override COMPILE_COMMANDS = compile_commands.json
+
+
+
 # -- D I R E C T O R I E S ----------------------------------------------------
 
 # source directory
@@ -99,11 +108,14 @@ override SRCDIR := sources
 # include directory
 override INCDIR := includes
 
-# library directory
-override LIBDIR := lib
+# release directory
+override RLSDIR := $(PROJECT)
 
 # build directory
 override BLDDIR := build
+
+# scripts directory
+override SCRDIR := scripts
 
 # object directory
 override OBJDIR := $(BLDDIR)/object
@@ -113,6 +125,7 @@ override DEPDIR := $(BLDDIR)/dependency
 
 # json directory
 override JSNDIR := $(BLDDIR)/json
+
 
 
 # -- S O U R C E S ------------------------------------------------------------
@@ -125,76 +138,6 @@ override HDR := $(shell find $(INCDIR) -type f -name '*.hpp')
 
 # get all header directories
 override HDRDIR := $(sort $(dir $(HDR)))
-
-
-# -- P R O G R A M  U T I L I T I E S -----------------------------------------
-
-# make directory if not exists
-MKDIR := mkdir -p
-
-# remove recursively force
-RM := rm -rf
-
-
-# -- T A R G E T S ------------------------------------------------------------
-
-# project name
-PROJECT = xns
-
-# main executable
-EXEC = exec_$(PROJECT)
-
-# static library
-STATIC_LIB = lib$(PROJECT).a
-
-# compile commands for clangd
-COMPILE_COMMANDS = compile_commands.json
-
-
-# -- C O M P I L E R  S E T T I N G S -----------------------------------------
-
-# compiler
-CCX := $(shell which clang++)
-
-#CCX := /opt/homebrew/Cellar/gcc/12.2.0/bin/g++-12
-
-# archiver
-AR := $(shell which ar)
-
-# archiver flags
-ARFLAGS := -rcs
-
-# compiler standard
-STD := -std=gnu++2b
-
-# compiler optimization
-OPT := -O0 -g3
-
-# compiler flags
-CXXFLAGS :=	-Wall -Wextra -Werror -Wpedantic \
-			-Wno-unused -Wno-unused-variable -Wno-unused-parameter \
-			-Winline -Weffc++
-
-# linker flags
-LDFLAGS ?=
-
-# dependency flags
-DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
-
-# compile commands flags
-CMPFLAGS = -MJ $(JSNDIR)/$*.json
-
-# include flags
-INCLUDES := $(addprefix -I,$(HDRDIR))
-
-DEF ?=
-
-# variable must be expanded at runtime
-DEFINES = $(addprefix -D,$(DEF))
-
-
-
-
 
 # pattern substitution for object files
 override OBJ := $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o,    $(SRC))
@@ -212,15 +155,80 @@ override DEPHIR := $(HIR:$(SRCDIR)/%=$(DEPDIR)/%)
 override JSNHIR := $(HIR:$(SRCDIR)/%=$(JSNDIR)/%)
 
 
-# -- F O R M A T T I N G ------------------------------------------------------
 
-# formatting (erase line, move cursor up, set color)
-override COLOR := "\x1b[1;32m"
-override ERASE := "\x1b[1F\x1b[0J"
 
-# reset formatting
-override RESET := "\x1b[0m"
-override GREP  := grep --color=auto '^\w\+'
+
+
+
+
+
+
+# -- C O M P I L E R  S E T T I N G S -----------------------------------------
+
+# single header script
+override SHS := $(SCRDIR)/single_header.sh
+
+# make directory if not exists
+override MKDIR := mkdir -p
+
+# remove recursively force
+override RM := rm -rf
+
+# compiler
+override CCX := $(shell which clang++)
+
+# archiver
+override AR := $(shell which ar)
+
+# archiver flags
+override ARFLAGS := -rcs
+
+# compiler standard
+override STD := -std=c++2a
+
+# compiler optimization
+override OPT := -O0 -g3
+
+# warning scope
+override CXXFLAGS :=	-Wall -Wextra
+
+# warning impact
+override CXXFLAGS += -Werror
+
+# standard respect
+override CXXFLAGS += -Wpedantic -Weffc++
+
+# unused suppression
+override CXXFLAGS += -Wno-unused -Wno-unused-variable -Wno-unused-parameter
+
+# optimization
+override CXXFLAGS += -Winline
+
+# type conversion
+override CXXFLAGS += -Wconversion -Wsign-conversion -Wfloat-conversion -Wnarrowing
+
+# shadowing
+override CXXFLAGS += -Wshadow
+
+# linker flags
+override LDFLAGS ?=
+
+# dependency flags
+override DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
+
+# compile commands flags
+override CMPFLAGS = -MJ $(JSNDIR)/$*.json
+
+# include flags
+override INCLUDES := $(addprefix -I,$(HDRDIR))
+
+# command line defines
+DEF ?=
+
+# defines flags
+override DEFINES := $(addprefix -D,$(DEF))
+
+
 
 
 # -- P H O N Y  T A R G E T S -------------------------------------------------
@@ -229,37 +237,38 @@ override GREP  := grep --color=auto '^\w\+'
 .PHONY: all clean fclean re ascii obj exec lib static
 
 
+# snow emoji
 EMOJI = 🚀
 BUILD_MODE := release
 
 
 # -- M A I N  T A R G E T S ---------------------------------------------------
 
-all: ascii lib
+all: ascii static
 	echo "$(EMOJI) [$(BUILD_MODE)] All targets are up to date !\n";
 
-
-# executable target
-exec: obj $(EXEC)
-
-# library target
-lib: static
-
 # static library target
-static: obj $(STATIC_LIB)
+static: obj $(RLSDIR)/$(STATIC_LIB) $(RLSDIR)/$(SINGLE_HEADER)
 
 
 # -- L I B R A R Y  T A R G E T S ---------------------------------------------
 
-$(EXEC): $(OBJ) $(COMPILE_COMMANDS)
-	echo $(COLOR)executable link$(RESET) $@;
-	$(CCX) $(LDFLAGS) $(OBJ) -o $@;
-	file $(EXEC) | $(GREP); echo;
+$(RLSDIR)/$(SINGLE_HEADER): $(HDR) Makefile | $(RLSDIR)
+	echo '#ifndef XNS_HEADER\n#define XNS_HEADER\n' > $@
+	for file in $(HDR); do
+		BASE=$${file:t};
+		echo '#include "inc/'$$BASE'"' >> $@;
+	done
+	echo '\n#endif' >> $@
+	mkdir -p $(RLSDIR)/inc
+	cp $(HDR) $(RLSDIR)/inc
+	echo $(COLOR)single header$(RESET) $@;
 
-$(STATIC_LIB): $(OBJ) $(COMPILE_COMMANDS)
+
+$(RLSDIR)/$(STATIC_LIB): $(OBJ) $(COMPILE_COMMANDS) | $(RLSDIR)
 	echo $(COLOR)static library link$(RESET) $@;
 	$(AR) $(ARFLAGS) $@ $(OBJ);
-	file $(STATIC_LIB) | $(GREP); echo;
+	file $(RLSDIR)/$(STATIC_LIB) | $(GREP); echo;
 
 
 # -- C O M P I L A T I O N ----------------------------------------------------
@@ -286,18 +295,18 @@ $(COMPILE_COMMANDS): $(JSN)
 
 # -- D I R E C T O R I E S  C R E A T I O N -----------------------------------
 
-$(OBJHIR) $(DEPHIR) $(JSNHIR):
+$(OBJHIR) $(DEPHIR) $(JSNHIR) $(RLSDIR):
 	$(MKDIR) $@
 
 # -- C L E A N I N G ----------------------------------------------------------
 
 clean:
-	echo $(COLOR)'[x]'$(RESET) "Cleaned";
+	echo $(COLOR)'[x]'$(RESET) 'cleaned';
 	$(RM) $(BLDDIR) $(PROJECT).dSYM
 
 fclean: clean
-	echo $(COLOR)'[x]'$(RESET) "Full cleaned";
-	$(RM) $(EXEC) $(STATIC_LIB) $(COMPILE_COMMANDS) .cache .env
+	echo $(COLOR)'[x]'$(RESET) 'full cleaned';
+	$(RM) $(EXEC) $(STATIC_LIB) $(RLSDIR) $(COMPILE_COMMANDS) .cache .env
 
 
 # -- R E C O M P I L E --------------------------------------------------------
