@@ -2,13 +2,17 @@
 #define EVNTYPE_HEADER
 
 #include "types.hpp"
+#include "macros.hpp"
 
 // -- N A M E S P A C E -------------------------------------------------------
 
 namespace xns {
 
-	/* event */
-	enum class evntype : xns::ubyte {
+
+	// -- E V N T Y P E -------------------------------------------------------
+
+	/* enum definition */
+	enum evntype : xns::ubyte {
 		NUL,          // null character (ctrl+space)
 		SOH,          // start of heading (ctrl+a)
 		STX,          // start of text (ctrl+b)
@@ -157,6 +161,7 @@ namespace xns {
 
 		EVNT_MAX
 	};
+
 
 }
 

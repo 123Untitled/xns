@@ -78,7 +78,9 @@ void xns::event::next_mode(void) {
 	_current = xns::move(_next);
 
 	// get subscribers index by event type
-	event_vector& subscribers = xns::get<1>(_modes[*_current])[IDX(evntype::BEGIN)];//._second[IDX(evntype::BEGIN)];
+	event_vector& subscribers = xns::get<1>(_modes[*_current])[
+		xns::evntype::BEGIN
+	];
 	// loop through all observers
 	for (xns::size_t x = 0; x < subscribers.size(); ++x) {
 		// call subscriber
@@ -158,11 +160,11 @@ void xns::event::unstack_mode(void) {
 
 
 /* call all event subscribers */
-void xns::event::call_event(const evntype type) {
+void xns::event::call_event(const xns::evntype type) {
 	// exit if no current mode or invalid event type
-	if (!_current || type >= evntype::EVNT_MAX) { return; }
+	if (!_current || type >= xns::evntype::EVNT_MAX) { return; }
 	// get subscribers index by event type
-	event_vector& subscribers = xns::get<1>(_modes[*_current])[IDX(type)];//._second[IDX(type)];
+	event_vector& subscribers = xns::get<1>(_modes[*_current])[type];
 	// loop through all observers
 	for (xns::size_t x = 0; x < subscribers.size(); ++x) {
 		// call subscriber
@@ -175,7 +177,7 @@ void xns::event::call_input(const xns::string& input) {
 	// exit if no current mode
 	if (!_current) { return; }
 	// get subscribers
-	input_vector& subscribers = xns::get<0>(_modes[*_current]);//._first;
+	input_vector& subscribers = xns::get<0>(_modes[*_current]);
 	// loop through all observers
 	for (xns::size_t x = 0; x < subscribers.size(); ++x) {
 		// call subscriber
@@ -187,11 +189,11 @@ void xns::event::call_input(const xns::string& input) {
 // -- P R I V A T E  M E T H O D S --------------------------------------------
 
 /* subscribe function to event */
-void xns::event::_subscribe(const evntmode& mode, const evntype type, event_function function) {
+void xns::event::_subscribe(const evntmode& mode, const xns::evntype type, event_function function) {
 	// check invalid pointers and event type
-	if (!function || type >= evntype::EVNT_MAX) { return; }
+	if (!function || type >= xns::evntype::EVNT_MAX) { return; }
 	// get event subscriber vector
-	event_vector& subscribers = xns::get<1>(_modes[mode._idx])[IDX(type)];//._second[IDX(type)];
+	event_vector& subscribers = xns::get<1>(_modes[mode._idx])[type];
 	// add new subscriber
 	subscribers.emplace_back(function);
 }
@@ -211,18 +213,10 @@ void xns::event::_subscribe(const evntmode& mode, input_function function) {
 
 
 
-//     _______  ________  ________  ________  ________  ________   _______  ________
-//   ╱╱       ╲╱    ╱   ╲╱    ╱   ╲╱        ╲╱        ╲╱        ╲_╱       ╲╱        ╲
-//  ╱╱        ╱         ╱         ╱        _╱         ╱         ╱         ╱         ╱
-// ╱        _╱╲        ╱         ╱╱       ╱╱         ╱         ╱         ╱        _╱
-// ╲________╱  ╲______╱╲__╱_____╱ ╲______╱ ╲__╱__╱__╱╲________╱╲________╱╲________╱
-
 
 /* index private constructor */
 xns::evntmode::evntmode(const xns::size_t idx)
-: _idx{idx}, _state{true} {
-	// code here...
-}
+: _idx{idx}, _state{true} {}
 
 /* destructor */
 xns::evntmode::~evntmode(void) {
@@ -391,7 +385,8 @@ void xns::event::dispatch(void) {
 	// get event instance
 	xns::event& evnt = xns::event::instance();
 
-	using Ev = xns::evntype;
+	using ev = xns::evntype;
+
 
 	// filter extended ascii codes
 	_input.filter(xns::string::is_multibyte, false);
@@ -404,16 +399,16 @@ void xns::event::dispatch(void) {
 			// check arrow sequence
 			switch (_input[2]) {
 				case 'A': // code for arrow up
-					evnt.call_event(Ev::UP);
+					evnt.call_event(ev::UP);
 					return;
 				case 'B': // code for arrow down
-					evnt.call_event(Ev::DOWN);
+					evnt.call_event(ev::DOWN);
 					return;
 				case 'C': // code for arrow right
-					evnt.call_event(Ev::RIGHT);
+					evnt.call_event(ev::RIGHT);
 					return;
 				case 'D': // code for arrow left
-					evnt.call_event(Ev::LEFT);
+					evnt.call_event(ev::LEFT);
 					return;
 				default:
 					break;
@@ -423,7 +418,7 @@ void xns::event::dispatch(void) {
 
 	if (_input.length() == 1) {
 		const xns::ubyte _char = (xns::ubyte)_input[0]; // NEED TO FIX CONVERSION
-		evnt.call_event(static_cast<Ev>(_char));
+		evnt.call_event(static_cast<ev>(_char));
 	}
 
 	// filter control characters

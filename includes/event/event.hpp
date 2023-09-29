@@ -199,7 +199,7 @@ namespace xns {
 			using event_vector = xns::vector<xns::callable<void(void)>>;
 
 			/* event array type */
-			using event_array = xns::array<event_vector, IDX(evntype::EVNT_MAX)>;
+			using event_array = xns::array<event_vector, xns::evntype::EVNT_MAX>;
 
 
 			/* mode type */
@@ -328,8 +328,6 @@ namespace xns {
 			/* subscribe method to input */
 			template <typename C>
 			void subscribe(event::input_method<C>, event::pointer<C>);
-			// !!!
-			//void subscribe(Event::EventMethod<C>, Event::Pointer<C>);
 
 	};
 
@@ -345,7 +343,6 @@ namespace xns {
 
 	/* subscribe method to input */
 	template <typename C>
-	//void Xf::Evntmode::subscribe(Event::EventMethod<C> method, Event::Pointer<C> instance) {
 	void xns::evntmode::subscribe(event::input_method<C> method, event::pointer<C> instance) {
 		// exit if not in a valid mode
 		if (!_state) { return; }
@@ -355,11 +352,11 @@ namespace xns {
 
 	/* subscribe method to event */
 	template <typename C>
-	void xns::event::_subscribe(const evntmode& mode, const evntype type, event_method<C> method, pointer<C> instance) {
+	void xns::event::_subscribe(const evntmode& mode, const xns::evntype type, event_method<C> method, pointer<C> instance) {
 		// check invalid pointers and event type
-		if (!method || !instance || type >= evntype::EVNT_MAX) { return; }
+		if (!method || !instance || type >= xns::evntype::EVNT_MAX) { return; }
 		// get event subscriber vector
-		event_vector& subscribers = xns::get<1>(_modes[mode._idx])[IDX(type)];//._second[IDX(type)];
+		event_vector& subscribers = xns::get<1>(_modes[mode._idx])[type];
 		// add new subscriber
 		subscribers.emplace_back(method, instance);
 	}
@@ -370,7 +367,7 @@ namespace xns {
 		// check invalid pointers
 		if (!method || !instance) { return; }
 		// get input subscriber vector
-		input_vector& subscribers = xns::get<0>(_modes[mode._idx]);//._first;
+		input_vector& subscribers = xns::get<0>(_modes[mode._idx]);
 		// add new subscriber
 		subscribers.emplace_back(method, instance);
 	}
