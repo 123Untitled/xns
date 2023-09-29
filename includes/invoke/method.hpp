@@ -1,9 +1,8 @@
-#ifndef XNS_METHOD_HEADER
-#define XNS_METHOD_HEADER
+#ifndef XNS_METHOD_HPP
+#define XNS_METHOD_HPP
 
 #include "types.hpp"
 #include "forward.hpp"
-#include "move.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -11,18 +10,19 @@
 namespace xns {
 
 
-	// -- M E T H O D  C L A S S ----------------------------------------------
+	// -- M E T H O D ---------------------------------------------------------
 
 	/* empty declaration */
-	template <class, class, class...>
+	template <typename, typename, typename...>
 	class method;
 
-	template <class O, class R, class... A>
+
+	template <typename O, typename R, typename... A>
 	class method<O, R(A...)> final {
 
 		public:
 
-			// -- P U B L I C  T Y P E S --------------------------------------
+			// -- public types ------------------------------------------------
 
 			/* self type */
 			using self        = method<O, R(A...)>;
@@ -37,172 +37,138 @@ namespace xns {
 			using return_type = R;
 
 
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			method(void) noexcept
-			: _method{nullptr} {
-				// code here...
-			}
+			inline constexpr method(void) noexcept
+			: _method{nullptr} {}
 
 			/* nullptr constructor */
-			method(xns::null) noexcept
-			: _method{nullptr} {
-				// code here...
-			}
+			inline constexpr method(xns::null) noexcept
+			: _method{nullptr} {}
 
 			/* method pointer constructor */
-			method(const prototype method) noexcept
-			: _method{method} {
-				// code here...
-			}
+			inline constexpr method(const prototype method) noexcept
+			: _method{method} {}
 
 			/* copy constructor */
-			method(const self& other) noexcept
-			: _method{other._method} {
-				// code here...
-			}
+			inline constexpr method(const self& other) noexcept
+			: _method{other._method} {}
 
 			/* move constructor */
-			method(self&& other) noexcept
-			: _method{xns::move(other._method)} {
-				// code here...
-			}
+			inline constexpr method(self&& other) noexcept
+			: method{other} {}
 
 			/* destructor */
-			~method(void) noexcept = default;
+			inline constexpr ~method(void) noexcept = default;
 
 
-			// -- P U B L I C  A S S I G N M E N T ----------------------------
+			// -- public assignments ------------------------------------------
 
 			/* nullptr assignment */
-			self& assign(xns::null) noexcept {
-				// set method pointer to null
+			inline constexpr auto assign(xns::null) noexcept -> void {
 				_method = nullptr;
-				// return self reference
-				return *this;
 			}
 
 			/* method pointer assignment */
-			self& assign(const prototype method) noexcept {
-				// set method pointer
+			inline constexpr auto assign(const prototype method) noexcept -> void {
 				_method = method;
-				// return self reference
-				return *this;
 			}
 
 			/* copy assignment */
-			self& assign(const self& other) noexcept {
-				// copy method pointer
+			inline constexpr auto assign(const self& other) noexcept -> void {
 				_method = other._method;
-				// return self reference
-				return *this;
 			}
 
 			/* move assignment */
-			self& assign(self&& other) noexcept {
-				// move method pointer
-				_method = xns::move(other._method);
-				// return self reference
+			inline constexpr auto assign(self&& other) noexcept -> void {
+				assign(other);
+			}
+
+
+			// -- public assignment operators ---------------------------------
+
+			/* nullptr assignment operator */
+			inline constexpr auto operator=(xns::null) noexcept -> self& {
+				assign(nullptr);
+				return *this;
+			}
+
+			/* method pointer assignment operator */
+			inline constexpr auto operator=(const prototype method) noexcept -> self& {
+				assign(method);
+				return *this;
+			}
+
+			/* copy assignment operator */
+			inline constexpr auto operator=(const self& other) noexcept -> self& {
+				assign(other);
+				return *this;
+			}
+
+			/* move assignment operator */
+			inline constexpr auto operator=(self&& other) noexcept -> self& {
+				operator=(other);
 				return *this;
 			}
 
 
-			// -- P U B L I C  A S S I G N M E N T  O P E R A T O R S ---------
-
-			/* nullptr assignment operator */
-			self& operator=(xns::null) noexcept {
-				// return nullptr assignment
-				return assign(nullptr);
-			}
-
-			/* method pointer assignment operator */
-			self& operator=(const prototype method) noexcept {
-				// return method pointer assignment
-				return assign(method);
-			}
-
-			/* copy assignment operator */
-			self& operator=(const self& other) noexcept {
-				// return copy assignment
-				return assign(other);
-			}
-
-			/* move assignment operator */
-			self& operator=(self&& other) noexcept {
-				// return move assignment
-				return assign(xns::move(other));
-			}
-
-
-			// -- P U B L I C  B O O L E A N  O P E R A T O R S ---------------
+			// -- public boolean operators ------------------------------------
 
 			/* boolean operator */
-			explicit operator bool(void) const noexcept {
-				// return method pointer validity
+			inline constexpr explicit operator bool(void) const noexcept {
 				return _method != nullptr;
 			}
 
 			/* not operator */
-			bool operator!(void) const noexcept {
-				// return method pointer invalidity
+			inline constexpr auto operator!(void) const noexcept -> bool {
 				return _method == nullptr;
 			}
 
 
-			// -- P U B L I C  C O M P A R I S O N  O P E R A T O R S ---------
+			// -- public comparison operators ---------------------------------
 
 			/* equality operator */
-			bool operator==(const self& other) const noexcept {
-				// return true if method pointers are equal
+			inline constexpr auto operator==(const self& other) const noexcept -> bool {
 				return _method == other._method;
 			}
 
 			/* inequality operator */
-			bool operator!=(const self& other) const noexcept {
-				// return true if function pointers are not equal
+			inline constexpr auto operator!=(const self& other) const noexcept -> bool {
 				return _method != other._method;
 			}
 
 
-			// -- P U B L I C  C A L L  O P E R A T O R -----------------------
+			// -- public methods ----------------------------------------------
 
 			/* method call operator */
-			return_type operator()(object& instance, A&&... arguments) {
-				// call method
+			inline constexpr auto operator()(object& instance, A&&... arguments) const -> return_type {
 				return (instance.*_method)(xns::forward<A>(arguments)...);
-				//return _method(Xf::forward<A>(arguments)...);
 			}
 
 
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* call */
-			return_type call(object& instance, A&&... arguments) const {
-				// call method
+			inline constexpr auto call(object& instance, A&&... arguments) const -> return_type {
 				return (instance.*_method)(xns::forward<A>(arguments)...);
-				//return _method(Xf::forward<A>(arguments)...);
 			}
 
 			/* reset */
-			void reset(void) noexcept {
-				// set function pointer to null
+			inline constexpr auto reset(void) noexcept -> void {
 				_method = nullptr;
 			}
 
 
 		private:
 
-			// -- P R I V A T E  M E M B E R S --------------------------------
+			// -- private members ---------------------------------------------
 
 			/* method pointer */
 			prototype _method;
 
-
 	};
-
-
 
 }
 
-#endif
+#endif // XNS_METHOD_HPP
