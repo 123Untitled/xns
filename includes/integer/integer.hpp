@@ -14,6 +14,7 @@
 
 
 #include "string.hpp"
+#include "to_string.hpp"
 
 #include <iostream>
 
@@ -109,8 +110,7 @@ namespace xns {
 			}
 
 			auto print(void) const noexcept -> void {
-				xns::string str;
-				str.to_string(_value);
+				xns::string str = xns::to_string(_value);
 				std::cout << (SIGNED ? "int" : "uint") << BYTES << ": " <<
 					str.data() << std::endl;
 			}
