@@ -101,7 +101,7 @@ namespace xns {
 
 
 		template <xns::is_string S, is_integral I>
-		static bool string_to_integer(const S& str, I& value) {
+		static bool to_integer(const S& str, I& value) {
 
 			/* integer type */
 			using integer       = xns::remove_cvr<I>;
