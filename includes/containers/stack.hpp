@@ -173,9 +173,6 @@ namespace xns {
 			/* push */
 			template <typename U>
 			auto push(U&& value) -> void {
-				// assert that U is same as value_type
-				static_assert(xns::is_same<xns::remove_cvr<U>, value_type>,
-						"): STACK: U MUST BE SAME AS T :(");
 				// allocate and link node
 				node_pointer node = allocator::make(xns::forward<U>(value));
 				node->_next = _top;
@@ -187,9 +184,6 @@ namespace xns {
 			/* emplace */
 			template <typename... A>
 			auto emplace(A&&... args) -> void {
-				// assert that T is constructible from A
-				static_assert(xns::is_constructible<value_type, A...>,
-						"): STACK: T MUST BE CONSTRUCTIBLE FROM A... :(");
 				// allocate and link node
 				node_pointer node = allocator::make(xns::forward<A>(args)...);
 				node->_next = _top;
