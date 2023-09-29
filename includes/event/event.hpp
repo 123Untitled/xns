@@ -327,7 +327,7 @@ namespace xns {
 		// exit if not in a valid mode
 		if (!_state) { return; }
 		// call event class method
-		event::instance()._subscribe(*this, type, method, instance);
+		event::shared()._subscribe(*this, type, method, instance);
 	}
 
 	/* subscribe method to input */
@@ -336,7 +336,7 @@ namespace xns {
 		// exit if not in a valid mode
 		if (!_state) { return; }
 		// call event class method
-		event::instance()._subscribe(*this, method, instance);
+		event::shared()._subscribe(*this, method, instance);
 	}
 
 	/* subscribe method to event */
