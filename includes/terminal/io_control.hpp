@@ -34,17 +34,17 @@ namespace xns {
 		using attrs = struct termios;
 
 
-		auto stdin(void) -> xns::unique_descriptor& {
+		static inline auto stdin(void) -> xns::unique_descriptor& {
 			static xns::unique_descriptor _stdin{STDIN_FILENO};
 			return _stdin;
 		}
 
-		auto stdout(void) -> xns::unique_descriptor& {
+		static inline auto stdout(void) -> xns::unique_descriptor& {
 			static xns::unique_descriptor _stdout{STDOUT_FILENO};
 			return _stdout;
 		}
 
-		auto stderr(void) -> xns::unique_descriptor& {
+		static inline auto stderr(void) -> xns::unique_descriptor& {
 			static xns::unique_descriptor _stderr{STDERR_FILENO};
 			return _stderr;
 		}
