@@ -377,9 +377,6 @@ namespace xns {
 			/* push back */
 			template <typename U>
 			auto push_back(U&& value) -> void {
-				// assert U is same as value_type
-				static_assert(xns::is_same<xns::remove_cvr<U>, value_type>,
-						"): VECTOR: PUSH BACK TYPE MISMATCH :(");
 				// check capacity
 				if (not available()) {
 					// double capacity
