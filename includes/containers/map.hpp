@@ -9,6 +9,7 @@
 #include "literal_map.hpp"
 #include "tuple.hpp"
 #include "is_comparable.hpp"
+#include "to_string.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -336,15 +337,11 @@ namespace xns {
 
 
 			static xns::string vcall(const key_value& data) {
-				xns::string str;
-				str.to_string(data.key());
-				return str;
+				return xns::to_string(data.key());
 			}
 
 			static xns::size_t scall(const key_value& data) {
-				xns::string str;
-				str.to_string(data.key());
-				return str.size();
+				return xns::to_string(data.key()).size();
 			}
 
 		void print(void) {
