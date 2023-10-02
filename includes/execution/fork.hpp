@@ -74,12 +74,12 @@ namespace xns {
 			// -- public accessors --------------------------------------------
 
 			/* child status */
-			inline status child(void) const noexcept {
+			inline auto child(void) const noexcept -> status {
 				return _schild;
 			}
 
 			/* parent status */
-			inline status parent(void) const noexcept {
+			inline auto parent(void) const noexcept -> status {
 				return _sparent;
 			}
 
@@ -94,8 +94,6 @@ namespace xns {
 
 			/* parent status */
 			status _sparent;
-
-
 
 
 	};
