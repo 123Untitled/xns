@@ -41,7 +41,7 @@ static auto simd_test(void) -> void {
 	constexpr size_type N = 1'000'000;
 
 	for (size_type i = 0; i < N; ++i) {
-		vec.copy_back(xns::random::integral<int>());
+		vec.push_back(xns::random::integral<int>());
 	}
 
 	auto start = xns::time::now();

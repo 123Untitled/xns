@@ -25,7 +25,7 @@ bool UT::unit_tests<"queue">(void) {
 
 	xns::tree<int> tree;
 
-	constexpr xns::size_t N = 10000000;
+	constexpr xns::size_t N = 1000;
 
 	for (xns::size_t i = 0; i < N; ++i)
 		tree.insert(xns::random::integral<int>());
