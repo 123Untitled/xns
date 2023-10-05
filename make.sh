@@ -218,7 +218,7 @@ function check_os {
 
 function required() {
 	# default required programs
-	local COMMANDS=('mkdir' 'rm' 'cd' 'pwd' 'sed' 'cat' 'file' 'vared' 'jq' 'shasum' 'wait' 'fzf' 'flock' 'wc')
+	local COMMANDS=('mkdir' 'rm' 'cd' 'pwd' 'sed' 'cat' 'file' 'vared' 'jq' 'openssl' 'wait' 'fzf' 'flock' 'wc')
 	# append arguments
 	COMMANDS+=( "$@" )
 	# loop through all required commands
@@ -345,10 +345,8 @@ function initialize_separator {
 
 
 function handle_compilation {
-	# hash source file
-	local HASH=$(shasum -a 1 <<< $FILE)
-	# remove all characters from last space
-	HASH=${HASH%% *}
+	# openssl hash
+	local HASH=$(openssl md5 <<< $FILE)
 	# add object file extension
 	local OBJ=$OBJDIR'/'$HASH'.o'
 	# add dependency file extension
