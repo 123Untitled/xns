@@ -17,6 +17,7 @@
 #include "memmove.hpp"
 #include "strcmp.hpp"
 #include "strncmp.hpp"
+#include "strlen.hpp"
 
 #include "swap.hpp"
 

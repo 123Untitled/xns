@@ -40,7 +40,6 @@ namespace xns {
 		public:
 
 
-
 			// -- public types ------------------------------------------------
 
 			/* self type */
