@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh --no-rcs
+#!/usr/bin/env -S zsh --no-rcs --err-exit
 
 # this script is used to generate missing unit test files
 
@@ -6,24 +6,21 @@ CO='\x1b[31m'
 CE='\x1b[32m'
 NC='\x1b[0m'
 
-GIT_DIR='xns'
+PROJECT='xns'
 
-XNS_INC_DIR='inc'
-XNS_SRC_DIR='src'
-TEST_DIR='test'
-TEST_SRC_DIR=$TEST_DIR/'src'
+INCDIR='includes'
+TSTDIR='sources/tests/src'
 
 
 SSH_REPO='git@github.com:123Untitled/xns.git'
 PUB_REPO='https://github.com/123Untitled/xns.git'
 
 
-
 # -- C H E C K  W O R K I N G  D I R E C T O R Y ------------------------------
 
 # check if the script is run in a git repository
 if [ ! -d .git ]; then
-	echo 'Please run this script in the' $CO$GIT_DIR$NC 'repository.'
+	echo 'please run this script in the' $CO$PROJECT$NC 'repository.'
 	exit 1
 fi
 
@@ -32,23 +29,7 @@ GIT_REPO=$(git config --get remote.origin.url)
 
 # check if the script is run in the right repository
 if [[ $GIT_REPO != $SSH_REPO && $GIT_REPO != $PUB_REPO ]]; then
-	echo 'Please run this script in the' $CO$GIT_DIR$NC 'repository.'
-	exit 1
-fi
-
-
-# -- C H E C K  D I R E C T O R I E S -----------------------------------------
-
-# check if the include directory exists
-if [ ! -d $XNS_INC_DIR ]; then
-	echo 'The' $CO$XNS_INC_DIR$NC 'directory does not exist.'
-	exit 1
-fi
-
-
-# check if the unit test directory exists
-if [ ! -d $TEST_SRC_DIR ]; then
-	echo 'The' $CO$TEST_SRC_DIR$NC 'directory does not exist.'
+	echo 'please run this script in the' $CO$PROJECT$NC 'repository.'
 	exit 1
 fi
 
@@ -60,32 +41,64 @@ git diff --cached --exit-code --quiet
 
 # check status
 if [ $? -ne 0 ]; then
-	echo 'Please' $CE'commit'$NC 'or' $CE'stash'$NC 'your changes first.'
+	echo 'please' $CE'commit'$NC 'or' $CE'stash'$NC 'your changes first.'
 	exit 1
 fi
 
 
-# -- C H E C K  M I S S I N G  U N I T  T E S T  F I L E S --------------------
+
+# -- C H E C K  D I R E C T O R I E S -----------------------------------------
+
+# check if the include directory exists
+if [ ! -d $INCDIR ]; then
+	echo 'the' $CO$INCDIR$NC 'directory does not exist.'
+	exit 1
+fi
+
+
+# check if the unit test directory exists
+if [ ! -d $TSTDIR ]; then
+	echo 'the' $CO$TSTDIR$NC 'directory does not exist.'
+	exit 1
+fi
+
+
+# -- I N I T I A L I Z A T I O N ----------------------------------------------
 
 # get all header files
-HEADERS=($XNS_INC_DIR/**/*.hpp(.N))
-# get all unit test files
-UNIT_TESTS=($TEST_SRC_DIR/**/*.cpp(.N))
-
+HEADERS=($INCDIR'/'**'/'*'.hpp'(.N))
 
 # get basenames and remove extension
 HEADERS=(${${HEADERS[@]##*/}[@]%'.hpp'})
 
-# remove extensions
-UNIT_TESTS=(${${UNIT_TESTS[@]##*/}[@]%'.cpp'})
-# remove '_tests' suffix
-UNIT_TESTS=(${(@)UNIT_TESTS%'_tests'})
+# get all unit test files
+TESTS=($TSTDIR'/'**'/'*'.cpp'(.N))
+
+# remove extensions and '_' prefix
+TESTS=(${${TESTS[@]##*/_}[@]%'.cpp'})
+
+# remove 'all' file
+TESTS=(${(@)TESTS:#all})
 
 
-# remove main
-UNIT_TESTS=(${(@)UNIT_TESTS:#main})
-# remove testclass
-HEADERS=(${(@)HEADERS:#testclass})
+# create an header table
+typeset -A HTABLE
+# create an unit test table
+typeset -A UTABLE
+
+# loop over all header files
+for HEADER in $HEADERS; do
+	# add header to table
+	HTABLE[$HEADER]=1
+done
+
+# loop over all unit test files
+for TEST in $TESTS; do
+	# add unit test to table
+	UTABLE[$TEST]=1
+done
+
+
 
 
 
@@ -94,30 +107,25 @@ function model {
 
 	# check if there is one argument
 	if [ $# -ne 1 ]; then
-		echo 'Internal error: function' $CO'model'$NC 'expects one argument.'
 		exit 1
 	fi
 
-	local FILE_NAME=$1
-
 	# unit test file model
-	UNIT_TEST_MODEL=\
-"#include \"unit_tests.hpp\"
-#include \"$FILE_NAME.hpp\"
+	local MODEL=\
+'#include "unit_tests.hpp"\n'\
+'#include "'$1'.hpp"\n\n'\
+'/* unit test */\n'\
+'template <>\n'\
+'int UT::unit_tests<"'$1'">(void) {\n'\
+'\treturn 0;\n'\
+'}\n\n'\
+'#if defined(XNS_TEST_'${1:u}')\n'\
+'int main(void) {\n'\
+'\treturn UT::unit_tests<"'$1'">();\n'\
+'}\n'\
+'#endif\n'
 
-/* unit test */
-template <>
-bool UT::unit_tests<\"$FILE_NAME\">(void) {
-\t// code here...
-\treturn false;
-}
-
-int main(void) {
-\treturn UT::unit_tests<\"$FILE_NAME\">()
-\t\t? EXIT_SUCCESS : EXIT_FAILURE;
-}
-"
-	echo $UNIT_TEST_MODEL
+	echo $MODEL
 }
 
 
@@ -149,40 +157,33 @@ function missing_test {
 
 	# loop over all header files
 	for HEADER in $HEADERS; do
+
 		# check if the associated unit file exist
-		if [[ ! $UNIT_TESTS =~ $HEADER ]]; then
+		if [[ ! -v UTABLE[$HEADER] ]]; then
+
 			# print message
-			echo $CE$HEADER'_tests.cpp'$NC 'does not exist.'"\r"
+			echo -n $CE'_'$HEADER'.cpp'$NC 'does not exist, generating it ? '
 
-			echo -n 'Generate file ? '
-			if ! prompt; then
-				continue
+			if prompt; then
+
+				# get the unit test file path
+				local FILE_PATH=$TSTDIR'/_'$HEADER'.cpp'
+
+				# check if the unit test file already exists
+				if [ -f $FILE_PATH ]; then
+					exit 1
+				fi
+
+				# generate unit test file
+				model $HEADER > $FILE_PATH
+
+				# add unit test file to git
+				git add -v $FILE_PATH
+				# commit unit test file
+				git commit -v -m "add unit test for $HEADER"
+				# push changes
+				git push -v
 			fi
-
-			# get the unit test file path
-			local FILE_PATH=$TEST_SRC_DIR'/'$HEADER'_tests.cpp'
-
-			# check if the unit test file already exists
-			if [ -f $FILE_PATH ]; then
-				echo 'Internal error: file' $CO$FILE_PATH$NC 'already exists.'
-				exit 1
-			fi
-
-			# generate unit test file
-			model $HEADER > $FILE_PATH
-
-			# check if the unit test file was generated
-			if [ $? -ne 0 ]; then
-				echo 'Failed to generate' $CE$HEADER'_tests.cpp'$NC'.'
-				exit 1
-			fi
-
-			# add unit test file to git
-			git add -v $FILE_PATH
-			# commit unit test file
-			git commit -v -m "add unit test for $HEADER"
-			# push changes
-			git push -v
 
 		fi
 	done
@@ -192,24 +193,30 @@ function missing_test {
 function missing_header {
 
 	# loop over all unit test files
-	for UNIT in $UNIT_TESTS; do
+	for TEST in $TESTS; do
 		# check if the associated header file exist
-		if [[ ! $HEADERS =~ $UNIT ]]; then
+		if [[ ! -v HTABLE[$TEST] ]]; then
+
 			# print message
-			echo $CO$UNIT'_tests.cpp'$NC 'does not have an associated header file.'"\r"
-			# find file path
-			local FILE_PATH=$UT_DIR'/src/'$UNIT'_tests.cpp'
-			# check if file exists
-			if [ ! -f $FILE_PATH ]; then
-				echo 'Internal error: file' $CO$FILE_PATH$NC 'does not exist.'
-				exit 1
-			fi
-			# purpose to delete the unit test file
-			echo -n 'Delete file ? '
+			echo -n $CO'_'$TEST'.cpp'$NC 'is not associated to a header file, delete it ? '
+
 			if prompt; then
-				echo 'deleting file...'
-			else
-				echo 'keeping file...'
+
+				# get the unit test file path
+				local FILE_PATH=$TSTDIR'/_'$TEST'.cpp'
+
+				# check if the unit test file already exists
+				if [ ! -f $FILE_PATH ]; then
+					exit 1
+				fi
+
+				# remove unit test file
+				git rm -v $FILE_PATH
+				# commit unit test file
+				git commit -v -m 'remove unit test for '$TEST
+				# push changes
+				git push -v
+
 			fi
 		fi
 
@@ -217,8 +224,8 @@ function missing_header {
 
 }
 
-missing_test
 missing_header
+missing_test
 
 
 
