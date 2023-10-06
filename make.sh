@@ -1,5 +1,9 @@
 #!/usr/bin/env -S zsh --no-rcs
 
+#echo 'non-compiled:' $0
+
+#exit 0
+
 # This script is used to compile the project.
 # Makefile forever, but not really lol.
 
@@ -182,7 +186,7 @@ FZF_OPTS=('--algo=v2' '--height=50%' '--no-multi' '--layout=reverse' '--border=r
 
 # main color
 	COLOR='\x1b[32m'
-  SUCCESS='\x1b[32m'
+  SUCCESS='\x1b[33m'
 	ERROR='\x1b[31m'
 	RESET='\x1b[0m'
 	ERASE='\x1b[1F\x1b[0J'
@@ -262,7 +266,7 @@ function repository {
 
 	# check if the script is run in a git repository
 	if [ ! -d .git ]; then
-		echo 'please run this script in the' $CO$PROJECT$NC 'repository.'
+		echo 'please run this script in the' $CO$PROJECT$NC 'repository.\n'
 		exit 1
 	fi
 
@@ -271,7 +275,7 @@ function repository {
 
 	# check if the script is run in the right repository
 	if [[ $GIT_REPO != $SSH_REPO && $GIT_REPO != $PUB_REPO ]]; then
-		echo 'please run this script in the' $COLOR$PROJECT$RESET 'repository.'
+		echo 'please run this script in the' $COLOR$PROJECT$RESET 'repository.\n'
 		exit 1
 	fi
 
@@ -289,7 +293,7 @@ function description {
 	if [[ $RESUME =~ $REGEX ]]; then
 		# print separator
 		echo $SEPARATOR
-		echo $COLOR'[+]'$RESET ${1##*/} '|' ${match[1]}
+		echo $SUCCESS'[+]'$RESET ${1##*/} '|' ${match[1]}
 	fi
 }
 
@@ -428,6 +432,10 @@ function handle_compilation {
 function handle_errors {
 	# get all log files
 	local LOGS=($LOGDIR'/'*'.log'(.N))
+	# declare associative array
+	declare -A ERRORS
+	# regex to match error
+	local REGEX='^.*/([^/]+):([0-9]+):([0-9]+): *(.+)$'
 
 	for LOG in $LOGS; do
 		# split log file into lines
@@ -438,8 +446,6 @@ function handle_errors {
 			if [[ $LOGLINE =~ 'In file included from' ]]; then
 				continue
 			fi
-
-			REGEX='^.*/([^/]+):([0-9]+):([0-9]+): *(.+)$'
 
 
 			if [[ $LOGLINE =~ $REGEX ]]; then
@@ -470,13 +476,12 @@ function compile {
 
 	# create build directories
 	mkdir -p $OBJDIR $DEPDIR $JSNDIR $LOGDIR
+	rm -f $LOGDIR'/'*'.log'
 
 	echo 0 > $COMPILED
 	touch $LOCK
 	# array of pids
 	PIDS=()
-
-	MAX_JOBS=200
 
 	# loop over source files
 	for FILE in $SRCS; do
@@ -504,7 +509,7 @@ function compile {
 	if [[ $COUNT -eq 0 ]]; then
 		echo $COLOR'[✓]'$RESET 'nothing to compile.'
 	else
-		echo '\n\n'🫠 $COUNT 'files compiled.'
+		echo '\n\n' 🫠 $COUNT 'files compiled.'
 	fi
 
 }
@@ -642,12 +647,12 @@ function setup_files() {
 # -- B A N N E R --------------------------------------------------------------
 
 function banner() {
-	echo $SUCCESS$BANNER$RESET
+	echo $COLOR$BANNER$RESET
 }
 
 function target_info() {
-	echo $SUCCESS$scriptname$RESET \
-		'launching' '['$SUCCESS${1##*/}$RESET']' 'build'
+	echo $COLOR$scriptname$RESET \
+		'launching' '['$COLOR${1##*/}$RESET']' 'build'
 }
 
 
@@ -692,6 +697,7 @@ function main() {
 	banner
 	check_os
 	required $CXX $ARCHIVER #$LEAKER
+	repository
 	initialize_separator
 
 	handle_argument
