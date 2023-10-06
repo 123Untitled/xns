@@ -113,6 +113,7 @@ LOCK=$BLDDIR'/.lock'
 
 # compiler
 CXX='/opt/homebrew/Cellar/llvm/17.0.2/bin/clang++'
+#CXX='clang++'
 
 # archiver
 ARCHIVER='ar'
