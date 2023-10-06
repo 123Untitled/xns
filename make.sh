@@ -508,14 +508,13 @@ function linkage {
 
 function require_build_mode {
 
-	BUILD_MODE=$(echo -e 'release\ntest\nconfigure' | fzf $FZF_OPTS)
+	BUILD_MODE=$(echo -e 'release\ntest\ninstall' | fzf $FZF_OPTS)
 
 	if [[ -z $BUILD_MODE ]]; then
 		exit 1
 	fi
 
 	echo 'BUILD_MODE='$BUILD_MODE > $SETUP
-
 }
 
 SRCTESTS=()
@@ -631,6 +630,11 @@ function handle_argument {
 		make_clean
 		echo 'BUILD_MODE=release' > $SETUP
 
+	# install
+	elif [[ $ARGUMENT == 'install' ]]; then
+		make_clean
+		echo 'BUILD_MODE=install' > $SETUP
+
 	# test
 	elif [[ $ARGUMENT == 'test' ]]; then
 		make_clean
@@ -670,6 +674,11 @@ function main() {
 		compile
 		database
 		linkage $EXECUTABLE make_executable
+	# install mode
+	elif [[ $BUILD_MODE == 'install' ]]; then
+		target_info 'install'
+		compile
+		linkage $STATIC make_static
 	fi
 
 
