@@ -170,7 +170,6 @@ namespace tests {
 
 }
 
-namespace test {
 
 
 
@@ -249,7 +248,6 @@ namespace test {
 	using S = X<std::string, "S", "string">;
 
 
-}
 
 
 #endif

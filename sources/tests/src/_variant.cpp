@@ -70,7 +70,7 @@ void benchmark(void) {
 
 /* unit test */
 template <>
-bool UT::unit_tests<"variant">(void) {
+int UT::unit_tests<"variant">(void) {
 
 
 	xns::variant<C, B, D> v0{};
@@ -80,21 +80,17 @@ bool UT::unit_tests<"variant">(void) {
 
 	auto c = xns::get<B>(xns::move(v0));
 
+	benchmark();
 
 
 
-	return true;
+	return 0;
 }
 
 
-
+#if defined(XNS_TEST_VARIANT)
 int main(void) {
+	return UT::unit_tests<"variant">();
+}
+#endif
 
-	benchmark();
-
-	return 0;
-
-
-	return UT::unit_tests<"variant">()
-		? EXIT_SUCCESS : EXIT_FAILURE;
-};

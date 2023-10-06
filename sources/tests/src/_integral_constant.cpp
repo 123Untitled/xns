@@ -3,8 +3,15 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"integral_constant">(void) {
+int UT::unit_tests<"integral_constant">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_INTEGRAL_CONSTANT)
+int main(void) {
+	return UT::unit_tests<"integral_constant">();
+}
+#endif
+
 

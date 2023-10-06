@@ -40,31 +40,37 @@ namespace UT {
 
 	/* unit test template [specialized in .cpp files] */
 	template <xns::basic_string_literal>
-	bool unit_tests(void);
+	int unit_tests(void);
 
 
 	// -- detail --------------------------------------------------------------
 
 	namespace impl {
 
-		template <xns::basic_string_literal test, xns::basic_string_literal... rest>
-		bool dispatcher(void) {
+		template <xns::basic_string_literal test>
+		int dispatcher(void) {
 			// start ut
 			start_ut<test>();
 			// test current unit test
-			if (!unit_tests<test>()) { return false; }
-
-			// check if there are more unit tests
-			if constexpr (sizeof...(rest) > 0) { return dispatcher<rest...>(); }
-
-			return true;
+			return UT::unit_tests<test>();
 		}
+
+		template <xns::basic_string_literal test, xns::basic_string_literal... rest>
+		int dispatcher(void) requires (sizeof...(rest) > 0) {
+			// start ut
+			start_ut<test>();
+			// test current unit test
+			int ret = UT::unit_tests<test>();
+			// test next unit test
+			return (ret == 0) ? impl::dispatcher<rest...>() : ret;
+		}
+
 	}
 
 
 	/* unit test dispatcher */
 	template <xns::basic_string_literal... LT>
-	bool dispatcher(void) {
+	int dispatch(void) {
 		// check if there are unit tests
 		static_assert(sizeof...(LT) > 0, "): NO UNIT TESTS TO RUN :(");
 		// return true if all unit tests succeed
@@ -73,48 +79,29 @@ namespace UT {
 
 
 	/* unit test launcher */
-	inline void launcher(void) {
-		UT::dispatcher<
-
-			// "window", (infinitely loops)
-
+	inline int launcher(void) {
+		return UT::dispatch<
 			"environment",
-
 			"array",
 			"string",
 			"map",
 			"tree",
 			"tuple",
 			"literal_map",
-
-
 			"input",
-
 			"random",
 			"xorshift",
-
 			"duration",
-
 			"matrix",
 			"math",
-
 			"bit_view",
-
 			"path",
-
-			"meta",
-
-
 			"numeric_limits",
-
-
 			"unique_ptr" // actually segfaults
-
-
-
-
+			// "window", (infinitely loops)
 		>();
 	}
+
 
 
 }

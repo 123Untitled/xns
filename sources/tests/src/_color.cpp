@@ -3,13 +3,14 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"color">(void) {
+int UT::unit_tests<"color">(void) {
 	// code here...
-	return false;
-}
-
-int main(void) {
-
-
 	return 0;
 }
+
+#if defined(XNS_TEST_COLOR)
+int main(void) {
+	return UT::unit_tests<"color">();
+}
+#endif
+

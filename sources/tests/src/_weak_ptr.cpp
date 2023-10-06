@@ -3,8 +3,15 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"weak_ptr">(void) {
+int UT::unit_tests<"weak_ptr">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_WEAK_PTR)
+int main(void) {
+	return UT::unit_tests<"weak_ptr">();
+}
+#endif
+
 

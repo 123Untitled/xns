@@ -121,7 +121,7 @@ static auto benchmark(void) -> void {
 
 /* unit test */
 template <>
-bool UT::unit_tests<"segment">(void) {
+int UT::unit_tests<"segment">(void) {
 
 	xns::segment<int> seg;
 
@@ -142,17 +142,15 @@ bool UT::unit_tests<"segment">(void) {
 	seg.print();
 
 
-	// code here...
-	return false;
-}
-
-int main(void) {
-
-
-
 	benchmark();
-	return EXIT_SUCCESS;
-	return UT::unit_tests<"segment">()
-		? EXIT_SUCCESS : EXIT_FAILURE;
+	// code here...
+	return 0;
 }
+
+#if defined(XNS_TEST_SEGMENT)
+int main(void) {
+	return UT::unit_tests<"segment">();
+}
+#endif
+
 

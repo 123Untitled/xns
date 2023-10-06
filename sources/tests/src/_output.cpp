@@ -3,7 +3,7 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"output">(void) {
+int UT::unit_tests<"output">(void) {
 
 	xns::string str{ "Hello, world!" };
 
@@ -14,13 +14,12 @@ bool UT::unit_tests<"output">(void) {
 
 
 	// code here...
-	return false;
-}
-
-int main(void) {
-
-	UT::unit_tests<"output">();
-
-
 	return 0;
 }
+
+#if defined(XNS_TEST_OUTPUT)
+int main(void) {
+	return UT::unit_tests<"output">();
+}
+#endif
+

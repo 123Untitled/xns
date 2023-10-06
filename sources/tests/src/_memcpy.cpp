@@ -11,7 +11,7 @@ static xns::size_t NSIZE = 0;
 
 /* unit test */
 template <>
-bool UT::unit_tests<"memcpy">(void) {
+int UT::unit_tests<"memcpy">(void) {
 
 	xns::size_t N = NSIZE * NSIZE * NSIZE;
 
@@ -34,33 +34,14 @@ bool UT::unit_tests<"memcpy">(void) {
 
 	xns::benchmark<5> bench;
 
-	bench.run("mmemcpy", mmemcpy, dst.data(), src.data(), N);
 	bench.run("xns::memcpy", xns::memcpy<xns::ubyte, xns::ubyte>, dst.data(), src.data(), N);
 	bench.run("std::memcpy", std::memcpy, dst.data(), src.data(), N);
 
-	bench.result();
+	bench.result("memcpy");
 	std::cout << "done" << std::endl;
 
 
-	return false;
-}
-
-
-
-
-
-
-int main(int ac, char** av) {
-
-	if (ac == 2) {
-		// atoi
-		NSIZE = atoi(av[1]);
-	}
-
-
-
-	return UT::unit_tests<"memcpy">()
-		? EXIT_SUCCESS : EXIT_FAILURE;
+	return 0;
 
 
 	// Taille de la ligne de cache en octets (ex. 128 octets)
@@ -83,15 +64,14 @@ int main(int ac, char** av) {
 
     free(reinterpret_cast<void*>(--address));
 
-
-
-
-
-
-
-
-
-	return 0;
-
 }
+
+
+
+
+#if defined(XNS_TEST_MEMCPY)
+int main(void) {
+	return UT::unit_tests<"memcpy">();
+}
+#endif
 

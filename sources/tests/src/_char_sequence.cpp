@@ -3,8 +3,15 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"char_sequence">(void) {
+int UT::unit_tests<"char_sequence">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_CHAR_SEQUENCE)
+int main(void) {
+	return UT::unit_tests<"char_sequence">();
+}
+#endif
+
 

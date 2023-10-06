@@ -48,7 +48,7 @@ static bool checker(void) {
 
 /* unit test */
 template <>
-bool UT::unit_tests<"is_signed">(void) {
+int UT::unit_tests<"is_signed">(void) {
 
 	UT::print<0x00ff00>("test_print: ", 23.5, "\n");
 
@@ -77,5 +77,13 @@ bool UT::unit_tests<"is_signed">(void) {
 	&& checker<"char32_t           ->", char32_t,           false>()
 	&& checker<"wchar_t            ->", wchar_t,            false>();
 
+	return 0;
 }
+
+#if defined(XNS_TEST_IS_SIGNED)
+int main(void) {
+	return UT::unit_tests<"is_signed">();
+}
+#endif
+
 

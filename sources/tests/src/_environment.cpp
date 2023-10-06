@@ -2,8 +2,7 @@
 #include "environment.hpp"
 
 template <>
-bool UT::unit_tests<"environment">(void) {
-
+int UT::unit_tests<"environment">(void) {
 
 	//xns::env::print();
 	auto p = xns::env::get("PATH");
@@ -15,12 +14,13 @@ bool UT::unit_tests<"environment">(void) {
 		std::cout << "\"PATH\" not found" << std::endl;
 	}
 
-
-	return true;
-}
-
-
-int main(void) {
-	UT::unit_tests<"environment">();
 	return 0;
 }
+
+
+#if defined(XNS_TEST_ENVIRONMENT)
+int main(void) {
+	return UT::unit_tests<"environment">();
+}
+#endif
+

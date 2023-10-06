@@ -2,8 +2,15 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"window_traits">(void) {
+int UT::unit_tests<"window_traits">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_WINDOW_TRAITS)
+int main(void) {
+	return UT::unit_tests<"window_traits">();
+}
+#endif
+
 

@@ -1,10 +1,17 @@
 #include "unit_tests.hpp"
-#include "macro.hpp"
+#include "macros.hpp"
 
 /* unit test */
 template <>
-bool UT::unit_tests<"macro">(void) {
+int UT::unit_tests<"macros">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_MACROS)
+int main(void) {
+	return UT::unit_tests<"macros">();
+}
+#endif
+
 

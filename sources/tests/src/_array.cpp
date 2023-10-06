@@ -6,7 +6,7 @@
 
 
 template <>
-bool UT::unit_tests<"array">(void) {
+int UT::unit_tests<"array">(void) {
 
 	using Type = Class<int, float, char>;
 
@@ -65,15 +65,15 @@ bool UT::unit_tests<"array">(void) {
 
 
 
-	return true;
-
-
-}
-
-
-int main(void) {
-
-
 
 	return 0;
+
 }
+
+
+#if defined(XNS_TEST_ARRAY)
+int main(void) {
+	return UT::unit_tests<"array">();
+}
+#endif
+

@@ -6,7 +6,7 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"aligned_storage">(void) {
+int UT::unit_tests<"aligned_storage">(void) {
 
 
 	xns::aligned_storage<sizeof(int), alignof(int)> storage;
@@ -18,8 +18,9 @@ bool UT::unit_tests<"aligned_storage">(void) {
 	return false;
 }
 
+#if defined(XNS_TEST_ALIGNED_STORAGE)
 int main(void) {
-	return UT::unit_tests<"aligned_storage">()
-		? EXIT_SUCCESS : EXIT_FAILURE;
+	return UT::unit_tests<"aligned_storage">();
 }
+#endif
 

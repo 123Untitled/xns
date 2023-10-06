@@ -3,8 +3,15 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"exceptions">(void) {
+int UT::unit_tests<"exceptions">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+
+#if defined(XNS_TEST_EXCEPTIONS)
+int main(void) {
+	return UT::unit_tests<"exceptions">();
+}
+#endif
 

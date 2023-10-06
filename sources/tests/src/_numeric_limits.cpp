@@ -10,7 +10,7 @@ void limits(const A&... args) {
 
 
 template <>
-bool UT::unit_tests<"numeric_limits">(void) {
+int UT::unit_tests<"numeric_limits">(void) {
 
 	// avoid namespace pollution
 	using namespace std;
@@ -88,14 +88,14 @@ bool UT::unit_tests<"numeric_limits">(void) {
 	std::cout << "static digits: " << limits::digits<10, xns::dec>() << std::endl;
 
 
-	return true;
-}
-
-
-
-int main(void) {
-
-	UT::unit_tests<"numeric_limits">();
-
 	return 0;
 }
+
+
+
+#if defined(XNS_TEST_NUMERIC_LIMITS)
+int main(void) {
+	return UT::unit_tests<"numeric_limits">();
+}
+#endif
+

@@ -156,7 +156,7 @@ static void subview(void) {
 
 
 template <>
-bool UT::unit_tests<"string">(void) {
+int UT::unit_tests<"string">(void) {
 
 	/*{
 		xns::fmt_string s{"hello!\x1b[3;31mworld!\x1b[0m."};
@@ -176,7 +176,6 @@ bool UT::unit_tests<"string">(void) {
 
 
 	}
-	return true;
 
 	{
 		xns::string s{"\x1b[31mhello world!\x1b[32m I'm a string\x1b[34m with colors\x1b[0m"};
@@ -197,7 +196,6 @@ bool UT::unit_tests<"string">(void) {
 		}
 
 	}
-	return true;
 
 
 
@@ -220,7 +218,7 @@ bool UT::unit_tests<"string">(void) {
 	// 	write(1, "\n", 1);
 	// }
 
-	return true;
+	return 0;
 
 }
 
@@ -559,7 +557,7 @@ static auto benchmark(void) {
 
 
 
-int main(void) {
+static int func(void) {
 
 
 	xns::u8string_view sv{u8"hello world!"};
@@ -652,6 +650,12 @@ int main(void) {
 
 }
 
+
+#if defined(XNS_TEST_STRING)
+int main(void) {
+	return UT::unit_tests<"string">();
+}
+#endif
 
 
 

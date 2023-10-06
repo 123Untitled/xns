@@ -1,47 +1,47 @@
 #include "unit_tests.hpp"
 #include "is_constructible.hpp"
 
-struct A {
-	A(int) { std::cout << "A constructor" << std::endl; }
-	~A() { std::cout << "A destructor" << std::endl; }
-	auto operator=(const A&) -> A&
+struct AA {
+	AA(int) { std::cout << "A constructor" << std::endl; }
+	~AA() { std::cout << "A destructor" << std::endl; }
+	auto operator=(const AA&) -> AA&
 	//= delete;
 	{ std::cout << "A copy assignment" << std::endl; return *this; }
 };
 
-struct B {
-	B(float) { std::cout << "B constructor" << std::endl; }
-	~B() { std::cout << "B destructor" << std::endl; }
+struct BB {
+	BB(float) { std::cout << "B constructor" << std::endl; }
+	~BB() { std::cout << "B destructor" << std::endl; }
 };
 
 
 /* unit test */
 template <>
-bool UT::unit_tests<"is_constructible">(void) {
+int UT::unit_tests<"is_constructible">(void) {
 
 
-	A a1{ 1 };
-	A a2{ 2 };
-	B b1{ 1.0f };
-	B b2{ 2.0f };
+	AA a1{ 1 };
+	AA a2{ 2 };
+	BB b1{ 1.0f };
+	BB b2{ 2.0f };
 
 
 	static_assert(
-	xns::is_assignable<A, A>,
+	xns::is_assignable<AA, AA>,
 	"NOPE");
 
 	//a1 = a2;
 
 
 
-	bool c1 = xns::is_constructible  <A, int>; // true
-	bool c2 = std::is_constructible_v<A, int>; // true
-	bool c3 = xns::is_constructible  <B, int>; // false
-	bool c4 = std::is_constructible_v<B, int>; // true
-	bool c5 = xns::is_constructible  <A, float>; // false
-	bool c6 = std::is_constructible_v<A, float>; // false
-	bool c7 = xns::is_constructible  <B, float>; // true
-	bool c8 = std::is_constructible_v<B, float>; // true
+	bool c1 = xns::is_constructible  <AA, int>; // true
+	bool c2 = std::is_constructible_v<AA, int>; // true
+	bool c3 = xns::is_constructible  <BB, int>; // false
+	bool c4 = std::is_constructible_v<BB, int>; // true
+	bool c5 = xns::is_constructible  <AA, float>; // false
+	bool c6 = std::is_constructible_v<AA, float>; // false
+	bool c7 = xns::is_constructible  <BB, float>; // true
+	bool c8 = std::is_constructible_v<BB, float>; // true
 
 
 	std::cout << "xns is_constructible <A, int  > = " << c1 << "\n";
@@ -55,13 +55,14 @@ bool UT::unit_tests<"is_constructible">(void) {
 
 	std::cout << "xns is_constructible <B, float> = " << c7 << "\n";
 	std::cout << "std is_constructible <B, float> = " << c8 << "\n\n";
-	return true;
-	// code here...
-	return false;
+
+	return 0;
 }
 
+#if defined(XNS_TEST_IS_CONSTRUCTIBLE)
 int main(void) {
-	return UT::unit_tests<"is_constructible">()
-		? EXIT_SUCCESS : EXIT_FAILURE;
+	return UT::unit_tests<"is_constructible">();
 }
+#endif
+
 

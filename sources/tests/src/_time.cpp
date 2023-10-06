@@ -3,7 +3,7 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"time">(void) {
+int UT::unit_tests<"time">(void) {
 	int i = 0;
 
 	while (i < 10000000) {
@@ -14,11 +14,12 @@ bool UT::unit_tests<"time">(void) {
 		++i;
 	}
 
-	// code here...
-	return false;
-}
-
-int main(void) {
-	UT::unit_tests<"time">();
 	return 0;
 }
+
+#if defined(XNS_TEST_TIME)
+int main(void) {
+	return UT::unit_tests<"time">();
+}
+#endif
+

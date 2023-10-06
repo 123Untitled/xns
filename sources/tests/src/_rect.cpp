@@ -3,7 +3,7 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"rect">(void) {
+int UT::unit_tests<"rect">(void) {
 
 	xns::rect<int> r1(0, 0, 100, 100);
 
@@ -15,25 +15,15 @@ bool UT::unit_tests<"rect">(void) {
 		PRECT(rects[i]);
 	}
 
-
-
 	//xns::rect<float> r2(0, 0.0f, 10.0f, 10.0f);
 
-
 	// code here...
-	return false;
-}
-
-int main(void) {
-
-
-	int i = -1;
-	int j = -1;
-
-	std::cout << i + j << std::endl;
-
-
-	UT::unit_tests<"rect">();
-
 	return 0;
 }
+
+#if defined(XNS_TEST_RECT)
+int main(void) {
+	return UT::unit_tests<"rect">();
+}
+#endif
+

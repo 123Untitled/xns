@@ -3,15 +3,14 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"fixed">(void) {
+int UT::unit_tests<"fixed">(void) {
 	// code here...
-	return false;
-}
-
-int main(void) {
-
-
-	UT::unit_tests<"fixed">();
-
 	return 0;
 }
+
+#if defined(XNS_TEST_FIXED)
+int main(void) {
+	return UT::unit_tests<"fixed">();
+}
+#endif
+

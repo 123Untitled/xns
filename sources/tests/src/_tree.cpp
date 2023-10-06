@@ -285,48 +285,22 @@ static auto interactive(void) -> void {
 
 
 template <>
-bool UT::unit_tests<"tree">(void) {
+int UT::unit_tests<"tree">(void) {
 
 	insert();
-	return true;
 
 	benchmark01();
-	return true;
 
 	interactive();
-	return true;
-
-
-}
-
-
-int main(int ac, char** av) {
-
-
-	/*
-	xns::string s{};
-	int fd = open("random.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	double mb = 0.0;
-	while (mb < 1000.0) {
-		xns::size_t n = xns::random::integral<xns::size_t>();
-		s.append(xns::conversion::integer_to_string(n));
-		s.append('\n');
-		// calculate writed size in megabytes
-		mb = (double)s.size() / (double)1'000'000.0;
-		std::cout << "\r" << mb << " MB";
-	}
-	::write(fd, s.data(), s.size());
-
-	close(fd);
 	return 0;
-	*/
 
 
-
-	if (ac == 2) {
-		// atoi
-		NSIZE = atoi(av[1]);
-	}
-	return UT::unit_tests<"tree">()
-		? EXIT_SUCCESS : EXIT_FAILURE;
 }
+
+#if defined(XNS_TEST_TREE)
+int main(void) {
+	return UT::unit_tests<"tree">();
+}
+#endif
+
+

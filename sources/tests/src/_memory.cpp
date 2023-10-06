@@ -12,7 +12,7 @@ class test {
 
 /* unit test */
 template <>
-bool UT::unit_tests<"memory">(void) {
+int UT::unit_tests<"memory">(void) {
 
 	constexpr xns::size_t N = 100000000;
 
@@ -55,20 +55,12 @@ bool UT::unit_tests<"memory">(void) {
 		std::cout << "      new/delete: " << std::right << std::setw(15) << end - start << " ns\n";
 	}
 
-
-
-
-
-
-
-
-
-
-	return false;
+	return 0;
 }
 
+#if defined(XNS_TEST_MEMORY)
 int main(void) {
-	return UT::unit_tests<"memory">()
-		? EXIT_SUCCESS : EXIT_FAILURE;
+	return UT::unit_tests<"memory">();
 }
+#endif
 

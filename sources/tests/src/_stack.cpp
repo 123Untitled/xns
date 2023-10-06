@@ -4,7 +4,7 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"stack">(void) {
+int UT::unit_tests<"stack">(void) {
 	constexpr int N = 10000000;
 
 	// with old allocator
@@ -29,12 +29,12 @@ bool UT::unit_tests<"stack">(void) {
 	std::cout << "  stack -> " << end - start << std::endl;
 
 
-	return false;
-}
-
-int main(void) {
-
-	UT::unit_tests<"stack">();
-
 	return 0;
 }
+
+#if defined(XNS_TEST_STACK)
+int main(void) {
+	return UT::unit_tests<"stack">();
+}
+#endif
+

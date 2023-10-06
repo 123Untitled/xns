@@ -24,7 +24,7 @@ void test(const bool result, const char* msg) {
 
 /* unit test */
 template <>
-bool UT::unit_tests<"is_pointer">(void) {
+int UT::unit_tests<"is_pointer">(void) {
 
 
 	test<false>(is_pointer<int[]>,          "int[]");
@@ -64,9 +64,12 @@ bool UT::unit_tests<"is_pointer">(void) {
 	test<true >(std::is_pointer<volatile int* volatile>::value,  "volatile int* volatile");
 	test<true >(std::is_pointer<const volatile int* volatile>::value, "const volatile int* volatile");
 	// code here...
-	return false;
+	return 0;
 }
 
+#if defined(XNS_TEST_IS_POINTER)
 int main(void) {
 	return UT::unit_tests<"is_pointer">();
 }
+#endif
+

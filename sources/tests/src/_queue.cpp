@@ -6,7 +6,7 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"queue">(void) {
+int UT::unit_tests<"queue">(void) {
 
 	// old allocator
 	// bfs 1000000  nodes:  20545625 ns
@@ -45,12 +45,12 @@ bool UT::unit_tests<"queue">(void) {
 
 
 	// code here...
-	return false;
-}
-
-int main(void) {
-
-	UT::unit_tests<"queue">();
-
 	return 0;
 }
+
+#if defined(XNS_TEST_QUEUE)
+int main(void) {
+	return UT::unit_tests<"queue">();
+}
+#endif
+

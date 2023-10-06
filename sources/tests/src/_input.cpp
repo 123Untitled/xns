@@ -3,7 +3,7 @@
 #include "terminal.hpp"
 
 template <>
-bool UT::unit_tests<"input">(void) {
+int UT::unit_tests<"input">(void) {
 
 
 	xns::terminal::raw_terminal(xns::VFlag::NON_BLOCKING);
@@ -27,5 +27,12 @@ bool UT::unit_tests<"input">(void) {
 
 	xns::terminal::restore_terminal();
 
-	return true;
+	return 0;
 }
+
+#if defined(XNS_TEST_INPUT)
+int main(void) {
+	return UT::unit_tests<"input">();
+}
+#endif
+

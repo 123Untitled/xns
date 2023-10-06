@@ -3,7 +3,7 @@
 
 
 template <>
-bool UT::unit_tests<"random">(void) {
+int UT::unit_tests<"random">(void) {
 
 
 	using type = char;
@@ -14,11 +14,13 @@ bool UT::unit_tests<"random">(void) {
 	}
 	std::cout << std::endl;
 
-	return true;
-}
-
-int main(void) {
-	UT::unit_tests<"random">();
 	return 0;
 }
+
+#if defined(XNS_TEST_RANDOM)
+int main(void) {
+	return UT::unit_tests<"random">();
+}
+#endif
+
 

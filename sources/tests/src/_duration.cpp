@@ -22,7 +22,7 @@ consteval xns::size_t max_len(void) {
 
 
 template <xns::is_duration from, xns::is_duration to, xns::umax expected>
-void test(const xns::string_view& from_name, const xns::string_view& to_name) {
+static void test(const xns::string_view& from_name, const xns::string_view& to_name) {
 
 	xns::out::write(from_name.data(), from_name.size());
 	for (xns::size_t x = from_name.size(); x < max_len(); ++x) {
@@ -122,7 +122,7 @@ void ratio_ut(void) {
 }
 
 template <>
-bool UT::unit_tests<"duration">(void) {
+int UT::unit_tests<"duration">(void) {
 
 
 	//ratio_ut();
@@ -307,9 +307,8 @@ bool UT::unit_tests<"duration">(void) {
 }
 
 
+#if defined(XNS_TEST_DURATION)
 int main(void) {
-
-	UT::unit_tests<"duration">();
-
-	return 0;
+	return UT::unit_tests<"duration">();
 }
+#endif

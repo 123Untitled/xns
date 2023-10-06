@@ -3,12 +3,7 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"endianness">(void) {
-	// code here...
-	return false;
-}
-
-int main(void) {
+int UT::unit_tests<"endianness">(void) {
 
 	if constexpr (xns::endianness::is_big()) {
 		std::cout << "big endian" << std::endl;
@@ -19,9 +14,12 @@ int main(void) {
 	else {
 		std::cout << "unknown endian" << std::endl;
 	}
-
-
-	return UT::unit_tests<"endianness">()
-		? EXIT_SUCCESS : EXIT_FAILURE;
+	return 0;
 }
+
+#if defined(XNS_TEST_ENDIANNESS)
+int main(void) {
+	return UT::unit_tests<"endianness">();
+}
+#endif
 

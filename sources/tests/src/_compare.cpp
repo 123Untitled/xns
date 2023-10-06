@@ -3,8 +3,15 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"compare">(void) {
+int UT::unit_tests<"compare">(void) {
 	// code here...
 	return false;
 }
+
+#if defined(XNS_TEST_COMPARE)
+int main(void) {
+	return UT::unit_tests<"compare">();
+}
+#endif
+
 

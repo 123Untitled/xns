@@ -21,7 +21,7 @@ void test(const bool result, const char* msg) {
 
 /* unit test */
 template <>
-bool UT::unit_tests<"is_array">(void) {
+int UT::unit_tests<"is_array">(void) {
 
 	// avoid namespace pollution
 	using namespace xns;
@@ -39,12 +39,15 @@ bool UT::unit_tests<"is_array">(void) {
 	test<true >(is_array<const volatile int[]>, "const volatile int[]");
 
 	// code here...
-	return false;
+	return 0;
 }
 
+#if defined(XNS_TEST_IS_ARRAY)
 int main(void) {
 	return UT::unit_tests<"is_array">();
 }
+#endif
+
 
 
 

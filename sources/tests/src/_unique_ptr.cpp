@@ -13,7 +13,7 @@ using AutoP = xns::unique_ptr<T>;
 void f(...) {}
 
 template <>
-bool UT::unit_tests<"unique_ptr">(void) {
+int UT::unit_tests<"unique_ptr">(void) {
 
 
 
@@ -54,7 +54,7 @@ bool UT::unit_tests<"unique_ptr">(void) {
 
 	xns::vector<xns::unique_ptr<int>> vec;
 
-	vec.move_back(xns::make_unique<int>(123));
+	vec.push_back(xns::make_unique<int>(123));
 
 	//Xf::AutoPointer<void> v{};
 
@@ -71,7 +71,14 @@ bool UT::unit_tests<"unique_ptr">(void) {
 
 	}
 
-	return true;
+	return 0;
 
 }
+
+#if defined(XNS_TEST_UNIQUE_PTR)
+int main(void) {
+	return UT::unit_tests<"unique_ptr">();
+}
+#endif
+
 

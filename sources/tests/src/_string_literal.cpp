@@ -1,4 +1,4 @@
-//#include "unit_tests.hpp"
+#include "unit_tests.hpp"
 
 //#include "literal_map.hpp"
 
@@ -13,8 +13,19 @@
 //consteval auto test_literal(void) -> void {
 //}
 
+template <>
+int UT::unit_tests<"string_literal">(void) {
+	// code here...
+	return 0;
+}
 
+#if defined(XNS_TEST_STRING_LITERAL)
 int main(void) {
+	return UT::unit_tests<"string_literal">();
+}
+#endif
+
+
 	//constexpr xns::string_literal s{"hello"};
 
 	//test_literal<s>();
@@ -31,10 +42,8 @@ int main(void) {
 	//constexpr xns::basic_string_literal<char, 5> s2{s};
 
 
-	return 0;
 
 
 	// WARNING: need to fix char_sequence !!!
 	//xns::literal_map<int, "hello", U"world", u8"!" > map{};
 
-}

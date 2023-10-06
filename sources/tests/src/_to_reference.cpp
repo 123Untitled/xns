@@ -3,8 +3,14 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"to_reference">(void) {
+int UT::unit_tests<"to_reference">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_TO_REFERENCE)
+int main(void) {
+	return UT::unit_tests<"to_reference">();
+}
+#endif
 

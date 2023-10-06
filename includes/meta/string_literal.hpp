@@ -173,6 +173,9 @@ namespace xns {
 	basic_string_literal(const T (&)[N]) -> basic_string_literal<T, N>;
 
 
+	template <xns::size_t N>
+	using string_literal = basic_string_literal<char, N>;
+
 	//// -- S T R I N G  L I T E R A L ------------------------------------------
 
 	//template <xns::size_t N>

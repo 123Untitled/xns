@@ -3,8 +3,16 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"border">(void) {
+int UT::unit_tests<"border">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_BORDER)
+int main(void) {
+	return UT::unit_tests<"border">();
+}
+#endif
+
+
 

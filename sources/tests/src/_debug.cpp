@@ -3,10 +3,17 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"debug">(void) {
+int UT::unit_tests<"debug">(void) {
 
 	xns::debug::print("Hello, world! %d\n", 42);
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_DEBUG)
+int main(void) {
+	return UT::unit_tests<"debug">();
+}
+#endif
+
 

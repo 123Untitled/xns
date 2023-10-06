@@ -85,7 +85,7 @@ static auto benchmark(void) -> void {
 
 /* unit test */
 template <>
-bool UT::unit_tests<"list">(void) {
+int UT::unit_tests<"list">(void) {
 
 	xns::list<const int> list;
 
@@ -110,11 +110,10 @@ bool UT::unit_tests<"list">(void) {
 		std::cout << ref2 << std::endl;
 	}
 
-	return false;
+	return 0;
 
 
 
-	return false;
 
 
 	xns::list<const int>::iterator it = list.begin();
@@ -165,7 +164,6 @@ bool UT::unit_tests<"list">(void) {
 
 
 
-	return false;
 
 	std::cout << list.front() << std::endl;
 	std::cout << list.back() << std::endl;
@@ -177,15 +175,12 @@ bool UT::unit_tests<"list">(void) {
 
 
 	// code here...
-	return false;
+	return 0;
 }
 
+#if defined(XNS_TEST_LIST)
 int main(void) {
-	benchmark();
-
-	return 0;
-
-	UT::unit_tests<"list">();
-	return 0;
-
+	return UT::unit_tests<"list">();
 }
+#endif
+

@@ -3,8 +3,15 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"bit_cast">(void) {
+int UT::unit_tests<"bit_cast">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_BIT_CAST)
+int main(void) {
+	return UT::unit_tests<"bit_cast">();
+}
+#endif
+
 

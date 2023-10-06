@@ -7,7 +7,7 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"bst_iterator">(void) {
+int UT::unit_tests<"bst_iterator">(void) {
 
 	xns::tree<int> tree {};
 
@@ -64,10 +64,12 @@ bool UT::unit_tests<"bst_iterator">(void) {
 
 
 
-	return false;
-}
-
-int main(void) {
-	UT::unit_tests<"bst_iterator">();
 	return 0;
 }
+
+#if defined(XNS_TEST_BST_ITERATOR)
+int main(void) {
+	return UT::unit_tests<"bst_iterator">();
+}
+#endif
+

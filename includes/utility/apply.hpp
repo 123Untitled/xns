@@ -19,7 +19,7 @@ namespace xns {
 		/* apply implementation */
 		template <typename F, typename T, xns::size_t... I>
 		constexpr auto apply(F&& function, T&& tuple, xns::index_seq<I...>) noexcept {
-			return function(tuple.template get<I>()...);
+			return function(get<I>(xns::forward<T>(tuple))...);
 		}
 
 	}

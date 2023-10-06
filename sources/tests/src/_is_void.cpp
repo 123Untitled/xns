@@ -3,8 +3,15 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"is_void">(void) {
+int UT::unit_tests<"is_void">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_IS_VOID)
+int main(void) {
+	return UT::unit_tests<"is_void">();
+}
+#endif
+
 

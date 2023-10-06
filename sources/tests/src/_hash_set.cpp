@@ -11,7 +11,7 @@ static xns::size_t check_sum = 0;
 
 /* unit test */
 template <>
-bool UT::unit_tests<"hash_set">(void) {
+int UT::unit_tests<"hash_set">(void) {
 
 	constexpr size_t N = 1000;
 	constexpr size_t S = 1000;
@@ -62,11 +62,13 @@ bool UT::unit_tests<"hash_set">(void) {
 
 
 	// code here...
-	return false;
+	return 0;
 }
 
+#if defined(XNS_TEST_HASH_SET)
 int main(void) {
-	return UT::unit_tests<"hash_set">()
-		? EXIT_SUCCESS : EXIT_FAILURE;
+	return UT::unit_tests<"hash_set">();
 }
+#endif
+
 

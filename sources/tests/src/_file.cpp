@@ -3,19 +3,19 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"file">(void) {
+int UT::unit_tests<"file">(void) {
 
 
 	xns::file file{"test.txt", O_RDWR | O_CREAT, 0644};
 
 
 	// code here...
-	return false;
-}
-
-int main(void) {
-
-	UT::unit_tests<"file">();
-
 	return 0;
 }
+
+#if defined(XNS_TEST_FILE)
+int main(void) {
+	return UT::unit_tests<"file">();
+}
+#endif
+

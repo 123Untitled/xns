@@ -23,7 +23,7 @@ class method_<R(C::*)(A...)> {
 
 /* unit test */
 template <>
-bool UT::unit_tests<"callable">(void) {
+int UT::unit_tests<"callable">(void) {
 
 	toto t;
 	using proto = void(toto::*)(int) volatile;
@@ -35,15 +35,14 @@ bool UT::unit_tests<"callable">(void) {
 
 	//xns::callable<proto> c1{&toto::print, t};
 
-	return false;
-}
-
-
-
-
-int main(void) {
-
-	UT::unit_tests<"callable">();
-
 	return 0;
 }
+
+
+#if defined(XNS_TEST_CALLABLE)
+int main(void) {
+	return UT::unit_tests<"callable">();
+}
+#endif
+
+

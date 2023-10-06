@@ -3,9 +3,7 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"directory">(void) {
-
-
+int UT::unit_tests<"directory">(void) {
 
 	xns::filesystem::recursive_iterator it{"./inc"};
 
@@ -25,12 +23,12 @@ bool UT::unit_tests<"directory">(void) {
 	xns::out::render();
 
 	// code here...
-	return false;
-}
-
-int main(void) {
-
-	UT::unit_tests<"directory">();
-
 	return 0;
 }
+
+#if defined(XNS_TEST_DIRECTORY)
+int main(void) {
+	return UT::unit_tests<"directory">();
+}
+#endif
+

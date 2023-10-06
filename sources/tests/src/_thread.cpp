@@ -1,14 +1,5 @@
 #include "unit_tests.hpp"
 #include "thread.hpp"
-
-/* unit test */
-template <>
-bool UT::unit_tests<"thread">(void) {
-	// code here...
-	return false;
-}
-
-
 #include <thread>
 #include "apply.hpp"
 
@@ -26,8 +17,9 @@ void printer(const A& a, int i) {
 	std::cout << i << std::endl;
 }
 
-int main(void) {
-
+/* unit test */
+template <>
+int UT::unit_tests<"thread">(void) {
 	/*
 	const xns::tuple<A, int> t{A{}, 123};
 	xns::apply(printer, t);
@@ -40,11 +32,13 @@ int main(void) {
 
 	t0.join();
 
-	return EXIT_SUCCESS;
-
-
-
-	return UT::unit_tests<"thread">()
-		? EXIT_SUCCESS : EXIT_FAILURE;
+	return 0;
 }
+
+
+#if defined(XNS_TEST_THREAD)
+int main(void) {
+	return UT::unit_tests<"thread">();
+}
+#endif
 

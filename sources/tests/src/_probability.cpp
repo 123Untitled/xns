@@ -3,8 +3,15 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"probability">(void) {
+int UT::unit_tests<"probability">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_PROBABILITY)
+int main(void) {
+	return UT::unit_tests<"probability">();
+}
+#endif
+
 

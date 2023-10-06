@@ -67,7 +67,7 @@ static bool checker(void) {
 
 /* unit test */
 template <>
-bool UT::unit_tests<"make_signed">(void) {
+int UT::unit_tests<"make_signed">(void) {
 
 	// this test fails, because make_signed cannot detect underlying type of enum
 	// normally, make_signed cannot compile if the underlying type is a bool
@@ -300,5 +300,13 @@ bool UT::unit_tests<"make_signed">(void) {
 	&& checker<"enum volatile wchar_t                  ->", volatile e18>()
 	&& checker<"enum const volatile wchar_t            ->", const volatile e18>();
 
+	return 0;
 }
+
+#if defined(XNS_TEST_MAKE_SIGNED)
+int main(void) {
+	return UT::unit_tests<"make_signed">();
+}
+#endif
+
 

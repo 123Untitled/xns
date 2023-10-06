@@ -3,8 +3,14 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"draw">(void) {
+int UT::unit_tests<"draw">(void) {
 	// code here...
 	return false;
 }
+
+#if defined(XNS_TEST_DRAW)
+int main(void) {
+	return UT::unit_tests<"draw">();
+}
+#endif
 

@@ -25,7 +25,7 @@ void test(const bool result, const char* msg) {
 
 /* unit test */
 template <>
-bool UT::unit_tests<"is_integral">(void) {
+int UT::unit_tests<"is_integral">(void) {
 
 	test<true >(is_integral<char>,               "char");
 	test<true >(is_integral<signed char>,        "signed char");
@@ -64,7 +64,9 @@ bool UT::unit_tests<"is_integral">(void) {
 	return false;
 }
 
+#if defined(XNS_TEST_IS_INTEGRAL)
 int main(void) {
-	UT::unit_tests<"is_integral">();
-	return 0;
+	return UT::unit_tests<"is_integral">();
 }
+#endif
+

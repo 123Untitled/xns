@@ -1,34 +1,31 @@
 #include "unit_tests.hpp"
 #include "optional.hpp"
-#include "testclass.hpp"
+
+#include <string>
+#include <iostream>
 
 
 
-
-void f(test::B& b) {
-	std::cout << b << std::endl;
+void f(std::string& str) {
+	std::cout << str << std::endl;
 }
 
 
 /* unit test */
 template <>
-bool UT::unit_tests<"optional">(void) {
+int UT::unit_tests<"optional">(void) {
 
+	xns::optional<std::string> opt{};
 
-	xns::optional<test::B> opt{};
+	//f(opt);
 
-
-	f(opt);
-
-
-
-
-
-	return false;
+	return 0;
 }
 
+#if defined(XNS_TEST_OPTIONAL)
 int main(void) {
-	return UT::unit_tests<"optional">()
-		? EXIT_SUCCESS : EXIT_FAILURE;
+	return UT::unit_tests<"optional">();
 }
+#endif
+
 

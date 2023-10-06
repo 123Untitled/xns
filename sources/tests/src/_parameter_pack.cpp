@@ -3,7 +3,14 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"parameter_pack">(void) {
+int UT::unit_tests<"parameter_pack">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_PARAMETER_PACK)
+int main(void) {
+	return UT::unit_tests<"parameter_pack">();
+}
+#endif
+

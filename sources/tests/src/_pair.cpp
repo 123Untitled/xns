@@ -6,7 +6,7 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"pair">(void) {
+int UT::unit_tests<"pair">(void) {
 
 
 	//auto [
@@ -26,17 +26,13 @@ bool UT::unit_tests<"pair">(void) {
 
 
 	// code here...
-	return false;
-}
-
-
-int main(void) {
-
-
-
-
-	UT::unit_tests<"pair">();
-
 	return 0;
 }
+
+
+#if defined(XNS_TEST_PAIR)
+int main(void) {
+	return UT::unit_tests<"pair">();
+}
+#endif
 

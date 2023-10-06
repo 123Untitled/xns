@@ -4,7 +4,7 @@
 #include <filesystem>
 
 template <>
-bool UT::unit_tests<"path">(void) {
+int UT::unit_tests<"path">(void) {
 
 
 	xns::path<xns::string> p;
@@ -21,7 +21,7 @@ bool UT::unit_tests<"path">(void) {
 
 		std::cout << "original path: " << str << std::endl;
 
-		xns::string_view sv = str2.pointer();
+		xns::string_view sv = str2.data();
 		// simplified path
 
 
@@ -39,5 +39,12 @@ bool UT::unit_tests<"path">(void) {
 	} std::cout << std::endl;
 
 
-	return true;
+	return 0;
 }
+
+#if defined(XNS_TEST_PATH)
+int main(void) {
+	return UT::unit_tests<"path">();
+}
+#endif
+

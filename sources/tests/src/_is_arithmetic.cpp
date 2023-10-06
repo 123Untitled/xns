@@ -3,8 +3,15 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"is_arithmetic">(void) {
+int UT::unit_tests<"is_arithmetic">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_IS_ARITHMETIC)
+int main(void) {
+	return UT::unit_tests<"is_arithmetic">();
+}
+#endif
+
 

@@ -3,7 +3,7 @@
 
 
 template <>
-bool UT::unit_tests<"matrix">() {
+int UT::unit_tests<"matrix">() {
 
 	xns::matrix_3x3<float> m1 {
 		1.0f, 2.0f, 3.0f,
@@ -54,6 +54,12 @@ bool UT::unit_tests<"matrix">() {
 	m1.print();
 	*/
 
-
-	return true;
+	return 0;
 }
+
+#if defined(XNS_TEST_MATRIX)
+int main(void) {
+	return UT::unit_tests<"matrix">();
+}
+#endif
+

@@ -345,7 +345,7 @@ namespace xns {
 			}
 
 		void print(void) {
-			_tree.print(scall, vcall);
+			_tree.print();
 		}
 
 

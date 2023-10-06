@@ -19,7 +19,7 @@ void print_(const A& a) {
 
 /* unit test */
 template <>
-bool UT::unit_tests<"is_function">(void) {
+int UT::unit_tests<"is_function">(void) {
 
 
 	std::cout << std::boolalpha;
@@ -39,11 +39,13 @@ bool UT::unit_tests<"is_function">(void) {
 
 
 
-	return false;
+	return 0;
 }
 
+#if defined(XNS_TEST_IS_FUNCTION)
 int main(void) {
-	return UT::unit_tests<"is_function">()
-		? EXIT_SUCCESS : EXIT_FAILURE;
+	return UT::unit_tests<"is_function">();
 }
+#endif
+
 

@@ -3,8 +3,15 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"shared_ptr">(void) {
+int UT::unit_tests<"shared_ptr">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_SHARED_PTR)
+int main(void) {
+	return UT::unit_tests<"shared_ptr">();
+}
+#endif
+
 

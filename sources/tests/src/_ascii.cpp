@@ -3,7 +3,14 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"ascii">(void) {
+int UT::unit_tests<"ascii">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_ASCII)
+int main(void) {
+	return UT::unit_tests<"ascii">();
+}
+#endif
+

@@ -7,7 +7,7 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"hash">(void) {
+int UT::unit_tests<"hash">(void) {
 
 	using pair = xns::pair<xns::string, xns::u64>;
 
@@ -31,14 +31,12 @@ bool UT::unit_tests<"hash">(void) {
 	std::cout << "array hash: " << xns::hash(arr) << std::endl;
 
 
-	return false;
+	return 0;
 }
 
+#if defined(XNS_TEST_HASH)
 int main(void) {
-
-
-
-	return UT::unit_tests<"hash">()
-		? EXIT_SUCCESS : EXIT_FAILURE;
+	return UT::unit_tests<"hash">();
 }
+#endif
 

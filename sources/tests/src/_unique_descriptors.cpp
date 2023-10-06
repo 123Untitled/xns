@@ -1,10 +1,17 @@
 #include "unit_tests.hpp"
-#include "unique_fd.hpp"
+#include "unique_descriptor.hpp"
 
 /* unit test */
 template <>
-bool UT::unit_tests<"unique_fd">(void) {
+int UT::unit_tests<"unique_descriptor">(void) {
 	// code here...
-	return false;
+	return 0;
 }
+
+#if defined(XNS_TEST_UNIQUE_DESCRIPTOR)
+int main(void) {
+	return UT::unit_tests<"unique_descriptor">();
+}
+#endif
+
 

@@ -3,8 +3,14 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"allocator">(void) {
+int UT::unit_tests<"allocator">(void) {
 	// code here...
 	return false;
 }
+
+#if defined(XNS_TEST_ALLOCATOR)
+int main(void) {
+	return UT::unit_tests<"allocator">();
+}
+#endif
 

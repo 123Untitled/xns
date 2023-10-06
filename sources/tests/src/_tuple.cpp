@@ -9,7 +9,7 @@ const int&& foo(void) {
 }
 
 template <>
-bool UT::unit_tests<"tuple">(void) {
+int UT::unit_tests<"tuple">(void) {
 
 	xns::tuple<int, int> t1{1, 2};
 
@@ -33,7 +33,7 @@ bool UT::unit_tests<"tuple">(void) {
 
 	//std::cout << ret << std::endl;
 
-	return false;
+	return 0;
 
 
 
@@ -70,16 +70,14 @@ bool UT::unit_tests<"tuple">(void) {
 	//t4.iterate();
 	//t5.iterate();
 
-	return true;
-
-}
-
-
-int main(void) {
-
-
-	UT::unit_tests<"tuple">();
-
 	return 0;
 
 }
+
+
+#if defined(XNS_TEST_TUPLE)
+int main(void) {
+	return UT::unit_tests<"tuple">();
+}
+#endif
+

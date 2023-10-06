@@ -3,7 +3,7 @@
 
 
 template <>
-bool UT::unit_tests<"literal_map">(void) {
+int UT::unit_tests<"literal_map">(void) {
 
 	constexpr xns::literal_map<int, "hello", "world", "this", "is", "cool"> instance = { 1, 2, 3, 4, 5 };
 
@@ -81,15 +81,16 @@ bool UT::unit_tests<"literal_map">(void) {
 
 
 
-
-	return true;
-}
-
-
-int main(void) {
-	UT::unit_tests<"literal_map">();
 	return 0;
+
 }
+
+
+#if defined(XNS_TEST_LITERAL_MAP)
+int main(void) {
+	return UT::unit_tests<"literal_map">();
+}
+#endif
 
 
 

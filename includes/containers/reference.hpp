@@ -32,15 +32,7 @@ namespace xns {
 			/* value type */
 			using type = T;
 
-			/* reference type */
-			using meta_ref = xns::conditional<xns::is_const<type>,
-											  const type&,
-											  type&>;
 
-			/* pointer type */
-			using meta_ptr = xns::conditional<xns::is_const<type>,
-											  const type*,
-											  type*>;
 
 
 			// -- public lifecycle --------------------------------------------
@@ -49,8 +41,11 @@ namespace xns {
 			reference(void) = delete;
 
 			/* lvalue reference constructor */
-			explicit inline reference(meta_ref ref) noexcept
-			: _ref{&ref} {}
+			template <typename U> requires xns::is_not_same<xns::remove_cvr<U>, self>
+			explicit inline reference(U&& ref) noexcept
+			: _ref{&ref} {
+				std::cout << "lvalue reference constructor" << std::endl;
+			}
 
 			/* deleted rvalue reference constructor */
 			reference(type&&) = delete;
@@ -82,6 +77,9 @@ namespace xns {
 				return *this;
 			}
 
+			auto get(void) const noexcept -> type& {
+				return *_ref;
+			}
 
 			/* deleted copy assignment operator */
 			auto operator=(const self&) -> self& = delete;
@@ -93,7 +91,7 @@ namespace xns {
 			// -- public conversion operators ---------------------------------
 
 			/* conversion to reference */
-			inline operator meta_ref(void) const noexcept {
+			inline operator type&(void) const noexcept {
 				return *_ref;
 			}
 
@@ -103,40 +101,39 @@ namespace xns {
 			// -- private members ---------------------------------------------
 
 			/* pointer */
-			self::meta_ptr _ref;
+			self::type* _ref;
 
 	};
 
 
-	template <typename T>
-	using mut_ref = xns::reference<T>;
+	// -- deduction guides ----------------------------------------------------
 
+	/* deduction guide for lvalue reference */
 	template <typename T>
-	using const_ref = xns::reference<const T>;
-
+	reference(T&) -> reference<T>;
 
 
 	// -- ref function --------------------------------------------------------
 
 	/* create mutable reference */
 	template <typename T>
-	inline constexpr auto make_reference(T& ref) noexcept -> xns::mut_ref<T> {
-		return xns::mut_ref<T>{ref};
+	inline constexpr auto ref(T& ref) noexcept -> xns::reference<T> {
+		return xns::reference<T>{ref};
 	}
 
 	/* create const reference */
 	template <typename T>
-	inline constexpr auto ref(const T& ref) noexcept -> xns::const_ref<T> {
-		return xns::const_ref<T>{ref};
+	inline constexpr auto ref(const T& ref) noexcept -> xns::reference<const T> {
+		return xns::reference<const T>{ref};
 	}
 
 	/* deleted rvalue ref */
 	template <typename T>
-	auto ref(T&&) noexcept -> xns::mut_ref<T> = delete;
+	auto ref(T&&) noexcept -> xns::reference<T> = delete;
 
 	/* deleted const rvalue ref */
 	template <typename T>
-	auto ref(const T&&) noexcept -> xns::const_ref<T> = delete;
+	auto ref(const T&&) noexcept -> xns::reference<const T> = delete;
 
 
 

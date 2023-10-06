@@ -6,7 +6,7 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"poller">(void) {
+int UT::unit_tests<"poller">(void) {
 
 	xns::network::poller poller;
 
@@ -69,11 +69,13 @@ bool UT::unit_tests<"poller">(void) {
 	sock2.listen(1);
 	//sock2.accept();
 	// code here...
-	return false;
+	return 0;
 }
 
+#if defined(XNS_TEST_POLLER)
 int main(void) {
-	return UT::unit_tests<"poller">()
-		? EXIT_SUCCESS : EXIT_FAILURE;
+	return UT::unit_tests<"poller">();
 }
+#endif
+
 

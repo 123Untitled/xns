@@ -25,7 +25,7 @@ void test(const bool result, const char* msg) {
 
 /* unit test */
 template <>
-bool UT::unit_tests<"inheritance">(void) {
+int UT::unit_tests<"inheritance">(void) {
 
 
 	tests::base base;
@@ -59,11 +59,12 @@ bool UT::unit_tests<"inheritance">(void) {
 	test<true >(std::is_base_of_v<tests::derived, tests::derived>, "derived -> derived");
 
 	// code here...
-	return false;
+	return 0;
 }
 
+#if defined(XNS_TEST_INHERITANCE)
 int main(void) {
-
-	// run the unit tests
 	return UT::unit_tests<"inheritance">();
 }
+#endif
+

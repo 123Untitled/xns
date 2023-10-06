@@ -3,12 +3,15 @@
 
 /* unit test */
 template <>
-bool UT::unit_tests<"camera">(void) {
+int UT::unit_tests<"camera">(void) {
 	// code here...
-	return false;
+	return 0;
 }
 
+#if defined(XNS_TEST_ADD_CONST)
 int main(void) {
-
-	return UT::unit_tests<"camera">() ? EXIT_SUCCESS : EXIT_FAILURE;
+	return UT::unit_tests<"camera">();
 }
+#endif
+
+

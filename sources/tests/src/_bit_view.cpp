@@ -7,7 +7,7 @@
 #include <sys/socket.h>
 
 template <>
-bool UT::unit_tests<"bit_view">(void) {
+int UT::unit_tests<"bit_view">(void) {
 
 	xns::terminal::raw_terminal();
 
@@ -123,32 +123,13 @@ bool UT::unit_tests<"bit_view">(void) {
 	xns::terminal::restore_terminal();
 
 
-	return true;
+	return 0;
 }
 
+#if defined(XNS_TEST_BIT_VIEW)
 int main(void) {
-
-	int a = 10238;
-
-	xns::bit_view<int> bv{a};
-
-	// std::cout << bv.get<0>() << std::endl;
-
-	 bv.print();
-	return 0;
-
-
-
-
-
-
-
-
-
-	UT::unit_tests<"bit_view">();
-
-	return 0;
-
-
+	return UT::unit_tests<"bit_view">();
 }
+#endif
+
 

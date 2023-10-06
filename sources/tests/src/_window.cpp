@@ -11,7 +11,7 @@ static xns::evntmode build_events(void) {
 
 	using ev = xns::evntype;
 
-	auto mode = xns::event::instance().new_mode();
+	auto mode = xns::event::shared().new_mode();
 
 	mode.subscribe(ev::ETX,   exit);
 	mode.subscribe(ev::MIN_Q, exit);
@@ -19,15 +19,15 @@ static xns::evntmode build_events(void) {
 	mode.subscribe(ev::LOOP,  render);
 	mode.subscribe(ev::CR, press_enter);
 
-	//Event::instance().set_mode(mode);
-	xns::event::instance().stack_mode(mode, xns::evntopt::FORCE);
-	//Event::instance().stack_mode(mode);
+	//Event::shared().set_mode(mode);
+	//xns::event::shared().stack_mode(mode, xns::evntopt::FORCE);
+	//Event::shared().stack_mode(mode);
 
 	return mode;
 }
 
 template <>
-bool UT::unit_tests<"window">(void) {
+int UT::unit_tests<"window">(void) {
 
 	auto mode = build_events();
 
@@ -36,12 +36,12 @@ bool UT::unit_tests<"window">(void) {
 	//WindowManager win;
 
 	xns::event::start_loop();
-	return true;
-}
-
-int main(void) {
-
-	UT::unit_tests<"window">();
-
 	return 0;
 }
+
+#if defined(XNS_TEST_WINDOW)
+int main(void) {
+	return UT::unit_tests<"window">();
+}
+#endif
+
