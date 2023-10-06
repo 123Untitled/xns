@@ -17,7 +17,7 @@
 #include "memmove.hpp"
 #include "strcmp.hpp"
 #include "strncmp.hpp"
-#include "strlen.hpp"
+//#include "strlen.hpp"
 
 #include "swap.hpp"
 
@@ -1508,11 +1508,11 @@ namespace xns {
 
 			/* to_basic_string (signed integral) as friend */
 			template <typename C, typename U>
-			friend auto to_basic_string(U) -> xns::basic_string<C> requires(xns::is_signed_integral<U>);
+			friend auto to_basic_string(const U&) -> xns::basic_string<C> requires(xns::is_signed_integral<U>);
 
 			/* to_basic_string (unsigned integral) as friend */
 			template <typename C, typename U>
-			friend auto to_basic_string(U) -> xns::basic_string<C> requires(xns::is_unsigned_integral<U>);
+			friend auto to_basic_string(const U&) -> xns::basic_string<C> requires(xns::is_unsigned_integral<U>);
 
 
 	};

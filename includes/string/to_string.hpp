@@ -16,7 +16,7 @@ namespace xns {
 
 	/* to basic string (signed integer) */
 	template <typename C, typename T>
-	auto to_basic_string(T vlue) -> xns::basic_string<C>
+	auto to_basic_string(const T& vlue) -> xns::basic_string<C>
 		// requirements
 		requires(xns::is_signed_integral<T>) {
 
@@ -66,9 +66,12 @@ namespace xns {
 
 	/* to basic string (unsigned integer) */
 	template <typename C, typename T>
-	auto to_basic_string(T number) -> xns::basic_string<C>
+	auto to_basic_string(const T& num) -> xns::basic_string<C>
+
 		// requirements
 		requires(xns::is_unsigned_integral<T>) {
+
+		T number = num;
 
 		using size_type = typename xns::basic_string<C>::size_type;
 
