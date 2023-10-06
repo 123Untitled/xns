@@ -346,7 +346,9 @@ function initialize_separator {
 
 function handle_compilation {
 	# openssl hash
-	local HASH=$(openssl md5 <<< $FILE)
+	#local HASH=$(openssl md5 <<< $FILE)
+	# get basename
+	local HASH=${1##*/}
 	# add object file extension
 	local OBJ=$OBJDIR'/'$HASH'.o'
 	# add dependency file extension
@@ -385,6 +387,44 @@ function handle_compilation {
 
 }
 
+function handle_errors {
+	# get all log files
+	local LOGS=($LOGDIR'/'*'.log'(.N))
+
+	for LOG in $LOGS; do
+		# split log file into lines
+		local LOGLINES=(${(f)"$(<$LOG)"})
+
+		for LOGLINE in $LOGLINES; do
+			# ignore pattern 'In file included from'
+			if [[ $LOGLINE =~ 'In file included from' ]]; then
+				continue
+			fi
+
+			REGEX='^.*/([^/]+):([0-9]+):([0-9]+): *(.+)$'
+
+
+			if [[ $LOGLINE =~ $REGEX ]]; then
+				BASE=${match[1]}
+				NUMBER=$(printf "%10d" ${match[2]})
+				MSG=$(printf "%10s" ${match[4]})
+
+				echo $NUMBER $COLOR'|'$RESET $BASE
+				echo $MSG
+
+			elif [[ $LOGLINE =~ '^ *~* *\^ *~* *$' ]]; then
+				echo $LOGLINE'\n'
+			else
+				echo $LOGLINE
+			fi
+
+
+		done
+
+	done
+}
+
+
 
 function compile {
 
@@ -397,11 +437,15 @@ function compile {
 	touch $LOCK
 	# array of pids
 	PIDS=()
+
+	MAX_JOBS=200
+
 	# loop over source files
 	for FILE in $SRCS; do
 		handle_compilation $FILE &
 		PIDS+=($!)
 	done
+
 
 	# loop over pids
 	for PID in $PIDS; do
@@ -411,7 +455,7 @@ function compile {
 		if [[ $? -ne 0 ]]; then
 			wait
 			echo '\n'$SEPARATOR
-			cat $LOGDIR'/'*'.log'
+			handle_errors
 			exit 1
 		fi
 	done
@@ -424,7 +468,6 @@ function compile {
 	else
 		echo '\n\n'🫠 $COUNT 'files compiled.'
 	fi
-
 
 }
 
@@ -465,7 +508,7 @@ function linkage {
 
 function require_build_mode {
 
-	BUILD_MODE=$(echo -e 'release\ntest' | fzf $FZF_OPTS)
+	BUILD_MODE=$(echo -e 'release\ntest\nconfigure' | fzf $FZF_OPTS)
 
 	if [[ -z $BUILD_MODE ]]; then
 		exit 1
@@ -475,6 +518,7 @@ function require_build_mode {
 
 }
 
+SRCTESTS=()
 
 function require_test_file {
 
@@ -494,9 +538,11 @@ function require_test_file {
 	if [[ -z $TEST ]]; then
 		exit 1
 	fi
-
 	echo 'TEST='$TEST >> $SETUP
+}
 
+function require_config {
+	# not implemented yet...
 }
 
 
@@ -505,6 +551,7 @@ function setup_build_mode() {
 
 	# check for .setup file
 	if [[ ! -f $SETUP ]]; then
+		make_clean
 		echo 'BUILD_MODE=' > $SETUP
 	fi
 
@@ -515,8 +562,10 @@ function setup_build_mode() {
 		require_build_mode
 	fi
 
-	if [[ $BUILD_MODE == 'test' ]] && [[ -z $TEST ]]; then
+	if   [[ $BUILD_MODE == 'test' ]] && [[ -z $TEST ]]; then
 		require_test_file
+	#elif [[ $BUILD_MODE == 'configure' ]]; then
+		#require_config
 	fi
 }
 
@@ -532,8 +581,15 @@ function setup_files() {
 	if [[ $BUILD_MODE == 'test' ]]; then
 		# get all directories hierarchy in incdir
 		INCLUDES+=($TSTINC/**/*(/N) $TSTINC)
-		# get all tests files (pattern matching _*.cpp)
-		SRCS+=($TSTSRC'/'**'/_'$TEST'.cpp'(.N))
+		if [[ $TEST == 'all' ]]; then
+			# get all tests files (pattern matching _*.cpp)
+			SRCS+=($TSTSRC'/'**'/_'*'.cpp'(.N))
+		else
+			# get all tests files (pattern matching _*.cpp)
+			SRCS+=($TSTSRC'/'**'/_'$TEST'.cpp'(.N))
+		fi
+		# append defines
+		DEFINES+=('-DXNS_TEST_'${TEST:u})
 	fi
 	# insert -I prefix to each directory
 	INCLUDES=("${INCLUDES[@]/#/-I}")
@@ -565,11 +621,12 @@ function handle_argument {
 	fi
 
 	# clean
-	if [[ $ARGUMENT == 'rm' ]]; then
+	if   [[ $ARGUMENT == 'rm'      ]]; then
 		target_info 'rm'
 		make_clean
 		exit 0
 
+	# release
 	elif [[ $ARGUMENT == 'release' ]]; then
 		make_clean
 		echo 'BUILD_MODE=release' > $SETUP
@@ -580,7 +637,7 @@ function handle_argument {
 		echo 'BUILD_MODE=test'    > $SETUP
 
 	else
-		echo 'unknown argument:' $COLOR$ARGUMENT$RESET
+		echo 'unknown argument:' $COLOR$ARGUMENT$RESET'\n'
 		exit 1
 	fi
 
