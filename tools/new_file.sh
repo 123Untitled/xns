@@ -14,8 +14,9 @@ CE='\x1b[32m'
 NC='\x1b[0m'
 
 GIT_DIR='xns'
-INC_DIR='inc'
-SRC_DIR='src'
+INCDIR='includes'
+SRCDIR='sources/core'
+TSTDIR='sources/tests/src'
 REPO='git@github.com:123Untitled/xns.git'
 
 
@@ -50,6 +51,7 @@ if [[ ! $1 =~ ^-[htsu]*$ ]]; then
 	echo 'Invalid' $CO'option'$NC'.'
 	exit 1
 fi
+
 
 # remove duplicate options
 OPTIONS=(${(u)${(s::)1}})
@@ -93,7 +95,7 @@ CLASS_NAME=$2
 
 
 # namespace name
-NAMESPACE_NAME='xns'
+NAMESPACE='xns'
 
 # to upper case
 UPPER_CLASS_NAME=${(U)CLASS_NAME}
@@ -129,7 +131,7 @@ HEADER_MODEL="#ifndef "$UPPER_CLASS_NAME"_HPP
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace "$NAMESPACE_NAME" {
+namespace "$NAMESPACE" {
 
 
 \t// -- "$CLEANED_CLASS_NAME" "$FILL_LINE_HEADER"
@@ -188,28 +190,28 @@ SOURCE_MODEL="#include \""$CLASS_NAME".hpp\"
 // -- public constructors -----------------------------------------------------
 
 /* default constructor */
-"$NAMESPACE_NAME"::"$CLASS_NAME"::"$CLASS_NAME"(void) noexcept
+"$NAMESPACE"::"$CLASS_NAME"::"$CLASS_NAME"(void) noexcept
 //:
 {
 \t// code here...
 }
 
 /* copy constructor */
-"$NAMESPACE_NAME"::"$CLASS_NAME"::"$CLASS_NAME"(const "$CLASS_NAME"& other) noexcept
+"$NAMESPACE"::"$CLASS_NAME"::"$CLASS_NAME"(const "$CLASS_NAME"& other) noexcept
 //:
 {
 \t// code here...
 }
 
 /* move constructor */
-"$NAMESPACE_NAME"::"$CLASS_NAME"::"$CLASS_NAME"("$CLASS_NAME"&& other) noexcept
+"$NAMESPACE"::"$CLASS_NAME"::"$CLASS_NAME"("$CLASS_NAME"&& other) noexcept
 //:
 {
 \t// code here...
 }
 
 /* destructor */
-"$NAMESPACE_NAME"::"$CLASS_NAME"::~"$CLASS_NAME"(void) noexcept {
+"$NAMESPACE"::"$CLASS_NAME"::~"$CLASS_NAME"(void) noexcept {
 \t// code here...
 }
 
@@ -217,7 +219,7 @@ SOURCE_MODEL="#include \""$CLASS_NAME".hpp\"
 // -- public assignment operators ---------------------------------------------
 
 /* copy assignment operator */
-"$NAMESPACE_NAME"::"$CLASS_NAME"& "$NAMESPACE_NAME"::"$CLASS_NAME"::operator=(const "$CLASS_NAME"& other) noexcept {
+"$NAMESPACE"::"$CLASS_NAME"& "$NAMESPACE"::"$CLASS_NAME"::operator=(const "$CLASS_NAME"& other) noexcept {
 \t// check for self assignment
 \tif (this != &other) {
 \t} // return self reference
@@ -225,7 +227,7 @@ SOURCE_MODEL="#include \""$CLASS_NAME".hpp\"
 }
 
 /* move assignment operator */
-"$NAMESPACE_NAME"::"$CLASS_NAME"& "$NAMESPACE_NAME"::"$CLASS_NAME"::operator=("$CLASS_NAME"&& other) noexcept {
+"$NAMESPACE"::"$CLASS_NAME"& "$NAMESPACE"::"$CLASS_NAME"::operator=("$CLASS_NAME"&& other) noexcept {
 \t// check for self assignment
 \tif (this != &other) {
 \t} // return self reference
@@ -243,7 +245,7 @@ TEMPLATE_MODEL="#ifndef "$UPPER_CLASS_NAME"_HPP
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace "$NAMESPACE_NAME" {
+namespace "$NAMESPACE" {
 
 
 	// -- "$CLEANED_CLASS_NAME" "$FILL_LINE_HEADER"
@@ -339,11 +341,11 @@ bool unit_test<\"$CLASS_NAME\">(void) {
 "
 
 # get all source files
-SRC_FILES=($SRC_DIR/**/*.cpp(.N))
+SRC_FILES=($SRCDIR/**/*.cpp(.N))
 # get all source files basename
 SRC_FILES=(${SRC_FILES[@]##*/})
 # get all header files
-HEADER_FILES=($INC_DIR/**/*.hpp(.N))
+HEADER_FILES=($INCDIR/**/*.hpp(.N))
 # get all header files basename
 HEADER_FILES=(${HEADER_FILES[@]##*/})
 
@@ -358,7 +360,7 @@ function gen_source {
 		exit 1
 	fi
 	# generate file
-	echo -n "$SOURCE_MODEL" >> $SRC_DIR'/'$FILE && echo $CO$FILE$NC 'source file generated.'
+	echo -n "$SOURCE_MODEL" >> $SRCDIR'/'$FILE && echo $CO$FILE$NC 'source file generated.'
 	#echo $CO$FILE$NC 'source file generated.'
 }
 
@@ -372,7 +374,7 @@ function gen_header {
 		exit 1
 	fi
 	# generate file
-	echo -n "$HEADER_MODEL" >> $INC_DIR'/'$FILE && echo $CO$FILE$NC 'header file generated.'
+	echo -n "$HEADER_MODEL" >> $INCDIR'/'$FILE && echo $CO$FILE$NC 'header file generated.'
 	#echo $CO$FILE$NC 'header file generated.'
 
 }
@@ -387,20 +389,19 @@ function gen_template {
 		exit 1
 	fi
 	# generate file
-	echo -n "$TEMPLATE_MODEL" >> $INC_DIR'/'$FILE && echo $CO$FILE$NC 'template file generated.'
+	echo -n "$TEMPLATE_MODEL" >> $INCDIR'/'$FILE && echo $CO$FILE$NC 'template file generated.'
 	#echo $CO$FILE$NC 'template file generated.'
 }
 
 # unit test generator
 function gen_unit_test {
 	# file to generate
-	local FILE="$CLASS_NAME"_tests.cpp
-	local DIR=$SRC_DIR'/unit_tests'
+	local FILE=$TSTDIR'/_'$CLASS_NAME'.cpp'
 	# check if file exists
-	if [[ -f $DIR'/'$FILE ]]; then
-		echo $CE$FILE$NC' already exists'
+	if (-f $file) {
+		echo $CE$FILE$NC 'already exists'
 		exit 1
-	fi
+	}
 	# generate file
 	echo -n "$UNIT_TEST_MODEL" >> $DIR'/'$FILE && echo $CO$FILE$NC 'unit test file generated.'
 	#echo $CO$FILE$NC 'unit test file generated.'
