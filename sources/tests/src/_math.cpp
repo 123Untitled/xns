@@ -1,6 +1,7 @@
 #include "unit_tests.hpp"
 #include "math.hpp"
 #include <cmath>
+#include <vector>
 #include "integer.hpp"
 #include "bit_view.hpp"
 #include "integer_arithmetic.hpp"

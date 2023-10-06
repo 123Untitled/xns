@@ -2,6 +2,7 @@
 #include "memory.hpp"
 #include "allocator.hpp"
 
+#include <vector>
 #include "tuple.hpp"
 #include "time.hpp"
 
