@@ -216,9 +216,25 @@ function check_os {
 
 # -- R E Q U I R E D  P R O G R A M S -----------------------------------------
 
-function required() {
+function required {
 	# default required programs
-	local COMMANDS=('mkdir' 'rm' 'cd' 'pwd' 'sed' 'cat' 'file' 'vared' 'jq' 'openssl' 'wait' 'fzf' 'flock' 'wc')
+	local COMMANDS=(
+		'mkdir'
+		'wait'
+		'pwd'
+		'rm'
+		'cd'
+		'wc'
+		'git'
+		'cat'
+		'sed'
+		'file'
+		'vared'
+		'openssl'
+		'flock'
+		'fzf'
+		'jq'
+	)
 	# append arguments
 	COMMANDS+=( "$@" )
 	# loop through all required commands
@@ -236,8 +252,30 @@ function required() {
 
 
 
+# -- C H E C K  W O R K I N G  D I R E C T O R Y ------------------------------
 
 
+function repository {
+
+	local SSH_REPO='git@github.com:123Untitled/xns.git'
+	local PUB_REPO='https://github.com/123Untitled/xns.git'
+
+	# check if the script is run in a git repository
+	if [ ! -d .git ]; then
+		echo 'please run this script in the' $CO$PROJECT$NC 'repository.'
+		exit 1
+	fi
+
+	# get the git repository name
+	GIT_REPO=$(git config --get remote.origin.url)
+
+	# check if the script is run in the right repository
+	if [[ $GIT_REPO != $SSH_REPO && $GIT_REPO != $PUB_REPO ]]; then
+		echo 'please run this script in the' $COLOR$PROJECT$RESET 'repository.'
+		exit 1
+	fi
+
+}
 
 
 
@@ -619,32 +657,31 @@ function handle_argument {
 		return
 	fi
 
-	# clean
-	if   [[ $ARGUMENT == 'rm'      ]]; then
-		target_info 'rm'
-		make_clean
-		exit 0
+	# switch argument
+	case $ARGUMENT in
 
-	# release
-	elif [[ $ARGUMENT == 'release' ]]; then
-		make_clean
-		echo 'BUILD_MODE=release' > $SETUP
-
-	# install
-	elif [[ $ARGUMENT == 'install' ]]; then
-		make_clean
-		echo 'BUILD_MODE=install' > $SETUP
-
-	# test
-	elif [[ $ARGUMENT == 'test' ]]; then
-		make_clean
-		echo 'BUILD_MODE=test'    > $SETUP
-
-	else
-		echo 'unknown argument:' $COLOR$ARGUMENT$RESET'\n'
-		exit 1
-	fi
-
+		'rm')
+			target_info 'rm'
+			make_clean
+			exit 0
+			;;
+		'release')
+			make_clean
+			echo 'BUILD_MODE=release' > $SETUP
+			;;
+		'test')
+			make_clean
+			echo 'BUILD_MODE=test'    > $SETUP
+			;;
+		'install')
+			make_clean
+			echo 'BUILD_MODE=install' > $SETUP
+			;;
+		*)
+			echo 'unknown argument:' $COLOR$ARGUMENT$RESET'\n'
+			exit 1
+			;;
+	esac
 
 }
 
@@ -662,29 +699,32 @@ function main() {
 	setup_build_mode
 	setup_files
 
-	# release mode
-	if [[ $BUILD_MODE == 'release' ]]; then
-		target_info $STATIC
-		compile
-		linkage $STATIC make_static
+	# switch build mode
+	case $BUILD_MODE in
 
-	# test mode
-	elif [[ $BUILD_MODE == 'test' ]]; then
-		target_info $TEST
-		compile
-		database
-		linkage $EXECUTABLE make_executable
-	# install mode
-	elif [[ $BUILD_MODE == 'install' ]]; then
-		target_info 'install'
-		compile
-		linkage $STATIC make_static
-	fi
-
+		'release')
+			target_info $STATIC
+			compile
+			linkage $STATIC make_static
+			;;
+		'test')
+			target_info $TEST
+			compile
+			database
+			linkage $EXECUTABLE make_executable
+			;;
+		'install')
+			target_info 'install'
+			compile
+			linkage $STATIC make_static
+			;;
+		*)
+			exit 1
+			;;
+	esac
 
 	echo $SEPARATOR
 	echo '💫' "[$BUILD_MODE]" 'All targets are up to date !\n';
-
 }
 
 
