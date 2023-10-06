@@ -2,8 +2,8 @@
 #define XNS_STRLEN_HPP
 
 
-template <typename T>
-class basic_string;
+//template <typename T>
+//class basic_string;
 
 // #include "string.hpp"
 
