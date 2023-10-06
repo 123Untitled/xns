@@ -1,26 +1,20 @@
-# xmake
-.xmake/
+
 # release output directory
 xns/
-
-doc/
-# ignore executable
-exec
-xnsexec
-xns_sh_gen
-
 #ignore single header
 xns.hpp
 
-# ignore build directory
-_bld/
-build/
+# ignore executable
+exec_*
 
-# ignore ninja build files
-**/build.ninja
+# ignore build directory
+build/
 
 # ignore .env files
 .env
+
+# ignore .setup files
+.setup
 
 # ignore all .a files recursively
 **/*.a
@@ -52,6 +46,3 @@ xfunc.dSYM/
 # ignore all .DS_Store files recursively
 **/.DS_Store
 
-# ignore clang-filter
-clang-filter
-ccfilter
