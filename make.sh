@@ -1,9 +1,5 @@
 #!/usr/bin/env -S zsh --no-rcs
 
-#echo 'non-compiled:' $0
-
-#exit 0
-
 # This script is used to compile the project.
 # Makefile forever, but not really lol.
 
@@ -116,7 +112,7 @@ LOCK=$BLDDIR'/.lock'
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-CXX='clang++'
+CXX='/opt/homebrew/Cellar/llvm/17.0.2/bin/clang++'
 
 # archiver
 ARCHIVER='ar'
@@ -286,23 +282,18 @@ function repository {
 # -- I M P L E M E N T A T I O N ----------------------------------------------
 
 function description {
-	# $1: target file
-	local RESUME=$(file $1)
 	# regex to match description
-	local REGEX='.*: (.*)'
-	if [[ $RESUME =~ $REGEX ]]; then
+	if [[ $(file $1) =~ '.*: (.*)' ]]; then
 		# print separator
-		echo $SEPARATOR
-		echo $SUCCESS'[+]'$RESET ${1##*/} '|' ${match[1]}
+		echo $SEPARATOR$SUCCESS'[+]'$RESET ${1##*/} '|' ${match[1]}
 	fi
 }
 
 function make_clean {
-	echo $SEPARATOR
 	# remove all targets
 	DELETED=$(rm -rfv $EXECUTABLE $STATIC $BLDDIR $CACHEDIR $DATABASE $SETUP | wc -l)
 	# print full cleaned message
-	echo $COLOR'[x]'$RESET 'full cleaned ('${DELETED##* } 'files)\n';
+	echo $SEPARATOR$COLOR'[⏺]'$RESET 'full cleaned ('${DELETED##* } 'files)\n';
 }
 
 function make_executable {
@@ -350,23 +341,19 @@ function is_link_required {
 
 function check_dependency {
 	# check if object or dependency file is missing
-	if [[ ! -f $1 ]] || [[ ! -f $2 ]];
-	then return 0; fi
-	# get file content
-	local CONTENT=$(<$2)
+	if [[ ! -f $1 ]] || [[ ! -f $2 ]] || [[ $MAKE -nt $1 ]]; then
+		return 0
+	fi
 	# split content into words
-	local WORDS=(${=CONTENT})
+	local WORDS=(${=$(<$2)})
 	# loop over array
 	for WORD in $WORDS; do
-
+		# check if word is not target or escape
 		if [[ $WORD != "\\" ]] && [[ $WORD != *":" ]]; then
 			# check if dependency is missing
 			[[ $WORD -nt $1 ]] && return 0
 		fi
 	done
-	if [[ $MAKE -nt $1 ]]; then
-		return 0
-	fi
 	return 1
 }
 
@@ -388,9 +375,7 @@ function initialize_separator {
 
 function handle_compilation {
 	# openssl hash
-	#local HASH=$(openssl md5 <<< $FILE)
-	# get basename
-	local HASH=${1##*/}
+	local HASH=$(openssl md5 <<< $FILE)
 	# add object file extension
 	local OBJ=$OBJDIR'/'$HASH'.o'
 	# add dependency file extension
@@ -474,9 +459,10 @@ function compile {
 
 	echo $SEPARATOR
 
+	rm -rf $LOGDIR
 	# create build directories
 	mkdir -p $OBJDIR $DEPDIR $JSNDIR $LOGDIR
-	rm -f $LOGDIR'/'*'.log'
+
 
 	echo 0 > $COMPILED
 	touch $LOCK
@@ -560,7 +546,6 @@ function require_build_mode {
 	echo 'BUILD_MODE='$BUILD_MODE > $SETUP
 }
 
-SRCTESTS=()
 
 function require_test_file {
 
