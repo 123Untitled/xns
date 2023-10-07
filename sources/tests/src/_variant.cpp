@@ -42,22 +42,22 @@ void benchmark(void) {
 		}
 	});
 
-	bench.run("std::variant", []() {
-
-
-		for (xns::size_t i = 0; i < N; ++i) {
-			svariant var{std::in_place_type<int>, xns::random::integral<int>()};
-
-			var.emplace<std::vector<xns::size_t>>(std::initializer_list<xns::size_t>{1, 2, 3, 4, 5, 6, 7, 8, 9});
-			if (std::holds_alternative<std::vector<xns::size_t>>(var)) {
-				check_sum ^= std::get<std::vector<xns::size_t>>(var)[xns::random::integral<xns::size_t>() % 9];
-			}
-			var.emplace<std::string>("hello world");
-			if (std::holds_alternative<std::string>(var)) {
-				check_sum ^= std::get<std::string>(var)[xns::random::integral<xns::size_t>() % 11];
-			}
-		}
-	});
+	//bench.run("std::variant", []() {
+	//
+	//
+	//	for (xns::size_t i = 0; i < N; ++i) {
+	//		svariant var{std::in_place_type<int>, xns::random::integral<int>()};
+	//
+	//		var.emplace<std::vector<xns::size_t>>(std::initializer_list<xns::size_t>{1, 2, 3, 4, 5, 6, 7, 8, 9});
+	//		if (std::holds_alternative<std::vector<xns::size_t>>(var)) {
+	//			check_sum ^= std::get<std::vector<xns::size_t>>(var)[xns::random::integral<xns::size_t>() % 9];
+	//		}
+	//		var.emplace<std::string>("hello world");
+	//		if (std::holds_alternative<std::string>(var)) {
+	//			check_sum ^= std::get<std::string>(var)[xns::random::integral<xns::size_t>() % 11];
+	//		}
+	//	}
+	//});
 
 
 	bench.result("variant");
