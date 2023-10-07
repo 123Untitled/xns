@@ -277,7 +277,7 @@ namespace xns {
 					if (::epoll_ctl(_epoll.get(), EPOLL_CTL_ADD, socket.get(), &event) == -1) {
 						std::cout << "error: " << std::strerror(errno) << std::endl;
 					} // increase buffer size
-					_events.push_back(); // INFO need to call resize
+					_events.emplace_back(); // INFO need to call resize
 				}
 
 				auto remove_socket(network::socket& socket) noexcept -> void {
@@ -338,7 +338,7 @@ namespace xns {
 				using event_vector = xns::vector<struct epoll_event>;
 
 				/* size type */
-				using size_type = typename kevent_vector::size_type;
+				using size_type = typename event_vector::size_type;
 
 
 				// -- private members -----------------------------------------
