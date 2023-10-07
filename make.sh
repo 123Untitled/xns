@@ -1,9 +1,9 @@
-#!/usr/bin/env -S zsh --no-rcs
+#!/usr/bin/env -S zsh --no-rcs --no-globalrcs
 
 # This script is used to compile the project.
 # Makefile forever, but not really lol.
 
-local BANNER=\
+BANNER=\
 '   ▁▁▁▁▁▁▁▁  ▁▁▁▁▁▁▁▁  ▁▁▁▁ ▁▁▁  ▁▁▁▁▁▁▁▁ \n'\
 '  ╱        ╲╱        ╲╱    ╱   ╲╱        ╲\n'\
 ' ╱         ╱         ╱         ╱         ╱\n'\
@@ -11,32 +11,32 @@ local BANNER=\
 '╲▁▁╱▁▁╱▁▁╱╲▁▁▁╱▁▁▁▁╱╲▁▁▁▁╱▁▁▁╱╲▁▁▁▁▁▁▁▁╱  \n'
 
 
-
 # -- S C R I P T  P A T H  S E T T I N G S ------------------------------------
 
 # get absolute directory of script
-abspath=$(cd ${0%/*}; pwd)
+ABSDIR=$(cd ${0%/*}; pwd)
 
 # get dirname of script
-rootname=${abspath##*/}
+rootname=${ABSDIR##*/}
 
 # get absolute path of script
-MAKE=$abspath/${0##*/}
+MAKE=$ABSDIR/${0##*/}
 
 # basename of the script without using basename command
 scriptname=${0##*/}
 
 
+
 # -- D I R E C T O R I E S ----------------------------------------------------
 
 # sources directory
-SRCDIR=$abspath'/sources/core'
+SRCDIR=$ABSDIR'/sources/core'
 
 # includes directory
-INCDIR=$abspath'/includes'
+INCDIR=$ABSDIR'/includes'
 
 # tests directory
-TSTDIR=$abspath'/sources/tests'
+TSTDIR=$ABSDIR'/sources/tests'
 
 # tests includes directory
 TSTINC=$TSTDIR'/inc'
@@ -45,7 +45,7 @@ TSTINC=$TSTDIR'/inc'
 TSTSRC=$TSTDIR'/src'
 
 # build directory
-BLDDIR=$abspath'/build'
+BLDDIR=$ABSDIR'/build'
 
 # object directory
 OBJDIR=$BLDDIR'/object'
@@ -54,14 +54,16 @@ OBJDIR=$BLDDIR'/object'
 DEPDIR=$BLDDIR'/dependency'
 
 # json directory
-JSNDIR=$BLDDIR/'json'
+JSNDIR=$BLDDIR'/json'
 
 # compile log directory
-LOGDIR=$BLDDIR/'log'
+LOGDIR=$BLDDIR'/log'
 
 # cache directory
-CACHEDIR=$abspath/'.cache'
+CACHEDIR=$ABSDIR'/.cache'
 
+# install directory
+INSTALLDIR=''
 
 
 # -- T A R G E T S ------------------------------------------------------------
@@ -70,19 +72,19 @@ CACHEDIR=$abspath/'.cache'
 PROJECT='xns'
 
 # target executable
-EXECUTABLE=$abspath'/exec_'$PROJECT
+EXECUTABLE=$ABSDIR'/exec_'$PROJECT
 
 # target static library
-STATIC=$abspath'/lib'$PROJECT'.a'
+STATIC=$ABSDIR'/lib'$PROJECT'.a'
 
 # compilation database
-DATABASE=$abspath/'compile_commands.json'
+DATABASE=$ABSDIR'/compile_commands.json'
 
 # .setup file
-SETUP=$abspath'/.setup'
+SETUP=$ABSDIR'/.setup'
 
 # command line arguments
-ARGUMENT=$1
+ARGUMENTS=($@)
 
 # number of arguments
 ARG_COUNT=$#
@@ -190,9 +192,28 @@ FZF_OPTS=('--algo=v2' '--height=50%' '--no-multi' '--layout=reverse' '--border=r
 SEPARATOR=''
 
 
+function initialize_separator {
+	# generate separator
+	SEPARATOR='\x1b[90m'
+	# loop over columns
+	for _ in $(seq $COLUMNS); do
+		# add separator
+		SEPARATOR+='─'
+	done # reset color
+	SEPARATOR+=$RESET
+}
 
 
+# -- B A N N E R --------------------------------------------------------------
 
+function banner() {
+	echo $COLOR$BANNER$RESET
+}
+
+function target_info() {
+	echo $COLOR$scriptname$RESET \
+		'launching' '['$COLOR${1##*/}$RESET']' 'build'
+}
 
 
 
@@ -200,15 +221,20 @@ SEPARATOR=''
 
 # check if operating system is supported
 function check_os {
+
+	if [[ -z $OSTYPE ]]; then
+		OSTYPE=$(uname -s)
+	fi
+
 	# check for macosx
-	if   [[ $OSTYPE == 'darwin'* ]]; then
-		#echo 'Detected OS:' $color'macosx'$reset
+	if   [[ $OSTYPE =~ 'darwin' ]]; then
+		#echo 'detected OS:' $color'macosx'$reset
 	# check for linux
-	elif [[ $OSTYPE == 'linux-gnu'* ]]; then
-		#echo 'Detected OS:' $color'linux'$reset
+	elif [[ $OSTYPE =~ 'linux' ]]; then
+		#echo 'detected OS:' $color'linux'$reset
 	# check for other
 	else
-		echo 'Unsupported OS:' $COLOR$OSTYPE$RESET
+		echo 'unsupported OS:' $COLOR$OSTYPE$RESET
 		exit 1
 	fi
 }
@@ -230,18 +256,20 @@ function required {
 		'cat'
 		'sed'
 		'file'
+		'uname'
 		'vared'
 		'openssl'
 		'flock'
 		'fzf'
+		'fzy'
 		'jq'
 	)
 	# append arguments
-	COMMANDS+=( "$@" )
+	COMMANDS+=($@)
 	# loop through all required commands
 	for CMD in $COMMANDS; do
 		# check if command is installed
-		if [[ -z "$(command -v $CMD)" ]]; then
+		if ! command -v $CMD &> /dev/null; then
 			# print error message
 			echo '\nerror:' $ERROR$CMD$RESET 'is not installed.'
 			exit 1
@@ -251,10 +279,7 @@ function required {
 
 
 
-
-
-# -- C H E C K  W O R K I N G  D I R E C T O R Y ------------------------------
-
+# -- R E P O S I T O R Y  C H E C K -------------------------------------------
 
 function repository {
 
@@ -297,6 +322,11 @@ function make_clean {
 	echo $SEPARATOR$COLOR'[⏺]'$RESET 'full cleaned ('${DELETED##* } 'files)\n';
 }
 
+function make_silent_clean {
+	# remove all targets
+	rm -rf $EXECUTABLE $STATIC $BLDDIR $CACHEDIR $DATABASE $SETUP
+}
+
 function make_executable {
 	# link executable
 	$LINKER $LDFLAGS $OBJS -o $EXECUTABLE || exit 1
@@ -311,68 +341,27 @@ function make_static {
 	description $STATIC
 }
 
-function make_database {
-	echo "[\n"$(cat $JSNS | sed '$s/,\s*$//')"\n]" | jq > $DATABASE
-	# check if compilation database succeeded
-	description $DATABASE
-}
 
 
 
-# -- U T I L I T I E S  F U N C T I O N S -------------------------------------
-
-
-
-
-function is_link_required {
-	# get first argument
-	local TARGET=$1
-	shift
-	# loop over object files
-	for DEPENDENCY in $@; do
-		# check if this script is modified
-		if [[ $DEPENDENCY -nt $TARGET ]]; then
-			return 0
-		fi
-	done
-	return 1
-}
-
-
+# -- C O M P I L A T I O N  F U N C T I O N S ---------------------------------
 
 function check_dependency {
 	# check if object or dependency file is missing
 	if [[ ! -f $1 ]] || [[ ! -f $2 ]] || [[ $MAKE -nt $1 ]]; then
 		return 0
 	fi
-	# split content into words
-	local WORDS=(${=$(<$2)})
-	# loop over array
-	for WORD in $WORDS; do
+	# loop over words in dependency file
+	for WORD in ${=$(<$2)}; do
+	#for WORD in $WORDS; do
 		# check if word is not target or escape
-		if [[ $WORD != "\\" ]] && [[ $WORD != *":" ]]; then
+		if [[ $WORD != '\' ]] && [[ $WORD != *':' ]]; then
 			# check if dependency is missing
 			[[ $WORD -nt $1 ]] && return 0
 		fi
 	done
 	return 1
 }
-
-
-
-
-function initialize_separator {
-	# generate separator
-	SEPARATOR='\x1b[90m'
-	# loop over columns
-	for _ in $(seq $COLUMNS); do
-		# add separator
-		SEPARATOR+='─'
-	done # reset color
-	SEPARATOR+=$RESET
-}
-
-
 
 function handle_compilation {
 	# openssl hash
@@ -502,49 +491,72 @@ function compile {
 }
 
 
-function database {
+# -- L I N K  F U N C T I O N S -----------------------------------------------
 
-	# get all json files
-	JSNS=($JSNDIR'/'**'/'*'.json'(.N))
-	# check if there is any json files
-	if [[ ${#JSNS[@]} -eq 0 ]]; then
-		exit 1
-	fi
-
-	# handle compilation database
-	if [[ ! -e $DATABASE ]] || is_link_required $DATABASE $JSNS; then
-		make_database
-	fi
+function is_link_required {
+	# get first argument
+	local TARGET=$1
+	shift
+	# loop over object files
+	for DEPENDENCY in $@; do
+		# check if this script is modified
+		if [[ $DEPENDENCY -nt $TARGET ]]; then
+			return 0
+		fi
+	done
+	return 1
 }
 
 function linkage {
 
 	local TARGET=$1
 	local FUNCTOR=$2
-
 	# get all object files
-	OBJS=($OBJDIR'/'**'/'*'.o'(.N))
-	# check if there is any object files
-	if [[ ${#OBJS[@]} -eq 0 ]]; then
-		exit 1
-	fi
+	OBJS=($OBJDIR'/'*'.o'(.N))
 	# handle target
 	if [[ ! -e $TARGET ]] || is_link_required $TARGET $OBJS; then
 		$FUNCTOR
 	fi
 }
 
+function database {
+	# get all json files
+	JSNS=($JSNDIR'/'*'.json'(.N))
+	# check if need to (re)generate database
+	if [[ ! -e $DATABASE ]] || is_link_required $DATABASE $JSNS; then
+		# start json string
+		local CONTENT='['
+		# get all json files content
+		for JSN in $JSNS; do
+			CONTENT+=$(<$JSN)
+		done
+		# erase last comma with bracket
+		CONTENT[-1]=']'
+		# format json content with jq
+		jq <<< $CONTENT > $DATABASE
+		# check if compilation database succeeded
+		description $DATABASE
+	fi
+}
 
+
+
+# -- B U I L D  M O D E -------------------------------------------------------
 
 function require_build_mode {
 
-	BUILD_MODE=$(echo -e 'release\ntest\ninstall' | fzf $FZF_OPTS)
+	IFS=$'\n'
+	local MODES=('release' 'install' 'test' 'debug' 'config' 'help' 'rm' )
+	MODE=$(fzy <<< ${MODES[@]})
+	IFS=$' \t\n'
 
-	if [[ -z $BUILD_MODE ]]; then
+	#MODE=$(echo -e 'release\ntest\ninstall' | fzf $FZF_OPTS)
+
+	if [[ -z $MODE ]]; then
 		exit 1
 	fi
 
-	echo 'BUILD_MODE='$BUILD_MODE > $SETUP
+	echo 'MODE='$MODE > $SETUP
 }
 
 
@@ -553,14 +565,18 @@ function require_test_file {
 	# get all tests files
 	local FILES=($TSTSRC'/'**'/_'*'.cpp'(.N))
 
-	# keep only basename without extension
-	FILES=("${FILES[@]##*/}")
-	# remove extension
-	FILES=("${FILES[@]%%.*}")
-	# remove _ prefix
-	FILES=("${FILES[@]#_}")
+	# loop over test files
+	for I in {1..${#FILES[@]}}; do
 
-	TEST=$(echo -e ${(j:\n:)FILES} | fzf $FZF_OPTS)
+		if [[ $FILES[$I] =~ '^.*/_(.*)\.cpp$' ]]; then
+			FILES[$I]=${match[1]}
+		fi
+
+	done
+
+	IFS=$'\n'
+	TEST=$(fzy <<< ${FILES[@]})
+	IFS=$' \t\n'
 
 	# check if test is selected
 	if [[ -z $TEST ]]; then
@@ -569,44 +585,45 @@ function require_test_file {
 	echo 'TEST='$TEST >> $SETUP
 }
 
-function require_config {
-	# not implemented yet...
+
+
+
+
+function setup_install {
+	# check arguments
+	case $ARG_COUNT; in
+
+		1)
+			INSTALLDIR=$ABSDIR
+			;;
+		2)
+			INSTALLDIR=$ARGUMENTS[2]
+			;;
+		*)
+			echo 'usage:' $COLOR$scriptname$RESET 'install [directory]\n'
+			exit 1
+			;;
+	esac
+
+	[[ ! -d $INSTALLDIR ]] && \
+		echo 'install directory' $COLOR$INSTALLDIR$RESET 'does not exist.\n'; exit 1
+
+	INSTALLDIR+='/'$PROJECT
 }
 
 
 
-function setup_build_mode() {
-
-	# check for .setup file
-	if [[ ! -f $SETUP ]]; then
-		make_clean
-		echo 'BUILD_MODE=' > $SETUP
-	fi
-
-	# load .setup file
-	source $SETUP
-
-	if [[ -z $BUILD_MODE ]]; then
-		require_build_mode
-	fi
-
-	if   [[ $BUILD_MODE == 'test' ]] && [[ -z $TEST ]]; then
-		require_test_file
-	#elif [[ $BUILD_MODE == 'configure' ]]; then
-		#require_config
-	fi
-}
 
 
 # -- S O U R C E  F I L E S ---------------------------------------------------
 
-function setup_files() {
+function setup_files {
 	# get source files
 	SRCS=($SRCDIR/**/*.'cpp'(.N))
 	# get all directories hierarchy in incdir
 	INCLUDES=($INCDIR/**/*(/N) $INCDIR)
 
-	if [[ $BUILD_MODE == 'test' ]]; then
+	if [[ $MODE == 'test' ]]; then
 		# get all directories hierarchy in incdir
 		INCLUDES+=($TSTINC/**/*(/N) $TSTINC)
 		if [[ $TEST == 'all' ]]; then
@@ -630,16 +647,6 @@ function setup_files() {
 
 
 
-# -- B A N N E R --------------------------------------------------------------
-
-function banner() {
-	echo $COLOR$BANNER$RESET
-}
-
-function target_info() {
-	echo $COLOR$scriptname$RESET \
-		'launching' '['$COLOR${1##*/}$RESET']' 'build'
-}
 
 
 function handle_argument {
@@ -649,36 +656,66 @@ function handle_argument {
 	fi
 
 	# switch argument
-	case $ARGUMENT in
+	case $ARGUMENTS[1]; in
+
+		'release')
+			echo 'MODE=release' > $SETUP
+			;;
+
+		'test')
+			make_silent_clean
+			echo 'in test condition'
+			echo 'MODE=test'    > $SETUP
+			(($ARG_COUNT == 2)) && echo 'TEST='$ARGUMENTS[2] >> $SETUP
+			;;
+
+		'install')
+			echo 'MODE=install' > $SETUP
+			;;
 
 		'rm')
 			target_info 'rm'
 			make_clean
 			exit 0
 			;;
-		'release')
-			make_clean
-			echo 'BUILD_MODE=release' > $SETUP
-			;;
-		'test')
-			make_clean
-			echo 'BUILD_MODE=test'    > $SETUP
-			;;
-		'install')
-			make_clean
-			echo 'BUILD_MODE=install' > $SETUP
-			;;
+
 		*)
-			echo 'unknown argument:' $COLOR$ARGUMENT$RESET'\n'
+			echo 'unknown argument:' $COLOR$ARGUMENTS[1]$RESET'\n'
 			exit 1
 			;;
 	esac
 
+
+}
+
+function setup_mode {
+
+	# check for .setup file
+	if [[ ! -f $SETUP ]]; then
+		make_silent_clean
+		echo 'MODE=' > $SETUP
+	fi
+
+	# load .setup file
+	source $SETUP
+
+	if [[ -z $MODE ]]; then
+		require_build_mode
+	fi
+
+	if   [[ $MODE == 'test' ]] && [[ -z $TEST ]]; then
+		require_test_file
+
+	elif [[ $MODE == 'install' ]]; then
+		setup_install
+	fi
 }
 
 
-# main function
-function main() {
+
+# -- M A I N ------------------------------------------------------------------
+
+function main {
 
 	banner
 	check_os
@@ -688,15 +725,16 @@ function main() {
 
 	handle_argument
 
-	setup_build_mode
+	setup_mode
 	setup_files
 
 	# switch build mode
-	case $BUILD_MODE in
+	case $MODE in
 
 		'release')
 			target_info $STATIC
 			compile
+			database
 			linkage $STATIC make_static
 			;;
 		'test')
@@ -716,7 +754,7 @@ function main() {
 	esac
 
 	echo $SEPARATOR
-	echo '💫' "[$BUILD_MODE]" 'All targets are up to date !\n';
+	echo '💫' "[$MODE]" 'All targets are up to date !\n';
 }
 
 
