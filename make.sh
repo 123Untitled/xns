@@ -114,8 +114,9 @@ LOCK=$BLDDIR'/.lock'
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-CXX='/opt/homebrew/Cellar/llvm/17.0.2/bin/clang++'
-#CXX='clang++'
+#CXX='/opt/homebrew/Cellar/llvm/17.0.2/bin/clang++'
+CXX='clang++'
+#CXX='g++'
 
 # archiver
 ARCHIVER='ar'
@@ -308,8 +309,8 @@ function repository {
 # -- I M P L E M E N T A T I O N ----------------------------------------------
 
 function description {
-	# regex to match description
-	if [[ $(file $1) =~ '.*: (.*)' ]]; then
+	# regex to match description keep all before first comma
+	if [[ $(file $1) =~ '.*: ([^,]+).*' ]]; then
 		# print separator
 		echo $SEPARATOR$SUCCESS'[+]'$RESET ${1##*/} '|' ${match[1]}
 	fi
@@ -319,7 +320,7 @@ function make_clean {
 	# remove all targets
 	DELETED=$(rm -rfv $EXECUTABLE $STATIC $BLDDIR $CACHEDIR $DATABASE $SETUP | wc -l)
 	# print full cleaned message
-	echo $SEPARATOR$COLOR'[⏺]'$RESET 'full cleaned ('${DELETED##* } 'files)\n';
+	echo $SEPARATOR$COLOR'[x]'$RESET 'full cleaned ('${DELETED##* } 'files)\n';
 }
 
 function make_silent_clean {
@@ -380,11 +381,12 @@ function handle_compilation {
 	if check_dependency $OBJ $DEP; then
 
 		# increment compiled files counter
-		flock -x $LOCK
-		local COUNT=$(<$COMPILED)
-		((++COUNT))
-		echo $COUNT > $COMPILED
-		flock -u $LOCK
+		#flock -x $LOCK
+		#local COUNT=$(<$COMPILED)
+		#((++COUNT))
+		#echo $COUNT > $COMPILED
+		#flock -u $LOCK
+		echo '*' >> $COMPILED
 
 		# compile source file
 		$CXX $STD $OPT $DEBUG $CXXFLAGS $DEFINES $INCLUDES \
@@ -453,9 +455,9 @@ function compile {
 	# create build directories
 	mkdir -p $OBJDIR $DEPDIR $JSNDIR $LOGDIR
 
+	rm -rf $COMPILED
+	touch $COMPILED
 
-	echo 0 > $COMPILED
-	touch $LOCK
 	# array of pids
 	PIDS=()
 
@@ -474,14 +476,15 @@ function compile {
 		if [[ $? -ne 0 ]]; then
 			wait
 			echo '\n'$SEPARATOR
-			handle_errors
+			cat $LOGDIR/*.log
+			#handle_errors
 			exit 1
 		fi
 	done
 
 	# get number of compiled files
-	local COUNT=$(<$COMPILED)
-
+	local COUNT=$(cat $COMPILED | wc -l)
+	#
 	if [[ $COUNT -eq 0 ]]; then
 		echo $COLOR'[✓]'$RESET 'nothing to compile.'
 	else
@@ -664,7 +667,6 @@ function handle_argument {
 
 		'test')
 			make_silent_clean
-			echo 'in test condition'
 			echo 'MODE=test'    > $SETUP
 			(($ARG_COUNT == 2)) && echo 'TEST='$ARGUMENTS[2] >> $SETUP
 			;;
