@@ -10,7 +10,7 @@
 #if defined(XNS_APPLE)
 	#include <sys/dir.h>
 // linux headers
-#elif defined(LINUX_OS)
+#elif defined(XNS_LINUX)
 	#include <dirent.h>
 #endif
 
