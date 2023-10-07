@@ -12,9 +12,6 @@
 // c++ standard library headers
 #include <iostream>
 
-// simd headers
-#include <arm_neon.h>
-
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
