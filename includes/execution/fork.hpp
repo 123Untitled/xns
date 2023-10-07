@@ -9,7 +9,7 @@
 // operating system headers
 #include <unistd.h>
 #include <sys/wait.h>
-#include <sys/errno.h>
+#include <errno.h>
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
