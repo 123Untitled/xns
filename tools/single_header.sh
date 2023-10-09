@@ -156,22 +156,28 @@ function generate_single_header {
 		# get content of header file
 		local CONTENT=($(<$HEADER))
 
-		# loop over all lines (skip two first lines (include guards) and last line (#endif))
-		for ((I = 3; I < $#CONTENT; ++I)); do
-
-			# skip comments
-			if [[ $CONTENT[$I] =~ '^[[:space:]]*//.*' ]]; then
-				continue
+		for L in $CONTENT; do
+			if [[ $L =~ $REGEX ]]; then
+				OUTPUT+=$L$'\n'
 			fi
-			if [[ $CONTENT[$I] =~ '^[[:space:]]*/\*.*\*/[[:space:]]*$' ]]; then
-				continue
-			fi
-
-			if [[ ! $CONTENT[$I] =~ $REGEX ]]; then
-				OUTPUT+=$CONTENT[$I]$'\n'
-			fi
-
 		done
+
+		# loop over all lines (skip two first lines (include guards) and last line (#endif))
+		#for ((I = 3; I < $#CONTENT; ++I)); do
+		#
+		#	# skip comments
+		#	if [[ $CONTENT[$I] =~ '^[[:space:]]*//.*' ]]; then
+		#		continue
+		#	fi
+		#	if [[ $CONTENT[$I] =~ '^[[:space:]]*/\*.*\*/[[:space:]]*$' ]]; then
+		#		continue
+		#	fi
+		#
+		#	if [[ ! $CONTENT[$I] =~ $REGEX ]]; then
+		#		OUTPUT+=$CONTENT[$I]$'\n'
+		#	fi
+		#
+		#done
 	done
 	# add include guard
 	echo -E '#ifndef XNS_SINGLE_HEADER' > $OUTFILE
