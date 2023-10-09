@@ -2,6 +2,7 @@
 #include "exceptions.hpp"
 #include <iostream>
 
+// launch all tests 🚀
 
 #if defined(XNS_TEST_ALL)
 int main(const int ac, const char** av) {
