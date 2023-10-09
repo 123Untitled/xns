@@ -528,13 +528,13 @@ static auto benchmark(void) {
 	xns::benchmark<5> bench;
 
 
-	bench.run("sso::string", [&] {
-		xns::sso_string<char> s;
-		for (xns::size_t i = 0; i < N; ++i) {
-			s.push_back(xns::random::integral<char>());
-		}
-		check_sum += s.size();
-	});
+	//bench.run("sso::string", [&] {
+	//	xns::sso_string<char> s;
+	//	for (xns::size_t i = 0; i < N; ++i) {
+	//		s.push_back(xns::random::integral<char>());
+	//	}
+	//	check_sum += s.size();
+	//});
 
 	bench.run("xns::string", [&] {
 		xns::string s;
