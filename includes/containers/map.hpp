@@ -9,7 +9,6 @@
 #include "literal_map.hpp"
 #include "tuple.hpp"
 #include "is_comparable.hpp"
-#include "to_string.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

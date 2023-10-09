@@ -8,7 +8,6 @@
 #include "types.hpp"
 #include "string.hpp"
 #include "string_literal.hpp"
-#include "to_string.hpp"
 #include "is_floating.hpp"
 
 // operating system headers
