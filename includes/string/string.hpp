@@ -7,7 +7,6 @@
 #include <unistd.h>
 
 // local includes
-#include "policy.hpp"
 #include "types.hpp"
 #include "move.hpp"
 #include "is_char.hpp"
@@ -35,6 +34,11 @@
 
 // strncmp
 #include <cstring>
+
+
+
+
+
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -75,13 +79,13 @@ namespace xns {
 	using wstring   = basic_string<wchar_t>;
 
 	/* utf-8 string type */
-	using u8string   = basic_string<char8_t>;
+	using u8string  = basic_string<char8_t>;
 
 	/* utf-16 string type */
-	using u16string  = basic_string<char16_t>;
+	using u16string = basic_string<char16_t>;
 
 	/* utf-32 string type */
-	using u32string  = basic_string<char32_t>;
+	using u32string = basic_string<char32_t>;
 
 
 	// -- I S  S T R I N G  ---------------------------------------------------
@@ -116,171 +120,20 @@ namespace xns {
 		return x;
 	}
 
-	/* string class */
-	template <typename T>
-	class sso_string {
 
 
-		// -- assertions ------------------------------------------------------
-
-		/* check if T is a character type */
-		static_assert(xns::is_char<T>,
-				"): BASIC STRING REQUIRES A CHARACTER TYPE :(");
-
-
-		public:
-
-
-
-			// -- public types ------------------------------------------------
-
-			/* character type */
-			using char_t      = xns::remove_cvr<T>;
-
-			/* self type */
-			using self        = sso_string<T>;
-
-			/* size type */
-			using size_type   = xns::size_t;
-
-			/* comparison type */
-			using signed_type = xns::s64;
-
-			/* pointer type */
-			using mut_ptr     = char_t*;
-
-			/* reference type */
-			using mut_ref     = char_t&;
-
-			/* move reference type */
-			using move_ref    = char_t&&;
-
-			/* const reference type */
-			using const_ref   = const char_t&;
-
-			/* const pointer type */
-			using const_ptr   = const char_t*;
-
-			/* allocator type */
-			using allocator   = xns::allocator<char_t>;
-
-			/* string view type */
-			using view        = xns::basic_string_view<char_t>;
-
-			/* iterator type */
-			using iterator    = xns::basic_string_iterator<char_t, false>;
-
-			/* const iterator type */
-			using const_iterator = xns::basic_string_iterator<char_t, true>;
-
-
-		private:
-
-			// -- private members ---------------------------------------------
-
-
-			/* big string */
-			struct big final {
-				mut_ptr   data;
-				size_type size;
-				size_type capacity : (sizeof(size_type) * XNS_CHAR_BIT) - 1;
-				size_type is_small : 1;
-			};
-
-			/* default capacity */
-			enum : size_type {
-				SSO_CAPACITY  = (sizeof(big) / sizeof(char_t)) - 1
-			};
-
-			/* small string */
-			struct small final {
-				char_t data[SSO_CAPACITY];
-				size_type available : (sizeof(char_t) * XNS_CHAR_BIT) - 1;
-				size_type is_small : 1;
-			};
-
-			/* sso union */
-			union sso final {
-				big   _big;
-				small _small;
-			};
-
-			/* sso string */
-			self::sso _sso;
-
-
-		public:
-
-			sso_string(void)
-			: _sso{._small{{0}, SSO_CAPACITY, 1}} {}
-
-			~sso_string(void) {
-				if (not is_small()) {
-					delete[] _sso._big.data;
-				}
-			}
-
-			auto is_small(void) const -> bool {
-				// extract least significant byte
-				return _sso._small.is_small;
-			}
-
-			xns::size_t available(void) const {
-				return is_small() ? _sso._small.available : _sso._big.capacity - _sso._big.size;
-			}
-
-			xns::size_t capacity(void) const {
-				return is_small() ? SSO_CAPACITY : _sso._big.capacity;
-			}
-
-			xns::size_t size(void) const {
-				return is_small() ? SSO_CAPACITY - _sso._small.available : _sso._big.size;
-			}
-
-			void push_back(T c) {
-				if (is_small()) {
-					// std::cout << "\x1b[32msmall pushing: " << (char)c << "\x1b[0m\n";
-
-						_sso._small.data[size()] = c;
-						--_sso._small.available;
-						_sso._small.data[size()] = 0;
-
-					if (_sso._small.available == 0) {
-						// std::cout << "DYNAMIC ALLOCATION\n";
-						char_t* data = new char_t[SSO_CAPACITY * 2];
-						xns::memcpy(data, _sso._small.data, SSO_CAPACITY);
-						_sso._big.data = data;
-						_sso._big.size = SSO_CAPACITY;
-						_sso._big.capacity = SSO_CAPACITY * 2;
-					}
-				}
-				else {
-					// std::cout << "\x1b[31mbig pushing: " << (char)c << "\x1b[0m\n";
-					if (_sso._big.size == _sso._big.capacity) {
-						// std::cout << "REALLOCATION\n";
-						char_t* data = new char_t[_sso._big.capacity * 2];
-						xns::memcpy(data, _sso._big.data, _sso._big.size);
-						data[_sso._big.size] = c;
-						delete[] _sso._big.data;
-						_sso._big.data = data;
-						++_sso._big.size;
-						_sso._big.capacity *= 2;
-					}
-					else {
-						_sso._big.data[_sso._big.size] = c;
-						++_sso._big.size;
-					}
-				}
-			}
-
-
-	};
 
 	// -- B A S I C  S T R I N G ----------------------------------------------
 
 	/* string class */
 	template <typename T>
 	class basic_string {
+
+
+		// -- friends -----------------------------------------------------
+
+		/* output stream operator as friend */
+		friend std::ostream& operator<<(std::ostream& os, const xns::basic_string<char>& string);
 
 
 		// -- assertions ------------------------------------------------------
@@ -1497,22 +1350,159 @@ namespace xns {
 
 
 
-			// -- friends -----------------------------------------------------
+			/* to basic string (signed integer) */
+			template <typename U>
+			static auto to_basic_string(const U& vlue) -> xns::basic_string<char_t>
+				// requirements
+				requires(xns::is_signed_integral<U>) {
 
-			/* output stream operator as friend */
-			friend std::ostream& operator<<(std::ostream& os, const xns::basic_string<char>& string);
+				U value = vlue;
+				self str;
 
-			/* to_basic_string as friend */
-			template <typename C, typename U>
-			friend auto to_basic_string(const U&) -> xns::basic_string<C>;
+				str.reserve(xns::limits::digits<U>() + 1); // INFO: +1 for negative sign
 
-			/* to_basic_string (signed integral) as friend */
-			template <typename C, typename U>
-			friend auto to_basic_string(const U&) -> xns::basic_string<C> requires(xns::is_signed_integral<U>);
+				constexpr U type_min = xns::limits::min<U>();
 
-			/* to_basic_string (unsigned integral) as friend */
-			template <typename C, typename U>
-			friend auto to_basic_string(const U&) -> xns::basic_string<C> requires(xns::is_unsigned_integral<U>);
+				U base = 10;
+
+				bool negative = false;
+
+				size_type x = 0;
+
+				// check negative
+				if (value < 0) {
+					// set negative flag
+					negative = true;
+
+					if (value == type_min) {
+						// INFO: this is a special case
+					}
+					else {
+						// inverse number
+						value = -value;
+					}
+				}
+
+				do {
+					U rem = value % base;
+					//_str[x] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
+					str._str[x] = (value % 10) + '0';
+					++x;
+				} while ((value /= base));
+
+				if (negative) { str._str[x++] = '-'; }
+
+				str.null_terminator(x);
+				// reverse all characters
+				str.reverse();
+
+				return str;
+			}
+
+
+		/* to basic string (unsigned integer) */
+		template <typename U>
+		static auto to_basic_string(const U& num) -> xns::basic_string<char_t>
+
+			// requirements
+			requires(xns::is_unsigned_integral<U>) {
+
+			U number = num;
+
+			self str;
+
+			constexpr size_type size = xns::limits::digits<T>();
+
+			str._str = str.allocate(size);
+			str._capacity = size;
+
+			// declare iterator
+			size_type x = 0;
+
+			// loop through number
+			do {
+				str._str[x] = (number % 10) + '0';
+				number /= 10;
+				++x;
+			} while (number);
+
+			str._str[x] = static_cast<U>(0);
+			str._size = x;
+
+			// reverse all characters
+			str.reverse();
+
+			return str;
+		}
+
+
+		template <typename I>
+		static bool to_integer(const self& str, I& value) requires(xns::is_integral<I>) {
+
+			/* integer type */
+			using integer       = xns::remove_cvr<I>;
+
+			// index
+			size_type x = 0;
+			// negative flag
+			int negative = 1;
+			// reset value
+			value = 0;
+
+			// skip leading whitespace
+			while (x < str.size()
+				&& xns::basic_string<char_t>::is_whitespace(str[x])) {
+				++x;
+			}
+
+			// check for sign
+			if      (str[x] == '+') { ++x;                }
+			else if (str[x] == '-') { ++x; negative = -1; }
+
+			// check for required sign
+			if constexpr (!xns::is_signed<I>) {
+				if (negative < 0) { value = 0;
+					return false;
+				}
+			}
+
+			const constexpr integer max = xns::limits::max<integer>();
+
+			// loop through digits
+			while (x < str.size() && self::is_digit(str[x])) {
+
+
+				integer add = (str[x] - '0');
+
+				// check for overflow
+				integer test = (max - add) / 10;
+
+				if (value > test) {
+					value = negative > 0 ? max : xns::limits::min<integer>();
+					return false;
+				}
+
+				// multiply by 10 and add digit
+				value = (value * 10) + add;
+
+				++x;
+			}
+
+			// skip trailing whitespace
+			while (x < str.size() && self::is_whitespace(str[x])) { ++x; }
+
+			if (x < str.size()) {
+				value = 0;
+				return false;
+			}
+
+			if constexpr (xns::is_signed<I>) {
+				value *= negative;
+			}
+
+			return true;
+		}
+
 
 
 	};
@@ -1522,6 +1512,37 @@ namespace xns {
 	/* deduction guide for null-terminated constructor */
 	template <typename T>
 	basic_string(const T*) -> basic_string<T>;
+
+
+	/* to c-string ascii */
+	template <typename T>
+	inline auto to_string(const T& value) -> xns::string {
+		return xns::string::to_basic_string<T>(value);
+	}
+
+	/* to wide string */
+	template <typename T>
+	inline auto to_wstring(const T& value) -> xns::wstring {
+		return xns::wstring::to_basic_string<T>(value);
+	}
+
+	/* to utf-8 string */
+	template <typename T>
+	inline auto to_u8string(const T& value) -> xns::u8string {
+		return xns::u8string::to_basic_string<T>(value);
+	}
+
+	/* to utf-16 string */
+	template <typename T>
+	inline auto to_u16string(const T& value) -> xns::u16string {
+		return xns::u16string::to_basic_string<T>(value);
+	}
+
+	/* to utf-32 string */
+	template <typename T>
+	inline auto to_u32string(const T& value) -> xns::u32string {
+		return xns::u32string::to_basic_string<T>(value);
+	}
 
 
 
@@ -1571,6 +1592,7 @@ namespace xns {
 
 
 
+
 	// -- <<  O P E R A T O R  ------------------------------------------------
 
 	/* output stream operator */
@@ -1583,13 +1605,6 @@ namespace xns {
 			else { os.write("nullptr", 7); }
 		return os;
 	}
-
-
-
-
-
-
-
 
 
 
@@ -2688,3 +2703,163 @@ namespace xns {
 
 
 #endif
+
+	///* string class */
+	//template <typename T>
+	//class sso_string {
+	//
+	//
+	//	// -- assertions ------------------------------------------------------
+	//
+	//	/* check if T is a character type */
+	//	static_assert(xns::is_char<T>,
+	//			"): BASIC STRING REQUIRES A CHARACTER TYPE :(");
+	//
+	//
+	//	public:
+	//
+	//
+	//
+	//		// -- public types ------------------------------------------------
+	//
+	//		/* character type */
+	//		using char_t      = xns::remove_cvr<T>;
+	//
+	//		/* self type */
+	//		using self        = sso_string<T>;
+	//
+	//		/* size type */
+	//		using size_type   = xns::size_t;
+	//
+	//		/* comparison type */
+	//		using signed_type = xns::s64;
+	//
+	//		/* pointer type */
+	//		using mut_ptr     = char_t*;
+	//
+	//		/* reference type */
+	//		using mut_ref     = char_t&;
+	//
+	//		/* move reference type */
+	//		using move_ref    = char_t&&;
+	//
+	//		/* const reference type */
+	//		using const_ref   = const char_t&;
+	//
+	//		/* const pointer type */
+	//		using const_ptr   = const char_t*;
+	//
+	//		/* allocator type */
+	//		using allocator   = xns::allocator<char_t>;
+	//
+	//		/* string view type */
+	//		using view        = xns::basic_string_view<char_t>;
+	//
+	//		/* iterator type */
+	//		using iterator    = xns::basic_string_iterator<char_t, false>;
+	//
+	//		/* const iterator type */
+	//		using const_iterator = xns::basic_string_iterator<char_t, true>;
+	//
+	//
+	//	private:
+	//
+	//		// -- private members ---------------------------------------------
+	//
+	//
+	//		/* big string */
+	//		struct big final {
+	//			mut_ptr   data;
+	//			size_type size;
+	//			size_type capacity : (sizeof(size_type) * XNS_CHAR_BIT) - 1;
+	//			size_type is_small : 1;
+	//		};
+	//
+	//		/* default capacity */
+	//		enum : size_type {
+	//			SSO_CAPACITY  = (sizeof(big) / sizeof(char_t)) - 1
+	//		};
+	//
+	//		/* small string */
+	//		struct small final {
+	//			char_t data[SSO_CAPACITY];
+	//			size_type available : (sizeof(char_t) * XNS_CHAR_BIT) - 1;
+	//			size_type is_small : 1;
+	//		};
+	//
+	//		/* sso union */
+	//		union sso final {
+	//			big   _big;
+	//			small _small;
+	//		};
+	//
+	//		/* sso string */
+	//		self::sso _sso;
+	//
+	//
+	//	public:
+	//
+	//		sso_string(void)
+	//		: _sso{._small{{0}, SSO_CAPACITY, 1}} {}
+	//
+	//		~sso_string(void) {
+	//			if (not is_small()) {
+	//				delete[] _sso._big.data;
+	//			}
+	//		}
+	//
+	//		auto is_small(void) const -> bool {
+	//			// extract least significant byte
+	//			return _sso._small.is_small;
+	//		}
+	//
+	//		xns::size_t available(void) const {
+	//			return is_small() ? _sso._small.available : _sso._big.capacity - _sso._big.size;
+	//		}
+	//
+	//		xns::size_t capacity(void) const {
+	//			return is_small() ? SSO_CAPACITY : _sso._big.capacity;
+	//		}
+	//
+	//		xns::size_t size(void) const {
+	//			return is_small() ? SSO_CAPACITY - _sso._small.available : _sso._big.size;
+	//		}
+	//
+	//		void push_back(T c) {
+	//			if (is_small()) {
+	//				// std::cout << "\x1b[32msmall pushing: " << (char)c << "\x1b[0m\n";
+	//
+	//					_sso._small.data[size()] = c;
+	//					--_sso._small.available;
+	//					_sso._small.data[size()] = 0;
+	//
+	//				if (_sso._small.available == 0) {
+	//					// std::cout << "DYNAMIC ALLOCATION\n";
+	//					char_t* data = new char_t[SSO_CAPACITY * 2];
+	//					xns::memcpy(data, _sso._small.data, SSO_CAPACITY);
+	//					_sso._big.data = data;
+	//					_sso._big.size = SSO_CAPACITY;
+	//					_sso._big.capacity = SSO_CAPACITY * 2;
+	//				}
+	//			}
+	//			else {
+	//				// std::cout << "\x1b[31mbig pushing: " << (char)c << "\x1b[0m\n";
+	//				if (_sso._big.size == _sso._big.capacity) {
+	//					// std::cout << "REALLOCATION\n";
+	//					char_t* data = new char_t[_sso._big.capacity * 2];
+	//					xns::memcpy(data, _sso._big.data, _sso._big.size);
+	//					data[_sso._big.size] = c;
+	//					delete[] _sso._big.data;
+	//					_sso._big.data = data;
+	//					++_sso._big.size;
+	//					_sso._big.capacity *= 2;
+	//				}
+	//				else {
+	//					_sso._big.data[_sso._big.size] = c;
+	//					++_sso._big.size;
+	//				}
+	//			}
+	//		}
+	//
+	//
+	//};
