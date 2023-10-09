@@ -17,6 +17,15 @@
 #include <sstream>
 
 
+struct flush final {
+	non_instanciable(flush);
+};
+
+struct buffered final {
+	non_instanciable(buffered);
+};
+
+
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
@@ -34,7 +43,7 @@ namespace xns {
 			out(void);
 
 			/* non-assignable class */
-			NON_ASSIGNABLE(out);
+			non_assignable(out);
 
 
 		public:
@@ -159,6 +168,7 @@ namespace xns {
 	};
 
 
+
 	template <typename... A>
 	auto print(const A&... args) -> void {
 		// write each argument
@@ -175,6 +185,20 @@ namespace xns {
 		out._buffer.append('\n');
 	}
 
+	template <typename T, typename... A> requires (xns::is_same<T, flush> || xns::is_same<T, buffered>)
+	auto println(const A&... args) -> void {
+		// write each argument
+		(out::write(args), ...);
+		// get out instance
+		auto& out = out::_instance;
+		// append new line
+		out._buffer.append('\n');
+
+		if constexpr (xns::is_same<T, flush>) {
+			// render buffer
+			out::render();
+		}
+	}
 
 
 }
