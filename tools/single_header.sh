@@ -3,26 +3,28 @@
 # This script is used to generate a single header file for xns library.
 
 
-# main color
+
+# -- C O L O S  ---------------------------------------------------------------
+
 SUCCESS='\x1b[32m'
 ERROR='\x1b[31m'
 RESET='\x1b[0m'
 ERASE='\x1b[1F\x1b[0J'
 
 
+CXX='clang++'
 
 # -- C H E C K  R E Q U I R E D  P R O G R A M S ------------------------------
 
 # required programs
-programs=('shasum' 'mkdir')
-#'clang++' 'tsort')
+PROGRAMS=('mkdir' 'tsort' $CXX 'tsort' 'openssl')
+
 # loop through all required commands
-for cmd in $programs; do
+for CMD in $PROGRAMS; do
 	# check if command is installed
-	if [[ -z "$(command -v $cmd)" ]]; then
+	if [[ -z "$(command -v $CMD)" ]]; then
 		# print error message
-		echo $color'Error:'$reset 'required program' \
-			$color''$cmd''$reset 'is not installed.'
+		echo 'error:' $ERROR$CMD$RESET 'is not installed.'
 		# exit script
 		exit 1
 	fi
@@ -30,184 +32,152 @@ done
 
 
 
-# -- G E T  A L L  H E A D E R  F I L E S -------------------------------------
 
+# -- H E A D E R  F I L E S ----------------------------------------------------
 
 # output directory
-OUT_DIR='xns'
+OUTDIR='xns'
+
+# temporary directory
+TMPDIR=$OUTDIR'/'$(openssl rand -hex 8)
 
 # output file
-OUT_FILE=$OUT_DIR'/xns.hpp'
+OUTFILE=$OUTDIR'/xns.hpp'
 
 # get all subdirectories in inc
-INC_DIRS=('includes'/**/*(/N) 'includes')
+INCDIRS=('includes/'**'/'*(/N) 'includes')
 
 # get all header files in inc
-HEADERS=('includes'/**/*.'hpp'(.N))
+HEADERS=('includes/'**'/'*'.hpp'(.N))
 
-INCLUDES=()
 # add -I flag for each header file
-for HEADER in $INC_DIRS; do
-	INCLUDES+=("-I$HEADER")
+INCLUDES=()
+for SUB in $INCDIRS; do
+	INCLUDES+=('-I'$SUB)
 done
 
+JOBS=8
+SORTED=()
 
-
-mkdir -p $OUT_DIR
-
-# -- P R E P R O C E S S  H E A D E R  F I L E S ------------------------------
-
-
-FORMATED=
+mkdir -p $TMPDIR
 
 
 
+function get_dependencies {
 
-function parse {
-
-	local FILE=$1
-	local CONTENT=$(clang++ $INCLUDES $FILE -MT $FILE -MM)
-
+	#local FILE=$(openssl md5 <<< $1)'.shd'
+	# get basename
+	local FILE=${1##*/}'.shd'
+	# set IFS to newline, tab and space + backslash
+	IFS=$'\n\t \\'
 	# split content into array
-	local WORDS=(${=CONTENT})
+	local WORDS=($($CXX $INCLUDES $1 -MT $1 -MM))
+	# reset default IFS
+	IFS=$' \t\n'
 
-	local HEADER=
+	# get first word and remove last character ':'
+	local TARGET=${WORDS[1]:0:-1}
+
 	# loop over array
-	for W in $WORDS; do
-		# get header file name
-		if [[ $W == *":" ]]; then
-			HEADER=${W:0:-1}
-		elif ! [[ $W == *"\\" ]]; then
-			FORMATED+=$HEADER' '$W'\n'
-		fi
+	for ((I=2; I <= $#WORDS; ++I)); do
+		echo $TARGET $WORDS[$I] >> $TMPDIR'/'$FILE
 	done
 }
 
 
+function launch_dependencies {
 
-ANIM=('-' '\' '|' '/')
-I=1
-# disable cursor
-echo -n '\x1b[?25l'
-echo -n 'Generating single header '
+	local -i RUNNING=0
+	local -i TOTAL=$#HEADERS
+	local -i COMPLETED=0
 
-for HEADER in $HEADERS; do
-	# print animation
-	echo -n '['${ANIM[$I]}']'
-	# move cursor right 3 characters
-	echo -n '\x1b[3D'
-	# increment animation index
-	((++I))
-	[[ $I -eq 5 ]] && I=1
-	parse $HEADER
-done
-# enable cursor
-echo -n '\x1b[?25h'
+	for HEADER in $HEADERS; do
+		get_dependencies $HEADER &
 
-echo '['$SUCCESS'ok'$RESET']'
+		((++RUNNING))
+		((++COMPLETED))
 
-
-# get tsort stdout and stderr in one variable without printing
-TSORTED=$(echo $FORMATED | tsort 2>&1)
+		if [[ $RUNNING -eq $JOBS ]]; then
+			wait
+			RUNNING=0
+			PERCENT=$((COMPLETED*100/TOTAL))
+			echo -n '\rdependencies resolved:' $PERCENT'%'
+		fi
+	done
+	wait
+	echo '\rdependencies resolved: \x1b[32m100%\x1b[0m'
+}
 
 
-# check if tsort failed
-if [[ $? -ne 0 ]]; then
-	# print error message
-	echo $error'Error:'$reset 'failed to sort header files.'
-	exit 1
-fi
 
-# check regex patter 'tsort: cycle in data'
-if [[ $TSORTED =~ 'tsort: cycle in data' ]]; then
-	# print error message
-	echo $error'Error:'$reset 'cyclic dependency in header files.'
-	exit 1
-fi
+# use tsort to topologically sort header files
+function topological_sort {
 
+	local DEPS=($TMPDIR'/'*'.shd')
+	local FORMATED=()
 
-# zsh split string into lines
-lines=(${(@f)TSORTED})
-
-FINAL=()
-# reverse order of lines
-for ((i = $#lines; i > 0; --i)); do
-	# add line to variable
-	FINAL+=($lines[$i])
-done
-
-
-# -- G E N E R A T E  S I N G L E  H E A D E R --------------------------------
-
-
-# system header associative array
-typeset -A INC_SYSTEM
-
-# loop over all header files
-for HEADER in $FINAL; do
-
-	local CONTENT=$(<$HEADER)
-
-	# check if header file includes system header
-	while [[ $CONTENT =~ '(#[[:space:]]*include[[:space:]]*<([^>]*)>)' ]]; do
-		INC_SYSTEM[${match[2]}]=1
-		# add header to system array
-		CONTENT=${CONTENT/$match[1]/}
+	IFS=$'\n'
+	# concatenate all dependencies
+	for DEP in $DEPS; do
+		FORMATED+=($(<$DEP))
 	done
 
-done
+	local OUTPUT=($(tsort -q <<< $FORMATED))
 
+	IFS=$' \t\n'
+
+	[[ $? -ne 0 ]] && echo 'error: tsort failed.' && exit 1
+
+	# reverse order of lines
+	for ((I = $#OUTPUT; I > 0; --I)); do
+		# add line to variable
+		SORTED+=($OUTPUT[$I])
+	done
+
+}
 
 
 # -- G E N E R A T E  S I N G L E  H E A D E R --------------------------------
 
+function generate_single_header {
 
-
-OUT=''
-
-
-
-
-function generate_file2 {
-
+	local OUTPUT=''
+ 	# regex to match local header
+	local REGEX='^[[:space:]]*#[[:space:]]*include[[:space:]]*".*"'
+	IFS=$'\n'
 	# loop over all header files
-	for HEADER in $FINAL; do
+	for HEADER in $SORTED; do
 
-		# check if file exists
-		if ! [[ -f $HEADER ]]; then
-			continue
-		fi
-
-		# get file content
-		local CONTENT=$(<$HEADER)
-		# split by line
-		local STRIPE=(${(@f)CONTENT})
-
-		local REGEX='^[[:space:]]*#[[:space:]]*include[[:space:]]*".*"'
+		# remove comments
+		#CLEANED=$($CXX -fpch-preprocess $INCLUDES $HEADER)
 
 		# skip only local includes (e.g. #include "...")
-		for L in $STRIPE; do
-			if [[ $L =~ $REGEX ]]; then
-				continue;
-			else
-				OUT+=$L$'\n'
+		for L in $(<$HEADER); do
+			if [[ $L =~ '^[[:space:]]*//.*' ]]; then
+				continue
+			fi
+			if [[ $L =~ '^[[:space:]]*/\*.*\*/[[:space:]]*$' ]]; then
+				continue
+			fi
+			if [[ ! $L =~ $REGEX ]]; then
+				OUTPUT+=$L$'\n'
 			fi
 		done
-
 	done
+	# add include guard
+	echo -E '#ifndef XNS_SINGLE_HEADER' > $OUTFILE
+	echo -E '#define XNS_SINGLE_HEADER' >> $OUTFILE
+	echo -E $OUTPUT >> $OUTFILE
+	echo -E '#endif' >> $OUTFILE
 
+	rm -rf $TMPDIR
 
 }
 
-generate_file2
+launch_dependencies
+topological_sort
+generate_single_header
 
-# add include guard
-echo -E '#ifndef XNS_SINGLE_HEADER' > $OUT_FILE
-echo -E '#define XNS_SINGLE_HEADER' >> $OUT_FILE
-
-echo -E $OUT >> $OUT_FILE
-
-echo -E '#endif' >> $OUT_FILE
 
 exit 0
 
@@ -215,62 +185,26 @@ exit 0
 
 
 
-# remove all comments
-#preprocessed=$(clang++ -std=c++2a -E -P -dD -x c++ - <<< "$file")
+# -- G E N E R A T E  S I N G L E  H E A D E R --------------------------------
 
 
+function system_headers {
+	# system header associative array
+	typeset -A INC_SYSTEM
+	# regex to match system header
+	local REGEX='^[[:space:]]*#[[:space:]]*include[[:space:]]*<([^>]*)>'
+	# loop over all header files
+	for HEADER in $SORTED; do
 
-# # loop over all system headers
-# for HEADER in ${(k)INC_SYSTEM}; do
-# 	# add system header to output file
-# 	echo '#include <'$HEADER'>' >> $OUT_FILE
-# done
+		IFS=$'\n'
+		local CONTENT=$(<$HEADER)
 
-# echo -E $file >> $OUT_FILE
-
-# end include guard
-
-
-
+		for FLINE in $CONTENT; do
+			if [[ $FLINE =~ $REGEX ]]; then
+				INC_SYSTEM[${match[1]}]=1
+			fi
+		done
+	done
+}
 
 
-
-# function generate_file {
-#
-# 	file='namespace xns {'
-#
-# 	# loop over all header files
-# 	for header in $FINAL; do
-# 		# check if file exists
-# 		if ! [[ -f $header ]]; then
-# 			continue
-# 		fi
-#
-# 		local content=$(<$header)
-# 		# split by line
-# 		local lines=( ${(@f)content} )
-#
-# 	F=0
-# 		# loop over all lines
-# 		for line in $lines; do
-#
-# 			if [[ $F -eq 0 ]]; then
-# 				if [[ $line =~ '^[[:space:]]*namespace[[:space:]]*xns[[:space:]]*{' ]]; then
-# 					F=1
-# 				fi
-# 			else
-# 				if [[ $line =~ "^}" ]]; then
-# 					break
-# 				else
-# 					file+=$line$'\n'
-# 					#echo -E $line >> $output_tmp
-# 				fi
-# 			fi
-#
-# 		done
-#
-#
-# 	done
-#
-# 	file+='}'
-# }
