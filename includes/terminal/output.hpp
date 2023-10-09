@@ -146,6 +146,9 @@ namespace xns {
 			template <typename... A>
 			friend auto println(const A&... args) -> void;
 
+			template <typename T, typename... A> requires (xns::is_same<T, flush> || xns::is_same<T, buffered>)
+			friend auto println(const A&... args) -> void;
+
 
 			// -- P R I V A T E  E N U M S ------------------------------------
 
