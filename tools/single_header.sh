@@ -157,7 +157,7 @@ function generate_single_header {
 		local CONTENT=($(<$HEADER))
 
 		for L in $CONTENT; do
-			if [[ $L =~ $REGEX ]]; then
+			if [[ ! $L =~ $REGEX ]]; then
 				OUTPUT+=$L$'\n'
 			fi
 		done
