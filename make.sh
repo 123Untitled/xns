@@ -114,8 +114,10 @@ LOCK=$BLDDIR'/.lock'
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-#CXX='/opt/homebrew/Cellar/llvm/17.0.2/bin/clang++'
-CXX='clang++'
+CXX='/opt/homebrew/Cellar/llvm/17.0.2/bin/clang++'
+#CXX='clang++'
+#CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
+#CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/aarch64-apple-darwin22-g++-13'
 #CXX='g++'
 
 # archiver
@@ -380,16 +382,10 @@ function handle_compilation {
 	# check if source file is modified
 	if check_dependency $OBJ $DEP; then
 
-		# increment compiled files counter
-		#flock -x $LOCK
-		#local COUNT=$(<$COMPILED)
-		#((++COUNT))
-		#echo $COUNT > $COMPILED
-		#flock -u $LOCK
-		echo '*' >> $COMPILED
+		echo >> $COMPILED
 
 		# compile source file
-		$CXX $STD $OPT $DEBUG $CXXFLAGS $DEFINES $INCLUDES \
+		$CXX -v $STD $OPT $DEBUG $CXXFLAGS $DEFINES $INCLUDES \
 			-MJ $JSN -MT $OBJ -MMD -MF $DEP -c $FILE -o $OBJ 2> $LOG
 
 		# check if compilation failed
@@ -404,6 +400,11 @@ function handle_compilation {
 
 	exit 0
 
+}
+
+
+function compile_release {
+	$CXX $STD $FAST $CXXFLAGS $DEFINES $INCLUDES $FILE -o $OBJ
 }
 
 function handle_errors {
@@ -423,6 +424,8 @@ function handle_errors {
 			if [[ $LOGLINE =~ 'In file included from' ]]; then
 				continue
 			fi
+			echo $LOGLINE
+			continue
 
 
 			if [[ $LOGLINE =~ $REGEX ]]; then
@@ -455,8 +458,7 @@ function compile {
 	# create build directories
 	mkdir -p $OBJDIR $DEPDIR $JSNDIR $LOGDIR
 
-	rm -rf $COMPILED
-	touch $COMPILED
+	echo -n > $COMPILED
 
 	# array of pids
 	PIDS=()
@@ -476,14 +478,16 @@ function compile {
 		if [[ $? -ne 0 ]]; then
 			wait
 			echo '\n'$SEPARATOR
-			cat $LOGDIR/*.log
-			#handle_errors
+			#cat $LOGDIR/*.log
+			handle_errors
 			exit 1
 		fi
 	done
 
 	# get number of compiled files
 	local COUNT=$(cat $COMPILED | wc -l)
+	# strip leading spaces
+	COUNT=${COUNT##* }
 	#
 	if [[ $COUNT -eq 0 ]]; then
 		echo $COLOR'[✓]'$RESET 'nothing to compile.'
@@ -592,10 +596,13 @@ function require_test_file {
 
 
 
-function setup_install {
+function setup_release {
 	# check arguments
 	case $ARG_COUNT; in
 
+		0)
+			INSTALLDIR=$ABSDIR
+			;;
 		1)
 			INSTALLDIR=$ABSDIR
 			;;
@@ -603,13 +610,13 @@ function setup_install {
 			INSTALLDIR=$ARGUMENTS[2]
 			;;
 		*)
-			echo 'usage:' $COLOR$scriptname$RESET 'install [directory]\n'
+			echo 'usage:' $COLOR$scriptname$RESET 'release [directory]\n'
 			exit 1
 			;;
 	esac
 
 	[[ ! -d $INSTALLDIR ]] && \
-		echo 'install directory' $COLOR$INSTALLDIR$RESET 'does not exist.\n'; exit 1
+		(echo 'install directory' $COLOR$INSTALLDIR$RESET 'does not exist.\n'; exit 1)
 
 	INSTALLDIR+='/'$PROJECT
 }
@@ -671,10 +678,6 @@ function handle_argument {
 			(($ARG_COUNT == 2)) && echo 'TEST='$ARGUMENTS[2] >> $SETUP
 			;;
 
-		'install')
-			echo 'MODE=install' > $SETUP
-			;;
-
 		'rm')
 			target_info 'rm'
 			make_clean
@@ -682,7 +685,8 @@ function handle_argument {
 			;;
 
 		*)
-			echo 'unknown argument:' $COLOR$ARGUMENTS[1]$RESET'\n'
+			echo 'unknown argument:' \
+				$COLOR$ARGUMENTS[1]$RESET'\n'
 			exit 1
 			;;
 	esac
@@ -698,6 +702,7 @@ function setup_mode {
 		echo 'MODE=' > $SETUP
 	fi
 
+
 	# load .setup file
 	source $SETUP
 
@@ -708,8 +713,8 @@ function setup_mode {
 	if   [[ $MODE == 'test' ]] && [[ -z $TEST ]]; then
 		require_test_file
 
-	elif [[ $MODE == 'install' ]]; then
-		setup_install
+	elif [[ $MODE == 'release' ]]; then
+		setup_release
 	fi
 }
 
@@ -721,7 +726,7 @@ function main {
 
 	banner
 	check_os
-	required $CXX $ARCHIVER #$LEAKER
+	required $CXX $ARCHIVER
 	repository
 	initialize_separator
 
@@ -736,7 +741,6 @@ function main {
 		'release')
 			target_info $STATIC
 			compile
-			database
 			linkage $STATIC make_static
 			;;
 		'test')
@@ -744,11 +748,6 @@ function main {
 			compile
 			database
 			linkage $EXECUTABLE make_executable
-			;;
-		'install')
-			target_info 'install'
-			compile
-			linkage $STATIC make_static
 			;;
 		*)
 			exit 1
