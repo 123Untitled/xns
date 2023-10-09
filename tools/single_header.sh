@@ -113,21 +113,25 @@ function launch_dependencies {
 # use tsort to topologically sort header files
 function topological_sort {
 
+
 	local DEPS=($TMPDIR'/'*'.shd')
 	local FORMATED=()
 
 	IFS=$'\n'
+	echo 'merging dependencies...'
 	# concatenate all dependencies
 	for DEP in $DEPS; do
 		FORMATED+=($(<$DEP))
 	done
 
+	echo 'topological sorting...'
 	local OUTPUT=($(tsort -q <<< $FORMATED))
 
 	IFS=$' \t\n'
 
 	[[ $? -ne 0 ]] && echo 'error: tsort failed.' && exit 1
 
+	echo 'reversing order...'
 	# reverse order of lines
 	for ((I = $#OUTPUT; I > 0; --I)); do
 		# add line to variable
@@ -141,6 +145,7 @@ function topological_sort {
 
 function generate_single_header {
 
+ 	echo 'generating single header...'
 	local OUTPUT=''
  	# regex to match local header
 	local REGEX='^[[:space:]]*#[[:space:]]*include[[:space:]]*".*"'
@@ -148,20 +153,24 @@ function generate_single_header {
 	# loop over all header files
 	for HEADER in $SORTED; do
 
-		# remove comments
-		#CLEANED=$($CXX -fpch-preprocess $INCLUDES $HEADER)
+		# get content of header file
+		local CONTENT=($(<$HEADER))
 
-		# skip only local includes (e.g. #include "...")
-		for L in $(<$HEADER); do
-			if [[ $L =~ '^[[:space:]]*//.*' ]]; then
+		# loop over all lines (skip two first lines (include guards) and last line (#endif))
+		for ((I = 3; I < $#CONTENT; ++I)); do
+
+			# skip comments
+			if [[ $CONTENT[$I] =~ '^[[:space:]]*//.*' ]]; then
 				continue
 			fi
-			if [[ $L =~ '^[[:space:]]*/\*.*\*/[[:space:]]*$' ]]; then
+			if [[ $CONTENT[$I] =~ '^[[:space:]]*/\*.*\*/[[:space:]]*$' ]]; then
 				continue
 			fi
-			if [[ ! $L =~ $REGEX ]]; then
-				OUTPUT+=$L$'\n'
+
+			if [[ ! $CONTENT[$I] =~ $REGEX ]]; then
+				OUTPUT+=$CONTENT[$I]$'\n'
 			fi
+
 		done
 	done
 	# add include guard
@@ -171,6 +180,7 @@ function generate_single_header {
 	echo -E '#endif' >> $OUTFILE
 
 	rm -rf $TMPDIR
+	echo 'done.'
 
 }
 
