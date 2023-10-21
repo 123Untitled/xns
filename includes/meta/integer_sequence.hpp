@@ -2,10 +2,7 @@
 #define XNS_INTEGER_SEQUENCE_HEADER
 
 #include "is_integral.hpp"
-
-//#include "output.hpp"
-
-//#include <iostream>
+#include "types.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
