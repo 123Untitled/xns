@@ -42,7 +42,7 @@ OUTDIR='xns'
 TMPDIR=$OUTDIR'/'$(openssl rand -hex 8)
 
 # output file
-OUTFILE=$OUTDIR'/xns.hpp'
+OUTFILE=$OUTDIR'/xns'
 
 # get all subdirectories in inc
 INCDIRS=('includes/'**'/'*(/N) 'includes')
