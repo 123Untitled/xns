@@ -209,9 +209,9 @@ namespace xns {
 			/* enqueue */
 			template <typename U>
 			auto enqueue(U&& value) -> void {
-				// assert that U is same as value_type
-				static_assert(xns::is_same<xns::remove_cvr<U>, value_type>,
-						"): QUEUE: U MUST BE SAME AS T :(");
+				// assert that T is convertible from U
+				//static_assert(xns::is_same<xns::remove_cvr<U>, value_type>, // TODO: replace with is_convertible ?
+				//		"): QUEUE: U MUST BE SAME AS T :(");
 				// allocate node
 				node_pointer node = allocator::make(xns::forward<U>(value));
 				// link node
