@@ -57,11 +57,11 @@ namespace xns {
 			basic_string_literal(void) = delete;
 
 			/* array constructor */
-			template <typename U, xns::size_t M>
+			template <typename U, size_type M>
 			consteval basic_string_literal(const U (&str)[M]) noexcept
 			: _data{} {
 
-				for (xns::size_t x = 0; x < N; ++x) {
+				for (size_type x = 0; x < N; ++x) {
 					_data[x] = str[x];
 				}
 			}
@@ -119,7 +119,7 @@ namespace xns {
 			// -- public comparison operators ---------------------------------
 
 			/* equality operator */
-			template <xns::is_char U, xns::size_t M>
+			template <xns::is_char U, size_type M>
 			consteval bool operator==(const U (&other)[M]) const noexcept {
 				// check size
 				if (N != M) { return false; }
@@ -128,19 +128,19 @@ namespace xns {
 			}
 
 			/* inequality operator */
-			template <xns::is_char U, xns::size_t M>
+			template <xns::is_char U, size_type M>
 			consteval bool operator!=(const U (&other)[M]) const noexcept {
 				return not (*this == other);
 			}
 
 			/* equality operator */
-			template <typename U, xns::size_t M>
+			template <typename U, size_type M>
 			consteval bool operator==(const basic_string_literal<U, M>& other) const noexcept {
 				return *this == other._data;
 			}
 
 			/* inequality operator */
-			template <typename U, xns::size_t M>
+			template <typename U, size_type M>
 			consteval bool operator!=(const basic_string_literal<U, M>& other) const noexcept {
 				return not (*this == other._data);
 			}
@@ -151,14 +151,14 @@ namespace xns {
 			// -- comparison utility ------------------------------------------
 
 			/* compare */
-			template <xns::size_t I, xns::is_char U, xns::size_t M>
+			template <size_type I, xns::is_char U, size_type M>
 			consteval bool compare(const U (&other)[M]) const noexcept requires (I < N) {
 				// compare current character and recurse
 				return _data[I] == other[I] ? compare<I + 1>(other) : false;
 			}
 
 			/* compare, end of recursion */
-			template <xns::size_t I, xns::is_char U, xns::size_t M>
+			template <size_type I, xns::is_char U, size_type M>
 			consteval bool compare(const U (&other)[M]) const noexcept requires (I == N) {
 				// end of recursion
 				return true;
