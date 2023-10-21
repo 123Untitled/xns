@@ -59,11 +59,6 @@ namespace xns {
 			/* const pointer type */
 			using const_ptr  = const type*;
 
-
-		private:
-
-			// -- private types -----------------------------------------------
-
 			/* allocator type */
 			using allocator  = xns::memory::pool<type>;
 
