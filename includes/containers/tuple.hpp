@@ -230,11 +230,11 @@ namespace xns {
 		friend constexpr auto get(xns::tuple<T...>&&) noexcept -> U&&;
 
 		/* get constant tuple element reference as friend */
-		template< typename U, typename... T>
+		template <typename U, typename... T>
 		friend constexpr auto get(const xns::tuple<T...>&) noexcept -> const U&;
 
 		/* get constant tuple element rvalue reference as friend */
-		template< typename U, typename... T>
+		template <typename U, typename... T>
 		friend constexpr auto get(const xns::tuple<T...>&&) noexcept -> const U&&;
 
 	};
