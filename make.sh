@@ -385,7 +385,7 @@ function handle_compilation {
 		echo >> $COMPILED
 
 		# compile source file
-		$CXX -v $STD $OPT $DEBUG $CXXFLAGS $DEFINES $INCLUDES \
+		$CXX $STD $OPT $DEBUG $CXXFLAGS $DEFINES $INCLUDES \
 			-MJ $JSN -MT $OBJ -MMD -MF $DEP -c $FILE -o $OBJ 2> $LOG
 
 		# check if compilation failed
