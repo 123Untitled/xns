@@ -80,7 +80,7 @@ namespace xns {
 
 			/* system page size */
 			static inline auto init_page_size(void) -> size_type {
-				if (auto page_size = ::sysconf(_SC_PAGESIZE); page_size > 0) {
+				if (const auto page_size = ::sysconf(_SC_PAGESIZE); page_size > 0) {
 					return static_cast<size_type>(page_size);
 				}
 				throw xns::exception(-2, "sysconf failed");
