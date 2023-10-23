@@ -16,6 +16,8 @@
 #include "memmove.hpp"
 #include "strcmp.hpp"
 #include "strncmp.hpp"
+
+#include "string_utils.hpp"
 //#include "strlen.hpp"
 
 #include "swap.hpp"
@@ -890,29 +892,30 @@ namespace xns {
 			// -- S P E C I A L  M O D I F I E R S ----------------------------
 
 			/* to uppercase */
-			auto to_uppercase(void) -> void {
+			auto to_upper(void) -> void {
 				// check if string is not null
 				if (_str != nullptr) {
 					// convert to uppercase
 					for (size_type x = 0; x < _size; ++x) {
-						_str[x] = string::to_uppercase(_str[x]);
+						_str[x] = xns::to_upper(_str[x]);
 					}
 				}
 			}
 
 			/* to lowercase */
-			void to_lowercase(void) {
+			void to_lower(void) {
 				// check if string is not null
 				if (_str != nullptr) {
 					// convert to lowercase
 					for (size_type x = 0; x < _size; ++x) {
-						_str[x] = string::to_lowercase(_str[x]);
+						_str[x] = xns::to_lower(_str[x]);
 					}
 				}
 			}
 
 			/* filter */ // INFO: ref functor
-			void filter(bool (&is_type)(const char_t), bool keep = true) {
+			template <bool inverse = true>
+			auto filter(bool (&is_type)(const char_t)) -> void {
 				// exit if string is null
 				if (_str == nullptr) { return; }
 				// offset
@@ -920,7 +923,7 @@ namespace xns {
 				// loop through string
 				for (size_type x = 0; x < _size; ++x) {
 					// check if character is not of type
-					if (is_type(_str[x]) != keep) { ++offset; }
+					if (is_type(_str[x]) != inverse) { ++offset; }
 					// shift characters
 					else { _str[x - offset] = _str[x]; }
 				}
@@ -1015,9 +1018,9 @@ namespace xns {
 
 					size_type x = index;
 					// skip printable characters
-					while (is_printable(_str[x])) { ++x; }
+					while (xns::is_print(_str[x])) { ++x; }
 					// skip whitespace characters
-					while (is_whitespace(_str[x])) { ++x; }
+					while (xns::is_space(_str[x])) { ++x; }
 
 					// check null character
 					if (_str[x]) { return x; }
@@ -1033,9 +1036,9 @@ namespace xns {
 
 					size_type x = index;
 					// skip whitespace characters
-					while (x != 0 && string::is_whitespace(_str[x])) { --x; }
+					while (x != 0 && xns::is_space(_str[x])) { --x; }
 					// skip printable characters
-					while (x != 0 && string::is_alpha(_str[x])) { --x; }
+					while (x != 0 && xns::is_alpha(_str[x])) { --x; }
 
 					return x;
 				}
@@ -1262,68 +1265,6 @@ namespace xns {
 			// -- P U B L I C  S T A T I C  M E T H O D S ---------------------
 
 
-			/* is upper */
-			static bool is_uppercase(const char_t character) {
-				// return true if character is upper
-				return (character > 0x40 && character < 0x5b);
-			}
-
-			/* is lower */
-			static bool is_lowercase(const char_t character) {
-				// return true if character is lower
-				return (character > 0x60 && character < 0x7b);
-			}
-
-			/* is alpha */
-			static bool is_alpha(const char_t character) {
-				// return true if character is alpha
-				return (is_uppercase(character) || is_lowercase(character));
-			}
-
-			/* is digit */
-			static bool is_digit(const char_t character) {
-				// return true if character is digit
-				return (character > 0x2f && character < 0x3a);
-			}
-
-			/* is hexadecimal */
-			static bool is_hexadecimal(const char_t character) {
-				// return true if character is hexadecimal
-				return (is_digit(character)
-						|| (character > 0x40 && character < 0x47)
-						|| (character > 0x60 && character < 0x67));
-			}
-
-			/* is print */
-			static bool is_printable(const char_t character) {
-				// return true if character is printable
-				return (character > 0x1f && character < 0x7f);
-			}
-
-			/* is whitespace */
-			static bool is_whitespace(const char_t character) {
-				// return true if character is white-space
-				return ((character > 0x08 && character < 0x0e) || character == 0x20);
-			}
-
-			/* is control */
-			static bool is_control(const char_t character) {
-				// return true if character is control
-				return character < 0x20 || character == 0x7f;
-			}
-
-			/* is graphical */
-			static bool is_graphical(const char_t character) {
-				// return true if character is graphical
-				return (character > 0x20 && character < 0x7f);
-			}
-
-			/* is multi-byte */
-			static bool is_multibyte(const char_t character) {
-				// return true if character is multi-byte
-				return character & 0x80;
-			}
-
 			/* is charset */
 			static bool is_charset(const char_t character, const_ptr charset) {
 				// check if charset is null
@@ -1335,19 +1276,6 @@ namespace xns {
 						return true; }
 				} return false;
 			}
-
-			/* to uppercase */
-			static char_t to_uppercase(const char_t character) {
-				// return uppercase character
-				return is_lowercase(character) ? character - 0x20 : character;
-			}
-
-			/* to lowercase */
-			static char_t to_lowercase(const char_t character) {
-				// return lowercase character
-				return is_uppercase(character) ? character + 0x20 : character;
-			}
-
 
 
 			/* to basic string (signed integer) */
@@ -1450,8 +1378,7 @@ namespace xns {
 			value = 0;
 
 			// skip leading whitespace
-			while (x < str.size()
-				&& xns::basic_string<char_t>::is_whitespace(str[x])) {
+			while (x < str.size() && xns::is_space(str[x])) {
 				++x;
 			}
 
@@ -1469,7 +1396,7 @@ namespace xns {
 			const constexpr integer max = xns::limits::max<integer>();
 
 			// loop through digits
-			while (x < str.size() && self::is_digit(str[x])) {
+			while (x < str.size() && xns::is_digit(str[x])) {
 
 
 				integer add = (str[x] - '0');
@@ -1489,7 +1416,7 @@ namespace xns {
 			}
 
 			// skip trailing whitespace
-			while (x < str.size() && self::is_whitespace(str[x])) { ++x; }
+			while (x < str.size() && xns::is_space(str[x])) { ++x; }
 
 			if (x < str.size()) {
 				value = 0;
@@ -1545,50 +1472,6 @@ namespace xns {
 	}
 
 
-
-
-	template <xns::is_char T>
-	auto char32_to(const xns::u32string& u32str) -> xns::basic_string<T> {
-
-		// assertion
-		static_assert(sizeof(T) == 1, "CHAR32_TO() ONLY SUPPORTS 8-BIT CHAR TYPES");
-
-		// size alias
-		using size_type = xns::u32string::size_type;
-		// declare char string
-		xns::string result;
-		// reserve space
-		result.reserve(u32str.size());
-		// loop over 32-bit chars
-		for (xns::size_t _ = 0; _ < u32str.size(); ++_) {
-			// get code point
-			char32_t cp = u32str[_];
-			// check for ascii
-			if (cp < 0x80) {
-				// append to result
-				result.append(static_cast<char>(cp));
-			}
-			// check for 2-byte
-			else if (cp < 0x800) {
-				result.append(static_cast<char>(0xC0 | (cp >> 6)));
-				result.append(static_cast<char>(0x80 | (cp & 0x3F)));
-			}
-			// check for 3-byte
-			else if (cp < 0x10000) {
-				result.append(static_cast<char>(0xE0 | (cp >> 12)));
-				result.append(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
-				result.append(static_cast<char>(0x80 | (cp & 0x3F)));
-			}
-			// check for 4-byte
-			else {
-				result.append(static_cast<char>(0xF0 | (cp >> 18)));
-				result.append(static_cast<char>(0x80 | ((cp >> 12) & 0x3F)));
-				result.append(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
-				result.append(static_cast<char>(0x80 | (cp & 0x3F)));
-			}
-		}
-		return result;
-	}
 
 
 
@@ -2068,11 +1951,61 @@ namespace xns {
 
 
 
+	//template <typename T, typename U>
+	//auto to_basic_string(const T& data) -> xns::basic_string<U> {
+	//
+	//
+	//	return {};
+	//}
 
 
 
 
 
+
+
+	template <xns::is_char T>
+	auto char32_to(const xns::u32string& u32str) -> xns::basic_string<T> {
+
+		// assertion
+		static_assert(sizeof(T) == 1, "CHAR32_TO() ONLY SUPPORTS 8-BIT CHAR TYPES");
+
+		// size alias
+		using size_type = xns::u32string::size_type;
+		// declare char string
+		xns::string result;
+		// reserve space
+		result.reserve(u32str.size());
+		// loop over 32-bit chars
+		for (xns::size_t _ = 0; _ < u32str.size(); ++_) {
+			// get code point
+			char32_t cp = u32str[_];
+			// check for ascii
+			if (cp < 0x80) {
+				// append to result
+				result.append(static_cast<char>(cp));
+			}
+			// check for 2-byte
+			else if (cp < 0x800) {
+				result.append(static_cast<char>(0xC0 | (cp >> 6)));
+				result.append(static_cast<char>(0x80 | (cp & 0x3F)));
+			}
+			// check for 3-byte
+			else if (cp < 0x10000) {
+				result.append(static_cast<char>(0xE0 | (cp >> 12)));
+				result.append(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
+				result.append(static_cast<char>(0x80 | (cp & 0x3F)));
+			}
+			// check for 4-byte
+			else {
+				result.append(static_cast<char>(0xF0 | (cp >> 18)));
+				result.append(static_cast<char>(0x80 | ((cp >> 12) & 0x3F)));
+				result.append(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
+				result.append(static_cast<char>(0x80 | (cp & 0x3F)));
+			}
+		}
+		return result;
+	}
 
 
 
