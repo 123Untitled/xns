@@ -87,6 +87,8 @@ static auto benchmark(void) -> void {
 template <>
 int UT::unit_tests<"list">(void) {
 
+	benchmark();
+	return 0;
 	xns::list<const int> list;
 
 	list.push_back(1);

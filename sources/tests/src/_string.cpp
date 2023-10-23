@@ -158,6 +158,9 @@ static void subview(void) {
 template <>
 int UT::unit_tests<"string">(void) {
 
+	xns::to_upper('a');
+	//xns::to_basic_string<char>(42);
+
 	/*{
 		xns::fmt_string s{"hello!\x1b[3;31mworld!\x1b[0m."};
 
