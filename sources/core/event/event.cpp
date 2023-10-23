@@ -310,7 +310,7 @@ void xns::event::dispatch(void) {
 
 
 	// filter extended ascii codes
-	_input.filter(xns::string::is_multibyte, false);
+	_input.filter<false>(xns::is_multi);
 
 
 	if (_input.length() == 3 && _input[0] == 0x1b) {
@@ -343,7 +343,7 @@ void xns::event::dispatch(void) {
 	}
 
 	// filter control characters
-	_input.filter(xns::string::is_control, false);
+	_input.filter<false>(xns::is_cntrl);
 
 	evnt.call_input(_input);
 }
