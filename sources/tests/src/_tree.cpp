@@ -1,305 +1,403 @@
+// local headers
 #include "unit_tests.hpp"
 #include "tree.hpp"
 #include "random.hpp"
 #include "time.hpp"
 #include "numeric_limits.hpp"
 #include "input.hpp"
+#include "escape.hpp"
+#include "memcpy.hpp"
+#include "benchmark.hpp"
+#include "file.hpp"
+
+// boost
+#include <boost/container/set.hpp>
+// google benchmark
+#include <benchmark/benchmark.h>
+
+// standard library
 #include <set>
 #include <unordered_set>
 #include <iostream>
 #include <vector>
 #include <unistd.h>
 #include <map>
-#include "escape.hpp"
-#include "memcpy.hpp"
-#include "benchmark.hpp"
-#include "file.hpp"
 
 
-
-xns::tree<char> generate_tree(const xns::size_t size) {
-	// check size
-	if (!size) { return {}; }
-	// create tree
-	xns::tree<char> ast;
-	// vector of node pointers
-	xns::vector<xns::tree<char>::node*> nodes;
-	// reserve space for nodes
-	nodes.reserve(size);
-	// loop to allocate nodes
-	for (xns::size_t i = 0; i < size; ++i) {
-		char c = (xns::random::integral<unsigned char>() % 94) + 33;
-		nodes.push_back(ast.new_node(nullptr, c));
-	}
-	// set root node
-	ast.root(ast.new_node(nullptr, 'r'));
-	// alias to node
-	using node_ptr = xns::tree<char>::node_pointer;
-
-
-	for (xns::size_t i = 0 + 1; i < size; ++i) {
-		// start at root
-		node_ptr current = ast.root();
-		do {
-			if (xns::random::integral<bool>()) {
-
-				if (current->left())  { current = current->left();  }
-
-				else { current->set_left(nodes[i]); break; }
-			}
-			else {
-				if (current->right()) { current = current->right(); }
-
-				else { current->set_right(nodes[i]); break; }
-			}
-		} while (true);
-	}
-
-	//ast.print();
-
-	return ast;
+template <bool sorted = false>
+auto random_vector(const xns::size_t size) -> std::vector<xns::size_t> {
+	std::vector<xns::size_t> vec;
+	for (xns::size_t i = 0; i < size; ++i)
+		vec.push_back(xns::random::integral<xns::size_t>());
+	if constexpr (sorted)
+		std::sort(vec.begin(), vec.end());
+	return vec;
 }
-
-
-static xns::size_t NSIZE = 0;
-
-
 
 
 static void benchmark01(void) {
 
 	using type = xns::size_t;
 
-	xns::vector<bool> tvec;
-	xns::vector<bool> svec;
+	enum : xns::size_t {
+		NSIZE = 1'000'000,
+		ITERATIONS = 1,
+		RANGE = 1000000000
+	};
+
+	xns::benchmark<6> bench;
+	xns::size_t checksum = 0;
+
+	//{
+	//	xns::tree<type> tree;
+	//	std::set<type> set;
+	//	boost::container::set<type> boost;
+	//	auto vec = random_vector<true>(NSIZE);
+	//
+	//	for (auto n : vec) {
+	//		tree.insert(n);
+	//		set.insert(n);
+	//		boost.insert(n);
+	//	}
+	//
+	//	bench.run("xns inorder", [&]() -> void {
+	//		for (auto it = tree.in_order_begin(); it; ++it) {
+	//			checksum ^= *it;
+	//		}
+	//	});
+	//
+	//	bench.run("std inorder", [&]() -> void {
+	//		for (auto it = set.begin(); it != set.end(); ++it) {
+	//			checksum ^= *it;
+	//		}
+	//	});
+	//
+	//	bench.run("boost inorder", [&]() -> void {
+	//		for (auto it = boost.begin(); it != boost.end(); ++it) {
+	//			checksum ^= *it;
+	//		}
+	//	});
+	//
+	//	//tree.defragment();
+	//
+	//}
+	//
+	//bench.result("in order iterator");
+	//std::cout << "checksum: " << checksum << std::endl;
+	//return;
+	//
+	//
 
 
+	std::vector<type> vec = random_vector<true>(NSIZE);
 
-	xns::benchmark<5> bench;
-
-
-	// xns::memory::pool<xns::tree<xns::size_t>::node>::init();
-
-	xns::vector<bool> res;
-	xns::tree<type> tree;
-	std::set<type> set;
-
-	bench.run("std::set insert", [&set]() -> void {
-			set.clear();
-
-		for (xns::size_t i = 0; i < NSIZE; ++i) {
-			set.insert(xns::random::integral<type>() % 100);
+	bench.run("xns::tree insert", [&]() -> void {
+		for (xns::size_t j = 0; j < ITERATIONS; ++j) {
+			xns::tree<type> tree;
+			for (xns::size_t i = 0; i < NSIZE; ++i) {
+				tree.insert(vec[i]);
+				checksum ^= tree.size();
+			}
+			//tree.memory_frag();
 		}
 	});
 
-	bench.run("xns::tree insert", [&tree]() -> void {
-		tree.clear();
-
-		for (xns::size_t i = 0; i < NSIZE; ++i) {
-			tree.insert(xns::random::integral<type>() % 100);
+	bench.run("std::set insert", [&]() -> void {
+		for (xns::size_t j = 0; j < ITERATIONS; ++j) {
+			std::set<type> sset;
+			for (xns::size_t i = 0; i < NSIZE; ++i) {
+				sset.insert(vec[i]);
+				checksum ^= sset.size();
+			}
 		}
 	});
 
+	bench.run("boost insert", [&]() -> void {
+		for (xns::size_t j = 0; j < ITERATIONS; ++j) {
+			boost::container::set<type> bset;
+			for (xns::size_t i = 0; i < NSIZE; ++i) {
+				bset.insert(vec[i]);
+				checksum ^= bset.size();
+			}
+		}
+	});
 
 	bench.result("insert");
+	std::cout << "checksum: " << checksum << std::endl;
+	return;
 
-	tvec.reserve(tree.size()*2);
-	svec.reserve(set.size()*2);
+	{
+		xns::tree<type> tree;
+		std::set<type> set;
+		boost::container::set<type> boost;
+		for (auto n : vec) {
+			tree.insert(n);
+			set.insert(n);
+			boost.insert(n);
+		}
 
-
-	bench.run("std::set contains", [&set, &svec]() -> void {
-
-		// for (xns::size_t i = 0; i < NSIZE; ++i) {
-			for (const auto& it : set) {
-				svec.push_back(set.contains(it));
+		bench.run("xns contains", [&]() -> void {
+			for (auto n : vec) {
+				checksum ^= tree.contains(n);
 			}
-			// svec.push_back(set.contains(xns::random::integral<type>() % 100));
-		// }
-	});
+		});
 
-	bench.run("xns::tree contains", [&tree, &tvec]() -> void {
-
-			for(auto it = tree.in_order_begin(); it; ++it) {
-				tvec.push_back(tree.contains(*it));
+		bench.run("std contains", [&]() -> void {
+			for (auto n : vec) {
+				checksum ^= set.contains(n);
 			}
-		// for (xns::size_t i = 0; i < NSIZE; ++i) {
-			// tvec.push_back(tree.contains(xns::random::integral<type>() % 100));
-		// }
-	});
+		});
 
+		bench.run("boost contains", [&]() -> void {
+			for (auto n : vec) {
+				checksum ^= boost.contains(n);
+			}
+		});
+
+	}
 
 
 
 	bench.result("contains");
-
-
-
-	int fd = open("random.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd == -1) {
-		std::cout << "open failed" << std::endl;
-		return;
-	}
-
-	::write(fd, tvec.data(), tvec.size());
-	::write(fd, svec.data(), svec.size());
-
-
-	close(fd);
-
+	std::cout << "checksum: " << checksum << std::endl;
 
 
 }
 
 
 /* insert */
-static auto insert(void) -> void {
+static auto insert_test(void) -> void {
 
+	using type = xns::size_t;
+	constexpr xns::size_t NSIZE = 50;
 
+	xns::tree<type> tree;
 
-	xns::tree<int> tree;
+	std::vector<type> vec = random_vector<false>(NSIZE);
 
-	xns::vector<int> vec;
+	for (auto n : vec)
+		tree.insert(n % 100);
 
-	 unsigned int n = (xns::random::integral<unsigned int>() % 20) + 30;
-	//unsigned int n = 3;
-	// unsigned int n = 1000000;
-
-	for (unsigned int i = 0; i < n; ++i) {
-		int r = xns::random::integral<int>() % 100;
-		// int r = xns::random::integral<int>();
-		vec.push_back(r);
-	}
-
-
-
-	for (auto& i : vec) {
-		//std::cout << "\x1b[32m" << i << "\x1b[0m" << std::endl;
-		//std::cout << std::endl;
-		tree.insert(i);
-		 tree.print();
-		 usleep(10000);
-		// std::cout << "tree depth: " << tree.depth() << std::endl;
-		// std::cout << "tree size: " << tree.size() << std::endl << std::endl;
-	}
-
-
-	check_tree(tree);
-	return;
-
-	std::cout << "START ERASING" << std::endl;
-
-	for (auto& i : vec) {
-		tree.print();
-		std::cout << "erasing: \x1b[31m" << i << "\x1b[0m" << std::endl;
-		tree.erase(i);
-		/*
-		try {
-			check_tree(tree);
-		} catch (std::exception& e) {
-			std::cout << e.what() << std::endl;
-			tree.print();
-			return;
-		}
-		*/
-		usleep(10000);
-	}
-	check_tree(tree);
+	tree.fragmentation();
+	tree.defragment();
 	tree.print();
+	tree.fragmentation();
+	tree.print();
+	//tree.memory_frag();
 
-
-
-
-
-	//std::cout << "END OF TEST" << std::endl;
-
+	xns::println("AVL size  - ", tree.size(), "\nAVL depth - ", tree.depth());
+	check_tree(tree);
+	xns::out::render();
 }
 
-
-static auto interactive(void) -> void {
-
-	xns::terminal::raw_terminal();
-	xns::print(xns::escape::enter_screen(),
-	xns::escape::move_home());
-	xns::out::render();
-
-
-	xns::tree<int> tree;
-	std::vector<int> vec;
-	bool balanced = false;
-
-	xns::string input;
-
-	while (true) {
-
-		input = xns::in::read();
-
-		// check for right arrow
-		if (input == "\x1b[C") {
-			xns::print(xns::escape::erase_screen(), xns::escape::move_home());
-			xns::out::render();
-				std::cout << "\x1b[32mINSERT\x1b[0m" << std::endl;
-				int i = xns::random::integral<int>() % 100;
-				vec.push_back(i);
-				tree.insert(i);
-
-			tree.print();
-			balanced = false;
-		}
-		// check for up arrow
-		else if (input == "\x1b[A") {
-			xns::print(xns::escape::erase_screen(), xns::escape::move_home());
-			xns::out::render();
-			std::cout << "\x1b[31mBALANCE\x1b[0m" << std::endl;
-			tree.print();
-			balanced = true;
-		}
-		// check for down arrow
-		else if (input == "\x1b[B") {
-			xns::print(xns::escape::erase_screen(), xns::escape::move_home());
-			xns::out::render();
-			std::cout << "\x1b[33mBACK\x1b[0m" << std::endl;
-			tree.clear();
-
-			for (std::vector<int>::size_type i = 0; i < vec.size() - 1; ++i) {
-				tree.insert(vec[i]);
-			}
-			tree.insert(vec.back());
-			balanced = false;
-			tree.print();
-
-
-		}
-		else if (input == "q") {
-			break;
-		}
-		else {
-			std::cout << "unknown command" << std::endl;
-		}
-	}
-
-	xns::print(xns::escape::exit_screen());
-	xns::out::render();
-	xns::terminal::restore_terminal();
-
-}
 
 
 template <>
 int UT::unit_tests<"tree">(void) {
 
-	insert();
 
-	benchmark01();
+	//auto vec = random_vector<false>(10);
+	//xns::tree<xns::size_t> tree;
+	//for (auto v : vec)
+	//	tree.insert(v);
 
-	interactive();
+
+	insert_test();
+	//benchmark01();
+	//interactive();
+	return 0;
+}
+
+
+			//type v = xns::random::integral<type>();
+			//state.ResumeTiming();
+			//state.PauseTiming();
+	//state.SetItemsProcessed(state.iterations() * state.range(0));
+		//state.PauseTiming();
+
+static xns::vector<xns::size_t> vec;
+
+template <typename T>
+void launch_bench(benchmark::State& state) {
+
+
+	using type = typename T::value_type;
+
+	for (auto _ : state) {
+		T tree;
+		for (int i = 0; i < state.range(0); ++i) {
+			tree.insert(vec[i]);
+			auto size = tree.size();
+			benchmark::DoNotOptimize(tree.size());
+		}
+	}
+	state.SetItemsProcessed(state.iterations() * state.range(0));
+}
+
+
+#define RANGE 1'000'00
+#define NUMBERS RANGE
+#define ITERATIONS 30
+
+using type = xns::size_t;
+using txns = xns::tree<type>;
+using tstd = std::set<type>;
+using tboo = boost::container::set<type>;
+
+
+
+BENCHMARK(launch_bench<txns>)->Name("xns")->Range(8, RANGE)->Iterations(ITERATIONS);
+BENCHMARK(launch_bench<tstd>)->Name("std")->Range(8, RANGE)->Iterations(ITERATIONS);
+BENCHMARK(launch_bench<tboo>)->Name("boost")->Range(8, RANGE)->Iterations(ITERATIONS);
+
+struct ss {
+	char c[21];
+} __attribute__((packed));
+
+
+#include "bjorklund.hpp"
+
+
+#if defined(XNS_TEST_TREE)
+//BENCHMARK_MAIN();
+int main(int argc, char** argv) {
+
+	if (argc != 4) return 1;
+
+
+	int n = std::atoi(argv[1]);
+	int k = std::atoi(argv[2]);
+	int m = std::atoi(argv[3]);
+	int b = 0;
+
+	xns::vector<int> bursts;
+
+	int kk = k;
+
+	while (kk > 0) {
+		if (kk >= m) {
+			// ajouter m à liste_bursts
+			bursts.push_back(m);
+			kk = kk - m;
+		}
+		else {
+			// ajouter k à liste_bursts
+			bursts.push_back(kk);
+			kk = 0;
+		}
+		b = b + 1;
+	}
+
+	std::cout << "burst " << b << std::endl;
+	for (auto v : bursts)
+		std::cout << v << " ";
+	std::cout << std::endl;
+
+	// 11111'0000'0000
+	std::cout << "step = " << ((n - k) + b) << std::endl;
+	std::cout << "pulse = " << b << std::endl;
+
+	auto seq = xns::bjorklund::generate((n - k) + b, b);
+
+	for (auto v : seq)
+		std::cout << v;
+	std::cout << std::endl;
+
+	xns::size_t y = 0;
+	for (xns::size_t i = 0; i < seq.size(); ++i) {
+		if (seq[i] == 1) {
+			int j = bursts[y++] - 1;
+			++i;
+			for (int z = 0; z < j; ++z) {
+				seq.insert(i, 1);
+			}
+			i += (j ? j - 1 : 0);
+		}
+	}
+
+	for (auto v : seq) {
+		std::cout << (v ? "\x1b[32mx\x1b[0m" : "-");
+	}
+	std::cout << std::endl;
+
 	return 0;
 
 
-}
+	for (int i = 0; i < 50; ++i) {
+		auto seq = xns::bjorklund::generate(xns::random::integral<xns::size_t>() % 100,
+											xns::random::integral<xns::size_t>() % 100);
+		for (auto v : seq)
+			std::cout << v;;
+		std::cout << std::endl;
+	}
 
-#if defined(XNS_TEST_TREE)
-int main(void) {
+
+	return 0;
+
+
+
+
+
+
+
+
+
+	//xns::tree<type> tree;
+	//
+	//tree.insert(2U);
+	//tree.insert(7U);
+	//tree.insert(5U);
+	//tree.insert(4U);
+	//tree.insert(1U);
+	//tree.insert(8U);
+	//tree.insert(6U);
+	//tree.insert(3U);
+	//tree.insert(0U);
+	//
+	//for (auto v : tree)
+	//	std::cout << v << " ";
+	//std::cout << std::endl;
+	//return 0;
+
+
+	//{
+	//	//xns::tree<type> tr;
+	//	for (xns::size_t i = 0; i < NUMBERS; ++i) {
+	//		vec.push_back(xns::random::integral<type>());
+	//		//tr.insert(xns::random::integral<type>());
+	//	}
+	//	//for (auto it = tr.in_order_begin(); it; ++it) {
+	//	//	vec.push_back(*it);
+	//	//}
+	//	//tr.clear();
+	//}
+	//benchmark::Initialize(&argc, argv);
+	//benchmark::RunSpecifiedBenchmarks();
+
+	//xns::benchmark<6> bench;
+	//xns::size_t check_sum = 0;
+	//
+	//bench.run("xns pool allocator", [&]() -> void {
+	//	for (xns::size_t i = 0; i < 1000000; ++i) {
+	//		auto ptr = xns::memory::pool<ss>::allocate();
+	//		check_sum ^= reinterpret_cast<xns::size_t>(ptr);
+	//		//xns::memory::pool<ss>::deallocate(ptr);
+	//	}
+	//});
+	//bench.run("xns allocator (malloc)", [&]() -> void {
+	//	for (xns::size_t i = 0; i < 1000000; ++i) {
+	//		auto ptr = std::allocator<ss>{}.allocate(1);
+	//		check_sum ^= reinterpret_cast<xns::size_t>(ptr);
+	//		//std::allocator<ss>{}.deallocate(ptr, 1);
+	//	}
+	//});
+	//
+	//bench.result("allocators");
+	//std::cout << "checksum: " << check_sum << std::endl;
+
+	//return 0;
 	return UT::unit_tests<"tree">();
+	return 0;
 }
 #endif
 

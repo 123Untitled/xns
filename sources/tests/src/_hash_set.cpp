@@ -5,6 +5,7 @@
 #include "benchmark.hpp"
 #include "time.hpp"
 #include <unordered_set>
+#include "trie.hpp"
 
 
 static xns::size_t check_sum = 0;
@@ -13,41 +14,52 @@ static xns::size_t check_sum = 0;
 template <>
 int UT::unit_tests<"hash_set">(void) {
 
-	constexpr size_t N = 1000;
-	constexpr size_t S = 1000;
+	std::cout << "sizeof xns::unordered_set<std::string>: " << sizeof(xns::unordered_set<std::string>) << std::endl;
+	std::cout << "sizeof std::unordered_set<std::string>: " << sizeof(std::unordered_set<std::string>) << std::endl;
 
+	constexpr size_t N = 10000;
+	constexpr size_t S = 128;
 
+	float load = 0.75f;
 
 	xns::benchmark<8> bench;
 
-	bench.run("xns::hash_map", [&] {
-		xns::hash_set<xns::string> xset{};
-		for (xns::size_t i = 0; i < N; ++i) {
-			xns::string str{};
-			for (xns::size_t j = 0; j < S; ++j) {
-				str.append(xns::random::integral<char>());
-				check_sum ^= str.back();
-			}
-			// xset.insert(str);
-			// check_sum ^= xset.size();
-		}
-	});
-
-	bench.run("std::unordered_map", [&] {
-		std::unordered_set<std::string> sset{};
+	bench.run("xns::unordered_set", [&] {
+		xns::unordered_set<std::string> xset{};
+		xset.max_load_factor(load);
 		for (xns::size_t i = 0; i < N; ++i) {
 			std::string str{};
 			for (xns::size_t j = 0; j < S; ++j) {
 				str.push_back(xns::random::integral<char>());
 				check_sum ^= str.back();
 			}
-			// sset.insert(str);
-			// check_sum ^= sset.size();
+			xset.insert(str);
+			check_sum ^= xset.size();
+		}
+
+
+		//xns::unordered_set<std::string>::collisions();
+
+	});
+
+	bench.run("std::unordered_set", [&] {
+		std::unordered_set<std::string> sset{};
+		sset.max_load_factor(load);
+		for (xns::size_t i = 0; i < N; ++i) {
+			std::string str{};
+			for (xns::size_t j = 0; j < S; ++j) {
+				str.push_back(xns::random::integral<char>());
+				check_sum ^= str.back();
+			}
+			sset.insert(str);
+			check_sum ^= sset.size();
 
 		}
 	});
 
 	bench.result("insert");
+
+
 
 
 	// bench.run("xns::hash_map", [&] {

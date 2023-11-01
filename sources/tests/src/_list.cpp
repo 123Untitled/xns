@@ -5,89 +5,89 @@
 //#include <vector>
 #include <list>
 
-#include "benchmark.hpp"
+//#include "benchmark.hpp"
 #include "random.hpp"
 
 
 static xns::size_t NSIZE = 100000;
 static xns::size_t check_sum = 0;
 
-static auto benchmark(void) -> void {
-
-	xns::benchmark<5> bench{};
-
-	xns::list<int> xlist;
-	for (xns::size_t i = 0; i < NSIZE; ++i)
-		xlist.push_back(xns::random::integral<int>());
-	std::list<int> slist;
-	for (xns::size_t i = 0; i < NSIZE; ++i)
-		slist.push_back(xns::random::integral<int>());
-
-
-	bench.run("xns::list push_back", []() -> void {
-
-		xns::list<int> local_list;
-		for (xns::size_t i = 0; i < NSIZE; ++i) {
-			local_list.push_back(xns::random::integral<int>());
-			check_sum ^= local_list.back();
-		}
-	});
-
-	bench.run("std::list push_back", []() -> void {
-
-		std::list<int> local_list;
-		for (xns::size_t i = 0; i < NSIZE; ++i) {
-			local_list.push_back(xns::random::integral<int>());
-			check_sum ^= local_list.back();
-		}
-	});
-
-	bench.result("push_back");
-
-	bench.run("xns::list reverse", [&xlist]() -> void {
-
-			xlist.reverse();
-			check_sum ^= xlist.front();
-	});
-
-	bench.run("std::list reverse", [&slist]() -> void {
-
-			slist.reverse();
-			check_sum ^= slist.front();
-	});
-
-	bench.result("reverse");
-
-
-	bench.run("xns::list copy", [&xlist]() -> void {
-			xns::list<int> local_list{xlist};
-			check_sum ^= local_list.front();
-	});
-
-	bench.run("std::list copy", [&slist]() -> void {
-			std::list<int> local_list{slist};
-			check_sum ^= local_list.front();
-	});
-
-	bench.result("copy");
-
-
-
-
-	std::cout << "check_sum: " << check_sum << std::endl;
-
-
-
-
-
-}
-
+//static auto benchmark(void) -> void {
+//
+//	xns::benchmark<5> bench{};
+//
+//	xns::list<int> xlist;
+//	for (xns::size_t i = 0; i < NSIZE; ++i)
+//		xlist.push_back(xns::random::integral<int>());
+//	std::list<int> slist;
+//	for (xns::size_t i = 0; i < NSIZE; ++i)
+//		slist.push_back(xns::random::integral<int>());
+//
+//
+//	bench.run("xns::list push_back", []() -> void {
+//
+//		xns::list<int> local_list;
+//		for (xns::size_t i = 0; i < NSIZE; ++i) {
+//			local_list.push_back(xns::random::integral<int>());
+//			check_sum ^= local_list.back();
+//		}
+//	});
+//
+//	bench.run("std::list push_back", []() -> void {
+//
+//		std::list<int> local_list;
+//		for (xns::size_t i = 0; i < NSIZE; ++i) {
+//			local_list.push_back(xns::random::integral<int>());
+//			check_sum ^= local_list.back();
+//		}
+//	});
+//
+//	bench.result("push_back");
+//
+//	bench.run("xns::list reverse", [&xlist]() -> void {
+//
+//			xlist.reverse();
+//			check_sum ^= xlist.front();
+//	});
+//
+//	bench.run("std::list reverse", [&slist]() -> void {
+//
+//			slist.reverse();
+//			check_sum ^= slist.front();
+//	});
+//
+//	bench.result("reverse");
+//
+//
+//	bench.run("xns::list copy", [&xlist]() -> void {
+//			xns::list<int> local_list{xlist};
+//			check_sum ^= local_list.front();
+//	});
+//
+//	bench.run("std::list copy", [&slist]() -> void {
+//			std::list<int> local_list{slist};
+//			check_sum ^= local_list.front();
+//	});
+//
+//	bench.result("copy");
+//
+//
+//
+//
+//	std::cout << "check_sum: " << check_sum << std::endl;
+//
+//
+//
+//
+//
+//}
+//
 
 /* unit test */
 template <>
 int UT::unit_tests<"list">(void) {
 
-	benchmark();
+	//benchmark();
 	return 0;
 	xns::list<const int> list;
 
@@ -180,9 +180,35 @@ int UT::unit_tests<"list">(void) {
 	return 0;
 }
 
-#if defined(XNS_TEST_LIST)
-int main(void) {
-	return UT::unit_tests<"list">();
+
+
+
+#include <benchmark/benchmark.h>
+
+template <typename T>
+void launch_bench(benchmark::State& state) {
+
+	using type = typename T::value_type;
+
+	for (auto _ : state) {
+		T list;
+		for (int i = 0; i < state.range(0); ++i) {
+			list.push_back(static_cast<type>(i));
+		}
+	}
+
+	//state.SetItemsProcessed(state.iterations() * state.range(0));
 }
+
+#define RANGE 1'000'000
+
+BENCHMARK(launch_bench<xns::list<xns::size_t>>)->Name("xns")->Range(8, RANGE)->Unit(benchmark::kMillisecond);
+BENCHMARK(launch_bench<std::list<xns::size_t>>)->Name("std")->Range(8, RANGE)->Unit(benchmark::kMillisecond);
+
+#if defined(XNS_TEST_LIST)
+BENCHMARK_MAIN();
+//int main(void) {
+//	return UT::unit_tests<"list">();
+//}
 #endif
 
