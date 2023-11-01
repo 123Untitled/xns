@@ -16,11 +16,6 @@
 // the values of the c_cflag, c_ispeed, and c_ospeed fields are ignored.
 
 
-// -- S I N G L E T O N  I N S T A N C E --------------------------------------
-
-/* singleton instance */
-xns::terminal xns::terminal::_instance{};
-
 
 // -- C O N S T R U C T O R S -------------------------------------------------
 
@@ -48,19 +43,16 @@ xns::terminal::terminal(void)
 }
 
 /* destructor */
-xns::terminal::~terminal(void) {
+xns::terminal::~terminal(void) noexcept {
 	// restore terminal settings if raw
-	if (_is_raw) { restore_terminal(); }
+	if (_is_raw == false)
+		return;
+	restore();
 }
 
 
 // -- M E T H O D S -----------------------------------------------------------
 
-/* get singleton instance */
-xns::terminal& xns::terminal::instance(void) {
-	// return singleton instance
-	return _instance;
-}
 
 /* get terminal settings */
 const struct termios xns::terminal::setup_terminal(void) {
@@ -69,11 +61,11 @@ const struct termios xns::terminal::setup_terminal(void) {
 	struct termios origin;
 
 	// get current terminal settings
-	if (!tcgetattr(STDIN_FILENO, &origin)) {
-		// if no error, set bool flag
-		_is_origin = true;
-	}
+	if (::tcgetattr(STDIN_FILENO, &origin) != 0)
+		return origin;
 
+	// if no error, set bool flag
+	_is_origin = true;
 	// return by value original terminal setup
 	return origin;
 }
@@ -107,29 +99,33 @@ void xns::terminal::flush(void) {
 	::tcflush(STDIN_FILENO, TCIFLUSH);
 }
 
-void xns::terminal::raw_terminal(const VFlag vmin) {
+auto xns::terminal::raw(const VFlag vmin) -> void {
+
+	// get instance
+	auto& instance = self::shared();
 
 	// check if terminal is setup
-	if (!_instance._is_setup) { return; }
+	if (instance._is_setup == false) { return; }
 
 	// VMIN = Minimum number of characters to read
-	_instance._raw.c_cc[VMIN] = static_cast<xns::ubyte>(vmin);
+	instance._raw.c_cc[VMIN] = static_cast<xns::ubyte>(vmin);
 
 	// set non-canonical mode
-	if (!::tcsetattr(STDIN_FILENO, TCSANOW, &_instance._raw)) {
-		_instance._is_raw = true;
-	}
+	if (::tcsetattr(STDIN_FILENO, TCSANOW, &instance._raw) != 0)
+		return;
+
+	instance._is_raw = true;
 }
 
-void xns::terminal::restore_terminal(void) {
-
+auto xns::terminal::restore(void) -> void {
+	// get instance
+	auto& instance = self::shared();
 	// check if terminal is setup
-	if (!_instance._is_setup) { return; }
-
+	if (instance._is_setup == false) { return; }
 	// reset orignal terminal settings
-	if (!::tcsetattr(STDIN_FILENO, TCSAFLUSH, &_instance._origin)) {
-		_instance._is_raw = false;
-	}
+	if (::tcsetattr(STDIN_FILENO, TCSAFLUSH, &instance._origin) != 0)
+		return;
+	instance._is_raw = false;
 }
 
 
@@ -155,12 +151,14 @@ int xns::terminal::query_terminal_size(void) {
 }
 
 void xns::terminal::terminal_resize_handler(int signum) {
+	// get instance
+	auto& instance = self::shared();
 	static_cast<void>(signum);
 	// query terminal size
-	if (_instance.query_terminal_size() != -1) {
-		// call resize event subscribers
-		xns::event::shared().call_event(xns::evntype::TERMINAL_RESIZE);
-	}
+	if (instance.query_terminal_size() != 0)
+		return;
+	// call resize event subscribers
+	xns::event::shared().call_event(xns::evntype::TERMINAL_RESIZE);
 }
 
 

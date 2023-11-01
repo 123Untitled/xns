@@ -41,6 +41,9 @@ namespace xns {
 
 			// -- public types ------------------------------------------------
 
+			/* self type */
+			using self = terminal;
+
 			/* terminal size type */
 			using term_size = decltype(xns::declval<struct winsize>().ws_row);
 
@@ -48,22 +51,25 @@ namespace xns {
 			// -- C O N S T R U C T O R S -------------------------------------
 
 			/* non-assignable class */
-			NON_ASSIGNABLE(terminal);
+			unassignable(terminal);
 
 			/* destructor */
-			~terminal(void);
+			~terminal(void) noexcept;
 
 
 			// -- M E T H O D S -----------------------------------------------
 
-			/* get singleton instance */
-			static terminal& instance(void);
+			/* instance */
+			static inline auto shared(void) -> xns::terminal& {
+				static xns::terminal instance{};
+				return instance;
+			}
 
 			/* set raw terminal */
-			static void raw_terminal(const VFlag vmin = xns::VFlag::BLOCKING);
+			static void raw(const VFlag vmin = xns::VFlag::BLOCKING);
 
 			/* restore original terminal */
-			static void restore_terminal(void);
+			static void restore(void);
 
 
 			/* flush stdin buffer */
@@ -71,8 +77,8 @@ namespace xns {
 
 
 			/* get terminal size */
-			template <class T>
-			static void get_terminal_size(T& width, T& height) {
+			template <typename T>
+			static inline auto terminal_size(T& width, T& height) -> void {
 
 				// require unsigned integral type
 				// supporting at least term_size bits
@@ -80,8 +86,16 @@ namespace xns {
 						&& sizeof(T) >= sizeof(term_size),
 						"): TERMINAL SIZE TYPE MUST BE UNSIGNED INTEGRAL TYPE :(");
 
-				width = _instance._width;
-				height = _instance._height;
+				// get instance
+				auto& instance = self::shared();
+
+				width  = static_cast<T>(instance._width);
+				height = static_cast<T>(instance._height);
+			}
+
+			/* get terminal width */
+			static inline auto width(void) -> term_size {
+				return self::shared()._width;
 			}
 
 
@@ -94,13 +108,7 @@ namespace xns {
 
 		private:
 
-			// -- A L I A S E S -----------------------------------------------
-
-
-
-
-
-			// -- C O N S T R U C T O R S -------------------------------------
+			// -- private lifecycle -------------------------------------------
 
 			/* private default constructor */
 			terminal(void);
@@ -124,15 +132,12 @@ namespace xns {
 
 
 
-			// -- M E M B E R S -----------------------------------------------
+			// -- private members --------------------------------------------
 
-			/* singleton instance */
-			static terminal _instance;
-
-			// raw terminal flag
+			/* raw terminal flag */
 			bool _is_raw;
 
-			// original terminal flag
+			/* original terminal flag */
 			bool _is_origin;
 
 			// setup flag
