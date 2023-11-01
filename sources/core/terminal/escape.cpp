@@ -339,6 +339,11 @@ xns::escape::string xns::escape::hex_color(const xns::hexcolor color, const bool
 }
 
 /* color rgb */
+xns::escape::string xns::escape::rgb_color(const xns::rgb& rgb, const bool fore) {
+	return rgb_color(rgb.r, rgb.g, rgb.b, fore);
+}
+
+/* color rgb */
 xns::escape::string xns::escape::rgb_color(xns::u8 r, xns::u8 g, xns::u8 b, const bool fore) {
 	// static 24bit color escape sequence
 	static xns::ubyte escape[] = {	'\x1b', '[',
