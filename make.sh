@@ -114,7 +114,7 @@ LOCK=$BLDDIR'/.lock'
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-CXX='/opt/homebrew/Cellar/llvm/17.0.2/bin/clang++'
+CXX='/opt/homebrew/Cellar/llvm/17.0.3/bin/clang++'
 #CXX='clang++'
 #CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
 #CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/aarch64-apple-darwin22-g++-13'
@@ -173,7 +173,7 @@ DEFINES=()
 
 
 # linker flags
-LDFLAGS=''
+LDFLAGS=('-lbenchmark' '-framework' 'CoreMIDI' '-framework' 'CoreAudio' '-framework' 'CoreFoundation')
 
 # memory checker
 LEAKER='valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes'
@@ -645,6 +645,8 @@ function setup_files {
 		fi
 		# append defines
 		DEFINES+=('-DXNS_TEST_'${TEST:u})
+		# set optimization level
+		OPT=$FAST
 	fi
 	# insert -I prefix to each directory
 	INCLUDES=("${INCLUDES[@]/#/-I}")
