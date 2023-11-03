@@ -14,6 +14,8 @@
 #include "fragmentation.hpp"
 #include "swap.hpp"
 #include "conditional.hpp"
+#include "queue.hpp"
+#include "stack.hpp"
 
 #include "variant.hpp"
 #include "terminal.hpp"
