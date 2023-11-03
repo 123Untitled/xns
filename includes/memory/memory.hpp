@@ -40,10 +40,10 @@ namespace xns {
 			// -- public lifecycle --------------------------------------------
 
 			/* non-instantiable class */
-			NON_INSTANCIABLE(memory);
+			uninstantiable(memory);
 
 
-		private:
+		public:
 
 			// -- private enums -----------------------------------------------
 
@@ -56,26 +56,28 @@ namespace xns {
 
 			// -- private static methods --------------------------------------
 
-
 			/* map */
-			static inline auto map(const size_type size = page_size()) -> void* {
-				//std::cout << "mmap allocate: " << size << std::endl;
-				void* ptr = ::mmap(nullptr, size, M_PROTECTION, M_FLAGS, -1, 0);
+			static inline auto map(const size_type size = page_size(), void* addr = nullptr) -> void* {
+				//std::cout << "\nmmap allocate: " << size << std::endl;
+				void* ptr = ::mmap(addr, size, M_PROTECTION, M_FLAGS, -1, 0);
+				//std::cout << "mmap address: " << ptr << std::endl << std::endl;
 				if (ptr == MAP_FAILED)
 					throw xns::exception(-2, "mmap failed");
 				return ptr;
 			}
 
 			/* unmap */
-			static inline auto unmap(void* ptr, const size_type size) -> void {
+			static inline auto unmap(void* ptr, const size_type size) noexcept -> void {
 				if (::munmap(ptr, size) == -1)
-					throw xns::exception(-2, "munmap failed");
+					;// not good idea to throw exception in destructor
 			}
 
 			/* page size */
-			static inline auto page_size(void) noexcept -> size_type {
+			static inline auto page_size(void) -> size_type {
 				static const size_type page_size = init_page_size();
+				//std::cout << "page size: " << (page_size << 4) << std::endl;
 				return page_size;
+				//return page_size << 4;
 			}
 
 			/* system page size */
@@ -89,8 +91,13 @@ namespace xns {
 			/* padding */
 			template <typename T>
 			static consteval auto padding(void) noexcept -> decltype(sizeof(void*)) {
-				// return padding
-				return (-sizeof(T)) & (sizeof(void*) - 1);
+				// size of type
+				constexpr size_type size = sizeof(T);
+				// memory block alignment
+				constexpr size_type align = sizeof(void*);
+				// padding
+				return (align - (size & (align - 1))) & (align - 1);
+				// alternative: (-sizeof(T)) & (sizeof(void*) - 1);
 			}
 
 			/* power of two padding */
@@ -104,6 +111,9 @@ namespace xns {
 
 
 			// -- pool implementation -----------------------------------------
+			// dumb fast fixed size pool allocator
+			// advantage: speed allocation and deallocation
+			// cons: cannot give back memory to system
 
 			template <size_type N>
 			class pool_impl final {
@@ -119,63 +129,69 @@ namespace xns {
 
 				private:
 
+					// -- forward declarations --------------------------------
+
+					struct page;
+					struct chunk;
+
+
+					// -- private types ---------------------------------------
+
+					/* page pointer type */
+					using page_ptr = page*;
+
+					/* chunk pointer type */
+					using chunk_ptr = chunk*;
+
+					/* void pointer type */
+					using void_ptr = void*;
+
+
 					// -- chunk -----------------------------------------------
 
 					struct chunk final {
 
-
-						// -- public types ------------------------------------
-
-						/* pointer type */
-						using pointer = chunk*;
-
-
 						// -- public lifecycle --------------------------------
 
-						/* non-instanciable class */
-						NON_INSTANCIABLE(chunk);
-
+						/* non-instantiable class */
+						uninstantiable(chunk);
 
 						// -- public members ----------------------------------
 
 						/* next chunk */
-						pointer next;
-
+						chunk_ptr _next;
 					};
 
 
 					// -- page ------------------------------------------------
 
-					struct alignas(sizeof(xns::addr_t)) page final {
+					struct alignas(sizeof(void*)) page final {
 
 						// -- public types ------------------------------------
 
 						/* self type */
 						using self = pool_impl<N>::page;
 
-						/* pointer type */
-						using pointer = self*;
-
-
 
 						// -- public lifecycle --------------------------------
 
 						/* default constructor */
 						inline page(const size_type capacity) noexcept
-						: size{capacity}, next{nullptr} {
+						: _capacity{capacity}, _next{nullptr} {
 
-							auto nchunks = (size - sizeof(self)) / N;
+							auto nchunks = (_capacity - sizeof(self)) / N;
 
-							auto last = (reinterpret_cast<xns::ubyte*>(this) + (N * nchunks)) - N;
-							auto data = reinterpret_cast<xns::ubyte*>(this + 1);
+							auto ptr  = data();
+							auto last = (ptr + (N * (nchunks - 1)));
 
-							while (data < last) {
-								reinterpret_cast<struct chunk*>(data)->next
-									= reinterpret_cast<struct chunk*>(data + N);
-								data += N;
+
+							while (ptr < last) {
+								reinterpret_cast<chunk_ptr>(ptr)->_next = reinterpret_cast<chunk_ptr>(ptr + N);
+								ptr += N;
 							}
 							// set last chunk next pointer to nul
-							reinterpret_cast<struct chunk*>(data)->next = nullptr;
+							reinterpret_cast<chunk_ptr>(ptr)->_next = nullptr;
+
 						}
 
 						/* destructor */
@@ -184,9 +200,19 @@ namespace xns {
 
 						// -- public accessors --------------------------------
 
-						/* first chunk */
-						inline auto first_chunk(void) noexcept -> typename chunk::pointer {
-							return reinterpret_cast<typename chunk::pointer>(this + 1);
+						/* chunks */
+						inline auto chunks(void) noexcept -> chunk_ptr {
+							return reinterpret_cast<chunk_ptr>(this + 1);
+						}
+
+						/* data */
+						inline auto data(void) noexcept -> xns::ubyte* {
+							return reinterpret_cast<xns::ubyte*>(this + 1);
+						}
+
+						/* capacity */
+						inline auto capacity(void) const noexcept -> size_type {
+							return _capacity;
 						}
 
 
@@ -194,18 +220,21 @@ namespace xns {
 
 						/* extend */
 						inline auto extend(void) noexcept -> void {
-							auto nsize = size << 1;
-							next = new (xns::memory::map(nsize)) page{nsize};
+							auto ncap = _capacity;// << 1;
+							_next = new (xns::memory::map(ncap)) page{ncap};
 						}
 
 
 						// -- public members ----------------------------------
 
-						/* size */
-						size_type size;
+						/* capacity */
+						size_type _capacity;
 
 						/* next page */
-						pointer next;
+						page_ptr _next;
+
+						/* first chunk */
+						chunk_ptr _chunks;
 
 					};
 
@@ -215,36 +244,36 @@ namespace xns {
 
 					/* default constructor */
 					inline pool_impl(void) noexcept
-					: _head{new (xns::memory::map()) page{xns::memory::page_size()}},
-					_tail{_head}, _chunk{_head->first_chunk()} {}
+					:	_head{new (xns::memory::map()) page{xns::memory::page_size()}},
+						_tail{_head},
+						_current{_head->chunks()} {}
 
 					/* non-assignable class */
-					NON_ASSIGNABLE(pool_impl);
+					unassignable(pool_impl);
 
 					/* destructor */
-					inline ~pool_impl(void) noexcept(false) {
+					inline ~pool_impl(void) noexcept {
 						// get head page
-						typename page::pointer page = _head;
-						// std::cout << "pool destructor [" << N << "]" << std::endl;
+						auto page = _head;
 						// loop over pages
 						while (page != nullptr) {
-							// std::cout << "deallocate page: " << page->size << std::endl;
-							typename page::pointer next = page->next;
-							xns::memory::unmap(page, page->size);
-							page = next; }
+							auto next = page->_next;
+							xns::memory::unmap(page, page->capacity());
+							page = next;
+						}
 					}
 
 
 					// -- private members -------------------------------------
 
 					/* head page */
-					typename page::pointer _head;
+					page_ptr _head;
 
 					/* tail page */
-					typename page::pointer _tail;
+					page_ptr _tail;
 
 					/* available chunk */
-					typename chunk::pointer _chunk;
+					chunk_ptr _current;
 
 
 				public:
@@ -262,38 +291,39 @@ namespace xns {
 					// -- public static methods -------------------------------
 
 
+
 					/* allocate */
-					static inline auto allocate(void) -> void* {
+					static inline auto allocate(void) -> void_ptr {
 						// get instance
-						self& instance = shared();
+						self& pool = shared();
 
-						typename chunk::pointer chunk = instance._chunk;
+						chunk_ptr ch = pool._current;
 
-						if (chunk->next != nullptr) {
-							instance._chunk = chunk->next;
+						if (ch->_next == nullptr) {
+							pool._tail->extend();
+							pool._tail = pool._tail->_next;
+							pool._current = pool._tail->chunks();
 						}
 						else {
-							instance._tail->extend();
-							instance._tail = instance._tail->next;
-							instance._chunk = instance._tail->first_chunk();
+							pool._current = ch->_next;
 						}
 
-						return static_cast<void*>(chunk);
+						return static_cast<void_ptr>(ch);
 					}
 
 
 					/* deallocate */
 					static inline auto deallocate(void* ptr) -> void {
-						// get instance
-						self& instance = shared();
-
-						typename chunk::pointer chunk = reinterpret_cast<typename chunk::pointer>(ptr);
-
-						chunk->next = instance._chunk;
-						instance._chunk = chunk;
+						// cast pointer to chunk
+						chunk_ptr ch = static_cast<chunk_ptr>(ptr);
+						// set next pointer to current chunk
+						ch->_next = shared()._current;
+						// set current chunk to deallocated chunk
+						shared()._current = ch;
 					}
 
 			};
+
 
 
 		public:
@@ -305,11 +335,11 @@ namespace xns {
 
 				private:
 
-					// -- private types -------------------------------------------
+					// -- private types ---------------------------------------
 
 					/* allocator type */
 					using allocator = xns::memory::pool_impl<
-						sizeof(T) + xns::memory::padding<T>()>;
+						  sizeof(T) + xns::memory::padding<T>()>;
 
 
 				public:
@@ -341,16 +371,15 @@ namespace xns {
 					// -- public lifecycle ------------------------------------
 
 					/* non-instantiable class */
-					NON_INSTANCIABLE(pool);
+					uninstantiable(pool);
 
 
 					// -- public static methods -------------------------------
 
 					/* init memory (force lazy initialization) */
-					inline static auto init(void) -> void {
-						allocator::shared();
+					static inline auto init(void) -> void {
+						self::allocator::shared();
 					}
-
 
 
 					// -- public allocation methods ---------------------------
@@ -408,24 +437,334 @@ namespace xns {
 						}
 					}
 
-
-					/* make */
-					template <typename... A>
-					static inline auto make(A&&... args) -> mut_ptr {
-						mut_ptr addr = allocate();
-						construct(addr, xns::forward<A>(args)...);
-						return addr;
-					}
-
-					/* store */
-					static auto store(mut_ptr addrs) noexcept -> void {
-						destroy(addrs);
-						deallocate(addrs);
-					}
-
 			};
 
 	};
+
+
+
+	// locality implementation
+	// fixed size pool allocator with locality
+	// advantage: good memory locality
+	// cons: slow allocation and deallocation
+
+
+
+	template <typename T>
+	class locality final {
+
+
+		public:
+
+			// -- public types ------------------------------------------------
+
+			/* self type */
+			using self = xns::locality<T>;
+
+			/* size type */
+			using size_type = decltype(sizeof(void*));
+
+			/* mutable pointer type */
+			using mut_ptr = T*;
+
+			/* const pointer type */
+			using const_ptr = const T*;
+
+
+		private:
+
+
+			class chunk final {
+
+				public:
+
+					// metadata only contains pointers to next and previous chunks
+					struct alignas(sizeof(void*)) meta final {
+
+						meta(void) = delete;
+
+						inline meta(chunk* nc, chunk* pc, chunk* na, chunk* pa) noexcept
+							: _nc{nc}, _pc{pc}, _na{na}, _pa{pa} {}
+
+						unassignable(meta);
+
+						/* data */
+						chunk *_nc, *_pc, *_na, *_pa;
+					};
+
+					struct first final {};
+					struct last  final {};
+
+					chunk(void) noexcept
+					: _meta{this + 1, this - 1, this + 1, this - 1} {}
+
+					chunk(chunk::first) noexcept
+					: _meta{this + 1, nullptr, this + 1, nullptr} {}
+
+					chunk(chunk::last) noexcept
+					: _meta{nullptr, this - 1, nullptr, this - 1} {}
+
+
+
+					inline auto next_available(void) noexcept -> chunk* {
+						return _meta._na;
+					}
+
+					inline auto next_available(chunk* na) noexcept -> void {
+						_meta._na = na;
+					}
+
+					inline auto prev_available(void) noexcept -> chunk* {
+						return _meta._pa;
+					}
+
+					inline auto prev_available(chunk* pa) noexcept -> void {
+						_meta._pa = pa;
+					}
+
+					inline auto data(void) noexcept -> mut_ptr {
+						return reinterpret_cast<mut_ptr>(_data);
+					}
+
+
+					// -- members ---------------------------------------------
+
+					/* metadata */
+					meta _meta;
+
+					/* data */
+					alignas(alignof(T)) xns::ubyte _data[sizeof(T)];
+
+			};
+
+
+			class alignas(sizeof(void*)) block final {
+
+				private:
+
+					// -- private types ---------------------------------------
+
+					/* self type */
+					using self = xns::locality<T>::block;
+
+
+				public:
+
+
+					inline block(const size_type capacity) noexcept
+						:	_capacity{capacity},
+						_next{nullptr}, _prev{nullptr},
+						_chunks{reinterpret_cast<chunk*>(this + 1)} {
+
+							typename chunk::first first{};
+
+							// construct first chunk
+							new (_chunks) chunk{first};
+
+							// compute number of chunks
+							const size_type nchunks = (capacity - sizeof(self)) / sizeof(chunk);
+
+							typename chunk::last last{};
+
+							// construct last chunk
+							new (_chunks + (nchunks - 1)) chunk{last};
+
+							// construct chunks
+							for (size_type i = 1; i < nchunks - 1; ++i) {
+								new (_chunks + i) chunk{};
+							}
+
+						}
+
+					/* capacity */
+					inline auto capacity(void) const noexcept -> size_type {
+						return _capacity;
+					}
+
+					/* next block */
+					inline auto next(void) const noexcept -> self* {
+						return _next;
+					}
+
+					/* prev block */
+					inline auto prev(void) const noexcept -> self* {
+						return _prev;
+					}
+
+					/* extend */
+					inline auto extend(void) noexcept -> void {
+						auto ncap = _capacity << 1;
+						_next = new (xns::memory::map(ncap)) self{ncap};
+					}
+
+					/* chunks */
+					inline auto chunks(void) noexcept -> chunk* {
+						return _chunks;
+					}
+
+
+				private:
+
+					// -- members ---------------------------------------------
+
+					/* capacity */
+					size_type _capacity;
+
+					/* next block */
+					block* _next;
+
+					/* prev block */
+					block* _prev;
+
+					/* chunks */
+					chunk* _chunks;
+
+			};
+
+
+			// -- private methods ---------------------------------------------
+
+			/* metadata accessors */
+			inline auto metadata(mut_ptr addr) -> chunk* {
+				chunk* ch = reinterpret_cast<chunk*>(
+						reinterpret_cast<xns::ubyte*>(addr) - sizeof(typename self::chunk::meta));
+
+				if (ch->data() != addr)
+					throw xns::exception(-2, "invalid address");
+
+				return ch;
+			}
+
+			/* extend */
+			inline auto extend(void) noexcept -> void {
+				_tail->extend();
+				_tail = _tail->next();
+			}
+
+
+		public:
+
+
+
+			// -- public lifecycle --------------------------------------------
+
+			/* non-assignable class */
+			unassignable(locality);
+
+			static inline auto shared(void) -> self& {
+				static self instance;
+				return instance;
+			}
+
+
+			// -- public static methods ---------------------------------------
+
+			/* allocate */
+			static auto allocate(mut_ptr hint = nullptr) -> mut_ptr {
+
+				// get instance
+				self& sshared = shared();
+
+				if (hint == nullptr) {
+					// to be implemented...
+				}
+
+				chunk* ch = sshared.metadata(hint);
+
+				if (ch->next_available()) {
+					chunk* next = ch->next_available();
+					ch->next_available(next->next_available());
+					return next->data();
+				}
+				else if (ch->prev_available()) {
+					chunk* prev = ch->prev_available();
+					ch->prev_available(prev->prev_available());
+					return prev->data();
+				}
+
+				// extend
+				sshared.extend();
+				ch = sshared._tail->chunks();
+
+
+				return nullptr;
+			}
+
+
+
+
+		private:
+
+			// -- private lifecycle -------------------------------------------
+
+			/* default constructor */
+			inline locality(void)
+				: _head{new (xns::memory::map()) self::block{xns::memory::page_size()}}, _tail{_head} {
+				}
+
+			/* destructor */
+			inline ~locality(void) noexcept(false) {
+				// get head page
+				auto block = _head;
+				// loop over pages
+				while (block != nullptr) {
+					auto next = block->next();
+					xns::memory::unmap(block, block->capacity());
+					block = next;
+				}
+			}
+
+
+			// -- private members ---------------------------------------------
+
+			/* head block */
+			block* _head;
+
+			/* tail block */
+			block* _tail;
+
+	};
+
+
+
+
+
+
+	///////////////////////////////////////////////////////////////////////////
+
+	// test:
+	// reinterpret block as balanced binary tree
+	template <typename T>
+	inline auto reinterpret_block(void) -> void {
+
+		const xns::size_t size = xns::memory::page_size();
+
+		void* ptr = xns::memory::map(size);
+
+		struct node final {
+			xns::ubyte data[sizeof(T)];
+			node* left;
+			node* right;
+		};
+
+		struct page final {
+			xns::size_t size;
+			node* root;
+		};
+
+		const xns::size_t avail = size - sizeof(page);
+		const xns::size_t nnode = avail / sizeof(node);
+
+
+
+
+
+
+
+
+
+	}
+
 
 }
 
