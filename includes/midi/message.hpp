@@ -1,5 +1,5 @@
-#ifndef MIDI_PACKET_HEADER
-#define MIDI_PACKET_HEADER
+#ifndef XNS_MIDI_MESSAGE_HPP
+#define XNS_MIDI_MESSAGE_HPP
 
 // xns headers
 

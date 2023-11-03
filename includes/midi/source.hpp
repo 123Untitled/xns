@@ -1,5 +1,5 @@
-#ifndef MIDI_SOURCE_HEADER
-#define MIDI_SOURCE_HEADER
+#ifndef XNS_MIDI_SOURCE_HPP
+#define XNS_MIDI_SOURCE_HPP
 
 #include "midi/client.hpp"
 #include "midi/platform.hpp"

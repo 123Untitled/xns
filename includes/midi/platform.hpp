@@ -1,5 +1,5 @@
-#ifndef MSH_PLATEFORM_HEADER
-#define MSH_PLATEFORM_HEADER
+#ifndef XNS_MIDI_PLATEFORM_HPP
+#define XNS_MIDI_PLATEFORM_HPP
 
 #include "os.hpp"
 #include "is_same.hpp"

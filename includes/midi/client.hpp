@@ -1,5 +1,5 @@
-#ifndef MSH_MIDI_CLIENT_HPP
-#define MSH_MIDI_CLIENT_HPP
+#ifndef XNS_MIDI_CLIENT_HPP
+#define XNS_MIDI_CLIENT_HPP
 
 
 #include "macros.hpp"

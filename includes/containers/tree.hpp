@@ -1,12 +1,11 @@
-#ifndef XNS_TREE_HEADER
-#define XNS_TREE_HEADER
+#ifndef XNS_TREE_HPP
+#define XNS_TREE_HPP
 
 #include "string.hpp"
 #include "stack.hpp"
 #include "types.hpp"
 #include "tuple.hpp"
 #include "safe_enum.hpp"
-#include "bst_iterator.hpp"
 #include "output.hpp"
 #include "escape.hpp"
 #include "terminal.hpp"
