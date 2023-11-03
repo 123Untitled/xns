@@ -75,7 +75,7 @@ namespace xns {
 
 				xns::println("\n\x1b[34m", msg, "\x1b[0m");
 
-				auto it = _benchs.reverse_in_order_begin();
+				auto it = _benchs.in_order_begin();
 
 				xns::size_t i = 0;
 
@@ -145,6 +145,8 @@ namespace xns {
 				cycle_type _cycle;
 				average_type _average;
 
+				// INFO:
+				// operator are inverted because reverse iterator is not implemented
 
 				inline auto operator==(const self& other) const noexcept -> bool {
 					return _average == other._average;
@@ -155,19 +157,19 @@ namespace xns {
 				}
 
 				inline auto operator<(const self& other) const noexcept -> bool {
-					return _average < other._average;
-				}
-
-				inline auto operator>(const self& other) const noexcept -> bool {
 					return _average > other._average;
 				}
 
+				inline auto operator>(const self& other) const noexcept -> bool {
+					return _average < other._average;
+				}
+
 				inline auto operator<=(const self& other) const noexcept -> bool {
-					return _average <= other._average;
+					return _average >= other._average;
 				}
 
 				inline auto operator>=(const self& other) const noexcept -> bool {
-					return _average >= other._average;
+					return _average <= other._average;
 				}
 
 			};
