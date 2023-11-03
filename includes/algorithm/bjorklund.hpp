@@ -26,7 +26,7 @@ namespace xns {
 
 			// -- public static methods ---------------------------------------
 
-			static auto generate(const size_type, const size_type) -> xns::vector<size_type>;
+			static auto generate(const size_type, const size_type, const size_type = 1) -> xns::vector<size_type>;
 
 
 		private:
@@ -37,7 +37,7 @@ namespace xns {
 			bjorklund(void) = delete;
 
 			/* argument constructor */
-			bjorklund(const size_type, const size_type) noexcept;
+			bjorklund(const size_type, const size_type, const size_type) noexcept;
 
 			/* non-assignable class */
 			unassignable(bjorklund);
@@ -66,6 +66,9 @@ namespace xns {
 			/* pulse count */
 			size_type _pulse;
 
+			/* burst count */
+			size_type _burst;
+
 			/* front */
 			node_ptr _front;
 
@@ -78,16 +81,21 @@ namespace xns {
 			/* generate euclidean rhythm */
 			auto generate_impl(void) -> xns::vector<size_type>;
 
+			/* generate bursts */
+			auto gen_bursts(void) const -> xns::vector<size_type>;
+
 			/* compute */
 			auto compute(size_type&, size_type&) noexcept -> void;
 
+			/* print */
+			auto print(const size_type) const noexcept -> void;
 
 			// -- private class -----------------------------------------------
 
 			struct node {
 
-				/* deleted default constructor */
-				node(void) = delete;
+				/* default constructor */
+				inline node(void) noexcept;
 
 				/* data constructor */
 				inline node(const size_type) noexcept;
