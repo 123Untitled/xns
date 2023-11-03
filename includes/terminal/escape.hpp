@@ -179,6 +179,9 @@ namespace xns {
 			/* rgb color */
 			static string rgb_color(xns::u8, xns::u8, xns::u8, const bool = true);
 
+			/* rgb color */
+			static string rgb_color(const xns::rgb&, const bool = true);
+
 
 		private:
 
