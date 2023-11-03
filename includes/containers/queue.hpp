@@ -213,7 +213,8 @@ namespace xns {
 				//static_assert(xns::is_same<xns::remove_cvr<U>, value_type>, // TODO: replace with is_convertible ?
 				//		"): QUEUE: U MUST BE SAME AS T :(");
 				// allocate node
-				node_pointer node = allocator::make(xns::forward<U>(value));
+				node_pointer node = allocator::allocate();
+				allocator::construct(node, xns::forward<U>(value));
 				// link node
 				link(node);
 			}
@@ -225,7 +226,8 @@ namespace xns {
 				static_assert(xns::is_constructible<value_type, A...>,
 						"): QUEUE: T MUST BE CONSTRUCTIBLE FROM A... :(");
 				// allocate node
-				node_pointer node = allocator::make(xns::forward<A>(args)...);
+				node_pointer node = allocator::allocate();
+				allocator::construct(node, xns::forward<A>(args)...);
 				// link node
 				link(node);
 			}
@@ -238,8 +240,10 @@ namespace xns {
 					node_pointer node = _head;
 					// unlink node
 					_head = _head->_next;
+					// destroy node
+					allocator::destroy(node);
 					// deallocate node
-					allocator::store(node);
+					allocator::deallocate(node);
 					// decrement size
 					--_size;
 				}
@@ -287,8 +291,10 @@ namespace xns {
 				while (node) {
 					// get next node
 					node_pointer next = node->_next;
+					// destroy node
+					allocator::destroy(node);
 					// deallocate node
-					allocator::store(node);
+					allocator::deallocate(node);
 					// set node to next
 					node = next;
 				}
@@ -311,7 +317,7 @@ namespace xns {
 			: _next{nullptr} {}
 
 			/* non-assignable class */
-			NON_ASSIGNABLE(node);
+			unassignable(node);
 
 			/* value copy constructor */
 			inline explicit node(queue<T>::const_reference value)
