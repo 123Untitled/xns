@@ -7,6 +7,7 @@
 #include "forward.hpp"
 #include "memory.hpp"
 #include "swap.hpp"
+#include "allocator.hpp"
 
 #include <iostream>
 
@@ -66,6 +67,7 @@ namespace xns {
 
 			/* allocator type */
 			using allocator = xns::memory::pool<node>;
+			//using allocator = xns::allocator<node>;
 
 
 		public:
@@ -174,7 +176,8 @@ namespace xns {
 			template <typename U>
 			auto push(U&& value) -> void {
 				// allocate and link node
-				node_pointer node = allocator::make(xns::forward<U>(value));
+				node_pointer node = allocator::allocate();
+				allocator::construct(node, xns::forward<U>(value));
 				node->_next = _top;
 				_top = node;
 				// increment size
@@ -185,7 +188,8 @@ namespace xns {
 			template <typename... A>
 			auto emplace(A&&... args) -> void {
 				// allocate and link node
-				node_pointer node = allocator::make(xns::forward<A>(args)...);
+				node_pointer node = allocator::allocate();
+				allocator::construct(node, xns::forward<A>(args)...);
 				node->_next = _top;
 				_top = node;
 				// increment size
@@ -199,8 +203,10 @@ namespace xns {
 					// get top node
 					node_pointer node = _top;
 					_top = _top->_next;
+					// destroy node
+					allocator::destroy(node);
 					// deallocate node
-					allocator::store(node);
+					allocator::deallocate(node);
 					// decrement size
 					--_size;
 				}
@@ -255,8 +261,10 @@ namespace xns {
 				while (node) {
 					// get next node
 					node_pointer next = node->_next;
+					// destroy node
+					allocator::destroy(node);
 					// deallocate node
-					allocator::store(node);
+					allocator::deallocate(node);
 					// set node to next
 					node = next;
 				}
@@ -288,7 +296,7 @@ namespace xns {
 			: _next{nullptr} {}
 
 			/* non-assignable class */
-			NON_ASSIGNABLE(node);
+			unassignable(node);
 
 			/* value copy constructor */
 			inline explicit node(stack<T>::const_reference value)
