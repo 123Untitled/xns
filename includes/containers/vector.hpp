@@ -1,3 +1,13 @@
+///////////////////////////////////////////////////////////////////////////////
+//       :::    ::: ::::    :::  ::::::::                                    //
+//      :+:    :+: :+:+:   :+: :+:    :+:                                    //
+//      +:+  +:+  :+:+:+  +:+ +:+                                            //
+//      +#++:+   +#+ +:+ +#+ +#++:++#++                                      //
+//    +#+  +#+  +#+  +#+#+#        +#+                                       //
+//  #+#    #+# #+#   #+#+# #+#    #+#                                        //
+// ###    ### ###    ####  ########                                          //
+///////////////////////////////////////////////////////////////////////////////
+
 #ifndef XNS_VECTOR_HEADER
 #define XNS_VECTOR_HEADER
 
@@ -86,6 +96,12 @@ namespace xns {
 			inline vector(void) noexcept
 			: _vector{nullptr}, _capacity{0}, _size{0} {}
 
+
+			/* allocation constructor */
+			explicit inline vector(pointer ptr, const size_type size) noexcept
+			: _vector{ptr}, _capacity{ptr ? size : 0}, _size{_capacity} {}
+			// WARNING: this constructor is dangerous, use with caution
+			// need to use same allocator as the one used to allocate ptr
 
 
 			/* copy constructor */
