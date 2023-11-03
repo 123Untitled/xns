@@ -212,7 +212,7 @@ namespace xns {
 			}
 
 			/* has type */
-			template <class T>
+			template <typename T>
 			inline constexpr auto has(void) const noexcept -> bool {
 				// check if type is in variant
 				static_assert(xns::is_one_of<T, A...>,
