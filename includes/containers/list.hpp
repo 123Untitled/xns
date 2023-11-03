@@ -289,7 +289,7 @@ namespace xns {
 				// set new head node
 				_head = _head->_next;
 				// delete node
-				delete_node(node);
+				store_node(node);
 				// check if list is empty
 				not _head ? _tail = nullptr : _head->_prev = nullptr;
 				// decrement size
@@ -305,7 +305,7 @@ namespace xns {
 				// set new tail node
 				_tail = _tail->_prev;
 				// delete node
-				delete_node(node);
+				store_node(node);
 				// check if list is empty
 				not _tail ? _head = nullptr : _tail->_next = nullptr;
 				// decrement size
@@ -389,23 +389,15 @@ namespace xns {
 			/* new node */
 			template <typename... A>
 			inline auto new_node(A&&... args) -> node_ptr {
-				return allocator::make(xns::forward<A>(args)...);
-
-				/* using allocator_traits = std::allocator_traits<std::allocator<node_type>>;
-				typename allocator_traits::allocator_type a;
-				node_ptr node = allocator_traits::allocate(a, 1);
-				allocator_traits::construct(a, node, xns::forward<A>(args)...);
-				return node; */
+				auto node = allocator::allocate();
+				allocator::construct(node, xns::forward<A>(args)...);
+				return node;
 			}
 
 			/* delete node */
-			inline void delete_node(node_ptr node) noexcept {
-				allocator::store(node);
-
-				/* using allocator_traits = std::allocator_traits<std::allocator<node_type>>;
-				typename allocator_traits::allocator_type a;
-				allocator_traits::destroy(a, node);
-				allocator_traits::deallocate(a, node, 1); */
+			inline void store_node(node_ptr node) noexcept {
+				allocator::destroy(node);
+				allocator::deallocate(node);
 			}
 
 
@@ -450,7 +442,7 @@ namespace xns {
 					 node = _head;
 					_head = _head->_next;
 					// delete node
-					delete_node(node);
+					store_node(node);
 				}
 			}
 
