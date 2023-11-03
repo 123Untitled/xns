@@ -2,11 +2,15 @@
 #define XNS_COLOR_HEADER
 
 #include "types.hpp"
+#include "math.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
+
+
+
 
 	// using hexcolor = xns::u32;
 
@@ -22,6 +26,10 @@ namespace xns {
 		xns::u8 b;
 		xns::u8 a;
 	};
+
+
+	auto lch_to_rgb(const xns::f64, const xns::f64, const xns::f64) -> xns::rgb;
+
 
 
 	class hexcolor final {
@@ -191,16 +199,6 @@ namespace xns {
 
 	};
 }
-
-/*
-#define LOWLIGHT_COLOR		0x414868
-#define DARK_GREY_COLOR		0x636363
-#define BCKGRND_COLOR		0x1F1F1F
-#define GREY_COLOR			0x7F7F7F
-#define WHITE_COLOR			0xE5E5E5
-#define GREEN_COLOR			0x37FFDA
-#define RED_COLOR			0xFF8BA5
-*/
 
 
 
