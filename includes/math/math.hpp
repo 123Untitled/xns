@@ -2,6 +2,7 @@
 #define XNS_MATH_HEADER
 
 #include "is_arithmetic.hpp"
+#include "is_floating.hpp"
 #include "is_signed.hpp"
 #include "numeric_limits.hpp"
 #include "is_scalar.hpp"
@@ -11,6 +12,16 @@
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
+
+
+	// -- R E M A P -----------------------------------------------------------
+
+	template <typename T>
+	inline auto remap(T value, T oldmin, T oldmax, T newmin, T newmax) -> T {
+		// assert that T is a floating point type
+		static_assert(xns::is_floating<T>, "): T MUST BE FLOATING POINT :(");
+		return (((value - oldmin) / (oldmax - oldmin)) * (newmax - newmin)) + newmin;
+	}
 
 
 	// -- A B S ---------------------------------------------------------------
@@ -46,24 +57,32 @@ namespace xns {
 
 	// -- M A X ---------------------------------------------------------------
 
-	template <class T, class U>
-	inline constexpr auto max(const T& a, const U& b) -> const decltype(a > b ? a : b)& {
+	template <typename T>
+	inline constexpr auto max(const T& a, const T& b) -> const T& {
 		// assert that T and U are comparable types
-		static_assert(xns::is_comparable<T, U>, "): MAX: TYPES MUST BE COMPARABLE :(");
+		static_assert(xns::is_comparable<T>, "): MAX: TYPES MUST BE COMPARABLE :(");
 		// return max value
 		return a > b ? a : b;
 	}
 
-
-
 	// -- M I N ---------------------------------------------------------------
 
-	template <class T, class U>
-	inline constexpr auto min(const T& a, const U& b) -> const decltype(a < b ? a : b)& {
+	template <typename T>
+	inline constexpr auto min(const T& a, const T& b) -> const T& {
 		// assert that T and U are comparable types
-		static_assert(xns::is_comparable<T, U>, "): MIN: TYPES MUST BE COMPARABLE :(");
+		static_assert(xns::is_comparable<T>, "): MIN: TYPES MUST BE COMPARABLE :(");
 		// return min value
 		return a < b ? a : b;
+	}
+
+	// -- C L A M P -----------------------------------------------------------
+
+	template <typename T>
+	inline constexpr auto clamp(const T& value, const T& min, const T& max) -> T {
+		// assert that T and U are comparable types
+		static_assert(xns::is_comparable<T>, "): CLAMP: TYPES MUST BE COMPARABLE :(");
+		// return clamped value
+		return value < min ? min : value > max ? max : value;
 	}
 
 
