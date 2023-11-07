@@ -20,7 +20,18 @@ namespace xns {
 	inline auto remap(T value, T oldmin, T oldmax, T newmin, T newmax) -> T {
 		// assert that T is a floating point type
 		static_assert(xns::is_floating<T>, "): T MUST BE FLOATING POINT :(");
-		return (((value - oldmin) / (oldmax - oldmin)) * (newmax - newmin)) + newmin;
+		return oldmin == oldmax ? newmin : (((value - oldmin) / (oldmax - oldmin)) * (newmax - newmin)) + newmin;
+	}
+
+
+	// -- D I F F -------------------------------------------------------------
+
+	template <typename T>
+	inline auto diff(const T& a, const T& b) -> T {
+		// assert that T and U are comparable types
+		static_assert(xns::is_scalar<T>, "): DIFF: TYPES MUST BE ARITHMETIC :(");
+		// return difference
+		return a > b ? a - b : b - a;
 	}
 
 
