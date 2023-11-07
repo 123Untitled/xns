@@ -227,20 +227,21 @@ static void benchmark01(void) {
 static auto insert_test(void) -> void {
 
 	using type = xns::size_t;
-	constexpr xns::size_t NSIZE = 50;
+	constexpr xns::size_t NSIZE = 300;
 
 	xns::tree<type> tree;
 
 	std::vector<type> vec = random_vector<false>(NSIZE);
 
 	for (auto n : vec)
-		tree.insert(n % 100);
+		tree.insert(n);
+		//tree.insert(n % 100);
 
 	tree.fragmentation();
 	tree.defragment();
-	tree.print();
+	//tree.print();
 	tree.fragmentation();
-	tree.print();
+	//tree.print();
 	//tree.memory_frag();
 
 	xns::println("AVL size  - ", tree.size(), "\nAVL depth - ", tree.depth());
@@ -319,9 +320,6 @@ struct ss {
 #if defined(XNS_TEST_TREE)
 //BENCHMARK_MAIN();
 int main(int argc, char** argv) {
-
-
-
 
 
 
