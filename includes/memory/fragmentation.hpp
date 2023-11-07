@@ -14,6 +14,18 @@
 namespace xns {
 
 
+	template <typename T, typename... A>
+	auto deviation(T&& value, A&&... values) -> T {
+
+		constexpr auto n = sizeof...(A) + 1;
+		// compute avg
+		T avg = (value + ... + values) / n; 
+		// variance computation
+		T variance = ((std::pow(value - avg, 2) + ... + std::pow(values - avg, 2)) / (n - 1));
+		// return standard deviation
+		return std::sqrt(variance);
+	}
+
 	// -- F R A G M E N T A T I O N -------------------------------------------
 
 	class fragmentation final {

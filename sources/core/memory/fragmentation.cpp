@@ -14,6 +14,7 @@ auto xns::fragmentation::display(const xns::vector<void*>& addrs) -> void {
 	xns::fragmentation{addrs};
 }
 
+
 xns::fragmentation::fragmentation(const xns::vector<void*>& addrs)
 :	_addrs{addrs},
 	_width{xns::terminal::width()},
@@ -66,6 +67,49 @@ xns::fragmentation::fragmentation(const xns::vector<void*>& addrs)
 	xns::println(xns::escape::reset_style());
 	xns::out::render();
 
+
+
+	// -- compute differences ---------------------------------------------------
+
+	xns::vector<size_type> diffs;
+
+	size_type min_diff = xns::limits::max<size_type>();
+	size_type max_diff = 0;
+
+
+	for (size_type i = 0; i < avgs.size(); ++i) {
+
+		if (i == avgs.size() - 1) {
+			auto diff = xns::diff(avgs[i], avgs[i - 1]);
+			// get min and max differences
+			min_diff = xns::min(diff, min_diff);
+			max_diff = xns::max(diff, max_diff);
+			diffs.push_back(diff);
+		}
+		else {
+			auto diff = xns::diff(avgs[i], avgs[i + 1]);
+			// get min and max differences
+			min_diff = xns::min(diff, min_diff);
+			max_diff = xns::max(diff, max_diff);
+			diffs.push_back(diff);
+		}
+	}
+
+	// loop over differences
+	for (auto& d : diffs) {
+
+		xns::f64 diff = static_cast<xns::f64>(d);
+
+		// print color
+		xns::print(xns::escape::rgb_color(xns::lch_to_rgb(
+			xns::remap(diff, (xns::f64)min_diff, (xns::f64)max_diff, 25.0,   80.0), // luma
+			xns::remap(diff, (xns::f64)min_diff, (xns::f64)max_diff, 10.0,   10.0), // chroma
+			xns::remap(diff, (xns::f64)min_diff, (xns::f64)max_diff, 300.0, 300.0)  // hue
+		), false), ' ');
+	}
+
+	xns::println(xns::escape::reset_style());
+	xns::out::render();
 
 }
 
