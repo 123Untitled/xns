@@ -73,7 +73,7 @@ namespace xns {
 			}
 
 			/* non-copyable class */
-			NON_COPYABLE(unique_descriptor);
+			non_copyable(unique_descriptor);
 
 			/* move constructor */
 			inline unique_descriptor(self&& other) noexcept
