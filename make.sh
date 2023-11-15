@@ -644,6 +644,7 @@ function setup_files {
 		fi
 		# append defines
 		DEFINES+=('-DXNS_TEST_'${TEST:u})
+		echo $DEFINES
 		# set optimization level
 		OPT=$FAST
 	fi
