@@ -11,6 +11,9 @@
 #include "string.hpp"
 
 
+#include "string_literal.hpp"
+
+
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
@@ -208,6 +211,49 @@ namespace xns {
 
 	};
 
+
+
+	// compile time compressed prefix tree (hard to implement, but possible)
+	// words known at compile time are stored in a trie
+	// search is done at runtime, but trie is built at compile time
+
+
+
+	template <xns::basic_string_literal... L>
+	class compile_time_trie final {
+
+		public:
+
+			using size_type = decltype(sizeof(0));
+
+			inline auto search(void) noexcept -> bool {
+				/* not implemented */
+				return false;
+			}
+
+
+		private:
+
+
+			static consteval auto get_number_of_nodes(void) noexcept -> size_type {
+
+
+
+
+
+				return 0;
+			}
+
+
+
+	};
+
+
+	// hard to implement.
+	// alternative: use a hash table with a perfect hash function
+	// complexity: O(1) + comparison of one string O(n)
+	// where n is the length of the string
+	// so it's same as a trie, but with a hash table instead of a tree
 
 
 };
