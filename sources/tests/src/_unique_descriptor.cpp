@@ -1,6 +1,8 @@
 #include "unit_tests.hpp"
 #include "unique_descriptor.hpp"
 
+#include "getline.hpp"
+
 /* unit test */
 template <>
 int UT::unit_tests<"unique_descriptor">(void) {
@@ -10,6 +12,7 @@ int UT::unit_tests<"unique_descriptor">(void) {
 
 #if defined(XNS_TEST_UNIQUE_DESCRIPTOR)
 int main(void) {
+
 	return UT::unit_tests<"unique_descriptor">();
 }
 #endif

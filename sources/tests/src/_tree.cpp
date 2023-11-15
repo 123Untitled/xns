@@ -13,7 +13,7 @@
 // boost
 #include <boost/container/set.hpp>
 // google benchmark
-#include <benchmark/benchmark.h>
+//#include <benchmark/benchmark.h>
 
 // standard library
 #include <set>
@@ -227,20 +227,20 @@ static void benchmark01(void) {
 static auto insert_test(void) -> void {
 
 	using type = xns::size_t;
-	constexpr xns::size_t NSIZE = 300;
+	constexpr xns::size_t NSIZE = 50;
 
 	xns::tree<type> tree;
 
 	std::vector<type> vec = random_vector<false>(NSIZE);
 
 	for (auto n : vec)
-		tree.insert(n);
+		tree.insert(n % 100);
 		//tree.insert(n % 100);
 
-	tree.fragmentation();
-	tree.defragment();
-	//tree.print();
-	tree.fragmentation();
+	//tree.fragmentation();
+	//tree.defragment();
+	tree.print();
+	//tree.fragmentation();
 	//tree.print();
 	//tree.memory_frag();
 
@@ -274,46 +274,46 @@ int UT::unit_tests<"tree">(void) {
 	//state.SetItemsProcessed(state.iterations() * state.range(0));
 		//state.PauseTiming();
 
-static xns::vector<xns::size_t> vec;
-
-template <typename T>
-void launch_bench(benchmark::State& state) {
-
-
-	using type = typename T::value_type;
-
-	for (auto _ : state) {
-		T tree;
-		for (int i = 0; i < state.range(0); ++i) {
-			tree.insert(vec[i]);
-			auto size = tree.size();
-			benchmark::DoNotOptimize(tree.size());
-		}
-	}
-	state.SetItemsProcessed(state.iterations() * state.range(0));
-}
-
-
-#define RANGE 1'000'00
-#define NUMBERS RANGE
-#define ITERATIONS 30
-
-using type = xns::size_t;
-using txns = xns::tree<type>;
-using tstd = std::set<type>;
-using tboo = boost::container::set<type>;
-
-
-
-BENCHMARK(launch_bench<txns>)->Name("xns")->Range(8, RANGE)->Iterations(ITERATIONS);
-BENCHMARK(launch_bench<tstd>)->Name("std")->Range(8, RANGE)->Iterations(ITERATIONS);
-BENCHMARK(launch_bench<tboo>)->Name("boost")->Range(8, RANGE)->Iterations(ITERATIONS);
-
-struct ss {
-	char c[21];
-} __attribute__((packed));
-
-
+//static xns::vector<xns::size_t> vec;
+//
+//template <typename T>
+//void launch_bench(benchmark::State& state) {
+//
+//
+//	using type = typename T::value_type;
+//
+//	for (auto _ : state) {
+//		T tree;
+//		for (int i = 0; i < state.range(0); ++i) {
+//			tree.insert(vec[i]);
+//			auto size = tree.size();
+//			benchmark::DoNotOptimize(tree.size());
+//		}
+//	}
+//	state.SetItemsProcessed(state.iterations() * state.range(0));
+//}
+//
+//
+//#define RANGE 1'000'00
+//#define NUMBERS RANGE
+//#define ITERATIONS 30
+//
+//using type = xns::size_t;
+//using txns = xns::tree<type>;
+//using tstd = std::set<type>;
+//using tboo = boost::container::set<type>;
+//
+//
+//
+//BENCHMARK(launch_bench<txns>)->Name("xns")->Range(8, RANGE)->Iterations(ITERATIONS);
+//BENCHMARK(launch_bench<tstd>)->Name("std")->Range(8, RANGE)->Iterations(ITERATIONS);
+//BENCHMARK(launch_bench<tboo>)->Name("boost")->Range(8, RANGE)->Iterations(ITERATIONS);
+//
+//struct ss {
+//	char c[21];
+//} __attribute__((packed));
+//
+//
 #include "bjorklund.hpp"
 
 
