@@ -37,7 +37,7 @@ namespace xns {
 					 "): STRING LITERALS MUST BE UNIQUE :(");
 
 		/* check for map size */
-		static_assert(sizeof...(L) > 1, "): MAP MUST HAVE AT LEAST 2 ELEMENTS :(");
+		static_assert(sizeof...(L) > 0, "): MAP MUST HAVE AT LEAST 1 KEY :(");
 
 
 		public:
