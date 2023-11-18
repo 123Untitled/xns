@@ -98,7 +98,7 @@ static void benchmark01(void) {
 	using type = xns::size_t;
 
 	enum : xns::size_t {
-		NSIZE = 1'000'000,
+		NSIZE = 1'000,
 		ITERATIONS = 1,
 		RANGE = 1000000000
 	};
@@ -147,7 +147,7 @@ static void benchmark01(void) {
 	//
 
 
-	std::vector<type> vec = random_vector<true>(NSIZE);
+	std::vector<type> vec = random_vector<false>(NSIZE);
 
 	bench.run("xns::tree insert", [&]() -> void {
 		for (xns::size_t j = 0; j < ITERATIONS; ++j) {
@@ -237,9 +237,11 @@ static auto insert_test(void) -> void {
 		tree.insert(n % 100);
 		//tree.insert(n % 100);
 
-	//tree.fragmentation();
-	//tree.defragment();
 	tree.print();
+	tree.fragmentation();
+	tree.defragment();
+	tree.print();
+	tree.fragmentation();
 	//tree.fragmentation();
 	//tree.print();
 	//tree.memory_frag();
@@ -261,8 +263,8 @@ int UT::unit_tests<"tree">(void) {
 	//	tree.insert(v);
 
 
-	insert_test();
-	//benchmark01();
+	//insert_test();
+	benchmark01();
 	//interactive();
 	return 0;
 }

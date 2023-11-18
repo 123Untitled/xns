@@ -5,19 +5,19 @@
 #include "benchmark.hpp"
 #include "random.hpp"
 
-std::vector<int> bjorklund_github(int step, int pulse) {
-	int back = step - pulse;
-	int remainder = back % pulse;
-	int per_pulse = (int) floor(back / pulse);
-	int noskip = (remainder == 0) ? 0 : (int) floor(pulse / remainder);
-	int skipXTime = (noskip == 0) ? 0 : (int) floor((pulse - remainder)/noskip);
+std::vector<xns::size_t> bjorklund_github(xns::size_t step, xns::size_t pulse) {
+	xns::size_t back = step - pulse;
+	xns::size_t remainder = back % pulse;
+	xns::size_t per_pulse = (xns::size_t) floor(back / pulse);
+	xns::size_t noskip = (remainder == 0) ? 0 : (xns::size_t) floor(pulse / remainder);
+	xns::size_t skipXTime = (noskip == 0) ? 0 : (xns::size_t) floor((pulse - remainder)/noskip);
 
-	std::vector<int> rhythm;
+	std::vector<xns::size_t> rhythm;
 
-	int count = 0;
-	int skipper = 0;
+	xns::size_t count = 0;
+	xns::size_t skipper = 0;
 
-	for (int i = 1; i <= step; i++) {
+	for (xns::size_t i = 1; i <= step; i++) {
 		if (count == 0) {
 			rhythm.push_back(1);
 			count = per_pulse;

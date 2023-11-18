@@ -10,6 +10,7 @@
 #include "tree.hpp"
 
 
+
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
@@ -28,7 +29,7 @@ namespace xns {
 			: _benchs{} {}
 
 			/* destructor */
-			inline ~benchmark(void) = default;
+			inline ~benchmark(void) noexcept = default;
 
 
 
@@ -42,7 +43,7 @@ namespace xns {
 
 				constexpr xns::size_t max = xns::limits::max<xns::size_t>();
 
-				time_t start = xns::time::now();
+				time_type start = xns::time::now();
 
 				// hide cursor
 				xns::print(xns::escape::hide_cursor());
@@ -58,7 +59,7 @@ namespace xns {
 				xns::out::render();
 
 
-				time_t end = xns::time::now();
+				time_type end = xns::time::now();
 
 				data_t data{};
 				data._msg = msg;
@@ -113,10 +114,6 @@ namespace xns {
 
 		private:
 
-			// -- private constants -------------------------------------------
-
-			/* time in nanoseconds */
-			inline static constexpr time_t TIME_NANO = TIME_SEC * 1'000'000'000;
 
 
 			// -- private types -----------------------------------------------
@@ -132,6 +129,12 @@ namespace xns {
 
 			/* msg type */
 			using msg_type = xns::string_view;
+
+
+			// -- private constants -------------------------------------------
+
+			/* time in nanoseconds */
+			inline static constexpr time_type TIME_NANO = TIME_SEC * 1'000'000'000;
 
 
 			// -- private structs ---------------------------------------------

@@ -1643,7 +1643,7 @@ namespace xns {
 				// check for null node
 				if (_node == nullptr) return;
 
-				_container.reserve(_node->_depth);
+				_container.reserve(static_cast<size_type>(_node->_depth));
 
 				// stack nodes
 				do {

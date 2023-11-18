@@ -6,6 +6,8 @@
 #include "macros.hpp"
 #include "os.hpp"
 
+#include <iostream>
+
 
 // operating system headers
 #if defined(XNS_APPLE)
@@ -42,20 +44,19 @@ namespace xns {
 			#if defined(XNS_APPLE)
 
 			/* get current time */
-			static auto now(void) -> xns::size_t {
-				return ::mach_absolute_time()
-					* shared()._abs_to_nano;
+			static auto now(void) noexcept -> size_type {
+				return static_cast<size_type>(::mach_absolute_time() * shared()._abs_to_nano);
 			}
 
 
 			#elif defined(XNS_LINUX) || defined(XNS_BSD)
 
 			/* get current time */
-			static auto now(void) -> xns::size_t {
+			static auto now(void) noexcept -> size_type {
 
 				struct ::timespec ts;
 				::clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-				return (static_cast<xns::size_t>(ts.tv_sec) * 1'000'000'000U)
+				return (static_cast<size_type>(ts.tv_sec) * 1'000'000'000U)
 					+ ts.tv_nsec;
 			}
 
@@ -77,14 +78,14 @@ namespace xns {
 				// get timebase info
 				::mach_timebase_info(&timebase);
 
+
 				// absolute clock to nanoseconds
 				_abs_to_nano = static_cast<xns::f64>(timebase.numer)
-							/ static_cast<xns::f64>(timebase.denom);
+							 / static_cast<xns::f64>(timebase.denom);
 
 				// nanoseconds to absolute clock
 				_nano_to_abs = static_cast<xns::f64>(timebase.denom)
-							/ static_cast<xns::f64>(timebase.numer);
-
+							 / static_cast<xns::f64>(timebase.numer);
 			}
 
 			#elif defined(XNS_LINUX) || defined(XNS_BSD)
@@ -95,7 +96,7 @@ namespace xns {
 			#endif
 
 			/* non-assignable class */
-			NON_ASSIGNABLE(time);
+			non_assignable(time);
 
 			/* destructor */
 			inline ~time(void) noexcept = default;
@@ -105,7 +106,7 @@ namespace xns {
 
 			/* get instance */
 			static inline auto shared(void) noexcept -> self& {
-				static xns::time instance;
+				static self instance;
 				return instance;
 			}
 
