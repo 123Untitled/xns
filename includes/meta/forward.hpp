@@ -8,23 +8,38 @@
 
 namespace xns {
 
+	// input        param        result
+	// T&           &            T&
+	// T&           &&           T&
+	// T&&          &            T&
+	// T&&          &&           T&&
+
 
 	// -- F O R W A R D -------------------------------------------------------
 
 	// forward lvalues as lvalues
-	template <class T>
-	inline constexpr T&& forward(xns::to_lvalue<T> obj) noexcept {
-		// cast to T&(&&) = T&
+	template <typename T>
+	inline constexpr auto forward(xns::to_lvalue<T> obj) noexcept -> T&& {
+		// cast -> T& && = T&
 		return static_cast<T&&>(obj);
 	}
 
 	// forward rvalues as rvalues
-	template <class T>
-	inline constexpr T&& forward(xns::to_rvalue<T> obj) noexcept {
-		// cast to T&&(&&) = T&&
+	template <typename T>
+	inline constexpr auto forward(xns::to_rvalue<T> obj) noexcept -> T&& {
+		// cast -> T&& && = T&&
 		return static_cast<T&&>(obj);
 	}
 
+	template <typename T>
+	inline constexpr auto forward2(xns::to_lvalue<T> obj) noexcept -> xns::to_lvalue<T> {
+		return static_cast<xns::to_lvalue<T>>(obj);
+	}
+
+	template <typename T>
+	inline constexpr auto forward2(xns::to_rvalue<T> obj) noexcept -> xns::to_lvalue<T> {
+		return static_cast<xns::to_lvalue<T>>(obj);
+	}
 
 }
 
