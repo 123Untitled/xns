@@ -133,7 +133,7 @@ auto xns::bjorklund::generate_impl(void) -> xns::vector<size_type> {
 	auto seq = xns::vector<size_type>::allocator::allocate(_step);
 	auto ptr = seq;
 	// retrieve sequence to fill vector
-	for (size_type i = 0; i < f; ++i) {
+	for (i = 0; i < f; ++i) {
 		// loop over subsequence
 		for (auto sub = _front + i; sub; sub = sub->_up, ++ptr)
 			*ptr = sub->_data;

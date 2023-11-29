@@ -77,7 +77,7 @@ xns::fragmentation::fragmentation(const xns::vector<void*>& addrs)
 	size_type max_diff = 0;
 
 
-	for (size_type i = 0; i < avgs.size(); ++i) {
+	for (i = 0; i < avgs.size(); ++i) {
 
 		if (i == avgs.size() - 1) {
 			auto diff = xns::diff(avgs[i], avgs[i - 1]);
