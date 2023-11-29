@@ -166,7 +166,7 @@ CXXFLAGS+=('-Winline')
 CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
 
 # shadowing
-#CXXFLAGS+=('-Wshadow')
+CXXFLAGS+=('-Wshadow')
 
 # defines
 DEFINES=()
@@ -389,16 +389,16 @@ function handle_compilation {
 
 		# check if compilation failed
 		if [[ $? -ne 0 ]]; then
-			echo -n   $ERROR'[x]'$RESET; exit 1
+			echo -n   $ERROR'[x]'$RESET
+			exit 1
 		else
-			echo -n $SUCCESS'[✓]'$RESET; exit 0
+			echo -n $SUCCESS'[✓]'$RESET
+			exit 0
 		fi
-
 
 	fi
 
 	exit 0
-
 }
 
 
@@ -422,18 +422,21 @@ function handle_errors {
 			# ignore pattern 'In file included from'
 			if [[ $LOGLINE =~ 'In file included from' ]]; then
 				continue
+			# ignore pattern '[0-9]+ warnings and [0-9]+ errors generated.'
+			elif [[ $LOGLINE =~ '[0-9]+ errors? generated.' ]]; then
+				continue
 			fi
-			echo $LOGLINE
-			continue
+			#echo $LOGLINE
+			#continue
 
 
 			if [[ $LOGLINE =~ $REGEX ]]; then
-				BASE=${match[1]}
-				NUMBER=$(printf "%10d" ${match[2]})
-				MSG=$(printf "%10s" ${match[4]})
-
-				echo $NUMBER $COLOR'|'$RESET $BASE
-				echo $MSG
+				#BASE=${match[1]}
+				#NUMBER=$(printf "%10d" ${match[2]})
+				#MSG=$(printf "%10s" ${match[4]})
+				#echo $NUMBER $COLOR'|'$RESET $BASE
+				#echo $MSG
+				echo $COLOR${match[1]} ${match[2]}$RESET ${match[4]}
 
 			elif [[ $LOGLINE =~ '^ *~* *\^ *~* *$' ]]; then
 				echo $LOGLINE'\n'
@@ -467,7 +470,6 @@ function compile {
 		handle_compilation $FILE &
 		PIDS+=($!)
 	done
-
 
 	# loop over pids
 	for PID in $PIDS; do
