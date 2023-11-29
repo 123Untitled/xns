@@ -71,7 +71,7 @@ namespace xns {
 			using const_reference = const value_type&;
 
 			/* move reference type */
-			using move_reference  = value_type&&;
+			using move_reference  = xns::remove_const<value_type>&&;
 
 			/* pointer type */
 			using mut_pointer     = value_type*;
