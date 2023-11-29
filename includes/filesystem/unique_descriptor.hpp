@@ -134,7 +134,7 @@ namespace xns {
 			// -- public conversion operators -----------------------------
 
 			/* descriptor conversion operator */
-			inline explicit operator descriptor(void) const noexcept {
+			inline operator descriptor(void) const noexcept {
 				// return descriptor
 				return _descriptor;
 			}
