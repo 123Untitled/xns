@@ -291,7 +291,7 @@ namespace xns {
 			/* depth */
 			inline auto depth(void) const noexcept -> size_type {
 				// return depth of tree
-				return _root ? _root->_depth : 0;
+				return _root ? static_cast<size_type>(_root->_depth) : 0U;
 			}
 
 
@@ -2095,7 +2095,7 @@ namespace xns {
 					node.pos += p_min;
 					node.pos *= X_OFFSET;
 					//node.level *= Y_OFFSET;
-					node.level = (levels + 1 - node.depth) * Y_OFFSET; // segfault when unbalanced tree
+					node.level = (levels + 1 - static_cast<xns::size_t>(node.depth)) * Y_OFFSET; // segfault when unbalanced tree
 				}
 
 
@@ -2124,13 +2124,13 @@ namespace xns {
 				// loop over nodes
 				for (auto& node : _nodes) {
 
-					size_type x = node.pos;
+					size_type x = static_cast<size_type>(node.pos);
 					size_type y = node.level;
 
 					// check if left
 					if (node.left != nullptr) {
 
-						size_type lx = node.left->pos;
+						size_type lx = static_cast<size_type>(node.left->pos);
 						size_type ly = node.left->level;
 
 						// draw horizontal line
@@ -2148,7 +2148,7 @@ namespace xns {
 
 					if (node.right != nullptr) {
 
-						size_type rx = node.right->pos;
+						size_type rx = static_cast<size_type>(node.right->pos);
 						size_type ry = node.right->level;
 
 						// draw horizontal line
