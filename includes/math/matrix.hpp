@@ -26,6 +26,8 @@ namespace xns {
 															 T::cols>>;
 
 
+	//matrix<float, 3, 3> mat;
+
 	// -- M A T R I X ---------------------------------------------------------
 
 	template <class T, xns::ubyte R, xns::ubyte C>
@@ -244,7 +246,6 @@ namespace xns {
 				std::cout << "\n" << std::flush;
 
 				_data.print();
-
 			}
 
 
@@ -363,9 +364,13 @@ namespace xns {
 		static_assert(xns::is_matrix<M1> && xns::is_matrix<M2>,
 						"): TYPES MUST BE MATRICES :(");
 
-		// check dimensions
-		static_assert(M1::cols == M2::rows || M2::cols == M1::rows,
+		// check dimensions // WARNING -----| not good ! (or)
+		//static_assert(M1::cols == M2::rows || M2::cols == M1::rows,
+						//"): DIMENSIONS MUST MATCH :(");
+		static_assert(M1::cols == M2::rows,
 						"): DIMENSIONS MUST MATCH :(");
+
+		// result col m1 x row m2
 
 		// get greatest rows and columns
 		constexpr auto rows = M1::rows > M2::rows ? M1::rows : M2::rows;
