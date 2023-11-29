@@ -19,7 +19,7 @@ namespace xns {
 	// -- F I L E  C L A S S --------------------------------------------------
 
 	template <decltype(sizeof(0)) S = 1024>
-	class file final : public xns::unique_descriptor {
+	class file final {
 
 
 		public:
@@ -40,12 +40,12 @@ namespace xns {
 
 			/* default constructor */
 			inline file(void) noexcept
-			: unique_descriptor{}, _buffer{} {}
+			: _descriptor{}, _buffer{} {}
 
 			/* variadic constructor */
 			template <typename... A>
 			inline file(const xns::string& path, A&&... args) noexcept
-			: unique_descriptor{xns::trust{}, ::open(path.data(), args...)},
+			: _descriptor{xns::trust{}, ::open(path.data(), args...)},
 			  _buffer{} {}
 
 			/* move constructor */
@@ -63,7 +63,7 @@ namespace xns {
 
 			/* is open */
 			inline auto is_open(void) const noexcept -> bool {
-				return unique_descriptor::valid();
+				return _descriptor.valid();
 			}
 
 
@@ -137,6 +137,9 @@ namespace xns {
 		private:
 
 			// -- private members ---------------------------------------------
+
+			/* descriptor */
+			xns::unique_descriptor _descriptor;
 
 			/* buffer */
 			char _buffer[S];
