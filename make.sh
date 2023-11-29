@@ -163,7 +163,7 @@ CXXFLAGS+=('-Wno-unused' '-Wno-unused-variable' '-Wno-unused-parameter')
 CXXFLAGS+=('-Winline')
 
 # type conversion
-#CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
+CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
 
 # shadowing
 #CXXFLAGS+=('-Wshadow')
