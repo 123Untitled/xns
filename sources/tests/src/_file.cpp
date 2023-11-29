@@ -6,7 +6,17 @@ template <>
 int UT::unit_tests<"file">(void) {
 
 
-	xns::file file{"test.txt", O_RDWR | O_CREAT, 0644};
+	xns::file<2048> file{"make.sh", O_RDWR | O_CREAT, 0644};
+
+	while (file.read()) {
+
+		xns::size_t i = 0;
+
+		while (i < file.readed()) {
+			std::cout << file[i];
+			++i;
+		}
+	}
 
 
 	// code here...

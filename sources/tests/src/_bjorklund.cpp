@@ -144,6 +144,7 @@ int main(int argc, char** argv) {
 	auto seq = xns::bjorklund::generate((xns::size_t)std::atoi(argv[1]), (xns::size_t)std::atoi(argv[2]), (xns::size_t)std::atoi(argv[3]));
 	//auto seq = xns::bjorklund::generate(13, 5, 2);
 	printv(seq);
+	return 0;
 
 	//return 0;
 
