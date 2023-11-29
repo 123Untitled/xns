@@ -1,7 +1,8 @@
 #ifndef XNS_IS_CONST_HEADER
 #define XNS_IS_CONST_HEADER
 
-#include "integral_constant.hpp"
+#include "macros.hpp"
+#include "remove.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -9,7 +10,7 @@
 namespace xns {
 
 
-	// -- I S  C O N S T  -----------------------------------------------------
+	// -- I S  C O N S T ------------------------------------------------------
 
 
 	// -- detail --------------------------------------------------------------
@@ -17,22 +18,27 @@ namespace xns {
 	namespace impl {
 
 		/* is const */
-		template <class T>
-		struct is_const          : xns::no  {};
+		template <typename T>
+		struct is_const final {
+			constexpr static bool value = false;
+			non_instanciable(is_const);
+		};
 
-		/* specialization */
-		template <class T>
-		struct is_const<const T> : xns::yes {};
+		/* true specialization */
+		template <typename T>
+		struct is_const<const T> final {
+			constexpr static bool value = true;
+			non_instanciable(is_const);
+		};
 
 	}
 
 
 	/* is const concept */
-	template <class T>
-	concept is_const = impl::is_const<T>::value;
-
+	template <typename T>
+	concept is_const = impl::is_const<xns::remove_reference<T>>::value;
 
 
 }
 
-#endif
+#endif // XNS_IS_CONST_HEADER
