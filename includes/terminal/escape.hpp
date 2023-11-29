@@ -253,10 +253,10 @@ namespace xns {
 
 					// -- private enums ---------------------------------------
 
-					enum : size_type {
-						BASE = 10,
-						ZERO = 48
-					};
+					//enum : size_type {
+					//	BASE = 10,
+					//	ZERO = 48
+					//};
 
 					// -- private lifecycle -----------------------------------
 
@@ -282,7 +282,7 @@ namespace xns {
 
 					bool number(void) {
 						if ((_c ^ 48) < 10) {
-							*_n = (*_n * BASE) + (static_cast<size_type>(_c) - ZERO);
+							*_n = (*_n * 10) + (static_cast<size_type>(_c) - 48);
 							return true;
 						}
 						else if (_c == ';') {

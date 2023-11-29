@@ -45,9 +45,9 @@ int UT::unit_tests<"math">() {
 
 static void func() {
 
-	using C = unsigned char;
-	using S = unsigned short;
-	using I = unsigned int;
+	//using C = unsigned char;
+	//using S = unsigned short;
+	//using I = unsigned int;
 
 	const char* types[3] = {"C", "S", "I"};
 

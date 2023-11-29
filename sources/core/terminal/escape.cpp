@@ -132,12 +132,6 @@ xns::escape::string xns::escape::move_down(const size_type cells) {
 
 
 
-#define BUFFER_SIZE_POS			32
-#define ZERO_ASCII				48
-#define BASE					10
-#define ESCAPE_BUFFER_SIZE		64
-#define FOREGROUND				true
-#define BACKGROUND				false
 
 
 
@@ -204,6 +198,12 @@ bool xns::escape::request_position(size_type& x, size_type& y) {
 
 
 
+//#define BUFFER_SIZE_POS			32
+//#define ZERO_ASCII				48
+//#define BASE					10
+//#define ESCAPE_BUFFER_SIZE		64
+//#define FOREGROUND				true
+//#define BACKGROUND				false
 
 
 // -- M O V E -----------------------------------------------------------------
@@ -212,6 +212,8 @@ bool xns::escape::request_position(size_type& x, size_type& y) {
 /* get move position */
 xns::escape::string xns::escape::move_position(size_type x, size_type y) {
 	// ESC[{line};{column}H
+
+	constexpr const xns::size_t ESCAPE_BUFFER_SIZE = 64;
 
 	char_t  escape[ESCAPE_BUFFER_SIZE];
 	xns::size_t ite;
@@ -227,14 +229,14 @@ xns::escape::string xns::escape::move_position(size_type x, size_type y) {
 	escape[ite] = 'H';
 	// integer to ascii X pos
 	while (x) {
-		escape[--ite] = ((x % BASE) ^ ZERO_ASCII);
-		x /= BASE;
+		escape[--ite] = ((x % 10) ^ 48);
+		x /= 10;
 	} // separator char
 	escape[--ite] = ';';
 	// integer to ascii Y pos
 	while (y) {
-		escape[--ite] = ((y % BASE) ^ ZERO_ASCII);
-		y /= BASE;
+		escape[--ite] = ((y % 10) ^ 48);
+		y /= 10;
 	} // ctrl char
 	escape[--ite] = '[';
 	// escape char
@@ -264,8 +266,8 @@ xns::escape::string xns::escape::_move_direction(size_type cells, const char_t d
 
 	// integer to ascii X pos
 	while (cells) {
-		buffer[--i] = ((cells % BASE) ^ ZERO_ASCII);
-		cells /= BASE;
+		buffer[--i] = ((cells % 10) ^ 48);
+		cells /= 10;
 	}
 
 	// ctrl character
@@ -303,8 +305,8 @@ const xns::escape::string& xns::escape::move_x(size_type x) {
 
 	// integer to ascii X pos
 	while (x) {
-		buffer[--i] = ((x % BASE) ^ ZERO_ASCII);
-		x /= BASE;
+		buffer[--i] = ((x % 10) ^ 48);
+		x /= 10;
 	}
 
 	// ctrl character
@@ -361,13 +363,13 @@ xns::escape::string xns::escape::rgb_color(xns::u8 r, xns::u8 g, xns::u8 b, cons
 	// integer to ascii
 	for (xns::size_t x = 3; x; --x) {
 		// red integer to ascii
-		escape[x + r_off] = ((r % BASE) ^ ZERO_ASCII);
+		escape[x + r_off] = ((r % 10) ^ 48);
 		// green integer to ascii
-		escape[x + g_off] = ((g % BASE) ^ ZERO_ASCII);
+		escape[x + g_off] = ((g % 10) ^ 48);
 		// blue integer to ascii
-		escape[x + b_off] = ((b % BASE) ^ ZERO_ASCII);
+		escape[x + b_off] = ((b % 10) ^ 48);
 		// remove last digit
-		r /= BASE; g /= BASE; b /= BASE;
+		r /= 10; g /= 10; b /= 10;
 	} // append escape sequence to buffer
 	return xns::string((char*)escape, 19);
 }

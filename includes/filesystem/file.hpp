@@ -70,7 +70,6 @@ namespace xns {
 			/* get file content */
 			inline auto content(void) const -> xns::string {
 
-				using size_type = xns::string::size_type;
 
 				// check if file is open
 				if (!is_open()) {
