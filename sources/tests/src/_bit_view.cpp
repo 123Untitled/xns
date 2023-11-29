@@ -9,7 +9,7 @@
 template <>
 int UT::unit_tests<"bit_view">(void) {
 
-	xns::terminal::raw_terminal();
+	xns::terminal::raw();
 
 	/*
 	char ll = 1;
@@ -120,7 +120,7 @@ int UT::unit_tests<"bit_view">(void) {
 	}
 
 
-	xns::terminal::restore_terminal();
+	xns::terminal::restore();
 
 
 	return 0;

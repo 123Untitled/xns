@@ -31,7 +31,7 @@ int UT::unit_tests<"hash_set">(void) {
 			std::string str{};
 			for (xns::size_t j = 0; j < S; ++j) {
 				str.push_back(xns::random::integral<char>());
-				check_sum ^= str.back();
+				check_sum ^= (xns::size_t)str.back();
 			}
 			xset.insert(str);
 			check_sum ^= xset.size();
@@ -49,7 +49,7 @@ int UT::unit_tests<"hash_set">(void) {
 			std::string str{};
 			for (xns::size_t j = 0; j < S; ++j) {
 				str.push_back(xns::random::integral<char>());
-				check_sum ^= str.back();
+				check_sum ^= (xns::size_t)str.back();
 			}
 			sset.insert(str);
 			check_sum ^= sset.size();

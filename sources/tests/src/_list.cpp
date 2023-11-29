@@ -29,7 +29,7 @@ static auto benchmark(void) -> void {
 		xns::list<int> local_list;
 		for (xns::size_t i = 0; i < NSIZE; ++i) {
 			local_list.push_back(xns::random::integral<int>());
-			check_sum ^= local_list.back();
+			check_sum ^= (xns::size_t)local_list.back();
 		}
 	});
 
@@ -38,7 +38,7 @@ static auto benchmark(void) -> void {
 		std::list<int> local_list;
 		for (xns::size_t i = 0; i < NSIZE; ++i) {
 			local_list.push_back(xns::random::integral<int>());
-			check_sum ^= local_list.back();
+			check_sum ^= (xns::size_t)local_list.back();
 		}
 	});
 
@@ -47,13 +47,13 @@ static auto benchmark(void) -> void {
 	bench.run("xns::list reverse", [&xlist]() -> void {
 
 			xlist.reverse();
-			check_sum ^= xlist.front();
+			check_sum ^= (xns::size_t)xlist.front();
 	});
 
 	bench.run("std::list reverse", [&slist]() -> void {
 
 			slist.reverse();
-			check_sum ^= slist.front();
+			check_sum ^= (xns::size_t)slist.front();
 	});
 
 	bench.result("reverse");
@@ -61,12 +61,12 @@ static auto benchmark(void) -> void {
 
 	bench.run("xns::list copy", [&xlist]() -> void {
 			xns::list<int> local_list{xlist};
-			check_sum ^= local_list.front();
+			check_sum ^= (xns::size_t)local_list.front();
 	});
 
 	bench.run("std::list copy", [&slist]() -> void {
 			std::list<int> local_list{slist};
-			check_sum ^= local_list.front();
+			check_sum ^= (xns::size_t)local_list.front();
 	});
 
 	bench.result("copy");

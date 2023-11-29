@@ -483,26 +483,28 @@ class sso {
 
 template <typename T>
 void sso_test(const T* msg) {
+
 	if (msg == nullptr) { return; }
+
 	sso<T> s;
 
-	xns::terminal::raw_terminal();
+	xns::terminal::raw();
 
 	xns::string input;
 
 	s.print();
-	while (input != "q") {
-
-		input = xns::in::read();
-		s.push_back(input.front());
-		s.print();
-	}
-
-
+	//while (input != "q") {
+	//
+	//	input = xns::in::read();
+	//	s.push_back(input.front());
+	//	s.print();
+	//}
 
 
 
-	xns::terminal::restore_terminal();
+
+
+	xns::terminal::restore();
 
 	return;
 

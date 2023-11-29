@@ -6,7 +6,7 @@ template <>
 int UT::unit_tests<"input">(void) {
 
 
-	xns::terminal::raw_terminal(xns::VFlag::NON_BLOCKING);
+	xns::terminal::raw(xns::VFlag::NON_BLOCKING);
 
 	auto str = xns::in::read();
 
@@ -25,7 +25,7 @@ int UT::unit_tests<"input">(void) {
 		}
 	}
 
-	xns::terminal::restore_terminal();
+	xns::terminal::restore();
 
 	return 0;
 }
