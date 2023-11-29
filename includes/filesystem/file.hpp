@@ -18,31 +18,45 @@ namespace xns {
 
 	// -- F I L E  C L A S S --------------------------------------------------
 
+	template <decltype(sizeof(0)) S = 1024>
 	class file final : public xns::unique_descriptor {
 
 
 		public:
 
+			// -- public types ------------------------------------------------
+
+			/* self type */
+			using self = xns::file<S>;
+
+			/* size type */
+			using size_type = decltype(S);
+
+			/* signed type */
+			using signed_type = xns::s64;
+
+
 			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
 			inline file(void) noexcept
-			: unique_descriptor{} {}
+			: unique_descriptor{}, _buffer{} {}
 
 			/* variadic constructor */
 			template <typename... A>
 			inline file(const xns::string& path, A&&... args) noexcept
-			: unique_descriptor{xns::trust{}, ::open(path.data(), args...)} {}
+			: unique_descriptor{xns::trust{}, ::open(path.data(), args...)},
+			  _buffer{} {}
 
 			/* move constructor */
-			inline file(xns::file&& other) noexcept
-			: unique_descriptor{xns::move(other)} {}
+			inline file(self&& other) noexcept
+			: unique_descriptor{xns::move(other)}, _buffer{} {}
 
-			/* non-assignable class */
-			NON_COPYABLE(file);
+			/* non-copyable class */
+			non_copyable(file);
 
 			/* destructor */
-			inline ~file(void) noexcept = default;
+			~file(void) noexcept = default;
 
 
 			// -- public accessors --------------------------------------------
@@ -87,14 +101,48 @@ namespace xns {
 			}
 
 
+			// -- public methods ----------------------------------------------
+			
+			/* read */
+			inline auto read(void) noexcept -> size_type {
+				// read descriptor
+				signed_type readed = static_cast<signed_type>(::read(_descriptor, _buffer, S));
+				// assign readed bytes
+				_readed = static_cast<size_type>(readed > 0 ? readed : 0);
+				// return readed bytes
+				return _readed;
+			}
+
+			/* readed */
+			inline auto readed(void) const noexcept -> size_type {
+				// return readed bytes
+				return _readed;
+			}
+
+
+
+			// -- public subscript operators ----------------------------------
+
+			/* subscript operator */
+			template <typename T>
+			inline auto operator[](const T& index) noexcept -> char& {
+				// assertion
+				static_assert(xns::is_integral<T>, "index must be integral");
+				// return buffer
+				return _buffer[index];
+			}
+
+
+
 		private:
-
-
 
 			// -- private members ---------------------------------------------
 
+			/* buffer */
+			char _buffer[S];
 
-
+			/* readed bytes */
+			size_type _readed;
 
 	};
 

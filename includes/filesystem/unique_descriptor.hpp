@@ -34,6 +34,7 @@ namespace xns {
 	// -- forward declarations ------------------------------------------------
 
 	/* file class */
+	template <decltype(sizeof(0))>
 	class file;
 
 
@@ -46,6 +47,7 @@ namespace xns {
 		// -- friends ---------------------------------------------------------
 
 		/* file class as friend */
+		template <decltype(sizeof(0))>
 		friend class file;
 
 
@@ -54,7 +56,7 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = unique_descriptor;
+			using self = xns::unique_descriptor;
 
 			/* descriptor type */
 			using descriptor = int;
@@ -94,14 +96,14 @@ namespace xns {
 			/* move assignment operator */
 			inline auto operator=(self&& other) noexcept -> self& {
 				// check for self assignment
-				if (this != &other) {
-					// close descriptor
-					close_descriptor();
-					// set descriptor
-					_descriptor = other._descriptor;
-					// invalidate other
-					other._descriptor = NULL_DESCRIPTOR;
-				} // return self reference
+				if (this == &other) { return *this; }
+				// close descriptor
+				close_descriptor();
+				// set descriptor
+				_descriptor = other._descriptor;
+				// invalidate other
+				other._descriptor = NULL_DESCRIPTOR;
+				// return self reference
 				return *this;
 			}
 
@@ -174,7 +176,7 @@ namespace xns {
 			}
 
 
-			// -- public modifiers ----------------------------------------
+			// -- public modifiers --------------------------------------------
 
 			/* reset descriptor */
 			inline auto reset(void) noexcept -> void {
@@ -191,6 +193,8 @@ namespace xns {
 				// set descriptor
 				_descriptor = descriptor;
 			}
+
+
 
 
 		private:
@@ -231,6 +235,7 @@ namespace xns {
 
 
 			// -- private members ---------------------------------------------
+
 
 			/* descriptor */
 			descriptor _descriptor;
