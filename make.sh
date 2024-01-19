@@ -3,6 +3,8 @@
 # This script is used to compile the project.
 # Makefile forever, but not really lol.
 
+OPS=$(uname -s)
+
 BANNER=\
 '   ▁▁▁▁▁▁▁▁  ▁▁▁▁▁▁▁▁  ▁▁▁▁ ▁▁▁  ▁▁▁▁▁▁▁▁ \n'\
 '  ╱        ╲╱        ╲╱    ╱   ╲╱        ╲\n'\
@@ -114,11 +116,7 @@ LOCK=$BLDDIR'/.lock'
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-#CXX='/opt/homebrew/Cellar/llvm/17.0.3/bin/clang++'
 CXX='clang++'
-#CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
-#CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/aarch64-apple-darwin22-g++-13'
-#CXX='g++'
 
 # archiver
 ARCHIVER='ar'
@@ -171,9 +169,13 @@ CXXFLAGS+=('-Wshadow')
 # defines
 DEFINES=()
 
-
 # linker flags
-LDFLAGS=('-lbenchmark' '-framework' 'CoreMIDI' '-framework' 'CoreAudio' '-framework' 'CoreFoundation')
+LDFLAGS=()
+
+
+if [[ $OPS =~ 'Darwin' ]]; then
+	LDFLAGS+=('-framework' 'CoreMIDI' '-framework' 'CoreAudio' '-framework' 'CoreFoundation')
+fi
 
 # memory checker
 LEAKER='valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes'
@@ -331,7 +333,7 @@ function make_silent_clean {
 
 function make_executable {
 	# link executable
-	$LINKER $LDFLAGS $OBJS -o $EXECUTABLE || exit 1
+	$LINKER $OBJS -o $EXECUTABLE $LDFLAGS || exit 1
 	# check if linking succeeded
 	description $EXECUTABLE
 }
