@@ -96,7 +96,7 @@ namespace xns {
 						if (i == _benchs.size() - 1)
 							xns::print("\x1b[32m");
 
-						double faster = prev / static_cast<double>(data._average);
+						double faster = static_cast<double>(prev) / static_cast<double>(data._average);
 
 						xns::println(data._msg, " -> ", data._cycle, " cycles in ",
 								data._time, " ms", " [AVG ", data._average, " ns] ", "(", faster, "x) FASTER");
