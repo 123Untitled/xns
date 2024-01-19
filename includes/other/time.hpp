@@ -5,6 +5,7 @@
 #include "types.hpp"
 #include "macros.hpp"
 #include "os.hpp"
+#include "duration.hpp"
 
 #include <iostream>
 
@@ -61,6 +62,19 @@ namespace xns {
 			}
 
 			#endif
+
+
+			template <typename F, typename T, typename R>
+			static auto clock(F&& f, xns::duration<T, R> d) -> void {
+
+				auto t = xns::time::now();
+				auto t2 = t + d.count();
+
+				while (t < t2) {
+					f();
+					t = xns::time::now();
+				}
+			}
 
 
 		private:

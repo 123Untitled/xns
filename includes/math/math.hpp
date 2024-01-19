@@ -187,6 +187,109 @@ namespace xns {
 		return xns::sin(value) / xns::cos(value);
 	}
 
+
+
+
+
+	template <typename T>
+	class min_max final {
+
+		// -- assertions ------------------------------------------------------
+
+		/* comparable type */
+		static_assert(xns::is_comparable<T>, "): MIN_MAX: types must be comparable :(");
+
+
+		public:
+
+			// -- public types ------------------------------------------------
+
+			/* self type */
+			using self = xns::min_max<T>;
+
+			/* value type */
+			using value_type = T;
+
+
+			// -- public lifecycle --------------------------------------------
+
+			/* default constructor */
+			inline constexpr min_max(void) noexcept
+			: _min{xns::limits::max<T>()}, _max{xns::limits::min<T>()} {}
+
+			/* copy constructor */
+			inline constexpr min_max(const self& other) noexcept
+			: _min{other._min}, _max{other._max} {}
+
+			/* move constructor */
+			inline constexpr min_max(self&& other) noexcept
+			: self{other} {}
+
+			/* destructor */
+			inline ~min_max(void) noexcept = default;
+
+
+			// -- public assignment operators ---------------------------------
+
+			/* copy assignment operator */
+			inline constexpr auto operator=(const self& other) noexcept -> self& {
+				// copy values
+				_min = other._min;
+				_max = other._max;
+				// return self reference
+				return *this;
+			}
+
+			/* move assignment operator */
+			inline constexpr auto operator=(self&& other) noexcept -> self& {
+				return self::operator=(other);
+			}
+
+
+			// -- public modifiers --------------------------------------------
+
+			/* update min and max values */
+			inline constexpr auto update(const value_type& value) noexcept -> void {
+				// update min value
+				_min = xns::min(_min, value);
+				// update max value
+				_max = xns::max(_max, value);
+			}
+
+
+			// -- public accessors --------------------------------------------
+
+			/* min value */
+			inline constexpr auto min(void) const noexcept -> const value_type& {
+				return _min;
+			}
+
+			/* max value */
+			inline constexpr auto max(void) const noexcept -> const value_type& {
+				return _max;
+			}
+
+
+		private:
+
+			// -- private members ---------------------------------------------
+
+			/* min value */
+			value_type _min;
+
+			/* max value */
+			value_type _max;
+
+	};
+
+
+
+
+
+
+
+
+
 }
 
 #endif

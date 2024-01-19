@@ -39,7 +39,7 @@ namespace midi {
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* send midi */
-			void send_midi(const midi::source&);
+			void send_midi(const midi::endpoint<"source">&);
 
 			/* add midi */
 			void add_midi(UInt32, MIDITimeStamp = 0);

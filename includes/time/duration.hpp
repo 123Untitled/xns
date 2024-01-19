@@ -188,6 +188,10 @@ namespace xns {
 	using years        = xns::duration<xns::umax, xns::ratio<31556952, 1>>;
 
 
+	/* bpm */
+	using bpm          = xns::duration<xns::umax, xns::ratio<1, 60>>;
+
+
 
 }
 

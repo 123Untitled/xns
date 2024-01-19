@@ -13,6 +13,7 @@
 #include "client.hpp"
 #include "source.hpp"
 #include "message.hpp"
+#include "port.hpp"
 
 //UInt32 msg = MIDICLOCKTICK;
 /*
@@ -22,7 +23,7 @@ msg = msg | 127; // velocity
 */
 
 
-#if defined(__APPLE__) && defined(__MACH__)
+#if defined(XNS_APPLE)
 
 // -- M I D I  N A M E S P A C E ----------------------------------------------
 
@@ -35,64 +36,36 @@ namespace midi {
 		ON    = 0x20900000, OFF   = 0x20800000
 	};
 
-	/* forward declaration */
-	class server;
 
-	/* unique server type */
-	using weak_server = xns::weak_ptr<midi::server>;
-
-
-	// -- M I D I  C L A S S --------------------------------------------------
+	// -- S E R V E R  C L A S S ----------------------------------------------
 
 	class server final {
 
 
-		friend class xns::memory::pool<midi::server>;
+		public:
 
-		private:
+			// -- public types ------------------------------------------------
 
-			template <class>
-			friend class xns::allocator;
-
-
-			// -- P R I V A T E  T Y P E S ------------------------------------
-
-			/* unique server type */
-			using unique_server = xns::unique_ptr<midi::server>;
+			/* self type */
+			using self = midi::server;
 
 			/* time stamp type */
 			using timestamp = MIDITimeStamp;
 
 
-			// -- P R I V A T E  C O N S T R U C T O R S ----------------------
-
-			/* default constructor */
-			server(void);
+			// -- public lifecycle --------------------------------------------
 
 			/* non-copyable class */
-			NON_ASSIGNABLE(server);
+			non_assignable(server);
 
 			/* destructor */
-			~server(void);
+			~server(void) noexcept = default;
 
 
-
-
-			// -- P R I V A T E  S T A T I C  M E M B E R S -------------------
-
-			/* singleton instance */
-			static unique_server _instance;
-
-
-		public:
-
-			// -- P U B L I C  S T A T I C  M E T H O D S ---------------------
+			// -- public static methods ---------------------------------------
 
 			/* instance getter */
 			static server& shared(void);
-
-			/* delete server */
-			static void delete_server(void);
 
 
 
@@ -110,21 +83,29 @@ namespace midi {
 
 		private:
 
-			// -- P R I V A T E  M E T H O D S --------------------------------
+
+			// -- private lifecycle -------------------------------------------
+
+			/* default constructor */
+			server(void);
+
+
+			// -- private methods ---------------------------------------------
 
 			/* setup midi */
 			void setup_server(void);
 
 
-
-
-			// -- P R I V A T E  M E M B E R S --------------------------------
+			// -- private members ---------------------------------------------
 
 			/* client */
 			midi::client _client;
 
 			/* source */
-			midi::source _source;
+			midi::endpoint<"source"> _source;
+
+			/* destination */
+			midi::endpoint<"destination"> _destination;
 
 			/* packet */
 			midi::packet _packet;
@@ -132,7 +113,6 @@ namespace midi {
 
 			//UInt				_data;
 			//Devicelist _devicelist;
-
 
 	};
 

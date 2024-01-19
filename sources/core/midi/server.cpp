@@ -1,49 +1,41 @@
 #include "midi/server.hpp"
 
 
-#if defined(__APPLE__) && defined(__MACH__)
+#if defined(XNS_APPLE)
 
-/* singleton instance */
-midi::server::unique_server midi::server::_instance;
 
 
 /* default constructor */
 midi::server::server(void)
-: _client{ }, _source{ } {
-	// setup midi server
+:	_client{"xns midi client"},
+	_source{_client, "xns midi source"},
+	_destination{_client, "xns midi destination"} {
 	setup_server();
 }
 
-midi::server::~server(void) {
-	// nothing to do here
-}
-
-/* instance getter */
-midi::server& midi::server::shared(void) {
-	static server instance;
+/* shared */
+auto midi::server::shared(void) -> self& {
+	static self instance;
 	return instance;
-	//// check if instance is null
-	//if (_instance == xns::null{}) {
-	//	// create new instance
-	//	_instance = xns::make_unique<server>();
-	//} // return instance
-	//return _instance;
-}
-
-/* delete server */
-void midi::server::delete_server(void) {
-	// delete instance
-	_instance.reset();
 }
 
 void midi::server::setup_server(void) {
-	// create client
-	_client.create("SEQTerminal");
-	_source.create(_client, "source_1.0");
-	_source.set_model("model_1.0");
-	_source.set_manufacturer("TMS_Industry");
 
-	get_sources();
+	//_source.model("model_1.0");
+	//_source.manufacturer("TMS_Industry");
+
+	//midi::port port{_client};
+	//port.connect(_source);
+
+	std::cout << "press enter to disconnect" << std::endl;
+	//CFRunLoopRun();
+	while (true) {
+	int c = std::getchar();
+	if (c == 'q') { break; }
+	}
+
+	//port.disconnect(_source);
+
 	//midiGetDevices();
 	//create_port();
 }

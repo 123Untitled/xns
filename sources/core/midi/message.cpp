@@ -4,13 +4,13 @@
 
 /* default constructor */
 midi::packet::packet(void)
-: _buffer{ }, _packet{nullptr}, _list{nullptr} {
+: _buffer{}, _packet{nullptr}, _list{nullptr} {
 	// reserve default buffer size
 	_buffer.reserve(BUFFSIZE);
 	// initialize the event list
 	_list = reinterpret_cast<MIDIEventList*>(_buffer.data());
 	// initialize the event packet
-	_packet = MIDIEventListInit(_list, kMIDIProtocol_1_0);
+	_packet = ::MIDIEventListInit(_list, kMIDIProtocol_1_0);
 
 }
 
@@ -21,7 +21,7 @@ midi::packet::~packet(void) {
 
 
 
-void midi::packet::send_midi(const midi::source& source) {
+void midi::packet::send_midi(const midi::endpoint<"source">& source) {
 
 	// check packet validity
 	if (_packet == nullptr) { return; }
@@ -29,10 +29,10 @@ void midi::packet::send_midi(const midi::source& source) {
 	// WARNING: need to check if the source is valid
 
 	// send midi to source device
-	const OSStatus err = MIDIReceivedEventList(source.get(), _list);
+	const OSStatus err = ::MIDIReceivedEventList(source.get(), _list);
 
 	// check if the midi was sent. INFO: not implemented
-	_packet = MIDIEventListInit(_list, kMIDIProtocol_1_0);
+	_packet = ::MIDIEventListInit(_list, kMIDIProtocol_1_0);
 }
 
 

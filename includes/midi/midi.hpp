@@ -5,5 +5,6 @@
 #include "midi/client.hpp"
 #include "midi/source.hpp"
 #include "midi/message.hpp"
+#include "midi/port.hpp"
 
 #endif
