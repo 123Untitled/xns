@@ -6,6 +6,8 @@
 #include "bit_view.hpp"
 #include "integer_arithmetic.hpp"
 
+#include <algorithm>
+
 template <>
 int UT::unit_tests<"math">() {
 

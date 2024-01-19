@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <variant>
 
 
 static size_t check_sum = 0;
