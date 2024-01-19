@@ -30,6 +30,7 @@ namespace xns {
 	namespace io_control {
 
 
+#if defined(XNS_APPLE) || defined(XNS_BSD)
 		/* struct termios type */
 		using attrs = struct termios;
 
@@ -251,9 +252,10 @@ namespace xns {
 			}
 			return 0;
 
-		}
+		} // flow
+#endif // XNS_APPLE || XNS_BSD
 
-	}
+	} // io_control
 
 }
 
