@@ -7,6 +7,7 @@
 #include "numeric_limits.hpp"
 #include "escape.hpp"
 #include "color.hpp"
+#include "math.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -21,9 +22,9 @@ namespace xns {
 		// compute avg
 		T avg = (value + ... + values) / n; 
 		// variance computation
-		T variance = ((std::pow(value - avg, 2) + ... + std::pow(values - avg, 2)) / (n - 1));
+		T variance = ((xns::pow(value - avg, 2) + ... + xns::pow(values - avg, 2)) / (n - 1));
 		// return standard deviation
-		return std::sqrt(variance);
+		return xns::sqrt(variance);
 	}
 
 	// -- F R A G M E N T A T I O N -------------------------------------------
