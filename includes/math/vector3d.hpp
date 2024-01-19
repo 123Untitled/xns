@@ -249,7 +249,7 @@ namespace xns {
 
 		/* dot product as friend */
 		template <typename U>
-		friend constexpr auto dot(const xns::vector3D<U>&, const xns::vector3D<U>&) noexcept -> xns::vector3D<U>::value_type;
+		friend constexpr auto dot(const xns::vector3D<U>&, const xns::vector3D<U>&) noexcept -> typename xns::vector3D<U>::value_type;
 
 		/* cross product as friend */
 		template <typename U>
@@ -277,7 +277,7 @@ namespace xns {
 
 	/* dot product */
 	template <typename T>
-	inline constexpr auto dot(const xns::vector3D<T>& v1, const xns::vector3D<T>& v2) noexcept -> xns::vector3D<T>::value_type {
+	inline constexpr auto dot(const xns::vector3D<T>& v1, const xns::vector3D<T>& v2) noexcept -> typename xns::vector3D<T>::value_type {
 		return (v1._x * v2._x) + (v1._y * v2._y) + (v1._z * v2._z);
 	}
 
