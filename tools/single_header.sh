@@ -31,8 +31,6 @@ for CMD in $PROGRAMS; do
 done
 
 
-
-
 # -- H E A D E R  F I L E S ----------------------------------------------------
 
 # output directory
@@ -125,7 +123,7 @@ function topological_sort {
 	done
 
 	echo 'topological sorting...'
-	local OUTPUT=($(tsort -q <<< $FORMATED))
+	local OUTPUT=($(tsort <<< $FORMATED))
 
 	IFS=$' \t\n'
 
@@ -138,6 +136,12 @@ function topological_sort {
 		SORTED+=($OUTPUT[$I])
 	done
 
+	# here need to find a way to check if tsort failed
+	# check if all header files are included
+	if [[ $#SORTED -ne $#HEADERS ]]; then
+		echo 'error: not all header files are included.'
+		exit 1
+	fi
 }
 
 
