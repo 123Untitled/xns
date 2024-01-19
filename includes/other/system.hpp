@@ -38,7 +38,12 @@ namespace xns {
 					std::cout << "cache line size: " << size << std::endl;
 					return size;
 					#else
-					return ::sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+					auto line = ::sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+					if (line == -1) {
+						std::cerr << "sysconf(_SC_LEVEL1_DCACHE_LINESIZE) failed" << std::endl;
+						return 0;
+					}
+					else return static_cast<xns::size_t>(line);
 					#endif
 				}();
 				return line;
