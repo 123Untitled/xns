@@ -41,18 +41,18 @@ namespace xns {
 					//xns::f64 hue_max = std::fmod(hue_range + hue_offset, 360.0);
 
 
-	inline auto deviation(void) -> double {
-		xns::vector<int> data;
-		double sum = 0.0, mean, standardDeviation = 0.0;
-		for (xns::size_t i = 0; i < data.size(); ++i) {
-			sum += data[i];
-		}
-		mean = sum / data.size();
-		for (xns::size_t i = 0; i < data.size(); ++i) {
-			standardDeviation += std::pow(data[i] - mean, 2);
-		}
-		return std::sqrt(standardDeviation / data.size());
-	}
+	//inline auto deviation(void) -> double {
+	//	xns::vector<int> data;
+	//	double sum = 0.0, mean, standardDeviation = 0.0;
+	//	for (xns::size_t i = 0; i < data.size(); ++i) {
+	//		sum += data[i];
+	//	}
+	//	mean = sum / data.size();
+	//	for (xns::size_t i = 0; i < data.size(); ++i) {
+	//		standardDeviation += std::pow(data[i] - mean, 2);
+	//	}
+	//	return std::sqrt(standardDeviation / data.size());
+	//}
 
 
 
@@ -1563,7 +1563,7 @@ namespace xns {
 
 	// -- I T E R A T O R -----------------------------------------------------
 
-	template <typename T> template <bool C, xns::tree<T>::traversal_type O>
+	template <typename T> template <bool C, typename xns::tree<T>::traversal_type O>
 	class xns::tree<T>::iterator final {
 
 
