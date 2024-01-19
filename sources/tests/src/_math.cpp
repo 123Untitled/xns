@@ -9,6 +9,23 @@
 template <>
 int UT::unit_tests<"math">() {
 
+
+	xns::min_max<unsigned long> mm{};
+
+	std::srand((unsigned int)getpid());
+
+	for (int i = 0; i < 10000; ++i) {
+		int a = std::rand();
+		mm.update((unsigned long)a);
+	}
+
+	std::cout << "min: " << mm.min() << std::endl;
+	std::cout << "max: " << mm.max() << std::endl;
+
+	return 0;
+
+
+
 	float f1 = 1.4f;
 	float f2 = -1.4f;
 	float f3 = 1.6f;

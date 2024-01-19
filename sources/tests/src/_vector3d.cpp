@@ -1,9 +1,28 @@
 #include "unit_tests.hpp"
 #include "vector3d.hpp"
 
+
+
 /* unit test */
 template <>
 int UT::unit_tests<"vector3d">(void) {
+
+	xns::vector3D<double> v1{2, 3, 4};
+	xns::vector3D<double> v2{5, 6, 7};
+
+	auto v3 = xns::normalize(v1);
+	auto v4 = xns::dot(v1, v2);
+	auto v5 = xns::cross(v1, v2);
+	auto v6 = xns::project(v1, v2);
+	auto v7 = xns::reflect(v1, v2);
+
+	v1.length();
+	v1.normalize();
+	v1.x(2.0);
+
+	v3.print();
+
+
 	return 0;
 }
 

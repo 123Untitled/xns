@@ -4,6 +4,10 @@
 /* unit test */
 template <>
 int UT::unit_tests<"midi">(void) {
+
+	midi::server::shared();
+	//midi::port port{};
+
 	return 0;
 }
 
