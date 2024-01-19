@@ -58,7 +58,7 @@ namespace xns {
 				struct ::timespec ts;
 				::clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
 				return (static_cast<size_type>(ts.tv_sec) * 1'000'000'000U)
-					+ ts.tv_nsec;
+					+ static_cast<size_type>(ts.tv_nsec);
 			}
 
 			#endif
