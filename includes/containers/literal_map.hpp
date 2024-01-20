@@ -16,7 +16,7 @@ namespace xns {
 
 	// -- L I T E R A L  M A P ------------------------------------------------
 
-	template <class T, xns::basic_string_literal... L>
+	template <typename T, xns::basic_string_literal... L>
 	class literal_map final {
 
 
@@ -37,27 +37,27 @@ namespace xns {
 					 "): STRING LITERALS MUST BE UNIQUE :(");
 
 		/* check for map size */
-		static_assert(sizeof...(L) > 0, "): MAP MUST HAVE AT LEAST 1 KEY :(");
+		static_assert(sizeof...(L) > 0, "): MAP MUST HAVE AT LEAST 1 KEY :("); // need to be removed !!!
 
 
 		public:
 
 			// -- public types ------------------------------------------------
 
+			/* self type */
+			using self = xns::literal_map<T, L...>;
+
 			/* value type */
 			using value_type = T;
 
-			/* self type */
-			using self = literal_map<value_type, L...>;
-
-			/* reference type */
-			using reference = value_type&;
+			/* mutable reference type */
+			using mut_ref = value_type&;
 
 			/* move reference type */
-			using move_reference = value_type&&;
+			using move_ref = value_type&&;
 
 			/* const reference type */
-			using const_reference = const value_type&;
+			using const_ref = const value_type&;
 
 
 		private:
@@ -84,28 +84,20 @@ namespace xns {
 
 				/* default constructor */
 				inline constexpr impl(void)
-				: element<key<L>>{ }... {
-					// nothing to do...
-				}
+				: element<key<L>>{}... {}
 
 				/* variadic constructor */
 				template <class... A>
 				inline constexpr impl(A&&... args) requires (sizeof...(A) > 1)
-				: element<key<L>>{xns::forward<A>(args)}... {
-					// forward arguments to elements
-				}
+				: element<key<L>>{xns::forward<A>(args)}... {}
 
 				/* copy constructor */
 				inline constexpr impl(const impl& other)
-				: element<key<L>>{other}... {
-					// copy other elements
-				}
+				: element<key<L>>{other}... {}
 
 				/* move constructor */
 				inline constexpr impl(impl&& other) noexcept
-				: element<key<L>>{xns::move(other)}... {
-					// move other elements
-				}
+				: element<key<L>>{xns::move(other)}... {}
 
 				/* destructor */
 				inline ~impl(void) noexcept = default;
@@ -144,14 +136,12 @@ namespace xns {
 			// -- public constructors -----------------------------------------
 
 			/* default constructor */
-			constexpr literal_map(void)
-			: _impl{ } {
-				// nothing to do...
-			}
+			inline constexpr literal_map(void)
+			: _impl{} {}
 
 			/* variadic constructor */
 			template <class... A>
-			constexpr literal_map(A&&... args) requires (sizeof...(A) > 1)
+			inline constexpr literal_map(A&&... args) requires (sizeof...(A) > 1)
 			: _impl{xns::forward<A>(args)...} {
 				static_assert(sizeof...(A) == sizeof...(L),
 							  "): INCORRECT NUMBER OF ARGUMENTS :(");
@@ -159,16 +149,12 @@ namespace xns {
 			}
 
 			/* copy constructor */
-			constexpr literal_map(const self& other)
-			: _impl{other._impl} {
-				// nothing to do...
-			}
+			inline constexpr literal_map(const self& other)
+			: _impl{other._impl} {}
 
 			/* move constructor */
-			constexpr literal_map(self&& other) noexcept
-			: _impl{xns::move(other._impl)} {
-				// nothing to do...
-			}
+			inline constexpr literal_map(self&& other) noexcept
+			: _impl{xns::move(other._impl)} {}
 
 			/* destructor */
 			~literal_map(void) noexcept = default;
@@ -207,14 +193,14 @@ namespace xns {
 
 			/* get element */
 			template <xns::basic_string_literal l>
-			constexpr reference get(void) {
+			constexpr auto get(void) noexcept -> mut_ref {
 				// return element indexed by key
 				return _impl.element<key<l>>::data;
 			}
 
 			/* const get element */
 			template <xns::basic_string_literal l>
-			constexpr const_reference get(void) const {
+			constexpr auto get(void) const noexcept -> const_ref {
 				// return const element indexed by key
 				return _impl.element<key<l>>::data;
 			}
@@ -224,27 +210,27 @@ namespace xns {
 
 			/* set element by copy */
 			template <xns::basic_string_literal l>
-			constexpr void set(const_reference value) {
+			constexpr auto set(const_ref value) -> void {
 				// set element by copy
 				_impl.element<key<l>>::data = value;
 			}
 
 			/* set element by move */
 			template <xns::basic_string_literal l>
-			constexpr void set(move_reference value) {
+			constexpr auto set(move_ref value) noexcept -> void {
 				// set element by move
 				_impl.element<key<l>>::data = xns::move(value);
 			}
 
 			/* emplace element */
 			template <xns::basic_string_literal l, class... A>
-			constexpr void emplace(A&&... args) {
+			constexpr auto emplace(A&&... args) -> void {
 				// forward arguments to element
 				_impl.element<key<l>>::data = value_type{xns::forward<A>(args)...};
 			}
 
 			/* clear */
-			constexpr void clear(void) {
+			constexpr auto clear(void) -> void {
 				// clear all elements
 				((_impl.element<key<L>>::data = value_type{}), ...);
 			}
@@ -253,17 +239,19 @@ namespace xns {
 			// -- public loopers ----------------------------------------------
 
 			/* for each element */
-			constexpr void for_each(void (*f)(reference)) {
-				(f(_impl.element<key<L>>::data), ...);
+			template <typename F, typename... A>
+			constexpr auto for_each(F&& f, A&&... args) -> void {
+				(f(_impl.element<key<L>>::data, xns::forward<A>(args)...), ...);
 			}
 
 			/* for each const element */
-			constexpr void for_each(void (*f)(const_reference)) const {
-				(f(_impl.element<key<L>>::data), ...);
+			template <typename F, typename... A>
+			constexpr auto for_each(F&& f, A&&... args) const -> void {
+				(f(_impl.element<key<L>>::data, xns::forward<A>(args)...), ...);
 			}
 
 			/* contains element */
-			constexpr bool contains(const_reference value) const {
+			constexpr auto contains(const_ref value) const -> bool {
 				return ((value == _impl.element<key<L>>::data) || ...);
 			}
 
