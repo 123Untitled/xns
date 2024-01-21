@@ -10,7 +10,7 @@ namespace xns {
 	// -- I N T E G R A L  C O N S T A N T ------------------------------------
 
 	/* integral constant */
-	template <class T, T V>
+	template <typename T, T V>
 	struct integral_constant {
 
 
@@ -44,13 +44,13 @@ namespace xns {
 	// -- T R U E  T Y P E -----------------------------------------------------
 
 	// true type
-	using yes = bool_constant<true>;
+	using yes = xns::bool_constant<true>;
 
 
 	// -- F A L S E  T Y P E ---------------------------------------------------
 
 	// false type
-	using no = bool_constant<false>;
+	using no = xns::bool_constant<false>;
 
 }
 
