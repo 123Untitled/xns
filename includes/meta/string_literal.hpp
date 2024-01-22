@@ -57,8 +57,9 @@ namespace xns {
 			basic_string_literal(void) = delete;
 
 			/* array constructor */
-			template <typename U, size_type M>
-			consteval basic_string_literal(const U (&str)[M]) noexcept
+			//template <typename U, size_type M>
+			template <size_type M>
+			consteval basic_string_literal(const T (&str)[M]) noexcept
 			: _data{} {
 
 				for (size_type x = 0; x < N; ++x) {
@@ -73,7 +74,7 @@ namespace xns {
 			inline consteval basic_string_literal(self&&) noexcept = default;
 
 			/* destructor */
-			inline ~basic_string_literal(void) noexcept = default;
+			~basic_string_literal(void) noexcept = default;
 
 
 			// -- public assignment operators ---------------------------------
@@ -87,24 +88,19 @@ namespace xns {
 
 			// -- public accessors --------------------------------------------
 
-			/* get data */
+			/* data */
 			inline consteval auto data(void) const noexcept -> const_pointer {
 				return _data;
 			}
 
-			/* get runtime data */
+			/* runtime data */
 			inline auto runtime_data(void) const noexcept -> const_pointer {
 				return _data;
 			}
 
-			/* get size */
+			/* size */
 			inline consteval auto size(void) const noexcept -> size_type {
-				return N - 1;
-			}
-
-			/* empty */
-			inline consteval auto empty(void) const noexcept -> bool {
-				return N == 0;
+				return N;
 			}
 
 
@@ -122,9 +118,11 @@ namespace xns {
 			template <xns::is_char U, size_type M>
 			consteval bool operator==(const U (&other)[M]) const noexcept {
 				// check size
-				if (N != M) { return false; }
-				// compare characters
-				return compare<0>(other);
+				if constexpr (N != M)
+					return false;
+				else
+					// compare characters
+					return compare<0>(other);
 			}
 
 			/* inequality operator */
@@ -173,8 +171,9 @@ namespace xns {
 	basic_string_literal(const T (&)[N]) -> basic_string_literal<T, N>;
 
 
-	template <xns::size_t N>
-	using string_literal = basic_string_literal<char, N>;
+
+	//template <xns::size_t N>
+	//using string_literal = basic_string_literal<char, N>;
 
 	//// -- S T R I N G  L I T E R A L ------------------------------------------
 
