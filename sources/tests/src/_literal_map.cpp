@@ -5,7 +5,23 @@
 template <>
 int UT::unit_tests<"literal_map">(void) {
 
+
+	xns::literal_map<int, "a", "b"> m1 = { 1, 2 };
+
+	m1.have_key<"a">();
+
+	std::cout << xns::get<"a">(m1) << std::endl;
+
+	xns::get<"a">(m1) = xns::move(xns::get<"b">(m1));
+
+	std::cout << xns::get<"a">(m1) << std::endl;
+
+
+	return 0;
+
+
 	constexpr xns::literal_map<int, "hello", "world", "this", "is", "cool"> instance = { 1, 2, 3, 4, 5 };
+
 
 	instance.for_each([](const int& v) {
 		std::cout << v << " ";
@@ -25,8 +41,8 @@ int UT::unit_tests<"literal_map">(void) {
 
 	constexpr xns::basic_string_literal sf{"hello {0}, {1}\n"};
 
-	using seq = xns::make_char_seq<6, 8, sf>;
-	using seq2 = xns::make_char_seq<1, 3, sf>;
+	using seq = xns::make_character_subsequence<sf, 6, 8>;
+	using seq2 = xns::make_character_subsequence<sf, 1, 3>;
 
 	seq::print();
 	//xns::static_tokenizer<seq> st;

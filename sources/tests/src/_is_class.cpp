@@ -14,7 +14,7 @@ union test_union {
 	float f;
 };
 
-void test_function(void) {
+void test_function_is_class(void) {
 }
 
 enum test_enum {
@@ -32,7 +32,7 @@ int UT::unit_tests<"is_class">(void) {
 	std::cout << "is_class [test_struct]: " << xns::is_class<test_struct> << std::endl;
 	std::cout << "is_class [test_union]: " << xns::is_class<test_union> << std::endl;
 	std::cout << "is_class [test_enum]: " << xns::is_class<test_enum> << std::endl;
-	std::cout << "is_class [void(*)()]: " << xns::is_class<decltype(test_function)> << std::endl;
+	std::cout << "is_class [void(*)()]: " << xns::is_class<decltype(test_function_is_class)> << std::endl;
 	std::cout << "is_class [void]: " << xns::is_class<void> << std::endl;
 	std::cout << "is_class [void*]: " << xns::is_class<void*> << std::endl;
 
