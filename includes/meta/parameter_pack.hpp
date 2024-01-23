@@ -52,7 +52,7 @@ namespace xns {
 
 
 	template <typename R, xns::size_t... IDX, typename... A>
-	auto pack_extract_imp(xns::index_seq<IDX...>i, A&... args) -> R {
+	auto pack_extract_imp(xns::index_sequence<IDX...>i, A&... args) -> R {
 		//debug_sequence(i); // REMOVE i
 		//return RType{};
 		// extract the pack recursively

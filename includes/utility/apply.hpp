@@ -18,11 +18,12 @@ namespace xns {
 
 		/* apply implementation */
 		template <typename F, typename T, xns::size_t... I>
-		constexpr auto apply(F&& function, T&& tuple, xns::index_seq<I...>) noexcept {
-			return function(get<I>(xns::forward<T>(tuple))...);
+		constexpr auto apply(F&& function, T&& tuple, xns::index_sequence<I...>) noexcept {
+			return function(xns::get<I>(xns::forward<T>(tuple))...);
 		}
 
 	}
+
 	template <typename F, typename T>
 	constexpr auto apply(F&& function, T&& tuple) noexcept -> auto {
 		// check T is a tuple

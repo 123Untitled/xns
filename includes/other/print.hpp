@@ -71,7 +71,7 @@ namespace xns {
 			}
 
 			template<xns::is_char T, xns::size_t N, size_t... I>
-			consteval void copy_array(T (&dest)[N], const T (&src)[N], xns::index_seq<I...>) {
+			consteval void copy_array(T (&dest)[N], const T (&src)[N], xns::index_sequence<I...>) {
 				((dest[I] = src[I]), ...);
 			}
 
@@ -82,7 +82,7 @@ namespace xns {
 			}
 
 			template <xns::basic_string_literal lit, xns::size_t... N>
-			static consteval auto split(const xns::index_seq<N...>& seq) {
+			static consteval auto split(const xns::index_sequence<N...>& seq) {
 
 
 				xns::array<xns::string_view, sizeof...(N)> ar;

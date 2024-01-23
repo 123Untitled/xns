@@ -13,7 +13,7 @@ namespace xns {
 	// -- I N T E G E R  S E Q U E N C E --------------------------------------
 
 	template <class T, T... N>
-	struct integer_seq final {
+	struct integer_sequence final {
 
 
 		// -- A S S E R T I O N S ---------------------------------------------
@@ -28,7 +28,7 @@ namespace xns {
 		using type = T;
 
 		/* self type */
-		using self  = integer_seq<type, N...>;
+		using self  = integer_sequence<type, N...>;
 
 
 		// -- A C C E S S O R S -----------------------------------------------
@@ -44,7 +44,7 @@ namespace xns {
 
 	/* integer_sequence of size_t */
 	template <xns::size_t... N>
-	using index_seq = integer_seq<xns::size_t, N...>;
+	using index_sequence = integer_sequence<xns::size_t, N...>;
 
 
 	// -- M A K E  I N T E G E R  S E Q U E N C E -----------------------------
@@ -72,7 +72,7 @@ namespace xns {
 			struct impl<NUMBER, SEQUENCE...> {
 
 				/* type of the integer sequence */
-				using type = integer_seq<int_type, SEQUENCE...>;
+				using type = integer_sequence<int_type, SEQUENCE...>;
 			};
 
 			/* specialization for N != B, which means we have to continue the recursion */
@@ -118,7 +118,7 @@ namespace xns {
 
 	/* alias to transform a parameter pack into an index sequence */
 	template <class... A>
-	using index_seq_for    = make_index_sequence<sizeof...(A)>;
+	using index_sequence_for    = make_index_sequence<sizeof...(A)>;
 
 
 
@@ -127,7 +127,7 @@ namespace xns {
 
 	/* debug function */
 	template<class T, T... ints>
-	void debug_sequence(integer_seq<T, ints...> int_seq) {
+	void debug_sequence(integer_sequence<T, ints...> int_seq) {
 		/*
 		xns::output::write("The sequence of size ");
 		std::cout << "The sequence of size " << int_seq.size() << ": ";
