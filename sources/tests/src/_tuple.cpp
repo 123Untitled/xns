@@ -11,19 +11,19 @@ const int&& foo(void) {
 template <>
 int UT::unit_tests<"tuple">(void) {
 
-	xns::tuple<int, int> t1{1, 2};
+	xns::tuple<int, int> t1 = xns::make_tuple(1, 2);
 
-	xns::get<1>(t1);
+	const auto& v = xns::get<1>(xns::move(t1));
 
 
-	xns::tuple<int, float, const char*> _tuple{2, 0.3f, "hello"};
+	xns::tuple<int, float, const char(&)[6]> _tuple = xns::make_tuple(1, 2.0f, "hello");
 
 	int refff = xns::get<int>(xns::move(_tuple));
 
 	static_assert(xns::is_unique<char, int, float, const char*>);
 
 
-	//int& reff = xns::get<1>(_tuple);
+	int& reff = xns::get<0>(_tuple);
 
 
 	//_tuple.set<0>(2);
@@ -45,7 +45,7 @@ int UT::unit_tests<"tuple">(void) {
 
 	Type type{1, 2.0, 'c'};
 
-	xns::tuple<Type, int, float> t3{xns::move(type), 2, 3.0f};
+	//xns::tuple<Type, int, float> t3{xns::move(type), 2, 3.0f};
 
 	//Tuple<float, char> t02 = t3;
 
