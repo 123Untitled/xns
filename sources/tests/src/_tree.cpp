@@ -9,6 +9,7 @@
 #include "memcpy.hpp"
 #include "benchmark.hpp"
 #include "file.hpp"
+#include <algorithm>
 
 // boost
 #include <boost/container/set.hpp>
