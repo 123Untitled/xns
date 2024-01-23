@@ -1,8 +1,6 @@
 #ifndef XNS_TYPE_AT_HEADER
 #define XNS_TYPE_AT_HEADER
 
-#include "types.hpp"
-
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
@@ -14,17 +12,17 @@ namespace xns {
 	namespace impl {
 
 
-		template <xns::size_t IDX, typename... A>
+		template <decltype(sizeof(0)) I, typename... A>
 		class type_at final {
 
 
 			// -- assertions --------------------------------------------------
 
 			/* check if pack is not empty */
-			static_assert(sizeof...(A) > 0, "TYPE_AT: EMPTY PACK!");
+			static_assert(sizeof...(A) > 0, "[xns::type_at] Parameter pack is empty.");
 
 			/* check if index is valid */
-			static_assert(IDX < sizeof...(A), "TYPE_AT: INDEX OUT OF RANGE!");
+			static_assert(I < sizeof...(A), "[xns::type_at] Index is out of range.");
 
 
 			private:
@@ -32,17 +30,17 @@ namespace xns {
 				// -- private implementation ----------------------------------
 
 				/* forward declaration */
-				template <decltype(IDX) N, typename... T>
+				template <decltype(I) N, typename... T>
 				struct impl;
 
 				/* specialization for N == IDX */
-				template <decltype(IDX) N, typename U, typename... T> requires (N == IDX)
+				template <decltype(I) N, typename U, typename... T> requires (N == I)
 				struct impl<N, U, T...> {
 					using type = U;
 				};
 
 				/* specialization for N < IDX */
-				template <decltype(IDX) N, typename U, typename... T> requires (N < IDX)
+				template <decltype(I) N, typename U, typename... T> requires (N < I)
 				struct impl<N, U, T...> {
 					using type = typename impl<N + 1, T...>::type;
 				};
@@ -55,14 +53,13 @@ namespace xns {
 				/* type indexed by IDX */
 				using type = typename impl<0, A...>::type;
 
-
 		};
 
 	}
 
 	/* type at type */
-	template <xns::size_t IDX, class... A>
-	using type_at = typename impl::type_at<IDX, A...>::type;
+	template <decltype(sizeof(0)) I, class... A>
+	using type_at = typename impl::type_at<I, A...>::type;
 
 }
 
