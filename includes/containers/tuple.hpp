@@ -57,6 +57,7 @@ namespace xns {
 				value_type value;
 			};
 
+			struct private_tag final {};
 
 			// -- I M P L E M E N T A T I O N  C L A S S ----------------------
 
@@ -84,7 +85,7 @@ namespace xns {
 
 				/* variadic constructor */
 				template <typename... U>
-				inline constexpr impl(U&&... args) requires (sizeof...(U) > 1)
+				inline constexpr impl(private_tag, U&&... args)
 				// fold expression to initialize tuple elements
 				: element<IDX, A>{xns::forward<U>(args)}... {}
 
@@ -154,6 +155,16 @@ namespace xns {
 			self::impl<sequence> _impl;
 
 
+
+
+			// -- private lifecycle -------------------------------------------
+
+			/* variadic constructor */
+			template <typename... U>
+			inline constexpr tuple(private_tag, U&&... args)
+			: _impl{private_tag{}, xns::forward<U>(args)...} {}
+
+
 		public:
 
 			// -- public lifecycle --------------------------------------------
@@ -162,10 +173,6 @@ namespace xns {
 			inline constexpr tuple(void) noexcept
 			: _impl{} {}
 
-			/* variadic constructor */
-			template <typename... U> requires (sizeof...(U) > 1)
-			inline constexpr tuple(U&&... args)
-			: _impl{xns::forward<U>(args)...} {}
 
 			/* copy constructor */
 			inline constexpr tuple(const self& tuple)
@@ -237,6 +244,10 @@ namespace xns {
 		template <typename U, typename... T>
 		friend constexpr auto get(const xns::tuple<T...>&&) noexcept -> const U&&;
 
+		/* make tuple as friend */
+		template <typename... T>
+		friend constexpr auto make_tuple(T&&...) -> xns::tuple<T...>;
+
 	};
 
 
@@ -251,7 +262,7 @@ namespace xns {
 	template <xns::size_t I, typename... T>
 	constexpr auto get(xns::tuple<T...>& tuple) noexcept -> xns::indexed_element<I, xns::tuple<T...>>& {
 		// check if index is in range
-		static_assert(I < sizeof...(T), "): GET: INDEX OUT OF RANGE! :(");
+		static_assert(I < sizeof...(T), "[xns::get] Index out of range.");
 		// get tuple element type
 		using elem_t = typename xns::tuple<T...>::template element_at<I>;
 		// return a reference to the tuple element
@@ -262,7 +273,7 @@ namespace xns {
 	template <xns::size_t I, typename... T>
 	constexpr auto get(xns::tuple<T...>&& tuple) noexcept -> xns::indexed_element<I, xns::tuple<T...>>&& {
 		// check if index is in range
-		static_assert(I < sizeof...(T), "): GET: INDEX OUT OF RANGE! :(");
+		static_assert(I < sizeof...(T), "[xns::get] Index out of range.");
 		// get tuple element type
 		using elem_t = typename xns::tuple<T...>::template element_at<I>;
 		// return a rvalue reference to the tuple element
@@ -273,7 +284,7 @@ namespace xns {
 	template <xns::size_t I, typename... T>
 	constexpr auto get(const xns::tuple<T...>& tuple) noexcept -> const xns::indexed_element<I, xns::tuple<T...>>& {
 		// check if index is in range
-		static_assert(I < sizeof...(T), "): INDEX OUT OF RANGE! :(");
+		static_assert(I < sizeof...(T), "[xns::get] Index out of range.");
 		// get tuple element type
 		using elem_t = typename xns::tuple<T...>::template element_at<I>;
 		// return a constant reference to the tuple element
@@ -284,7 +295,7 @@ namespace xns {
 	template <xns::size_t I, typename... T>
 	constexpr auto get(const xns::tuple<T...>&& tuple) noexcept -> const xns::indexed_element<I, xns::tuple<T...>>&& {
 		// check if index is in range
-		static_assert(I < sizeof...(T), "): INDEX OUT OF RANGE! :(");
+		static_assert(I < sizeof...(T), "[xns::get] Index out of range.");
 		// get tuple element type
 		using elem_t = typename xns::tuple<T...>::template element_at<I>;
 		// return a constant rvalue reference to the tuple element
@@ -312,9 +323,9 @@ namespace xns {
 	template <typename U, typename... T>
 	constexpr auto get(xns::tuple<T...>& tuple) noexcept -> U& {
 		// check if type is in tuple
-		static_assert(xns::is_one_of<U, T...>, "): GET: TYPE NOT IN TUPLE! :(");
+		static_assert(xns::is_one_of<U, T...>, "[xns::get] Type is not in tuple.");
 		// require all types to be unique
-		static_assert(xns::is_unique<U, T...>, "): GET: CANNOT GET AMBIGUOUS TYPE! :(");
+		static_assert(xns::is_unique<U, T...>, "[xns::get] Type is ambiguous, because it is not unique.");
 		// get tuple element type
 		using elem_t = typename xns::tuple<T...>::template element_from<U>;
 		// return a reference to the tuple element
@@ -325,9 +336,9 @@ namespace xns {
 	template <typename U, typename... T>
 	constexpr auto get(xns::tuple<T...>&& tuple) noexcept -> U&& {
 		// check if type is in tuple
-		static_assert(xns::is_one_of<U, T...>, "): GET: TYPE NOT IN TUPLE! :(");
+		static_assert(xns::is_one_of<U, T...>, "[xns::get] Type is not in tuple.");
 		// require all types to be unique
-		static_assert(xns::is_unique<U, T...>, "): GET: CANNOT GET AMBIGUOUS TYPE! :(");
+		static_assert(xns::is_unique<U, T...>, "[xns::get] Type is ambiguous, because it is not unique.");
 		// get tuple element type
 		using elem_t = typename xns::tuple<T...>::template element_from<U>;
 		// return a rvalue reference to the tuple element
@@ -338,9 +349,9 @@ namespace xns {
 	template< typename U, typename... T>
 	constexpr auto get(const xns::tuple<T...>& tuple) noexcept -> const U& {
 		// check if type is in tuple
-		static_assert(xns::is_one_of<U, T...>, "): GET: TYPE NOT IN TUPLE! :(");
+		static_assert(xns::is_one_of<U, T...>, "[xns::get] Type is not in tuple.");
 		// require all types to be unique
-		static_assert(xns::is_unique<U, T...>, "): GET: CANNOT GET AMBIGUOUS TYPE! :(");
+		static_assert(xns::is_unique<U, T...>, "[xns::get] Type is ambiguous, because it is not unique.");
 		// get tuple element type
 		using elem_t = typename xns::tuple<T...>::template element_from<U>;
 		// return a constant reference to the tuple element
@@ -351,9 +362,9 @@ namespace xns {
 	template< typename U, typename... T>
 	constexpr auto get(const xns::tuple<T...>&& tuple) noexcept -> const U&& {
 		// check if type is in tuple
-		static_assert(xns::is_one_of<U, T...>, "): GET: TYPE NOT IN TUPLE! :(");
+		static_assert(xns::is_one_of<U, T...>, "[xns::get] Type is not in tuple.");
 		// require all types to be unique
-		static_assert(xns::is_unique<U, T...>, "): GET: CANNOT GET AMBIGUOUS TYPE! :(");
+		static_assert(xns::is_unique<U, T...>, "[xns::get] Type is ambiguous, because it is not unique.");
 		// get tuple element type
 		using elem_t = typename xns::tuple<T...>::template element_from<U>;
 		// return a constant rvalue reference to the tuple element
@@ -376,16 +387,35 @@ namespace xns {
 	namespace impl {
 
 		template <typename T>
-		struct is_tuple : xns::no {};
+		struct is_tuple final {
+			constexpr static bool value = false;
+		};
 
 		template <typename... A>
-		struct is_tuple<xns::tuple<A...>> : xns::yes {};
+		struct is_tuple<xns::tuple<A...>> final {
+			constexpr static bool value = true;
+		};
 
 	}
 
 	/* is tuple concept */
 	template <typename T>
 	concept is_tuple = impl::is_tuple<xns::remove_cvrp<T>>::value;
+
+
+	// -- make tuple ----------------------------------------------------------
+
+	/* make tuple */
+	template <typename... A>
+	constexpr auto make_tuple(A&&... args) -> xns::tuple<A...> {
+		using tag = typename xns::tuple<A...>::private_tag;
+
+		return xns::tuple<A...>{
+			tag{},
+			xns::forward<A>(args)...};
+	}
+
+
 
 
 
