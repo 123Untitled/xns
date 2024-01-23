@@ -45,7 +45,7 @@ namespace xns {
 
 					/* members constructor */
 					explicit wrapper(F&& function, A&&... arguments) noexcept
-					: func{function}, args{xns::forward<A>(arguments)...} {}
+					: func{function}, args{xns::in_place{}, xns::forward<A>(arguments)...} {}
 
 
 					~wrapper(void) noexcept = default;

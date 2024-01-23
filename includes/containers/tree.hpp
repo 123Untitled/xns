@@ -2022,7 +2022,7 @@ namespace xns {
 
 				_nodes.emplace_back();
 
-				queue.emplace(_tree._root, &_nodes.back());
+				queue.emplace(xns::in_place{}, _tree._root, &_nodes.back());
 
 
 				while (not queue.empty()) {
@@ -2054,7 +2054,7 @@ namespace xns {
 											0, // depth
 											xns::string{});
 
-						queue.emplace(node->_left, &_nodes.back());
+						queue.emplace(xns::in_place{}, node->_left, &_nodes.back());
 						info->left = &_nodes.back();
 					}
 
@@ -2069,7 +2069,7 @@ namespace xns {
 											0, // depth
 											xns::string{});
 
-						queue.emplace(node->_right, &_nodes.back());
+						queue.emplace(xns::in_place{}, node->_right, &_nodes.back());
 						info->right = &_nodes.back();
 
 					}

@@ -12,6 +12,7 @@
 #include "type_at.hpp"
 #include "index_of.hpp"
 #include "integer_sequence.hpp"
+#include "in_place.hpp"
 
 // c++ standard library headers
 #include <iostream>
@@ -50,30 +51,26 @@ namespace xns {
 
 			// -- private structs ---------------------------------------------
 
-			/* element */
-			template <size_type IDX, typename value_type>
-			struct element {
-				/* value */
-				value_type value;
-			};
-
+			/* private tag */
 			struct private_tag final {};
 
-			// -- I M P L E M E N T A T I O N  C L A S S ----------------------
+			/* element */
+			template <size_type, typename T>
+			struct element { T value; };
 
-			/* forward declaration */
-			template <class>
+			/* impl */
+			template <typename>
 			struct impl;
 
 			/* specialization for index sequence */
-			template <size_type... IDX>
-			struct impl<xns::index_seq<IDX...>> final : public element<IDX, A>... {
+			template <size_type... I>
+			struct impl<xns::index_sequence<I...>> final : public self::element<I, A>... {
 
 
 				// -- public types --------------------------------------------
 
 				/* self type */
-				using self = impl<xns::index_seq<IDX...>>;
+				using self = impl<xns::index_sequence<I...>>;
 
 
 				// -- public lifecycle ----------------------------------------
@@ -81,23 +78,23 @@ namespace xns {
 				/* default constructor */
 				inline constexpr impl(void) noexcept
 				// fold expression to default-initialize tuple elements
-				: element<IDX, A>{}... {}
+				: element<I, A>{}... {}
 
 				/* variadic constructor */
 				template <typename... U>
-				inline constexpr impl(private_tag, U&&... args)
+				inline constexpr impl(xns::in_place, U&&... args)
 				// fold expression to initialize tuple elements
-				: element<IDX, A>{xns::forward<U>(args)}... {}
+				: element<I, A>{xns::forward<U>(args)}... {}
 
 				/* copy constructor */
 				inline constexpr impl(const self& other)
 				// fold expression to copy-initialize tuple elements
-				: element<IDX, A>{other}... {}
+				: element<I, A>{other}... {}
 
 				/* move constructor */
 				inline constexpr impl(self&& other) noexcept
 				// fold expression to move-initialize tuple elements
-				: element<IDX, A>{xns::move(other)}... {}
+				: element<I, A>{xns::move(other)}... {}
 
 				/* destructor */
 				inline constexpr ~impl(void) noexcept = default;
@@ -109,7 +106,7 @@ namespace xns {
 				inline constexpr auto operator=(const self& other) -> self& {
 					// INFO: check for self-assignment is not necessary (see below)
 					// because this check is already done in the tuple::operator=()
-					((element<IDX, A>::operator=(other)), ...);
+					((element<I, A>::operator=(other)), ...);
 					// return self-reference
 					return *this;
 				}
@@ -118,7 +115,7 @@ namespace xns {
 				inline constexpr auto operator=(self&& other) noexcept -> self& {
 					// INFO: check for self-assignment is not necessary (see below)
 					// because this check is already done in the tuple::operator=()
-					((element<IDX, A>::operator=(xns::move(other))), ...);
+					((element<I, A>::operator=(xns::move(other))), ...);
 					// return self-reference
 					return *this;
 				}
@@ -130,22 +127,22 @@ namespace xns {
 			// -- private types -----------------------------------------------
 
 			/* sequence type */
-			using sequence = xns::index_seq_for<A...>;
+			using sequence = xns::index_sequence_for<A...>;
 
 			/* indexed type */
-			template <size_type IDX>
-			using indexed = xns::type_at<IDX, A...>;
+			template <size_type I>
+			using indexed = xns::type_at<I, A...>;
 
-			/* element at */
-			template <size_type IDX>
-			using element_at = element<IDX, indexed<IDX>>;
+			/* element from index */
+			template <size_type I>
+			using element_at = self::element<I, indexed<I>>;
 
 			/* element from type */
 			template <typename T>
 			using element_from = element<xns::index_of<T, A...>(), T>;
 
 			/* index of type */
-			template <class T>
+			template <typename T>
 			static constexpr xns::size_t _index_of = xns::index_of<T, A...>();
 
 
@@ -159,10 +156,6 @@ namespace xns {
 
 			// -- private lifecycle -------------------------------------------
 
-			/* variadic constructor */
-			template <typename... U>
-			inline constexpr tuple(private_tag, U&&... args)
-			: _impl{private_tag{}, xns::forward<U>(args)...} {}
 
 
 		public:
@@ -172,6 +165,11 @@ namespace xns {
 			/* default constructor */
 			inline constexpr tuple(void) noexcept
 			: _impl{} {}
+
+			/* variadic constructor */
+			template <typename... U>
+			inline constexpr tuple(xns::in_place, U&&... args)
+			: _impl{xns::in_place{}, xns::forward<U>(args)...} {}
 
 
 			/* copy constructor */
@@ -191,20 +189,22 @@ namespace xns {
 			/* copy assignment operator */
 			constexpr auto operator=(const self& other) -> self& {
 				// check for self-assignment
-				if (this != &other) {
-					// copy data
-					_impl = other._impl;
-				} // return self-reference
+				if (this == &other)
+					return *this;
+				// copy data
+				_impl = other._impl;
+				// return self-reference
 				return *this;
 			}
 
 			/* move assignment operator */
 			constexpr auto operator=(self&& other) noexcept -> self& {
 				// check for self-assignment
-				if (this != &other) {
-					// move data
-					_impl = xns::move(other._impl);
-				} // return self-reference
+				if (this == &other)
+					return *this;
+				// move data
+				_impl = xns::move(other._impl);
+				// return self-reference
 				return *this;
 			}
 
@@ -408,10 +408,10 @@ namespace xns {
 	/* make tuple */
 	template <typename... A>
 	constexpr auto make_tuple(A&&... args) -> xns::tuple<A...> {
-		using tag = typename xns::tuple<A...>::private_tag;
+		//using tag = typename xns::tuple<A...>::private_tag;
 
 		return xns::tuple<A...>{
-			tag{},
+			xns::in_place{},
 			xns::forward<A>(args)...};
 	}
 
