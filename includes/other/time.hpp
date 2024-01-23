@@ -46,7 +46,8 @@ namespace xns {
 
 			/* get current time */
 			static auto now(void) noexcept -> size_type {
-				return static_cast<size_type>(::mach_absolute_time() * shared()._abs_to_nano);
+				return static_cast<size_type>(
+						static_cast<xns::f64>(::mach_absolute_time()) * shared()._abs_to_nano);
 			}
 
 
