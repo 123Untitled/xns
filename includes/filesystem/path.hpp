@@ -330,14 +330,14 @@ namespace xns {
 						if (_segments.empty()
 							|| xns::get<1>(_segments.back()) == segment_type::PARENT) {
 							// add parent segment
-							_segments.emplace_back(xns::in_place{}, string_type{&path[x], z}, segment_type::PARENT); // this call need make_tuple() !!!
+							_segments.emplace_back(string_type{&path[x], z}, segment_type::PARENT); // this call need make_tuple() !!!
 						} // else remove previous segment
 						else { _segments.pop_back(); }
 					}
 
 					// add entity segment
 					else {
-						_segments.emplace_back(xns::in_place{}, string_type{&path[x], z}, segment_type::ENTITY);
+						_segments.emplace_back(string_type{&path[x], z}, segment_type::ENTITY);
 					}
 				}
 

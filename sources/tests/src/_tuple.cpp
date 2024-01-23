@@ -11,9 +11,18 @@ const int&& foo(void) {
 template <>
 int UT::unit_tests<"tuple">(void) {
 
-	xns::tuple<int, int> t1 = xns::make_tuple(1, 2);
+	xns::tuple<> t0;
+	std::tuple<> t1;
 
-	const auto& v = xns::get<1>(xns::move(t1));
+	std::cout << "sizeof: " << sizeof(t0) << std::endl;
+	std::cout << "sizeof: " << sizeof(t1) << std::endl;
+	return 0;
+
+
+
+	xns::tuple<int> t3{1};
+
+	//const auto& v = xns::get<1>(xns::move(t1));
 
 
 	xns::tuple<int, float, const char(&)[6]> _tuple = xns::make_tuple(1, 2.0f, "hello");

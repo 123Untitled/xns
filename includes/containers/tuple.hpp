@@ -27,7 +27,7 @@ namespace xns {
 	// -- T U P L E  C L A S S ------------------------------------------------
 
 	template <typename... A>
-	class alignas(sizeof(xns::addr_t)) tuple final {
+	class tuple final {
 
 
 		public:
@@ -50,9 +50,6 @@ namespace xns {
 
 
 			// -- private structs ---------------------------------------------
-
-			/* private tag */
-			struct private_tag final {};
 
 			/* element */
 			template <size_type, typename T>
@@ -82,7 +79,7 @@ namespace xns {
 
 				/* variadic constructor */
 				template <typename... U>
-				inline constexpr impl(xns::in_place, U&&... args)
+				inline constexpr impl(U&&... args)
 				// fold expression to initialize tuple elements
 				: element<I, A>{xns::forward<U>(args)}... {}
 
@@ -167,10 +164,9 @@ namespace xns {
 			: _impl{} {}
 
 			/* variadic constructor */
-			template <typename... U>
-			inline constexpr tuple(xns::in_place, U&&... args)
-			: _impl{xns::in_place{}, xns::forward<U>(args)...} {}
-
+			template <typename... U> requires (sizeof...(U) == sizeof...(A))
+			inline constexpr tuple(U&&... args)
+			: _impl{xns::forward<U>(args)...} {}
 
 			/* copy constructor */
 			inline constexpr tuple(const self& tuple)
@@ -248,7 +244,7 @@ namespace xns {
 		template <typename... T>
 		friend constexpr auto make_tuple(T&&...) -> xns::tuple<T...>;
 
-	};
+	}; 
 
 
 	/* deduction guide */
@@ -409,10 +405,7 @@ namespace xns {
 	template <typename... A>
 	constexpr auto make_tuple(A&&... args) -> xns::tuple<A...> {
 		//using tag = typename xns::tuple<A...>::private_tag;
-
-		return xns::tuple<A...>{
-			xns::in_place{},
-			xns::forward<A>(args)...};
+		return xns::tuple<A...>{xns::forward<A>(args)...};
 	}
 
 
