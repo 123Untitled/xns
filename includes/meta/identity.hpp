@@ -16,13 +16,13 @@ namespace xns {
 
 
 		/* identity */
-		template <class T>
+		template <typename T>
 		struct identity {
 			using type = T;
 		};
 
 		/* identity parameter pack */
-		template <class... A>
+		template <typename... A>
 		struct identity_pack {
 			using type = identity_pack<A...>;
 		};

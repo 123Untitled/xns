@@ -1,5 +1,5 @@
-#ifndef XNS_ALWAYS_FALSE_HEADER
-#define XNS_ALWAYS_FALSE_HEADER
+#ifndef XNS_ALWAYS_FALSE_HPP
+#define XNS_ALWAYS_FALSE_HPP
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -13,7 +13,7 @@ namespace xns {
 
 		template <typename>
 		struct always_false {
-			static constexpr bool value{false};
+			static constexpr bool value = false;
 		};
 	}
 
@@ -22,4 +22,4 @@ namespace xns {
 
 }
 
-#endif // ALWAYS_FALSE_HEADER
+#endif // XNS_ALWAYS_FALSE_HPP

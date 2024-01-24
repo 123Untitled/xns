@@ -1,8 +1,8 @@
-#ifndef XNS_IS_INTEGRAL_HEADER
-#define XNS_IS_INTEGRAL_HEADER
+#ifndef XNS_IS_INTEGRAL_XNS
+#define XNS_IS_INTEGRAL_XNS
 
 #include "is_one_of.hpp"
-#include "remove.hpp"
+//#include "remove.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

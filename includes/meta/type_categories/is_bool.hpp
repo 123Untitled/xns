@@ -1,5 +1,5 @@
-#ifndef XNS_IS_BOOL_HEADER
-#define XNS_IS_BOOL_HEADER
+#ifndef XNS_IS_BOOL_HPP
+#define XNS_IS_BOOL_HPP
 
 #include "is_same.hpp"
 #include "remove.hpp"
@@ -16,6 +16,6 @@ namespace xns {
 	template <typename T>
 	constexpr bool is_bool = xns::is_same<bool, xns::remove_cv<T>>;
 
-}
+} // namespace xns
 
-#endif
+#endif // XNS_IS_BOOL_HPP
