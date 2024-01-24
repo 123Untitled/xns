@@ -1,12 +1,10 @@
-#ifndef XNS_ADD_CONST_HEADER
-#define XNS_ADD_CONST_HEADER
-
+#ifndef XNS_ADD_CONST_HPP
+#define XNS_ADD_CONST_HPP
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
-
 
 	// -- A D D  C O N S T ----------------------------------------------------
 
@@ -15,11 +13,11 @@ namespace xns {
 	namespace impl {
 
 		/* add const */
-		template <class T>
-		struct add_const { using type = const T; };
+		template <typename T>
+		struct add_const          { using type = const T; };
 
 		/* specialisation for const T */
-		template <class T>
+		template <typename T>
 		struct add_const<const T> { using type = const T; };
 
 	}
@@ -30,7 +28,6 @@ namespace xns {
 	template <class T>
 	using add_const = typename impl::add_const<T>::type;
 
+} // namespace xns
 
-}
-
-#endif
+#endif // XNS_ADD_CONST_HPP
