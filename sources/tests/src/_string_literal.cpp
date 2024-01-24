@@ -27,12 +27,14 @@ int UT::unit_tests<"string_literal">(void) {
 
 	using arr_ref = const char(&)[6];
 
-	constexpr xns::basic_string_literal str1{u8"hello"};
-	constexpr xns::basic_string_literal str2{"hello"};
+	constexpr xns::basic_string_literal str1{L"hello"};
+	constexpr xns::basic_string_literal str2{U"hello"};
 
-	if (str1 <= str2) {
-		std::cout << "str1 == str2" << std::endl;
-	}
+	std::cout << str1.size() << std::endl;
+
+	//if (str1 <= str2) {
+	//	std::cout << "str1 == str2" << std::endl;
+	//}
 
 
 	//constexpr arr_ref arr1 = str1;
