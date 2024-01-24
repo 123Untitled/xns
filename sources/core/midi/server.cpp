@@ -7,9 +7,9 @@
 
 /* default constructor */
 midi::server::server(void)
-:	_client{"xns midi client"},
-	_source{_client, "xns midi source"},
-	_destination{_client, "xns midi destination"} {
+:	_client{xns::string{"xns midi client"}},
+	_source{_client, xns::string{"xns midi source"}},
+	_destination{_client, xns::string{"xns midi destination"}} {
 	setup_server();
 }
 
