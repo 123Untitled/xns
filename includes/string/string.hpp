@@ -33,11 +33,14 @@
 #include "is_signed.hpp"
 
 
+#include "char_traits.hpp"
+
 
 // strncmp
 #include <cstring>
 
 
+#include "string_literal.hpp"
 
 
 
@@ -95,7 +98,7 @@ namespace xns {
 	/* is string concept */
 	template <class T>
 	concept is_string = xns::is_same<T, xns::basic_string<typename T::char_t>>
-				|| xns::is_same<T, xns::basic_string_view<typename T::char_t>>;
+					 || xns::is_same<T, xns::basic_string_view<typename T::char_t>>;
 
 
 	/* basic string iterator */
@@ -103,15 +106,15 @@ namespace xns {
 	class basic_string_iterator;
 
 
-
 	// -- non-member functions ------------------------------------------------
 
-	/* strlen */
+	/* strlen (null-terminated string) */
 	template <typename T>
 	constexpr auto strlen(const T* str) noexcept -> typename basic_string<T>::size_type {
+		std::cout << "strlen (null-terminated string)" << std::endl;
 		// check T is a character type
 		static_assert(xns::is_char<T>,
-				"): STRLEN REQUIRES A CHARACTER TYPE :(");
+				"): strlen requires a character type :(");
 		// check if pointer is null
 		if (str == nullptr) { return 0; }
 		// compute length
@@ -122,6 +125,25 @@ namespace xns {
 		return x;
 	}
 
+	/* strlen (basic string) */
+	template <typename T>
+	constexpr inline auto strlen(const xns::basic_string<T>& string) noexcept -> auto {
+		return typename basic_string<T>::size_type{string.size()};
+	}
+
+	/* strlen (basic string view) */
+	template <typename T>
+	constexpr inline auto strlen(const basic_string_view<T>& view) noexcept -> auto {
+		return typename basic_string_view<T>::size_type{view.size()};
+	}
+
+	/* strlen (character) */
+	template <typename T> requires(xns::is_char<T>)
+	constexpr inline auto strlen(const T& character) noexcept -> auto {
+		std::cout << "strlen (character)" << std::endl;
+		return typename basic_string<T>::size_type{1};
+	}
+
 
 
 
@@ -129,7 +151,7 @@ namespace xns {
 
 	/* string class */
 	template <typename T>
-	class basic_string {
+	class basic_string final {
 
 
 		// -- friends -----------------------------------------------------
@@ -142,12 +164,46 @@ namespace xns {
 
 		/* check if T is a character type */
 		static_assert(xns::is_char<T>,
-				"): BASIC STRING REQUIRES A CHARACTER TYPE :(");
+				"): basic string requires a character type :(");
 
 
 		public:
 
 			// -- public types ------------------------------------------------
+
+			/* self type */
+			using _self        = xns::basic_string<T>;
+
+			/* traits type */
+			using _traits      = xns::char_traits<T>;
+
+			/* char type */
+			using _char        = typename _traits::_char;
+
+			/* size type */
+			using _unsigned    = typename _traits::_size;
+
+			/* mutable pointer type */
+			using _mut_ptr     = typename _traits::_mut_ptr;
+
+			/* const pointer type */
+			using _const_ptr   = typename _traits::_const_ptr;
+
+			/* mutable reference type */
+			using _mut_ref     = typename _traits::_mut_ref;
+
+			/* const reference type */
+			using _const_ref   = typename _traits::_const_ref;
+
+			/* signed int type */
+			using _signed      = typename _traits::_signed;
+
+
+
+
+
+
+
 
 			/* character type */
 			using char_t      = xns::remove_cvr<T>;
@@ -194,7 +250,7 @@ namespace xns {
 			// -- private members ---------------------------------------------
 
 			/* pointer */
-			mut_ptr _str;
+			mut_ptr   _str;
 
 			/* capacity */
 			size_type _capacity;
@@ -224,7 +280,7 @@ namespace xns {
 
 
 			/* null-terminated string constructor */
-			basic_string(const_ptr str)
+			explicit basic_string(const_ptr str)
 			: _str{nullptr}, _capacity{xns::strlen(str)}, _size{_capacity} {
 				// exit if size is zero
 				if (not _size) { return; }
@@ -237,7 +293,7 @@ namespace xns {
 			}
 
 			/* buffer constructor */
-			explicit basic_string(const_ptr str, const size_type size)
+			basic_string(const_ptr str, const size_type size)
 			: _str{nullptr}, _capacity{size}, _size{size} {
 				// exit if buffer is null or empty
 				if (not str || not size) { init(); return; }
@@ -250,7 +306,7 @@ namespace xns {
 			}
 
 			/* fill constructor */
-			explicit basic_string(const char_t character, const size_type count)
+			basic_string(const char_t character, const size_type count)
 			: _str{nullptr}, _capacity{count}, _size{count} {
 				// exit if count is zero
 				if (!count) { return; }
@@ -353,19 +409,19 @@ namespace xns {
 
 			/* copy assignment */
 			auto assign(const self& other) -> void {
+				// check for self-assignment
+				if (this == &other) { return; }
 				// check for other size
 				if (other.empty()) { clear(); return; }
-				// check for self-assignment
-				if (this != &other) {
-					// check if capacity is sufficient
-					if (_capacity < other._size) {
-						// reallocate memory
-						reallocate(other._size);
-					} // copy string
-					xns::memcpy(_str, other._str, other._size);
-					// set nullchar
-					null_terminator(other._size);
-				}
+				// check if capacity is sufficient
+				if (_capacity < other._size) {
+					// reallocate memory
+					reallocate(other._size);
+				} // copy string
+				//_traits::copy(_str, other._str, other._size);
+				xns::memcpy(_str, other._str, other._size);
+				// set nullchar
+				null_terminator(other._size);
 			}
 
 			/* move assignment */
@@ -674,7 +730,6 @@ namespace xns {
 				return *this;
 			}
 
-
 			/* string append */
 			inline auto append(const self& str) -> self& {
 				// call buffer append
@@ -716,12 +771,11 @@ namespace xns {
 
 
 			template <typename... A>
-			static constexpr bool append_selector(void) {
+			static consteval bool append_selector(void) {
 				// minimum arguments needed
 				constexpr size_type min = 2;
 				// check if all arguments are of type string
-				constexpr bool type = (xns::is_same<
-											xns::remove_reference<A>,
+				constexpr bool type = (xns::is_same<xns::remove_cvr<A>,
 											self> && ...); // WARNING NEED TO RECHECK THIS AFTER RECENT CHANGES
 				// check if there are at least two arguments
 				constexpr bool required = sizeof...(A) >= min;
@@ -729,9 +783,16 @@ namespace xns {
 				return type && required;
 			}
 
-			/* multiple string append */
+
+
 			template <typename... A>
-			self& append(A&&... strings) requires(append_selector<A...>()) {
+			auto multi_length(A&&... strings) const -> size_type {
+				return (xns::strlen(xns::forward<A>(strings)) + ...);
+			}
+
+			/* multiple string append */
+			template <typename... A> requires(append_selector<A...>())
+			auto append_multi(A&&... strings) -> self& {
 
 				// get the size of the strings
 				size_type size = 0;
@@ -1228,8 +1289,8 @@ namespace xns {
 
 			/* try expand */
 			inline auto try_expand(const size_type request) const noexcept -> size_type {
-				auto cap = (_capacity << 1U);
-				return request > cap ? request : cap;
+				auto new_capacity = (_capacity << 1U);
+				return request > new_capacity ? request : new_capacity;
 			}
 
 
@@ -1437,8 +1498,8 @@ namespace xns {
 
 
 	/* deduction guide for null-terminated constructor */
-	template <typename T>
-	basic_string(const T*) -> basic_string<T>;
+	//template <typename T>
+	//basic_string(const T*) -> basic_string<T>;
 
 
 	/* to c-string ascii */
@@ -1502,6 +1563,15 @@ namespace xns {
 
 			// -- public types ------------------------------------------------
 
+			using _self           = xns::basic_string_view<T>;
+
+			using _traits         = xns::char_traits<T>;
+
+			using _char           = typename _traits::_char;
+
+			using _unsigned       = typename _traits::_size;
+
+
 			/* character type */
 			using char_t          = xns::remove_cv<T>;
 
@@ -1532,7 +1602,21 @@ namespace xns {
 
 			/* pointer constructor */
 			inline constexpr basic_string_view(const_ptr str) noexcept
-			: _str{str ? str : _empty}, _size{xns::strlen(str)} {}
+			: _str{str ? str : _empty}, /*_size{ xns::strlen(str)} temp for test */ _size{0} {
+
+				if (str) {
+
+					size_type x = 0;
+
+					while (str[x]) {
+						++x;
+					}
+
+					_size = x;
+
+				} // this to be removed
+
+			}
 
 			/* pointer and length constructor */
 			inline constexpr basic_string_view(const_ptr str, const size_type size) noexcept
@@ -2636,7 +2720,7 @@ namespace xns {
 
 
 #endif
-
+	//
 	///* string class */
 	//template <typename T>
 	//class sso_string {
