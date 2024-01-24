@@ -75,11 +75,11 @@ auto xns::env::get(const xns::string& name) noexcept -> const xns::env::weak_str
 /* get paths */
 auto xns::env::paths(void) -> xns::vector<xns::string> {
 
-	weak_string weak{get("PATH")};
+	weak_string weak{get(xns::string{"PATH"})};
 
 	if (weak == nullptr) { return{}; }
 
-	return weak->split(":");
+	return weak->split(xns::string{":"});
 }
 
 
