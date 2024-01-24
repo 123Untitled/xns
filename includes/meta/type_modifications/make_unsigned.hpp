@@ -41,7 +41,7 @@ namespace xns {
 			// -- types -------------------------------------------------------
 
 			/* signed type */
-			using unsigned_type = xns::unsign<sizeof(T)>;
+			using unsigned_type = xns::_unsigned<sizeof(T)>;
 
 			/* conditional type */
 			using type = xns::conditional<xns::is_const<T>,

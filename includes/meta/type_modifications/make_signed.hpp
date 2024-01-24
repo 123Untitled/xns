@@ -1,5 +1,5 @@
-#ifndef XNS_MAKE_SIGNED_HEADER
-#define XNS_MAKE_SIGNED_HEADER
+#ifndef XNS_MAKE_SIGNED_HPP
+#define XNS_MAKE_SIGNED_HPP
 
 #include "types.hpp"
 
@@ -19,48 +19,46 @@ namespace xns {
 
 	// -- M A K E  S I G N E D ------------------------------------------------
 
-
 	// -- detail --------------------------------------------------------------
 
 	namespace impl {
 
-
-		template <class T>
+		template <typename T>
 		struct make_signed {
-
 
 			// -- assertions --------------------------------------------------
 
 			// check if T is an integral type
-			static_assert(xns::is_integral<T> || xns::is_enum<T>, "): MAKE_SIGNED REQUIRES AN INTEGRAL TYPE :(");
+			static_assert(xns::is_integral<T> || xns::is_enum<T>,
+					"make_signed requires an integral type.");
 
 			// check if T is not a bool
-			static_assert(xns::is_bool<T> == false, "): MAKE_SIGNED DOES NOT SUPPORT BOOL :(");
+			static_assert(xns::is_bool<T> == false,
+					"make_signed does not support bool.");
 
 
 			// -- types -------------------------------------------------------
 
 			/* signed type */
-			using signed_type = xns::sign<sizeof(T)>;
+			using signed_type = xns::_signed<sizeof(T)>;
 
 			/* conditional type */
 			using type = xns::conditional<xns::is_const<T>,
 						 xns::conditional<xns::is_volatile<T>,
-						 const volatile signed_type,
-						 const signed_type>,
+										  const volatile signed_type,
+										  const signed_type>,
 						 xns::conditional<xns::is_volatile<T>,
-						 volatile signed_type,
-						 signed_type>>;
+										  volatile signed_type,
+										  signed_type>>;
 
-		};
+		}; // struct make_signed
 
-	}
-
+	} // namespace impl
 
 	/* make signed */
 	template <class T>
 	using make_signed = typename impl::make_signed<T>::type;
 
-}
+} // namespace xns
 
-#endif
+#endif // XNS_MAKE_SIGNED_HPP
