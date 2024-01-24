@@ -3,6 +3,7 @@
 
 #include "forward.hpp"
 #include "macros.hpp"
+#include "types.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
