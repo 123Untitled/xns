@@ -13,10 +13,10 @@ namespace xns {
 	namespace impl {
 
 		template <typename T, typename R = T&&>
-		R declval(int);
+		auto declval(int) -> R;
 
 		template <typename T>
-		T declval(long);
+		auto declval(long) -> T;
 	}
 
 	template<typename T>
