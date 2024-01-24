@@ -173,6 +173,7 @@ namespace tests {
 
 
 
+/*
 	template <typename T, xns::basic_string_literal CLASS_NAME,
 						xns::basic_string_literal TYPE_NAME>
 	class X {
@@ -246,6 +247,7 @@ namespace tests {
 	using F = X<float, "F", "float">;
 	using D = X<double,"D", "double">;
 	using S = X<std::string, "S", "string">;
+	*/
 
 
 
