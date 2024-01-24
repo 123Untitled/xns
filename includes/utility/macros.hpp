@@ -1,5 +1,5 @@
-#ifndef XNS_MACROS_HEADER
-#define XNS_MACROS_HEADER
+#ifndef XNS_MACROS_HPP
+#define XNS_MACROS_HPP
 
 namespace xns {
 
@@ -36,6 +36,6 @@ namespace xns {
 	#define unassignable(obj) NON_ASSIGNABLE(obj)
 
 
-}
+} // namespace xns
 
-#endif
+#endif // XNS_MACROS_HPP
