@@ -34,10 +34,11 @@ namespace xns {
 		/* check all string literals are unique */
 		static_assert(xns::is_all_unique
 					 <key<L>...>,
-					 "): STRING LITERALS MUST BE UNIQUE :(");
+					 "All keys must be unique.");
 
 		/* check for map size */
-		static_assert(sizeof...(L) > 0, "): MAP MUST HAVE AT LEAST 1 KEY :(");
+		static_assert(sizeof...(L) > 0,
+					"Map must have at least one element.");
 
 
 		public:
@@ -145,8 +146,7 @@ namespace xns {
 			inline constexpr literal_map(A&&... args) requires (sizeof...(A) > 1)
 			: _impl{xns::forward<A>(args)...} {
 				static_assert(sizeof...(A) == sizeof...(L),
-							  "): INCORRECT NUMBER OF ARGUMENTS :(");
-				// forward arguments to implementation
+							"Map must have exactly one value for each key.");
 			}
 
 			/* copy constructor */
