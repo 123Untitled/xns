@@ -1,10 +1,7 @@
-#ifndef XNS_IS_SAME_HEADER
-#define XNS_IS_SAME_HEADER
+#ifndef XNS_IS_SAME_HPP
+#define XNS_IS_SAME_HPP
 
-#include "identity.hpp"
-#include "integral_constant.hpp"
 #include "remove.hpp"
-
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
@@ -13,50 +10,36 @@ namespace xns {
 
 	// -- I S  S A M E ---------------------------------------------------------
 
-	/* is same false */
-	template <class T, class U>
-	struct _is_same : xns::no {};
+	// -- detail --------------------------------------------------------------
 
-	/* is same true */
-	template <class T>
-	struct _is_same<T, T> : xns::yes {};
+	namespace impl {
+
+
+		template <typename T, typename U>
+		constexpr bool is_same_test       = false;
+
+		template <typename T>
+		constexpr bool is_same_test<T, T> = true;
+
+		template <typename T, typename... U>
+		constexpr bool is_same = (xns::impl::is_same_test<T, U> && ...);
+
+	} // namespace impl
+
 
 	/* is same concept */
-	template <class T, class U>
-	concept is_same = _is_same<T, U>::value;
+	template <typename... T>
+	concept is_same = xns::impl::is_same<T...>;
 
 	/* is not same concept */
-	template <class T, class U>
-	concept is_not_same = !is_same<T, U>;
+	template <typename... T>
+	concept is_not_same = not xns::impl::is_same<T...>;
+
+	/* is same remove cvr concept */
+	template <typename... T>
+	concept is_same_cvr = xns::impl::is_same<xns::remove_cvr<T>...>;
 
 
-	// -- I S  A L L  S A M E -------------------------------------------------
+} // namespace xns
 
-	// INFO: does i need to remove cvr?
-	// answer: no, because cvr is not part of the type
-
-	/* is all same concept */
-	template <class T, class... U>
-	concept is_all_same = (is_same<T, U> && ...);
-
-	/* is not all same concept */
-	template <class T, class... U>
-	concept is_not_all_same = !is_all_same<T, U...>;
-
-	/* is all same remove cvr concept */
-	template <class T, class... U>
-	concept is_all_same_base = (is_same<remove_cvr<T>, remove_cvr<U>> && ...);
-
-
-
-
-
-
-	/* is same concept remove specifier */
-	//template <class T, class U>
-	//concept IsSameRmCvr = is_same<remove_cvr_t<T>, remove_cvr_t<U>>;
-
-
-}
-
-#endif
+#endif // XNS_IS_SAME_HPP
