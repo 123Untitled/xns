@@ -89,7 +89,7 @@ namespace xns {
 
 			/* variadic constructor */
 			template <class... A>
-			constexpr matrix(A&&... args) requires (xns::is_all_same_base<T, A...>)
+			constexpr matrix(A&&... args) requires (xns::is_same_cvr<T, A...>)
 			: _data{xns::forward<A>(args)...} {
 				// check if number of arguments is correct
 				static_assert(sizeof...(args) == R * C,
@@ -120,7 +120,7 @@ namespace xns {
 
 			/* variadic assignment */
 			template <class... A>
-			void assign(A&&... args) requires (xns::is_all_same<T, A...>) {
+			void assign(A&&... args) requires (xns::is_same<T, A...>) {
 				// check if number of arguments is correct
 				static_assert(sizeof...(args) == R * C,
 					"): NUMBER OF ARGUMENTS MUST BE EQUAL TO MATRIX SIZE :(");
