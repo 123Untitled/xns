@@ -1,9 +1,19 @@
 #include "unit_tests.hpp"
 #include "types.hpp"
+#include <string>
 
 /* unit test */
 template <>
 int UT::unit_tests<"types">(void) {
+
+	std::cout << "bits in a char: " << xns::bits_per_byte << std::endl;
+	std::cout << "bytes in a pointer: " << xns::bytes_per_address << std::endl;
+
+	xns::_unsigned<4> _un;
+
+	std::cout << "integer bytes: " << sizeof(_un) << std::endl;
+
+
 	// code here...
 	return 0;
 }

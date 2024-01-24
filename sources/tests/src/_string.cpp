@@ -7,6 +7,7 @@
 #include "bit_view.hpp"
 #include "terminal.hpp"
 
+#include <string>
 
 
 #define SUCCESS(msg) std::cout << "\x1b[32m" << "success" << "\x1b[0m" << ": " << msg << " > "
@@ -155,8 +156,25 @@ static void subview(void) {
 }
 
 
+
+
 template <>
 int UT::unit_tests<"string">(void) {
+
+
+	{
+		xns::string s{};
+		xns::string a{"hello"};
+		xns::string b{" world!"};
+		xns::string c{"it's me"};
+		xns::string_view d{"hello world!"};
+
+		std::cout << "start test\n" << std::endl;
+		s.multi_length(a, b, c, "fie", d, 'c');
+	}
+
+
+	return 0;
 
 	xns::to_upper('a');
 	//xns::to_basic_string<char>(42);
@@ -577,7 +595,7 @@ static int func(void) {
 
 
 	xns::string s0{"My|name|is|tutur|to"};
-	auto v = s0.split<true>("|");
+	auto v = s0.split<true>(xns::string{"|"});
 	for (auto& s : v) {
 		std::cout << s << std::endl;
 	}
