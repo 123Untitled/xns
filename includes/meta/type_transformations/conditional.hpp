@@ -1,5 +1,5 @@
-#ifndef XNS_CONDITIONAL_HEADER
-#define XNS_CONDITIONAL_HEADER
+#ifndef XNS_CONDITIONAL_XNS
+#define XNS_CONDITIONAL_XNS
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -8,25 +8,30 @@ namespace xns {
 
 	// -- C O N D I T I O N A L -----------------------------------------------
 
+	// -- detail --------------------------------------------------------------
+
+	namespace impl {
+
+		/* conditional */
+		template <bool, typename T, typename F>
+		struct conditional;
+
+		/* true specialization */
+		template <typename T, typename F>
+		struct conditional<true, T, F>  final { using type = T; };
+
+		/* false specialization */
+		template <typename T, typename F>
+		struct conditional<false, T, F> final { using type = F; };
+
+	};
+
 	/* conditional */
-	template <bool B, class T, class F>
-	struct _conditional;
+	template <bool B, typename T, typename F>
+	using conditional = typename xns::impl::conditional<B, T, F>::type;
 
-	/* true specialization */
-	template <class T, class F>
-	struct _conditional<true, T, F>       { using type = T; };
+} // namespace xns
 
-	/* false specialization */
-	template <class T, class F>
-	struct _conditional<false, T, F>      { using type = F; };
-
-	/* conditional type */
-	template <bool B, class T, class F>
-	using conditional = typename _conditional<B, T, F>::type;
-
-}
-
-
-#endif
+#endif // XNS_CONDITIONAL_XNS
 
 
