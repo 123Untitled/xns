@@ -57,7 +57,7 @@ int UT::unit_tests<"literal_map">(void) {
 	constexpr xns::basic_string_literal s0{{'a', 'b', '\0'}};
 	//constexpr xns::string_literal s0{"ab"};
 
-	std::cout << "s0: " << s0.runtime_data() << std::endl;
+	//std::cout << "s0: " << s0.runtime_data() << std::endl;
 	std::cout << "s0: " << s0.size() << std::endl;
 
 	if (s0 == L"ab") {

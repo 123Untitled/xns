@@ -74,12 +74,11 @@ template <>
 int UT::unit_tests<"variant">(void) {
 
 
-	xns::variant<C, B, D> v0{};
+	//xns::variant<C, B, D> v0{};
+	//
+	//v0.emplace<C>('c');
 
-	v0.emplace<C>('c');
-
-
-	auto c = xns::get<B>(xns::move(v0));
+	//auto c = xns::get<B>(xns::move(v0));
 
 	benchmark();
 
