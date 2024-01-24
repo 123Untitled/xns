@@ -2,8 +2,9 @@
 #define XNS_STRING_LITERAL_HEADER
 
 #include "is_char.hpp"
-#include "types.hpp"
 #include "is_same.hpp"
+#include "is_comparable.hpp"
+//#include "types.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -11,334 +12,302 @@
 namespace xns {
 
 
+	// -- C O P Y -------------------------------------------------------------
+
+	// -- details -------------------------------------------------------------
+
+	namespace impl {
+
+		/* copy implementation */
+		template <typename T, decltype(sizeof(0)) D, decltype(D) S, decltype(S) I>
+		inline constexpr auto copy(T (&dst)[D], const T (&src)[S]) noexcept -> void {
+			if constexpr (I == D or I == S){
+				return;
+			} else {
+				dst[I] = src[I];
+				xns::impl::copy<T, D, S, I + 1>(dst, src);
+			}
+		}
+
+	}
+
+	/* copy */
+	template <typename T, decltype(sizeof(0)) D, decltype(D) S>
+	inline constexpr auto copy(T (&dst)[D], const T (&src)[S]) noexcept -> void {
+		xns::impl::copy<T, D, S, 0>(dst, src);
+	}
+
+
+	// -- C O M P A R E -------------------------------------------------------
+
+	// -- details -------------------------------------------------------------
+
+	namespace impl {
+
+		/* compare implementation */
+		template <typename T1, typename T2, decltype(sizeof(0)) S, decltype(S) I>
+		inline constexpr auto compare(const T1 (&lhs)[S], const T2 (&rhs)[S]) noexcept -> signed int {
+			if constexpr (I == S) {
+				return 0;
+			} else {
+				return (lhs[I] == rhs[I])
+					 ? (xns::impl::compare<T1, T2, S, I + 1>(lhs, rhs))
+					 : (lhs[I] > rhs[I] ? +1 : -1);
+			}
+		}
+
+	}
+
+	/* compare */
+	template <typename T1, typename T2, decltype(sizeof(0)) L, decltype(L) R>
+	inline constexpr auto compare(const T1 (&lhs)[L], const T2 (&rhs)[R]) noexcept -> signed int {
+		// assert that type is comparable
+		static_assert(xns::is_comparable<T1, T2>, "Template parameter 'T' must be a comparable type.");
+		// check for equal size
+		if constexpr (L == R)
+			return xns::impl::compare<T1, T2, L, 0>(lhs, rhs);
+		else
+			return (L > R ? +1 : -1);
+	}
+
+
+
 
 	// -- B A S I C  S T R I N G  L I T E R A L -------------------------------
 
-	template<typename T, xns::size_t N>
-	class basic_string_literal {
-
+	template<typename T, decltype(sizeof(0)) N>
+	struct basic_string_literal final {
 
 		// -- assertions ------------------------------------------------------
 
 		/* check character type */
 		static_assert(xns::is_char<T>,
-				"): STRING_LITERAL: MUST BE OF CHARACTER TYPE :(");
+				"Template parameter 'T' must be a character type.");
 
 		/* check for null size */
-		static_assert(N > 0, "): STRING_LITERAL: MUST HAVE SIZE > 0 :(");
+		static_assert(N > 0,
+				"Template parameter 'N' must be greater than zero.");
 
 
-		public:
+		// -- public types ------------------------------------------------
 
-			// -- public types ------------------------------------------------
+		/* self type */
+		using self = xns::basic_string_literal<T, N>;
 
-			/* self type */
-			using self = basic_string_literal<T, N>;
+		/* character type */
+		using char_t = T;
 
-			/* character type */
-			using char_t = T;
+		/* const pointer type */
+		using const_ptr = const char_t*;
 
-			/* const pointer type */
-			using const_pointer = const char_t*;
+		/* const reference type */
+		using const_ref = const char_t(&)[N];
 
-			/* size type */
-			using size_type = decltype(N);
-
-
-			// -- public members ----------------------------------------------
-
-			/* array of characters */
-			char_t _data[N];
+		/* size type */
+		using size_type = decltype(N);
 
 
-			// -- public lifecycle --------------------------------------------
+		// -- public members ----------------------------------------------
 
-			/* deleted default constructor */
-			basic_string_literal(void) = delete;
-
-			/* array constructor */
-			//template <typename U, size_type M>
-			template <size_type M>
-			consteval basic_string_literal(const T (&str)[M]) noexcept
-			: _data{} {
-
-				for (size_type x = 0; x < N; ++x) {
-					_data[x] = str[x];
-				}
-			}
-
-			/* copy constructor */
-			inline consteval basic_string_literal(const self&) noexcept = default;
-
-			/* move constructor */
-			inline consteval basic_string_literal(self&&) noexcept = default;
-
-			/* destructor */
-			~basic_string_literal(void) noexcept = default;
+		/* array of characters */
+		char_t _data[N];
 
 
-			// -- public assignment operators ---------------------------------
+		// -- public lifecycle --------------------------------------------
 
-			/* copy assignment operator */
-			inline consteval auto operator=(const self&) noexcept -> self& = default;
+		/* deleted default constructor */
+		basic_string_literal(void) = delete;
 
-			/* move assignment operator */
-			inline consteval auto operator=(self&&) noexcept -> self& = default;
+		/* array constructor */
+		template <typename U, size_type M>
+		consteval basic_string_literal(const U (&str)[M]) noexcept
+		: _data{} {
+			xns::copy(_data, str);
+		}
 
+		/* copy constructor */
+		consteval basic_string_literal(const self&) noexcept = default;
 
-			// -- public accessors --------------------------------------------
+		/* move constructor */
+		consteval basic_string_literal(self&&) noexcept = default;
 
-			/* data */
-			inline consteval auto data(void) const noexcept -> const_pointer {
-				return _data;
-			}
-
-			/* runtime data */
-			inline auto runtime_data(void) const noexcept -> const_pointer {
-				return _data;
-			}
-
-			/* size */
-			inline consteval auto size(void) const noexcept -> size_type {
-				return N;
-			}
+		/* destructor */
+		~basic_string_literal(void) noexcept = default;
 
 
-			// -- public subscript operator -----------------------------------
+		// -- public assignment operators ---------------------------------
 
-			/* subscript operator */
-			inline consteval auto operator[](const size_type index) const noexcept -> char_t {
-				return _data[index];
-			}
+		/* copy assignment operator */
+		consteval auto operator=(const self&) noexcept -> self& = default;
 
-
-			// -- public comparison operators ---------------------------------
-
-			/* equality operator */
-			template <xns::is_char U, size_type M>
-			consteval bool operator==(const U (&other)[M]) const noexcept {
-				// check size
-				if constexpr (N != M)
-					return false;
-				else
-					// compare characters
-					return compare<0>(other);
-			}
-
-			/* inequality operator */
-			template <xns::is_char U, size_type M>
-			consteval bool operator!=(const U (&other)[M]) const noexcept {
-				return not (*this == other);
-			}
-
-			/* equality operator */
-			template <typename U, size_type M>
-			consteval bool operator==(const basic_string_literal<U, M>& other) const noexcept {
-				return *this == other._data;
-			}
-
-			/* inequality operator */
-			template <typename U, size_type M>
-			consteval bool operator!=(const basic_string_literal<U, M>& other) const noexcept {
-				return not (*this == other._data);
-			}
+		/* move assignment operator */
+		consteval auto operator=(self&&) noexcept -> self& = default;
 
 
-		private:
+		// -- public accessors --------------------------------------------
 
-			// -- comparison utility ------------------------------------------
+		/* data */
+		consteval auto data(void) const noexcept -> const_ref {
+			return _data;
+		}
 
-			/* compare */
-			template <size_type I, xns::is_char U, size_type M>
-			consteval bool compare(const U (&other)[M]) const noexcept requires (I < N) {
-				// compare current character and recurse
-				return _data[I] == other[I] ? compare<I + 1>(other) : false;
-			}
+		/* size */
+		consteval auto size(void) const noexcept -> size_type {
+			return N - 1; // assume null-terminated
+		}
 
-			/* compare, end of recursion */
-			template <size_type I, xns::is_char U, size_type M>
-			consteval bool compare(const U (&other)[M]) const noexcept requires (I == N) {
-				// end of recursion
-				return true;
-			}
+
+		// -- public conversion operators ---------------------------------
+
+		/* const pointer conversion operator */
+		constexpr operator const_ref(void) const noexcept {
+			return _data;
+		}
+
+
+		// -- public comparison operators ---------------------------------
+
+		/* equality operator */
+		template <typename U, size_type M>
+		consteval auto operator==(const basic_string_literal<U, M>& other) const noexcept -> bool {
+			return xns::compare(_data, other._data) == 0;
+		}
+
+		/* inequality operator */
+		template <typename U, size_type M>
+		consteval auto operator!=(const basic_string_literal<U, M>& other) const noexcept -> bool {
+			return xns::compare(_data, other._data) != 0;
+		}
+
+		/* less than operator */
+		template <typename U, size_type M>
+		consteval auto operator<(const basic_string_literal<U, M>& other) const noexcept -> bool {
+			return xns::compare(_data, other._data) < 0;
+		}
+
+		/* greater than operator */
+		template <typename U, size_type M>
+		consteval auto operator>(const basic_string_literal<U, M>& other) const noexcept -> bool {
+			return xns::compare(_data, other._data) > 0;
+		}
+
+		/* less than or equal to operator */
+		template <typename U, size_type M>
+		consteval auto operator<=(const basic_string_literal<U, M>& other) const noexcept -> bool {
+			return xns::compare(_data, other._data) <= 0;
+		}
+
+		/* greater than or equal to operator */
+		template <typename U, size_type M>
+		consteval auto operator>=(const basic_string_literal<U, M>& other) const noexcept -> bool {
+			return xns::compare(_data, other._data) >= 0;
+		}
 
 	};
 
 
 	// -- deduction guides ----------------------------------------------------
 
-	template <typename T, xns::size_t N>
-	basic_string_literal(const T (&)[N]) -> basic_string_literal<T, N>;
-
-
-
-	//template <xns::size_t N>
-	//using string_literal = basic_string_literal<char, N>;
-
-	//// -- S T R I N G  L I T E R A L ------------------------------------------
-
-	//template <xns::size_t N>
-	//class string_literal final : public basic_string_literal<char, N> {
-
-
-	//	// -- assertions ------------------------------------------------------
-
-	//	/* check for 'char' type */
-	//	//static_assert(xns::is_same<T, char>,
-	//	//		"): STRING_LITERAL: MUST BE 'char' TYPE :(");
-
-
-	//	public:
-
-	//		// -- public lifecycle --------------------------------------------
-
-	//		/* array constructor override */
-	//		template <xns::size_t M>
-	//		inline consteval string_literal(const char (&str)[M]) noexcept
-	//		: basic_string_literal<char, M>{str} {}
-
-
-	//};
-
-	//// -- deduction guides ----------------------------------------------------
-
-	//template <xns::size_t N>
-	//string_literal(const char (&)[N]) -> xns::string_literal<N>;
-
-
-
-
-	//// -- W S T R I N G  L I T E R A L ----------------------------------------
-
-	//template <typename T, xns::size_t N>
-	//class wstring_literal final : public basic_string_literal<T, N> {
-
-
-	//	// -- assertions ------------------------------------------------------
-
-	//	/* check for 'wchar_t' type */
-	//	static_assert(xns::is_same<T, wchar_t>,
-	//			"): WSTRING_LITERAL: MUST BE 'wchar_t' TYPE :(");
-
-
-	//	public:
-
-	//		// -- public lifecycle --------------------------------------------
-
-	//		/* array constructor override */
-	//		template <typename U, xns::size_t M>
-	//		inline consteval wstring_literal(const U (&str)[M]) noexcept
-	//		: basic_string_literal<U, M>(str) {}
-
-	//};
-
-	//// -- deduction guides ----------------------------------------------------
-
-	//template <typename T, xns::size_t N>
-	//wstring_literal(const T (&)[N]) -> wstring_literal<T, N>;
-
-
-
-
-	//// -- U 8 S T R I N G  L I T E R A L --------------------------------------
-
-	//template <typename T, xns::size_t N>
-	//class u8string_literal final : public basic_string_literal<T, N> {
-
-
-	//	// -- assertions ------------------------------------------------------
-
-	//	/* check for 'char8_t' type */
-	//	static_assert(xns::is_same<T, char8_t>,
-	//			"): U8STRING_LITERAL: MUST BE 'char8_t' TYPE :(");
-
-
-	//	public:
-
-	//		// -- public lifecycle --------------------------------------------
-
-	//		/* array constructor override */
-	//		template <typename U, xns::size_t M>
-	//		inline consteval u8string_literal(const U (&str)[M]) noexcept
-	//		: basic_string_literal<U, M>(str) {}
-
-	//};
-
-	//// -- deduction guides ----------------------------------------------------
-
-	//template <typename T, xns::size_t N>
-	//u8string_literal(const T (&)[N]) -> u8string_literal<T, N>;
-
-
-
-
-	//// -- U 1 6 S T R I N G  L I T E R A L ------------------------------------
-
-	//template <typename T, xns::size_t N>
-	//class u16string_literal final : public basic_string_literal<T, N> {
-
-
-	//	// -- assertions ------------------------------------------------------
-
-	//	/* check for 'char16_t' type */
-	//	static_assert(xns::is_same<T, char16_t>,
-	//			"): U8STRING_LITERAL: MUST BE 'char16_t' TYPE :(");
-
-
-	//	public:
-
-	//		// -- public lifecycle --------------------------------------------
-
-	//		/* array constructor override */
-	//		template <typename U, xns::size_t M>
-	//		inline consteval u16string_literal(const U (&str)[M]) noexcept
-	//		: basic_string_literal<U, M>(str) {}
-
-	//};
-
-	//// -- deduction guides ----------------------------------------------------
-
-	//template <typename T, xns::size_t N>
-	//u16string_literal(const T (&)[N]) -> u16string_literal<T, N>;
-
-
-
-
-	//// -- U 3 2 S T R I N G  L I T E R A L ------------------------------------
-
-	//template <typename T, xns::size_t N>
-	//class u32string_literal final : public basic_string_literal<T, N> {
-
-
-	//	// -- assertions ------------------------------------------------------
-
-	//	/* check for 'char32_t' type */
-	//	static_assert(xns::is_same<T, char32_t>,
-	//			"): U8STRING_LITERAL: MUST BE 'char32_t' TYPE :(");
-
-
-	//	public:
-
-	//		// -- public lifecycle --------------------------------------------
-
-	//		/* array constructor override */
-	//		template <typename U, xns::size_t M>
-	//		inline consteval u32string_literal(const U (&str)[M]) noexcept
-	//		: basic_string_literal<U, M>(str) {}
-
-	//};
-
-	//// -- deduction guides ----------------------------------------------------
-
-	//template <typename T, xns::size_t N>
-	//u32string_literal(const T (&)[N]) -> u32string_literal<T, N>;
-
-
-
-
-
-
-
+	template <typename T, decltype(sizeof(0)) N>
+	basic_string_literal(const T (&)[N]) -> xns::basic_string_literal<T, N>;
+
+
+
+	/* equality operator */
+	template <typename T1, typename T2,
+			  decltype(sizeof(0)) L, decltype(L) R>
+	inline consteval auto operator==(const xns::basic_string_literal<T1, L>& lhs,
+									 const T2 (&rhs)[R]) noexcept -> bool {
+		return xns::compare(lhs._data, rhs) == 0;
+	}
+
+	/* equality operator (reverse) */
+	template <typename T1, typename T2,
+			  decltype(sizeof(0)) L, decltype(L) R>
+	inline consteval auto operator==(const T1 (&lhs)[L],
+									 const xns::basic_string_literal<T2, R>& rhs) noexcept -> bool {
+		return xns::compare(lhs, rhs._data) == 0;
+	}
+
+	/* inequality operator */
+	template <typename T1, typename T2,
+			  decltype(sizeof(0)) L, decltype(L) R>
+	inline consteval auto operator!=(const xns::basic_string_literal<T1, L>& lhs,
+									 const T2 (&rhs)[R]) noexcept -> bool {
+		return xns::compare(lhs._data, rhs) != 0;
+	}
+
+	/* inequality operator (reverse) */
+	template <typename T1, typename T2,
+			  decltype(sizeof(0)) L, decltype(L) R>
+	inline constexpr auto operator!=(const T1 (&lhs)[L],
+									 const xns::basic_string_literal<T2, R>& rhs) noexcept -> bool {
+		return xns::compare(lhs, rhs._data) != 0;
+	}
+
+	/* less than operator */
+	template <typename T1, typename T2,
+			  decltype(sizeof(0)) L, decltype(L) R>
+	inline constexpr auto operator<(const xns::basic_string_literal<T1, L>& lhs,
+									const T2 (&rhs)[R]) noexcept -> bool {
+		return xns::compare(lhs._data, rhs) < 0;
+	}
+
+	/* less than operator (reverse) */
+	template <typename T1, typename T2,
+			  decltype(sizeof(0)) L, decltype(L) R>
+	inline constexpr auto operator<(const T1 (&lhs)[L],
+									const xns::basic_string_literal<T2, R>& rhs) noexcept -> bool {
+		return xns::compare(lhs, rhs._data) < 0;
+	}
+
+	/* greater than operator */
+	template <typename T1, typename T2,
+			  decltype(sizeof(0)) L, decltype(L) R>
+	inline constexpr auto operator>(const xns::basic_string_literal<T1, L>& lhs,
+									const T2 (&rhs)[R]) noexcept -> bool {
+		return xns::compare(lhs._data, rhs) > 0;
+	}
+
+	/* greater than operator (reverse) */
+	template <typename T1, typename T2,
+			  decltype(sizeof(0)) L, decltype(L) R>
+	inline constexpr auto operator>(const T1 (&lhs)[L],
+									const xns::basic_string_literal<T2, R>& rhs) noexcept -> bool {
+		return xns::compare(lhs, rhs._data) > 0;
+	}
+
+	/* less than or equal to operator */
+	template <typename T1, typename T2,
+			  decltype(sizeof(0)) L, decltype(L) R>
+	inline constexpr auto operator<=(const xns::basic_string_literal<T1, L>& lhs,
+									 const T2 (&rhs)[R]) noexcept -> bool {
+		return xns::compare(lhs._data, rhs) <= 0;
+	}
+
+	/* less than or equal to operator (reverse) */
+	template <typename T1, typename T2,
+			  decltype(sizeof(0)) L, decltype(L) R>
+	inline constexpr auto operator<=(const T1 (&lhs)[L],
+									 const xns::basic_string_literal<T2, R>& rhs) noexcept -> bool {
+		return xns::compare(lhs, rhs._data) <= 0;
+	}
+
+	/* greater than or equal to operator */
+	template <typename T1, typename T2,
+			  decltype(sizeof(0)) L, decltype(L) R>
+	inline constexpr auto operator>=(const xns::basic_string_literal<T1, L>& lhs,
+									 const T2 (&rhs)[R]) noexcept -> bool {
+		return xns::compare(lhs._data, rhs) >= 0;
+	}
+
+	/* greater than or equal to operator (reverse) */
+	template <typename T1, typename T2,
+			  decltype(sizeof(0)) L, decltype(L) R>
+	inline constexpr auto operator>=(const T1 (&lhs)[L],
+									 const xns::basic_string_literal<T2, R>& rhs) noexcept -> bool {
+		return xns::compare(lhs, rhs._data) >= 0;
+	}
 
 
 
