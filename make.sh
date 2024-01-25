@@ -1,5 +1,20 @@
 #!/usr/bin/env -S zsh --no-rcs --no-globalrcs
 
+ARRRAY=(1 2 3 4 5 6 7 8 9 10)
+
+#
+echo $ARRRAY
+#
+REMOVE=3
+ARRRAY=("${ARRRAY[@]/$REMOVE}")
+#
+#ARRRAY=(${ARRRAY:|REMOVE})
+#
+echo $ARRRAY
+#
+#exit
+
+
 # This script is used to compile the project.
 # Makefile forever, but not really lol.
 
@@ -207,6 +222,13 @@ LEAKER='valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes'
 FZF_OPTS=('--algo=v2' '--height=50%' '--no-multi' '--layout=reverse' '--border=rounded' '--scroll-off=50'  '--bind' 'tab:down' \
 		  '--color=border:8,fg:7,bg:0,hl:2,fg+:3,bg+:8,hl+:4,info:5,prompt:6,pointer:6,marker:3,spinner:5,header:1')
 
+
+MAX_JOBS=''
+if [[ $OPS =~ 'Darwin' ]]; then
+	MAX_JOBS=$(sysctl -n hw.ncpu)
+else
+	MAX_JOBS=$(nproc)
+fi
 
 
 # -- C O L O R  S E T T I N G S -----------------------------------------------
@@ -479,6 +501,7 @@ function handle_errors {
 
 function compile {
 
+
 	echo $SEPARATOR
 
 	rm -rf $LOGDIR
@@ -494,6 +517,26 @@ function compile {
 	for FILE in $SRCS; do
 		handle_compilation $FILE &
 		PIDS+=($!)
+
+		# check equal or more than max jobs
+		if [[ ${#PIDS[@]} -eq $MAX_JOBS ]]; then
+
+			for PID in $PIDS; do
+				# wait for pid
+				wait $PID
+				# check if compilation failed
+				if [[ $? -ne 0 ]]; then
+					# wait all pids
+					wait
+					echo '\n'$SEPARATOR
+					#cat $LOGDIR/*.log
+					handle_errors
+					exit 1
+				fi
+			done
+
+			PIDS=()
+		fi
 	done
 
 	# loop over pids
