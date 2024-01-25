@@ -42,8 +42,8 @@ namespace xns {
 			// -- private types -----------------------------------------------
 
 			/* storage type */
-			using storage = xns::aligned_storage<size_of_max<A...>(),
-												align_of_max<A...>()>;
+			using storage = xns::aligned_storage<xns::sizeof_max<A...>(),
+												xns::alignof_max<A...>()>;
 
 
 			// -- private enums -----------------------------------------------
