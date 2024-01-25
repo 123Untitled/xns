@@ -56,7 +56,7 @@ namespace xns {
 			// -- private enum ------------------------------------------------
 
 			/* lookup table size */
-			enum : size_type { LOOKUP_SIZE = (1 << XNS_CHAR_BIT) };
+			enum : size_type { LOOKUP_SIZE = (1 << xns::bits_per_byte) };
 
 
 			/* forward declaration */

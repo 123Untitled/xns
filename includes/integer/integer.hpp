@@ -54,8 +54,8 @@ namespace xns {
 			using self = integer;
 
 			/* underlying type */
-			using underlying = xns::conditional<SIGNED, xns::sign<BYTES / XNS_CHAR_BIT>,
-														xns::unsign<BYTES / XNS_CHAR_BIT>>;
+			using underlying = xns::conditional<SIGNED, xns::_signed<BYTES / xns::bits_per_byte>,
+														xns::_unsigned<BYTES / xns::bits_per_byte>>;
 
 			enum : underlying {
 				MIN = xns::limits::min<underlying>(),
