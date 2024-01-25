@@ -173,11 +173,11 @@ namespace xns {
 	// -- deduction guides ----------------------------------------------------
 
 	/* deduction guide for default constructor */
-	function(void) -> xns::function<void(void)>;
+	function(void) -> function<void(void)>;
 
 	/* deduction guide for function pointers */
 	template <typename R, typename... A>
-	function(R(*)(A...)) -> xns::function<R(A...)>;
+	function(R(*)(A...)) -> function<R(A...)>;
 
 
 } // namespace xns

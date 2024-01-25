@@ -72,7 +72,6 @@ namespace xns {
 
 
 
-
 	// -- B A S I C  S T R I N G  L I T E R A L -------------------------------
 
 	template<typename T, decltype(sizeof(0)) N>
@@ -209,7 +208,7 @@ namespace xns {
 	// -- deduction guides ----------------------------------------------------
 
 	template <typename T, decltype(sizeof(0)) N>
-	basic_string_literal(const T (&)[N]) -> xns::basic_string_literal<T, N>;
+	basic_string_literal(const T (&)[N]) -> basic_string_literal<T, N>;
 
 
 

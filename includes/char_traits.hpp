@@ -126,7 +126,7 @@ namespace xns {
 }
 
 template <typename T>
-auto test(T&& t) -> xns::char_traits<T>::_char {
+auto test(T&& t) -> typename xns::char_traits<T>::_char {
 	return xns::char_traits<T>::assign(t, t);
 }
 

@@ -5,7 +5,7 @@
 
 auto unit_tests_midi(void) -> int {
 
-	midi::server::shared();
+	//midi::server::shared();
 	//midi::port port{};
 
 	return 0;

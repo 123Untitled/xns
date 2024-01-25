@@ -146,11 +146,11 @@ namespace xns {
 
 	/* signed integer types */
 	template <decltype(sizeof(0)) N>
-	using _signed = xns::integer_selector<N>::_signed;
+	using _signed = typename xns::integer_selector<N>::_signed;
 
 	/* unsigned integer types */
 	template <decltype(sizeof(0)) N>
-	using _unsigned = xns::integer_selector<N>::_unsigned;
+	using _unsigned = typename xns::integer_selector<N>::_unsigned;
 
 
 	/* arch address types */

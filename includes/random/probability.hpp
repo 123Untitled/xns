@@ -92,7 +92,7 @@ namespace Xf {
 			/* launch */
 			const value_type& launch(void) const {
 				// set random seed
-				std::srand(std::time(NULL) / getpid());
+				std::srand(static_cast<unsigned int>(::getpid()));
 				// get random number
 				const float random = std::rand() % (size_type)_sum;
 				// get probability
