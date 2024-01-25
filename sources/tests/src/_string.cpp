@@ -669,13 +669,23 @@ static int func(void) {
 	append_string_test<char>();
 	append_fill_test();
 
-
-
 }
 
 
 #if defined(XNS_TEST_STRING)
-int main(void) {
+int main(int ac, char** av) {
+
+	const char* str = av[1];
+
+
+	xns::string s0{str};
+
+	//xns::string s{"hello world!"};
+
+	//std::cout << s << std::endl;
+	return 0;
+
+
 	return unit_tests_string();
 }
 #endif

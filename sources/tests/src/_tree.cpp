@@ -12,7 +12,7 @@
 #include <algorithm>
 
 // boost
-#include <boost/container/set.hpp>
+//#include <boost/container/set.hpp>
 // google benchmark
 //#include <benchmark/benchmark.h>
 
@@ -171,6 +171,7 @@ static void benchmark01(void) {
 		}
 	});
 
+	/*
 	bench.run("boost insert", [&]() -> void {
 		for (xns::size_t j = 0; j < ITERATIONS; ++j) {
 			boost::container::set<type> bset;
@@ -180,6 +181,7 @@ static void benchmark01(void) {
 			}
 		}
 	});
+	*/
 
 	bench.result("insert");
 	std::cout << "checksum: " << checksum << std::endl;
@@ -188,11 +190,13 @@ static void benchmark01(void) {
 	{
 		xns::tree<type> tree;
 		std::set<type> set;
+		/*
 		boost::container::set<type> boost;
+		*/
 		for (auto n : vec) {
 			tree.insert(n);
 			set.insert(n);
-			boost.insert(n);
+			//boost.insert(n);
 		}
 
 		bench.run("xns contains", [&]() -> void {
@@ -201,17 +205,20 @@ static void benchmark01(void) {
 			}
 		});
 
+
 		bench.run("std contains", [&]() -> void {
 			for (auto n : vec) {
 				checksum ^= set.contains(n);
 			}
 		});
 
+		/*
 		bench.run("boost contains", [&]() -> void {
 			for (auto n : vec) {
 				checksum ^= boost.contains(n);
 			}
 		});
+		*/
 
 	}
 
