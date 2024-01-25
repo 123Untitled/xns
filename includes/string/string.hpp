@@ -276,12 +276,27 @@ namespace xns {
 				_str = allocate(capacity);
 				// set nullchar
 				null_terminator();
+				std::cout << "capacity constructor" << std::endl;
 			}
 
 
 			/* null-terminated string constructor */
-			explicit basic_string(const_ptr str)
-			: _str{nullptr}, _capacity{xns::strlen(str)}, _size{_capacity} {
+			//explicit basic_string(const_ptr str)
+			//: _str{nullptr}, _capacity{xns::strlen(str)}, _size{_capacity} {
+			//	// exit if size is zero
+			//	if (not _size) { return; }
+			//	// allocate memory
+			//	_str = allocate(_capacity);
+			//	// set nullchar
+			//	null_terminator();
+			//	// copy string
+			//	xns::memcpy(_str, str, _size);
+			//}
+
+			/* array constructor */
+			template <size_type N>
+			explicit basic_string(const char_t (&str)[N])
+			: _str{nullptr}, _capacity{str[N - 1] == 0 ? N - 1 : N}, _size{_capacity} {
 				// exit if size is zero
 				if (not _size) { return; }
 				// allocate memory
@@ -290,6 +305,8 @@ namespace xns {
 				null_terminator();
 				// copy string
 				xns::memcpy(_str, str, _size);
+
+				std::cout << "array constructor" << std::endl;
 			}
 
 			/* buffer constructor */
@@ -303,6 +320,7 @@ namespace xns {
 				null_terminator();
 				// copy string
 				xns::memcpy(_str, str, size);
+				std::cout << "buffer constructor" << std::endl;
 			}
 
 			/* fill constructor */
@@ -316,15 +334,20 @@ namespace xns {
 				null_terminator();
 				// fill string
 				xns::memset(_str, character, count);
+				std::cout << "fill constructor" << std::endl;
 			}
 
 			/* string view constructor */
 			explicit inline basic_string(const self::view& view)
-			: basic_string{view.data(), view.size()} {}
+			: basic_string{view.data(), view.size()} {
+				std::cout << "string view constructor" << std::endl;
+			}
 
 			/* copy constructor */
 			inline basic_string(const self& other)
-			: basic_string{other._str, other._size} {}
+			: basic_string{other._str, other._size} {
+				std::cout << "copy constructor" << std::endl;
+			}
 
 			/* move constructor */
 			inline basic_string(self&& other) noexcept
@@ -914,16 +937,16 @@ namespace xns {
 			/* erase character */
 			auto erase(const size_type index) -> void {
 				// check if index is valid and string is not null
-				if (index < _size && _str != nullptr) {
-					// move characters
+				if (index >= _size || _str != nullptr)
+					return;
+				// move characters
 
-					// loop through string
-					for (size_type x = index; x < _size; ++x) {
-						// shift characters
-						_str[x] = _str[x + 1];
-					} // decrement size
-					--_size;
-				}
+				// loop through string
+				for (size_type x = index; x < _size; ++x) {
+					// shift characters
+					_str[x] = _str[x + 1]; // nullchar will be shifted
+				} // decrement size
+				--_size;
 			}
 
 			/* erase range */
@@ -954,24 +977,16 @@ namespace xns {
 
 			/* to uppercase */
 			auto to_upper(void) -> void {
-				// check if string is not null
-				if (_str != nullptr) {
-					// convert to uppercase
-					for (size_type x = 0; x < _size; ++x) {
-						_str[x] = xns::to_upper(_str[x]);
-					}
-				}
+				// convert to uppercase
+				for (size_type x = 0; x < _size; ++x)
+					_str[x] = xns::to_upper(_str[x]);
 			}
 
 			/* to lowercase */
 			void to_lower(void) {
-				// check if string is not null
-				if (_str != nullptr) {
-					// convert to lowercase
-					for (size_type x = 0; x < _size; ++x) {
-						_str[x] = xns::to_lower(_str[x]);
-					}
-				}
+				// convert to lowercase
+				for (size_type x = 0; x < _size; ++x)
+					_str[x] = xns::to_lower(_str[x]);
 			}
 
 			/* filter */ // INFO: ref functor
