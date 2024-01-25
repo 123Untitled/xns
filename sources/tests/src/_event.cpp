@@ -2,15 +2,15 @@
 #include "event.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"event">(void) {
+
+auto unit_tests_event(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_EVENT)
 int main(void) {
-	return UT::unit_tests<"event">();
+	return unit_tests_event();
 }
 #endif
 

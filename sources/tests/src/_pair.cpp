@@ -5,8 +5,8 @@
 #include "tuple.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"pair">(void) {
+
+auto unit_tests_pair(void) -> int {
 
 
 	//auto [
@@ -32,7 +32,7 @@ int UT::unit_tests<"pair">(void) {
 
 #if defined(XNS_TEST_PAIR)
 int main(void) {
-	return UT::unit_tests<"pair">();
+	return unit_tests_pair();
 }
 #endif
 

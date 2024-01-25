@@ -5,8 +5,8 @@
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"aligned_storage">(void) {
+
+auto unit_tests_aligned_storage(void) -> int {
 
 
 	xns::aligned_storage<sizeof(int), alignof(int)> storage;
@@ -20,7 +20,7 @@ int UT::unit_tests<"aligned_storage">(void) {
 
 #if defined(XNS_TEST_ALIGNED_STORAGE)
 int main(void) {
-	return UT::unit_tests<"aligned_storage">();
+	return unit_tests_aligned_storage();
 }
 #endif
 

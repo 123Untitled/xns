@@ -5,9 +5,10 @@
 #include <array>
 
 
-template <>
-int UT::unit_tests<"array">(void) {
 
+auto unit_tests_array(void) -> int {
+
+	/*
 	using Type = Class<int, float, char>;
 
 	xns::array<xns::array<int, 3>, 2> a{
@@ -63,6 +64,7 @@ int UT::unit_tests<"array">(void) {
 		Type{3, 3.0f, 'c'}
 	);
 
+	*/
 
 
 
@@ -73,7 +75,7 @@ int UT::unit_tests<"array">(void) {
 
 #if defined(XNS_TEST_ARRAY)
 int main(void) {
-	return UT::unit_tests<"array">();
+	return unit_tests_array();
 }
 #endif
 

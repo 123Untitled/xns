@@ -6,8 +6,8 @@
 #include <string>
 #include <sys/socket.h>
 
-template <>
-int UT::unit_tests<"bit_view">(void) {
+
+auto unit_tests_bit_view(void) -> int {
 
 	xns::terminal::raw();
 
@@ -128,7 +128,7 @@ int UT::unit_tests<"bit_view">(void) {
 
 #if defined(XNS_TEST_BIT_VIEW)
 int main(void) {
-	return UT::unit_tests<"bit_view">();
+	return unit_tests_bit_view();
 }
 #endif
 

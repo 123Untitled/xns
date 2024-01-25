@@ -2,15 +2,15 @@
 #include "integer_sequence.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"integer_sequence">(void) {
+
+auto unit_tests_integer_sequence(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_INTEGER_SEQUENCE)
 int main(void) {
-	return UT::unit_tests<"integer_sequence">();
+	return unit_tests_integer_sequence();
 }
 #endif
 

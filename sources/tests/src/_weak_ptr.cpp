@@ -2,15 +2,15 @@
 #include "weak_ptr.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"weak_ptr">(void) {
+
+auto unit_tests_weak_ptr(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_WEAK_PTR)
 int main(void) {
-	return UT::unit_tests<"weak_ptr">();
+	return unit_tests_weak_ptr();
 }
 #endif
 

@@ -2,8 +2,8 @@
 #include "output.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"output">(void) {
+
+auto unit_tests_output(void) -> int {
 
 	xns::string str{ "Hello, world!" };
 
@@ -19,7 +19,7 @@ int UT::unit_tests<"output">(void) {
 
 #if defined(XNS_TEST_OUTPUT)
 int main(void) {
-	return UT::unit_tests<"output">();
+	return unit_tests_output();
 }
 #endif
 

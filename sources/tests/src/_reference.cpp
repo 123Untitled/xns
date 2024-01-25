@@ -3,8 +3,8 @@
 
 #include <vector>
 
-template <>
-int UT::unit_tests<"reference">(void) {
+
+auto unit_tests_reference(void) -> int {
 
 	int i = 5;
 	int j = 6;
@@ -31,7 +31,7 @@ int UT::unit_tests<"reference">(void) {
 
 #if defined(XNS_TEST_REFERENCE)
 int main(void) {
-	return UT::unit_tests<"reference">();
+	return unit_tests_reference();
 }
 #endif
 

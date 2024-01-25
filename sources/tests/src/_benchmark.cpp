@@ -2,14 +2,14 @@
 #include "benchmark.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"benchmark">(void) {
+
+auto unit_tests_benchmark(void) -> int {
 	return 0;
 }
 
 #if defined(XNS_TEST_BENCHMARK)
 int main(void) {
-	return UT::unit_tests<"benchmark">();
+	return unit_tests_benchmark();
 }
 #endif
 

@@ -2,8 +2,8 @@
 #include "matrix.hpp"
 
 
-template <>
-int UT::unit_tests<"matrix">() {
+
+int unit_tests_matrix(void) {
 
 	xns::matrix_3x3<float> m1 {
 		1.0f, 2.0f, 3.0f,
@@ -59,7 +59,7 @@ int UT::unit_tests<"matrix">() {
 
 #if defined(XNS_TEST_MATRIX)
 int main(void) {
-	return UT::unit_tests<"matrix">();
+	return unit_tests_matrix();
 }
 #endif
 

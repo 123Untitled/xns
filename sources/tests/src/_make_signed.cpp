@@ -1,5 +1,6 @@
 #include "unit_tests.hpp"
 #include "make_signed.hpp"
+#include "string_literal.hpp"
 
 #include <unistd.h>
 #include <type_traits>
@@ -66,8 +67,8 @@ static bool checker(void) {
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"make_signed">(void) {
+
+auto unit_tests_make_signed(void) -> int {
 
 	// this test fails, because make_signed cannot detect underlying type of enum
 	// normally, make_signed cannot compile if the underlying type is a bool
@@ -305,7 +306,7 @@ int UT::unit_tests<"make_signed">(void) {
 
 #if defined(XNS_TEST_MAKE_SIGNED)
 int main(void) {
-	return UT::unit_tests<"make_signed">();
+	return unit_tests_make_signed();
 }
 #endif
 

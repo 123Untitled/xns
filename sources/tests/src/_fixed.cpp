@@ -2,15 +2,15 @@
 #include "fixed.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"fixed">(void) {
+
+auto unit_tests_fixed(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_FIXED)
 int main(void) {
-	return UT::unit_tests<"fixed">();
+	return unit_tests_fixed();
 }
 #endif
 

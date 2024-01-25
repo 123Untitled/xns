@@ -21,8 +21,8 @@ public:
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"shared_ptr">(void) {
+
+auto unit_tests_shared_ptr(void) -> int {
 
     auto a = std::make_shared<_A>();
     auto b = std::make_shared<_B>();
@@ -46,7 +46,7 @@ int UT::unit_tests<"shared_ptr">(void) {
 
 #if defined(XNS_TEST_SHARED_PTR)
 int main(void) {
-	return UT::unit_tests<"shared_ptr">();
+	return unit_tests_shared_ptr();
 }
 #endif
 

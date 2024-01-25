@@ -12,8 +12,8 @@ void f(std::string& str) {
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"optional">(void) {
+
+auto unit_tests_optional(void) -> int {
 
 	xns::optional<std::string> opt{};
 
@@ -24,7 +24,7 @@ int UT::unit_tests<"optional">(void) {
 
 #if defined(XNS_TEST_OPTIONAL)
 int main(void) {
-	return UT::unit_tests<"optional">();
+	return unit_tests_optional();
 }
 #endif
 

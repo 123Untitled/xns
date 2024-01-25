@@ -3,7 +3,6 @@
 #include "string.hpp"
 
 #include "reference.hpp"
-#include "testclass.hpp"
 
 #include "random.hpp"
 #include "benchmark.hpp"
@@ -70,8 +69,8 @@ void benchmark(void) {
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"variant">(void) {
+
+auto unit_tests_variant(void) -> int {
 
 
 	//xns::variant<C, B, D> v0{};
@@ -90,7 +89,7 @@ int UT::unit_tests<"variant">(void) {
 
 #if defined(XNS_TEST_VARIANT)
 int main(void) {
-	return UT::unit_tests<"variant">();
+	return unit_tests_variant();
 }
 #endif
 

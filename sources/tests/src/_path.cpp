@@ -3,8 +3,8 @@
 
 #include <filesystem>
 
-template <>
-int UT::unit_tests<"path">(void) {
+
+auto unit_tests_path(void) -> int {
 
 
 	xns::path<xns::string> p;
@@ -17,7 +17,7 @@ int UT::unit_tests<"path">(void) {
 		// original path
 		const char* str = "../../xns/../../../../lib/log.txt/.";
 		//const wchar_t* wstr = L"../../xns/../../../../lib/log.txt/.";
-		xns::string str2 = str;
+		xns::string str2 = xns::string{str};
 
 		std::cout << "original path: " << str << std::endl;
 
@@ -44,7 +44,7 @@ int UT::unit_tests<"path">(void) {
 
 #if defined(XNS_TEST_PATH)
 int main(void) {
-	return UT::unit_tests<"path">();
+	return unit_tests_path();
 }
 #endif
 

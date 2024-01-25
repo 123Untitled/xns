@@ -2,15 +2,15 @@
 #include "is_fundamental.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_fundamental">(void) {
+
+auto unit_tests_is_fundamental(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_IS_FUNDAMENTAL)
 int main(void) {
-	return UT::unit_tests<"is_fundamental">();
+	return unit_tests_is_fundamental();
 }
 #endif
 

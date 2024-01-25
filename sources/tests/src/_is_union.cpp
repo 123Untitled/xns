@@ -24,8 +24,8 @@ enum test_enum {
 };
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_union">(void) {
+
+auto unit_tests_is_union(void) -> int {
 
 	// is_union
 
@@ -50,7 +50,7 @@ int UT::unit_tests<"is_union">(void) {
 
 #if defined(XNS_TEST_IS_UNION)
 int main(void) {
-	return UT::unit_tests<"is_union">();
+	return unit_tests_is_union();
 }
 #endif
 

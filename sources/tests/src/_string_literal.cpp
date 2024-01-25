@@ -22,8 +22,8 @@ consteval auto test1(void) -> bool {
 	//return str1 != str2;
 }
 
-template <>
-int UT::unit_tests<"string_literal">(void) {
+
+auto unit_tests_string_literal(void) -> int {
 
 	using arr_ref = const char(&)[6];
 
@@ -78,7 +78,7 @@ int UT::unit_tests<"string_literal">(void) {
 
 #if defined(XNS_TEST_STRING_LITERAL)
 int main(void) {
-	return UT::unit_tests<"string_literal">();
+	return unit_tests_string_literal();
 }
 #endif
 

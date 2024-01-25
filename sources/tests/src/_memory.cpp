@@ -12,8 +12,8 @@ class test {
 };// __attribute__((packed));
 
 /* unit test */
-template <>
-int UT::unit_tests<"memory">(void) {
+
+auto unit_tests_memory(void) -> int {
 
 	using type = test<10>;
 
@@ -33,7 +33,7 @@ int UT::unit_tests<"memory">(void) {
 
 #if defined(XNS_TEST_MEMORY)
 int main(void) {
-	return UT::unit_tests<"memory">();
+	return unit_tests_memory();
 }
 #endif
 

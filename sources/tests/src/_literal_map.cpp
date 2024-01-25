@@ -2,8 +2,8 @@
 #include "literal_map.hpp"
 
 
-template <>
-int UT::unit_tests<"literal_map">(void) {
+
+auto unit_tests_literal_map(void) -> int {
 
 
 	xns::literal_map<int, "a", "b"> m1 = { 1, 2 };
@@ -104,7 +104,7 @@ int UT::unit_tests<"literal_map">(void) {
 
 #if defined(XNS_TEST_LITERAL_MAP)
 int main(void) {
-	return UT::unit_tests<"literal_map">();
+	return unit_tests_literal_map();
 }
 #endif
 

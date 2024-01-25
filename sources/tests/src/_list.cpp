@@ -84,8 +84,8 @@ static auto benchmark(void) -> void {
 //
 
 /* unit test */
-template <>
-int UT::unit_tests<"list">(void) {
+
+auto unit_tests_list(void) -> int {
 
 	benchmark();
 	return 0;
@@ -208,7 +208,7 @@ int UT::unit_tests<"list">(void) {
 #if defined(XNS_TEST_LIST)
 //BENCHMARK_MAIN();
 int main(void) {
-	return UT::unit_tests<"list">();
+	return unit_tests_list();
 }
 #endif
 

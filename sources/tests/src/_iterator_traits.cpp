@@ -2,15 +2,15 @@
 #include "iterator_traits.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"iterator_traits">(void) {
+
+auto unit_tests_iterator_traits(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_ITERATOR_TRAITS)
 int main(void) {
-	return UT::unit_tests<"iterator_traits">();
+	return unit_tests_iterator_traits();
 }
 #endif
 

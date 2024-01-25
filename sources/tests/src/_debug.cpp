@@ -2,8 +2,8 @@
 #include "debug.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"debug">(void) {
+
+auto unit_tests_debug(void) -> int {
 
 	xns::debug::print("Hello, world! %d\n", 42);
 	// code here...
@@ -12,7 +12,7 @@ int UT::unit_tests<"debug">(void) {
 
 #if defined(XNS_TEST_DEBUG)
 int main(void) {
-	return UT::unit_tests<"debug">();
+	return unit_tests_debug();
 }
 #endif
 

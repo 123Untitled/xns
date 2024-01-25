@@ -2,15 +2,15 @@
 #include "allocator.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"allocator">(void) {
+
+auto unit_tests_allocator(void) -> int {
 	// code here...
 	return false;
 }
 
 #if defined(XNS_TEST_ALLOCATOR)
 int main(void) {
-	return UT::unit_tests<"allocator">();
+	return unit_tests_allocator();
 }
 #endif
 

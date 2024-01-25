@@ -11,8 +11,8 @@
 static xns::size_t check_sum = 0;
 
 /* unit test */
-template <>
-int UT::unit_tests<"hash_set">(void) {
+
+auto unit_tests_hash_set(void) -> int {
 
 	std::cout << "sizeof xns::unordered_set<std::string>: " << sizeof(xns::unordered_set<std::string>) << std::endl;
 	std::cout << "sizeof std::unordered_set<std::string>: " << sizeof(std::unordered_set<std::string>) << std::endl;
@@ -79,7 +79,7 @@ int UT::unit_tests<"hash_set">(void) {
 
 #if defined(XNS_TEST_HASH_SET)
 int main(void) {
-	return UT::unit_tests<"hash_set">();
+	return unit_tests_hash_set();
 }
 #endif
 

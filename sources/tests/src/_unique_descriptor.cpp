@@ -4,8 +4,8 @@
 #include "getline.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"unique_descriptor">(void) {
+
+auto unit_tests_unique_descriptor(void) -> int {
 	// code here...
 	return 0;
 }
@@ -13,7 +13,7 @@ int UT::unit_tests<"unique_descriptor">(void) {
 #if defined(XNS_TEST_UNIQUE_DESCRIPTOR)
 int main(void) {
 
-	return UT::unit_tests<"unique_descriptor">();
+	return unit_tests_unique_descriptor();
 }
 #endif
 

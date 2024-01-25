@@ -26,8 +26,8 @@ static xns::evntmode build_events(void) {
 	return mode;
 }
 
-template <>
-int UT::unit_tests<"window">(void) {
+
+auto unit_tests_window(void) -> int {
 
 	auto mode = build_events();
 
@@ -41,7 +41,7 @@ int UT::unit_tests<"window">(void) {
 
 #if defined(XNS_TEST_WINDOW)
 int main(void) {
-	return UT::unit_tests<"window">();
+	return unit_tests_window();
 }
 #endif
 

@@ -5,8 +5,8 @@
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"poller">(void) {
+
+auto unit_tests_poller(void) -> int {
 
 	xns::network::poller poller;
 
@@ -74,7 +74,7 @@ int UT::unit_tests<"poller">(void) {
 
 #if defined(XNS_TEST_POLLER)
 int main(void) {
-	return UT::unit_tests<"poller">();
+	return unit_tests_poller();
 }
 #endif
 

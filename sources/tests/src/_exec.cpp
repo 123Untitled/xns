@@ -2,15 +2,15 @@
 #include "exec.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"exec">(void) {
+
+auto unit_tests_exec(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_EXEC)
 int main(void) {
-	return UT::unit_tests<"exec">();
+	return unit_tests_exec();
 }
 #endif
 

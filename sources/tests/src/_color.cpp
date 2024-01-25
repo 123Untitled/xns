@@ -2,15 +2,15 @@
 #include "color.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"color">(void) {
+
+auto unit_tests_color(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_COLOR)
 int main(void) {
-	return UT::unit_tests<"color">();
+	return unit_tests_color();
 }
 #endif
 

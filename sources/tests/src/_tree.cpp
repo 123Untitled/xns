@@ -254,8 +254,8 @@ static auto insert_test(void) -> void {
 
 
 
-template <>
-int UT::unit_tests<"tree">(void) {
+
+auto unit_tests_tree(void) -> int {
 
 
 	//auto vec = random_vector<false>(10);
@@ -384,7 +384,7 @@ int main(int argc, char** argv) {
 	//std::cout << "checksum: " << check_sum << std::endl;
 
 	//return 0;
-	return UT::unit_tests<"tree">();
+	return unit_tests_tree();
 	return 0;
 }
 #endif

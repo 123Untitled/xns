@@ -2,8 +2,8 @@
 #include "endianness.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"endianness">(void) {
+
+auto unit_tests_endianness(void) -> int {
 
 	if constexpr (xns::endianness::is_big()) {
 		std::cout << "big endian" << std::endl;
@@ -19,7 +19,7 @@ int UT::unit_tests<"endianness">(void) {
 
 #if defined(XNS_TEST_ENDIANNESS)
 int main(void) {
-	return UT::unit_tests<"endianness">();
+	return unit_tests_endianness();
 }
 #endif
 

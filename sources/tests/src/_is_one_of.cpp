@@ -10,8 +10,8 @@ static auto is_one_of(const char* msg) -> void {
 }
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_one_of">(void) {
+
+auto unit_tests_is_one_of(void) -> int {
 
 
 	is_one_of<true, int, int, int>("int, int, int");
@@ -26,7 +26,7 @@ int UT::unit_tests<"is_one_of">(void) {
 
 #if defined(XNS_TEST_IS_ONE_OF)
 int main(void) {
-	return UT::unit_tests<"is_one_of">();
+	return unit_tests_is_one_of();
 }
 #endif
 

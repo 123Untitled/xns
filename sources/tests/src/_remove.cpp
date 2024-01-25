@@ -2,15 +2,15 @@
 #include "remove.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"remove">(void) {
+
+auto unit_tests_remove(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_REMOVE)
 int main(void) {
-	return UT::unit_tests<"remove">();
+	return unit_tests_remove();
 }
 #endif
 

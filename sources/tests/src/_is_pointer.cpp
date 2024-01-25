@@ -1,5 +1,7 @@
 #include "unit_tests.hpp"
 #include "is_pointer.hpp"
+#include <iostream>
+#include <iomanip>
 
 // avoid namespace pollution
 using namespace xns;
@@ -23,8 +25,8 @@ void test(const bool result, const char* msg) {
 }
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_pointer">(void) {
+
+auto unit_tests_is_pointer(void) -> int {
 
 
 	test<false>(is_pointer<int[]>,          "int[]");
@@ -69,7 +71,7 @@ int UT::unit_tests<"is_pointer">(void) {
 
 #if defined(XNS_TEST_IS_POINTER)
 int main(void) {
-	return UT::unit_tests<"is_pointer">();
+	return unit_tests_is_pointer();
 }
 #endif
 

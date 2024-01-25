@@ -2,15 +2,15 @@
 #include "declval.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"declval">(void) {
+
+auto unit_tests_declval(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_DECLVAL)
 int main(void) {
-	return UT::unit_tests<"declval">();
+	return unit_tests_declval();
 }
 #endif
 

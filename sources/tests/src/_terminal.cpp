@@ -2,15 +2,15 @@
 #include "terminal.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"terminal">(void) {
+
+auto unit_tests_terminal(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_TERMINAL)
 int main(void) {
-	return UT::unit_tests<"terminal">();
+	return unit_tests_terminal();
 }
 #endif
 

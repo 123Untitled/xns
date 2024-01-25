@@ -18,8 +18,8 @@ void printer(const A& a, int i) {
 }
 
 /* unit test */
-template <>
-int UT::unit_tests<"thread">(void) {
+
+auto unit_tests_thread(void) -> int {
 	/*
 	const xns::tuple<A, int> t{A{}, 123};
 	xns::apply(printer, t);
@@ -38,7 +38,7 @@ int UT::unit_tests<"thread">(void) {
 
 #if defined(XNS_TEST_THREAD)
 int main(void) {
-	return UT::unit_tests<"thread">();
+	return unit_tests_thread();
 }
 #endif
 

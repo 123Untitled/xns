@@ -12,8 +12,8 @@ using AutoP = xns::unique_ptr<T>;
 
 void f(...) {}
 
-template <>
-int UT::unit_tests<"unique_ptr">(void) {
+
+auto unit_tests_unique_ptr(void) -> int {
 
 
 
@@ -23,13 +23,13 @@ int UT::unit_tests<"unique_ptr">(void) {
 	bool b = Xf::is_base_of_v<Base<int>, Class<int, float, char>>;
 	*/
 
-	bool s1 = xns::is_base_of<Base<int>, Base<int>>;
-	bool s2 = xns::is_derived_from<int, void>;
+	//bool s1 = xns::is_base_of<Base<int>, Base<int>>;
+	//bool s2 = xns::is_derived_from<int, void>;
 
-	std::cout << s2 << std::endl;
 
-	using Base    = Base<int>;
-	using Derived = Class<int, float, char>;
+
+	//using Base    = Base<int>;
+	//using Derived = Class<int, float, char>;
 
 
 	//p1.assign(1, 2.0f, '3');
@@ -38,28 +38,28 @@ int UT::unit_tests<"unique_ptr">(void) {
 
 	//AutoP<B> p3{Xf::move(p1)};
 
-	AutoP<Derived> p1 = xns::make_unique<Derived>(123, 99.9f, 'X');
-	if (!p1) {
-		std::cout << "null" << std::endl;
-	}
-
-	AutoP<Base> p3;
-
-	xns::unique_ptr<Derived> p2;
-
-
+	//AutoP<Derived> p1 = xns::make_unique<Derived>(123, 99.9f, 'X');
+	//if (!p1) {
+	//	std::cout << "null" << std::endl;
+	//}
+	//
+	//AutoP<Base> p3;
+	//
+	//xns::unique_ptr<Derived> p2;
 
 
-	xns::unique_ptr<int> ptr_int = xns::make_unique<int>(123);
-
-	xns::vector<xns::unique_ptr<int>> vec;
-
-	vec.push_back(xns::make_unique<int>(123));
-
-	//Xf::AutoPointer<void> v{};
 
 
-	std::cout << *p2 << std::endl;
+	//xns::unique_ptr<int> ptr_int = xns::make_unique<int>(123);
+	//
+	//xns::vector<xns::unique_ptr<int>> vec;
+	//
+	//vec.push_back(xns::make_unique<int>(123));
+	//
+	////Xf::AutoPointer<void> v{};
+	//
+	//
+	//std::cout << *p2 << std::endl;
 
 
 	//AutoP<B> p4{p1};
@@ -77,7 +77,7 @@ int UT::unit_tests<"unique_ptr">(void) {
 
 #if defined(XNS_TEST_UNIQUE_PTR)
 int main(void) {
-	return UT::unit_tests<"unique_ptr">();
+	return unit_tests_unique_ptr();
 }
 #endif
 

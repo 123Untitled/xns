@@ -63,8 +63,8 @@ static auto simd_test(void) -> void {
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"vector">(void) {
+
+auto unit_tests_vector(void) -> int {
 
 	simd_test();
 	xns::vector<int> v;
@@ -74,7 +74,7 @@ int UT::unit_tests<"vector">(void) {
 
 #if defined(XNS_TEST_VECTOR)
 int main(void) { {
-	return UT::unit_tests<"vector">();
+	return unit_tests_vector();
 }
 }
 #endif

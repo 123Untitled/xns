@@ -2,15 +2,15 @@
 #include "conditional.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"conditional">(void) {
+
+auto unit_tests_conditional(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_CONDITIONAL)
 int main(void) {
-	return UT::unit_tests<"conditional">();
+	return unit_tests_conditional();
 }
 #endif
 

@@ -18,8 +18,8 @@ void print_(const A& a) {
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_function">(void) {
+
+auto unit_tests_is_function(void) -> int {
 
 
 	std::cout << std::boolalpha;
@@ -44,7 +44,7 @@ int UT::unit_tests<"is_function">(void) {
 
 #if defined(XNS_TEST_IS_FUNCTION)
 int main(void) {
-	return UT::unit_tests<"is_function">();
+	return unit_tests_is_function();
 }
 #endif
 

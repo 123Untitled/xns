@@ -3,8 +3,8 @@
 #include <string>
 
 /* unit test */
-template <>
-int UT::unit_tests<"move">(void) {
+
+auto unit_tests_move(void) -> int {
 
 
 	std::string a{"hello"};
@@ -22,7 +22,7 @@ int UT::unit_tests<"move">(void) {
 
 #if defined(XNS_TEST_MOVE)
 int main(void) {
-	return UT::unit_tests<"move">();
+	return unit_tests_move();
 }
 #endif
 

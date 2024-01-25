@@ -2,11 +2,11 @@
 #include "file.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"file">(void) {
+
+auto unit_tests_file(void) -> int {
 
 
-	xns::file<2048> file{"make.sh", O_RDWR | O_CREAT, 0644};
+	xns::file<2048> file{xns::string{"make.sh"}, O_RDWR | O_CREAT, 0644};
 
 	while (file.read()) {
 
@@ -25,7 +25,7 @@ int UT::unit_tests<"file">(void) {
 
 #if defined(XNS_TEST_FILE)
 int main(void) {
-	return UT::unit_tests<"file">();
+	return unit_tests_file();
 }
 #endif
 

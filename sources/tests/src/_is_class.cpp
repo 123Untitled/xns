@@ -24,8 +24,8 @@ enum test_enum {
 };
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_class">(void) {
+
+auto unit_tests_is_class(void) -> int {
 
 	std::cout << "is_class [int]: " << xns::is_class<int> << std::endl;
 	std::cout << "is_class [test_class]: " << xns::is_class<test_class> << std::endl;
@@ -41,7 +41,7 @@ int UT::unit_tests<"is_class">(void) {
 
 #if defined(XNS_TEST_IS_CLASS)
 int main(void) {
-	return UT::unit_tests<"is_class">();
+	return unit_tests_is_class();
 }
 #endif
 

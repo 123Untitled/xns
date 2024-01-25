@@ -2,15 +2,15 @@
 #include "base.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"base">(void) {
+
+auto unit_tests_base(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_BASE)
 int main(void) {
-	return UT::unit_tests<"base">();
+	return unit_tests_base();
 }
 #endif
 

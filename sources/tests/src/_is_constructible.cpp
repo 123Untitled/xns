@@ -16,8 +16,8 @@ struct BB {
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_constructible">(void) {
+
+auto unit_tests_is_constructible(void) -> int {
 
 
 	AA a1{ 1 };
@@ -61,7 +61,7 @@ int UT::unit_tests<"is_constructible">(void) {
 
 #if defined(XNS_TEST_IS_CONSTRUCTIBLE)
 int main(void) {
-	return UT::unit_tests<"is_constructible">();
+	return unit_tests_is_constructible();
 }
 #endif
 

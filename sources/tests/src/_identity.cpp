@@ -2,15 +2,15 @@
 #include "identity.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"identity">(void) {
+
+auto unit_tests_identity(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_IDENTITY)
 int main(void) {
-	return UT::unit_tests<"identity">();
+	return unit_tests_identity();
 }
 #endif
 

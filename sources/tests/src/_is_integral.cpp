@@ -1,5 +1,7 @@
 #include "unit_tests.hpp"
 #include "is_integral.hpp"
+#include <iostream>
+#include <iomanip>
 
 // avoid namespace pollution
 using namespace xns;
@@ -24,8 +26,8 @@ void test(const bool result, const char* msg) {
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_integral">(void) {
+
+auto unit_tests_is_integral(void) -> int {
 
 	test<true >(is_integral<char>,               "char");
 	test<true >(is_integral<signed char>,        "signed char");
@@ -66,7 +68,7 @@ int UT::unit_tests<"is_integral">(void) {
 
 #if defined(XNS_TEST_IS_INTEGRAL)
 int main(void) {
-	return UT::unit_tests<"is_integral">();
+	return unit_tests_is_integral();
 }
 #endif
 

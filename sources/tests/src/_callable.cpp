@@ -22,8 +22,8 @@ class method_<R(C::*)(A...)> {
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"callable">(void) {
+
+auto unit_tests_callable(void) -> int {
 
 	toto t;
 	using proto = void(toto::*)(int) volatile;
@@ -41,7 +41,7 @@ int UT::unit_tests<"callable">(void) {
 
 #if defined(XNS_TEST_CALLABLE)
 int main(void) {
-	return UT::unit_tests<"callable">();
+	return unit_tests_callable();
 }
 #endif
 

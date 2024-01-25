@@ -1,5 +1,7 @@
 #include "unit_tests.hpp"
 #include "is_array.hpp"
+#include <iostream>
+#include <iomanip>
 
 template <bool expected>
 void test(const bool result, const char* msg) {
@@ -20,8 +22,8 @@ void test(const bool result, const char* msg) {
 }
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_array">(void) {
+
+auto unit_tests_is_array(void) -> int {
 
 	// avoid namespace pollution
 	using namespace xns;
@@ -44,7 +46,7 @@ int UT::unit_tests<"is_array">(void) {
 
 #if defined(XNS_TEST_IS_ARRAY)
 int main(void) {
-	return UT::unit_tests<"is_array">();
+	return unit_tests_is_array();
 }
 #endif
 

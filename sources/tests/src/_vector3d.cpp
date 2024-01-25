@@ -4,8 +4,8 @@
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"vector3d">(void) {
+
+auto unit_tests_vector3d(void) -> int {
 
 	xns::vector3D<double> v1{2, 3, 4};
 	xns::vector3D<double> v2{5, 6, 7};
@@ -28,7 +28,7 @@ int UT::unit_tests<"vector3d">(void) {
 
 #if defined(XNS_TEST_VECTOR3D)
 int main(void) {
-	return UT::unit_tests<"vector3d">();
+	return unit_tests_vector3d();
 }
 #endif
 

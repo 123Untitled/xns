@@ -2,15 +2,15 @@
 #include "is_void.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_void">(void) {
+
+auto unit_tests_is_void(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_IS_VOID)
 int main(void) {
-	return UT::unit_tests<"is_void">();
+	return unit_tests_is_void();
 }
 #endif
 

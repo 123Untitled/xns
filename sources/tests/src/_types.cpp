@@ -3,8 +3,8 @@
 #include <string>
 
 /* unit test */
-template <>
-int UT::unit_tests<"types">(void) {
+
+auto unit_tests_types(void) -> int {
 
 	std::cout << "bits in a char: " << xns::bits_per_byte << std::endl;
 	std::cout << "bytes in a pointer: " << xns::bytes_per_address << std::endl;
@@ -20,7 +20,7 @@ int UT::unit_tests<"types">(void) {
 
 #if defined(XNS_TEST_TYPES)
 int main(void) {
-	return UT::unit_tests<"types">();
+	return unit_tests_types();
 }
 #endif
 

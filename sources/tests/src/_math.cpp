@@ -8,8 +8,8 @@
 
 #include <algorithm>
 
-template <>
-int UT::unit_tests<"math">() {
+
+int unit_tests_math(void) {
 
 
 	xns::min_max<unsigned long> mm{};
@@ -102,7 +102,7 @@ void generateComparisons(void) {
 
 #if defined(XNS_TEST_MATH)
 int main(void) {
-	return UT::unit_tests<"math">();
+	return unit_tests_math();
 }
 #endif
 

@@ -2,10 +2,10 @@
 #include "directory.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"directory">(void) {
 
-	xns::filesystem::recursive_iterator it{"./inc"};
+auto unit_tests_directory(void) -> int {
+
+	xns::filesystem::recursive_iterator it{xns::string{"./inc"}};
 
 	//xns::filesystem::iterator it{"."};
 	int i = 0;
@@ -28,7 +28,7 @@ int UT::unit_tests<"directory">(void) {
 
 #if defined(XNS_TEST_DIRECTORY)
 int main(void) {
-	return UT::unit_tests<"directory">();
+	return unit_tests_directory();
 }
 #endif
 

@@ -7,8 +7,8 @@ static void func(void) {
 }
 
 /* unit test */
-template <>
-int UT::unit_tests<"time">(void) {
+
+auto unit_tests_time(void) -> int {
 
 	xns::bpm tempo{120};
 
@@ -30,7 +30,7 @@ int UT::unit_tests<"time">(void) {
 
 #if defined(XNS_TEST_TIME)
 int main(void) {
-	return UT::unit_tests<"time">();
+	return unit_tests_time();
 }
 #endif
 

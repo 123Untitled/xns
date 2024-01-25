@@ -2,15 +2,15 @@
 #include "is_arithmetic.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_arithmetic">(void) {
+
+auto unit_tests_is_arithmetic(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_IS_ARITHMETIC)
 int main(void) {
-	return UT::unit_tests<"is_arithmetic">();
+	return unit_tests_is_arithmetic();
 }
 #endif
 

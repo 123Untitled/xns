@@ -2,14 +2,14 @@
 #include "xorshift.hpp"
 
 
-template <>
-int UT::unit_tests<"xorshift">(void) {
+
+auto unit_tests_xorshift(void) -> int {
 	return 0;
 }
 
 #if defined(XNS_TEST_XORSHIFT)
 int main(void) {
-	return UT::unit_tests<"xorshift">();
+	return unit_tests_xorshift();
 }
 #endif
 

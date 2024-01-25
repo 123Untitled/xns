@@ -2,15 +2,15 @@
 #include "is_all_unique.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_all_unique">(void) {
+
+auto unit_tests_is_all_unique(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_IS_ALL_UNIQUE)
 int main(void) {
-	return UT::unit_tests<"is_all_unique">();
+	return unit_tests_is_all_unique();
 }
 #endif
 

@@ -2,15 +2,15 @@
 #include "ascii.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"ascii">(void) {
+
+auto unit_tests_ascii(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_ASCII)
 int main(void) {
-	return UT::unit_tests<"ascii">();
+	return unit_tests_ascii();
 }
 #endif
 

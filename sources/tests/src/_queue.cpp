@@ -5,8 +5,8 @@
 #include "time.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"queue">(void) {
+
+auto unit_tests_queue(void) -> int {
 
 	// old allocator
 	// bfs 1000000  nodes:  20545625 ns
@@ -50,7 +50,7 @@ int UT::unit_tests<"queue">(void) {
 
 #if defined(XNS_TEST_QUEUE)
 int main(void) {
-	return UT::unit_tests<"queue">();
+	return unit_tests_queue();
 }
 #endif
 

@@ -2,8 +2,8 @@
 #include "midi.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"midi">(void) {
+
+auto unit_tests_midi(void) -> int {
 
 	midi::server::shared();
 	//midi::port port{};
@@ -13,7 +13,7 @@ int UT::unit_tests<"midi">(void) {
 
 #if defined(XNS_TEST_MIDI)
 int main(void) {
-	return UT::unit_tests<"midi">();
+	return unit_tests_midi();
 }
 #endif
 

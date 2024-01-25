@@ -2,15 +2,15 @@
 #include "forward.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"forward">(void) {
+
+auto unit_tests_forward(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_FORWARD)
 int main(void) {
-	return UT::unit_tests<"forward">();
+	return unit_tests_forward();
 }
 #endif
 

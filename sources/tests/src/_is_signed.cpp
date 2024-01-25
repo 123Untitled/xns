@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 #include <type_traits>
+#include "string_literal.hpp"
 
 
 template <xns::basic_string_literal msg, class T, bool expected>
@@ -47,10 +48,10 @@ static bool checker(void) {
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_signed">(void) {
 
-	UT::print<0x00ff00>("test_print: ", 23.5, "\n");
+auto unit_tests_is_signed(void) -> int {
+
+	//UT::print<0x00ff00>("test_print: ", 23.5, "\n");
 
 	return
 
@@ -82,7 +83,7 @@ int UT::unit_tests<"is_signed">(void) {
 
 #if defined(XNS_TEST_IS_SIGNED)
 int main(void) {
-	return UT::unit_tests<"is_signed">();
+	return unit_tests_is_signed();
 }
 #endif
 

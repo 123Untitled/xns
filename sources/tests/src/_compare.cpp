@@ -2,15 +2,15 @@
 #include "compare.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"compare">(void) {
+
+auto unit_tests_compare(void) -> int {
 	// code here...
 	return false;
 }
 
 #if defined(XNS_TEST_COMPARE)
 int main(void) {
-	return UT::unit_tests<"compare">();
+	return unit_tests_compare();
 }
 #endif
 

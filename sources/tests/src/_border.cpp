@@ -2,15 +2,15 @@
 #include "border.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"border">(void) {
+
+auto unit_tests_border(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_BORDER)
 int main(void) {
-	return UT::unit_tests<"border">();
+	return unit_tests_border();
 }
 #endif
 

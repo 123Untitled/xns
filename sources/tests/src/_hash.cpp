@@ -6,8 +6,8 @@
 #include "array.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"hash">(void) {
+
+auto unit_tests_hash(void) -> int {
 
 	using pair = xns::pair<xns::string, xns::u64>;
 
@@ -36,7 +36,7 @@ int UT::unit_tests<"hash">(void) {
 
 #if defined(XNS_TEST_HASH)
 int main(void) {
-	return UT::unit_tests<"hash">();
+	return unit_tests_hash();
 }
 #endif
 

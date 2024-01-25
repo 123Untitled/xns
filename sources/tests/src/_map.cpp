@@ -9,15 +9,15 @@
 
 
 
-template <>
-int UT::unit_tests<"map">(void) {
+
+auto unit_tests_map(void) -> int {
 	return 0;
 }
 
 
 #if defined(XNS_TEST_MAP)
 int main(void) {
-	return UT::unit_tests<"map">();
+	return unit_tests_map();
 }
 #endif
 

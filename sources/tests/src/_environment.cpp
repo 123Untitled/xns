@@ -1,11 +1,11 @@
 #include "unit_tests.hpp"
 #include "environment.hpp"
 
-template <>
-int UT::unit_tests<"environment">(void) {
+
+auto unit_tests_environment(void) -> int {
 
 	//xns::env::print();
-	auto p = xns::env::get("PATH");
+	auto p = xns::env::get(xns::string{"PATH"});
 
 	if (p) {
 		std::cout << *p << std::endl;
@@ -20,7 +20,7 @@ int UT::unit_tests<"environment">(void) {
 
 #if defined(XNS_TEST_ENVIRONMENT)
 int main(void) {
-	return UT::unit_tests<"environment">();
+	return unit_tests_environment();
 }
 #endif
 

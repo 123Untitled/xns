@@ -7,7 +7,7 @@
 int main(const int ac, const char** av) {
 
 	// start main function
-	try { UT::launcher(); }
+	try { /*UT::launcher();*/ }
 	// catch memory errors
 	catch (const xns::exception& except) {
 

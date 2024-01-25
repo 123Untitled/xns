@@ -6,8 +6,8 @@
 #include "random.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"bjorklund">(void) {
+
+auto unit_tests_bjorklund(void) -> int {
 	return 0;
 }
 
@@ -15,7 +15,7 @@ int UT::unit_tests<"bjorklund">(void) {
 
 #if defined(XNS_TEST_BJORKLUND)
 int main(int argc, char** argv) {
-	return UT::unit_tests<"bjorklund">();
+	return unit_tests_bjorklund();
 }
 #endif
 

@@ -4,8 +4,8 @@
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"trie">(void) {
+
+auto unit_tests_trie(void) -> int {
 
 	xns::trie<int> tr;
 
@@ -15,7 +15,7 @@ int UT::unit_tests<"trie">(void) {
 
 #if defined(XNS_TEST_TRIE)
 int main(void) {
-	return UT::unit_tests<"trie">();
+	return unit_tests_trie();
 }
 #endif
 

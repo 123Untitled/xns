@@ -3,8 +3,8 @@
 #include "time.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"stack">(void) {
+
+auto unit_tests_stack(void) -> int {
 	constexpr int N = 10000000;
 
 	// with old allocator
@@ -34,7 +34,7 @@ int UT::unit_tests<"stack">(void) {
 
 #if defined(XNS_TEST_STACK)
 int main(void) {
-	return UT::unit_tests<"stack">();
+	return unit_tests_stack();
 }
 #endif
 

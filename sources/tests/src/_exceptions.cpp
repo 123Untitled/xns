@@ -2,8 +2,8 @@
 #include "exceptions.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"exceptions">(void) {
+
+auto unit_tests_exceptions(void) -> int {
 	// code here...
 	return 0;
 }
@@ -11,7 +11,7 @@ int UT::unit_tests<"exceptions">(void) {
 
 #if defined(XNS_TEST_EXCEPTIONS)
 int main(void) {
-	return UT::unit_tests<"exceptions">();
+	return unit_tests_exceptions();
 }
 #endif
 

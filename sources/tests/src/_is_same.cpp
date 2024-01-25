@@ -15,8 +15,8 @@ static auto is_same_cvr_test(const char* msg) -> void {
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_same">(void) {
+
+auto unit_tests_is_same(void) -> int {
 
 
 	is_same_test<true, int, int>("int, int");
@@ -76,7 +76,7 @@ int UT::unit_tests<"is_same">(void) {
 
 #if defined(XNS_TEST_IS_SAME)
 int main(void) {
-	return UT::unit_tests<"is_same">();
+	return unit_tests_is_same();
 }
 #endif
 

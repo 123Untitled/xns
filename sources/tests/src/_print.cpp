@@ -2,15 +2,15 @@
 #include "print.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"print">(void) {
+
+auto unit_tests_print(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_PRINT)
 int main(void) {
-	return UT::unit_tests<"print">();
+	return unit_tests_print();
 }
 #endif
 

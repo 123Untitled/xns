@@ -14,8 +14,8 @@ using safe = xns::safe_enum<def>;
 
 
 /* unit test */
-template <>
-int UT::unit_tests<"safe_enum">(void) {
+
+auto unit_tests_safe_enum(void) -> int {
 
 	safe s1 = safe::MAX;
 
@@ -27,7 +27,7 @@ int UT::unit_tests<"safe_enum">(void) {
 
 #if defined(XNS_TEST_SAFE_ENUM)
 int main(void) {
-	return UT::unit_tests<"safe_enum">();
+	return unit_tests_safe_enum();
 }
 #endif
 

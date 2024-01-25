@@ -1,15 +1,15 @@
 #include "unit_tests.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"window_traits">(void) {
+
+auto unit_tests_window_traits(void) -> int {
 	// code here...
 	return 0;
 }
 
 #if defined(XNS_TEST_WINDOW_TRAITS)
 int main(void) {
-	return UT::unit_tests<"window_traits">();
+	return unit_tests_window_traits();
 }
 #endif
 

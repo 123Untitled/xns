@@ -1,4 +1,6 @@
 #include "unit_tests.hpp"
+#include <iostream>
+#include <iomanip>
 #include "inheritance.hpp"
 
 // avoid namespace pollution
@@ -22,10 +24,23 @@ void test(const bool result, const char* msg) {
 		std::cout << "\x1b[31mfailure\x1b[0m" << std::endl;
 }
 
+namespace tests {
+
+	class base {
+		public:
+			virtual ~base(void) = default;
+	};
+
+	class derived : public base {
+		public:
+			virtual ~derived(void) = default;
+	};
+
+}
 
 /* unit test */
-template <>
-int UT::unit_tests<"inheritance">(void) {
+
+auto unit_tests_inheritance(void) -> int {
 
 
 	tests::base base;
@@ -64,7 +79,7 @@ int UT::unit_tests<"inheritance">(void) {
 
 #if defined(XNS_TEST_INHERITANCE)
 int main(void) {
-	return UT::unit_tests<"inheritance">();
+	return unit_tests_inheritance();
 }
 #endif
 

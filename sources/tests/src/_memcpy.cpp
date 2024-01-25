@@ -10,8 +10,8 @@
 static xns::size_t NSIZE = 0;
 
 /* unit test */
-template <>
-int UT::unit_tests<"memcpy">(void) {
+
+auto unit_tests_memcpy(void) -> int {
 
 	xns::size_t N = NSIZE * NSIZE * NSIZE;
 
@@ -71,7 +71,7 @@ int UT::unit_tests<"memcpy">(void) {
 
 #if defined(XNS_TEST_MEMCPY)
 int main(void) {
-	return UT::unit_tests<"memcpy">();
+	return unit_tests_memcpy();
 }
 #endif
 

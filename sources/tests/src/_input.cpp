@@ -2,8 +2,8 @@
 #include "input.hpp"
 #include "terminal.hpp"
 
-template <>
-int UT::unit_tests<"input">(void) {
+
+auto unit_tests_input(void) -> int {
 
 
 	xns::terminal::raw(xns::VFlag::NON_BLOCKING);
@@ -32,7 +32,7 @@ int UT::unit_tests<"input">(void) {
 
 #if defined(XNS_TEST_INPUT)
 int main(void) {
-	return UT::unit_tests<"input">();
+	return unit_tests_input();
 }
 #endif
 

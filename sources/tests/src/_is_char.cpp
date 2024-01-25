@@ -2,15 +2,15 @@
 #include "is_char.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"is_char">(void) {
+
+auto unit_tests_is_char(void) -> int {
 	// code here...
 	return false;
 }
 
 #if defined(XNS_TEST_IS_CHAR)
 int main(void) {
-	return UT::unit_tests<"is_char">();
+	return unit_tests_is_char();
 }
 #endif
 

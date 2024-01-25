@@ -2,8 +2,8 @@
 #include "random.hpp"
 
 
-template <>
-int UT::unit_tests<"random">(void) {
+
+auto unit_tests_random(void) -> int {
 
 
 	using type = char;
@@ -19,7 +19,7 @@ int UT::unit_tests<"random">(void) {
 
 #if defined(XNS_TEST_RANDOM)
 int main(void) {
-	return UT::unit_tests<"random">();
+	return unit_tests_random();
 }
 #endif
 

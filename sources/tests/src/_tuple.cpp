@@ -8,8 +8,8 @@ const int&& foo(void) {
 	return xns::move(i);
 }
 
-template <>
-int UT::unit_tests<"tuple">(void) {
+
+auto unit_tests_tuple(void) -> int {
 
 	xns::tuple<> t0;
 	std::tuple<> t1;
@@ -50,9 +50,8 @@ int UT::unit_tests<"tuple">(void) {
 	//std::cout << refff << std::endl;
 
 
-	using Type = Class<int, double, char>;
 
-	Type type{1, 2.0, 'c'};
+	//Type type{1, 2.0, 'c'};
 
 	//xns::tuple<Type, int, float> t3{xns::move(type), 2, 3.0f};
 
@@ -86,7 +85,7 @@ int UT::unit_tests<"tuple">(void) {
 
 #if defined(XNS_TEST_TUPLE)
 int main(void) {
-	return UT::unit_tests<"tuple">();
+	return unit_tests_tuple();
 }
 #endif
 

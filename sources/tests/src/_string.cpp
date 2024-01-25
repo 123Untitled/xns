@@ -158,8 +158,8 @@ static void subview(void) {
 
 
 
-template <>
-int UT::unit_tests<"string">(void) {
+
+auto unit_tests_string(void) -> int {
 
 
 	{
@@ -342,7 +342,7 @@ static auto insert_test(void) -> void {
 namespace xns {
 template <typename T>
 consteval auto bits(void) noexcept -> xns::size_t {
-	return sizeof(T) * XNS_CHAR_BIT;
+	return sizeof(T) * xns::bits_per_byte;
 }
 }
 
@@ -676,7 +676,7 @@ static int func(void) {
 
 #if defined(XNS_TEST_STRING)
 int main(void) {
-	return UT::unit_tests<"string">();
+	return unit_tests_string();
 }
 #endif
 

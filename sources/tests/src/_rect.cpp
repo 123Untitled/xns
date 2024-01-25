@@ -2,8 +2,8 @@
 #include "rect.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"rect">(void) {
+
+auto unit_tests_rect(void) -> int {
 
 	xns::rect<int> r1(0, 0, 100, 100);
 
@@ -23,7 +23,7 @@ int UT::unit_tests<"rect">(void) {
 
 #if defined(XNS_TEST_RECT)
 int main(void) {
-	return UT::unit_tests<"rect">();
+	return unit_tests_rect();
 }
 #endif
 

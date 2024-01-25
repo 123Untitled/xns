@@ -2,14 +2,14 @@
 #include "add_const.hpp"
 
 /* unit test */
-template <>
-int UT::unit_tests<"add_const">(void) {
+
+auto unit_tests_add_const(void) -> int {
 	return 0;
 }
 
 
 #if defined(XNS_TEST_ADD_CONST)
 int main(void) {
-	return UT::unit_tests<"add_const">();
+	return unit_tests_add_const();
 }
 #endif
