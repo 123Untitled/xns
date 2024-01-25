@@ -44,7 +44,7 @@ namespace xns {
 			// -- private constants -------------------------------------------
 
 			/* number of bits in value type */
-			static constexpr size_type _bits = sizeof(type) * XNS_CHAR_BIT;
+			static constexpr size_type _bits = sizeof(type) * xns::bits_per_byte;
 
 
 		public:
@@ -135,11 +135,11 @@ namespace xns {
 					::write(1, "0", 1);
 				}
 
-				if constexpr ((N % XNS_CHAR_BIT == 0) && (N != 0)) {
+				if constexpr ((N % xns::bits_per_byte == 0) && (N != 0)) {
 					write(1, " ", 1);
 				}
 
-				if constexpr ((N % (XNS_CHAR_BIT * sizeof(void*)) == 0) && (N != 0)) {
+				if constexpr ((N % (xns::bits_per_byte * sizeof(void*)) == 0) && (N != 0)) {
 					write(1, "\n", 1);
 				}
 
@@ -168,28 +168,28 @@ namespace xns {
 			template <size_type N> requires (xns::endianness::is_little())
 			static consteval auto byte_index(void) noexcept -> size_type {
 				// return byte index
-				return sizeof(type) - 1 - (N / XNS_CHAR_BIT);
+				return sizeof(type) - 1 - (N / xns::bits_per_byte);
 			}
 
 			/* get byte index (big endian) */
 			template <size_type N> requires (xns::endianness::is_big())
 			static consteval auto byte_index(void) noexcept -> size_type {
 				// return byte index
-				return N / XNS_CHAR_BIT;
+				return N / xns::bits_per_byte;
 			}
 
 			/* get bit index (within byte) (little endian) */
 			template <size_type N> requires (xns::endianness::is_little())
 			static consteval auto bit_index(void) noexcept -> size_type {
 				// return bit index
-				return N % XNS_CHAR_BIT;
+				return N % xns::bits_per_byte;
 			}
 
 			/* get bit index (within byte) (big endian) */
 			template <size_type N> requires (xns::endianness::is_big())
 			static consteval auto bit_index(void) noexcept -> size_type {
 				// return bit index
-				return XNS_CHAR_BIT - 1 - (N % XNS_CHAR_BIT);
+				return xns::bits_per_byte - 1 - (N % xns::bits_per_byte);
 			}
 
 
