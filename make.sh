@@ -154,7 +154,8 @@ LOCK=$BLDDIR'/.lock'
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-CXX='/opt/homebrew/Cellar/llvm/17.0.6_1/bin/clang++'
+#CXX='/opt/homebrew/Cellar/llvm/17.0.6_1/bin/clang++'
+CXX='clang++'
 
 # archiver
 ARCHIVER='ar'
@@ -166,7 +167,7 @@ ARFLAGS='-rcs'
 LINKER=$CXX
 
 # standard
-STD='-std=c++23'
+STD='-std=c++2a'
 
 # debug
 DEBUG='-g3'
