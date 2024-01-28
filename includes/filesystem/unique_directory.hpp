@@ -1,10 +1,11 @@
-#ifndef XNS_UNIQUE_DIRECTORY_HEADER
-#define XNS_UNIQUE_DIRECTORY_HEADER
+#ifndef XNS_UNIQUE_DIRECTORY_HPP
+#define XNS_UNIQUE_DIRECTORY_HPP
 
 // local headers
 #include "os.hpp"
 #include "macros.hpp"
 #include "string.hpp"
+#include "unique_descriptor.hpp"
 
 // macos headers
 #if defined(XNS_APPLE)
@@ -20,7 +21,7 @@
 namespace xns {
 
 
-	// -- U N I Q U E  D I R E C T O R Y  C L A S S ---------------------------
+	// -- U N I Q U E  D I R E C T O R Y --------------------------------------
 
 	class unique_directory {
 
@@ -30,7 +31,7 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = unique_directory;
+			using self = xns::unique_directory;
 
 			/* directory type */
 			using directory = DIR;
@@ -46,12 +47,14 @@ namespace xns {
 			NON_COPYABLE(unique_directory);
 
 			/* string constructor */
-			template <typename T>
+			template <typename T> requires xns::is_string<T>
 			inline explicit unique_directory(const T& path) noexcept
 			: _directory{::opendir(path.data())} {
-				// check T is a string type
-				static_assert(xns::is_string<T>,
-					"): UNIQUE_DIRECTORY: T must be a string type :(");
+			}
+
+			/* unique_descriptor constructor */
+			inline explicit unique_directory(const xns::unique_descriptor& descriptor) noexcept
+			: _directory{::fdopendir(descriptor)} {
 			}
 
 			/* pointer constructor */
@@ -80,14 +83,15 @@ namespace xns {
 			/* move assignment operator */
 			inline auto operator=(unique_directory&& other) noexcept -> self& {
 				// check for self-assignment
-				if (this != &other) {
-					// close directory
-					if (_directory != nullptr) { ::closedir(_directory); }
-					// move directory
-					_directory = other._directory;
-					// invalidate other
-					other._directory = nullptr;
-				} // return self-reference
+				if (this == &other)
+					return *this;
+				// close directory
+				if (_directory != nullptr) ::closedir(_directory);
+				// move directory
+				_directory = other._directory;
+				// invalidate other
+				other._directory = nullptr;
+				// return self-reference
 				return *this;
 			}
 
@@ -129,8 +133,8 @@ namespace xns {
 			/* directory pointer */
 			directory* _directory;
 
-	};
+	}; // class unique_directory
 
-}
+} // namespace xns
 
-#endif // UNIQUE_DIRECTORY_HEADER
+#endif // UNIQUE_DIRECTORY_HPP
