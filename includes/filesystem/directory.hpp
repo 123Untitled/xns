@@ -22,7 +22,7 @@ namespace xns {
 	namespace filesystem {
 
 
-		// -- D I R E C T O R Y  I T E R A T O R  C L A S S -------------------
+		// -- D I R E C T O R Y  I T E R A T O R ------------------------------
 
 		template <bool recursive>
 		class directory_iterator final {
@@ -204,7 +204,7 @@ namespace xns {
 				// -- public boolean operators --------------------------------
 
 				/* boolean operator */
-				inline operator bool(void) const noexcept {
+				inline explicit operator bool(void) const noexcept {
 					return _entity != nullptr;
 				}
 
