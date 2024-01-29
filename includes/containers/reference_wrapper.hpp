@@ -1,14 +1,25 @@
-#ifndef XNS_REFERENCE_HEADER
-#define XNS_REFERENCE_HEADER
+/*****************************************************************************/
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*****************************************************************************/
+
+#pragma once
+
+#ifndef XNS_REFERENCE_WRAPPER_HPP
+#define XNS_REFERENCE_WRAPPER_HPP
 
 // local headers
 #include "move.hpp"
 #include "is_same.hpp"
 #include "remove.hpp"
-#include "conditional.hpp"
-#include "is_const.hpp"
-
-#include <iostream>
+#include "forward.hpp"
+#include "addressof.hpp"
+#include "invoke.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -16,83 +27,94 @@
 namespace xns {
 
 
-	// -- R E F E R E N C E ---------------------------------------------------
+	/* is lvalue convertible */
+	template <typename T, typename U>
+	concept is_lvalue_convertible = requires(U&& u) {
+		{ static_cast<U&&>(u) } -> xns::is_same<T&>;
+	};
+
+
+	// -- R E F E R E N C E  W R A P P E R ------------------------------------
 
 	template <typename T>
-	class reference final {
-
+	class reference_wrapper final {
 
 		public:
 
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = xns::reference<T>;
+			using self = xns::reference_wrapper<T>;
 
-			/* value type */
+			/* type */
 			using type = T;
-
-
 
 
 			// -- public lifecycle --------------------------------------------
 
 			/* deleted default constructor */
-			reference(void) = delete;
+			reference_wrapper(void) = delete;
 
 			/* lvalue reference constructor */
-			template <typename U> requires xns::is_not_same<xns::remove_cvr<U>, self>
-			explicit inline reference(U&& ref) noexcept
-			: _ref{&ref} {
-				std::cout << "lvalue reference constructor" << std::endl;
+			template <typename U> requires xns::is_not_same<xns::remove_cvr<U>, self> 
+			inline constexpr reference_wrapper(U&& ref)
+			: _ptr{xns::addressof(ref)} {
+				// check if U is not a rvalue reference
+				static_assert(xns::is_lvalue_convertible<type, U>,
+						"reference_wrapper can only be constructed from lvalue references");
 			}
 
-			/* deleted rvalue reference constructor */
-			reference(type&&) = delete;
-
 			/* copy constructor */
-			inline reference(const self& other) noexcept
-			: _ref{other._ref} {
-				std::cout << "copy constructor" << std::endl;
+			inline reference_wrapper(const self& other) noexcept
+			: _ptr{other._ptr} {
 			}
 
 			/* move constructor */
-			inline reference(self&&) noexcept = default;
+			inline reference_wrapper(self&& other) noexcept
+			: _ptr{other._ptr} {
+			}
 
 			/* destructor */
-			inline ~reference(void) noexcept = default;
+			~reference_wrapper(void) noexcept = default;
 
 
 			// -- public assignment operators ---------------------------------
 
-			inline auto operator=(const type& value) -> self& {
-				static_assert(!xns::is_const<type>, "cannot assign to const reference");
-				*_ref = value;
+			/* copy assignment operator */
+			inline auto operator=(const self& other) noexcept -> self& {
+				_ptr = other._ptr;
 				return *this;
 			}
 
-			inline auto operator=(type&& value) noexcept -> self& {
-				static_assert(!xns::is_const<type>, "cannot assign to const reference");
-				*_ref = xns::move(value);
+			/* move assignment operator */
+			inline auto operator=(self&& other) noexcept -> self& {
+				_ptr = other._ptr;
 				return *this;
 			}
 
+
+			// -- public accessors --------------------------------------------
+
+			/* get */
 			auto get(void) const noexcept -> type& {
-				return *_ref;
+				return *_ptr;
 			}
-
-			/* deleted copy assignment operator */
-			auto operator=(const self&) -> self& = delete;
-
-			/* deleted move assignment operator */
-			auto operator=(self&&) noexcept -> self& = delete;
 
 
 			// -- public conversion operators ---------------------------------
 
 			/* conversion to reference */
 			inline operator type&(void) const noexcept {
-				return *_ref;
+				return *_ptr;
+			}
+
+
+			// -- public function operators -----------------------------------
+
+			// invoke
+			template <typename... A>
+			auto operator()(A&&... args) const noexcept(/* is no throw invocable */ true) -> decltype(auto) {
+				return xns::invoke(*_ptr, xns::forward<A>(args)...);
 			}
 
 
@@ -101,46 +123,54 @@ namespace xns {
 			// -- private members ---------------------------------------------
 
 			/* pointer */
-			self::type* _ref;
+			type* _ptr;
 
-	};
+	}; // class reference_wrapper
 
 
 	// -- deduction guides ----------------------------------------------------
 
 	/* deduction guide for lvalue reference */
 	template <typename T>
-	reference(T&) -> reference<T>;
+	reference_wrapper(T&) -> reference_wrapper<T>;
 
 
 	// -- ref function --------------------------------------------------------
 
 	/* create mutable reference */
 	template <typename T>
-	inline constexpr auto ref(T& ref) noexcept -> xns::reference<T> {
-		return xns::reference<T>{ref};
+	inline constexpr auto ref(T& ref) noexcept -> xns::reference_wrapper<T> {
+		return xns::reference_wrapper<T>{ref};
 	}
 
 	/* create const reference */
 	template <typename T>
-	inline constexpr auto ref(const T& ref) noexcept -> xns::reference<const T> {
-		return xns::reference<const T>{ref};
+	inline constexpr auto cref(const T& ref) noexcept -> xns::reference_wrapper<const T> {
+		return xns::reference_wrapper<const T>{ref};
 	}
 
 	/* deleted rvalue ref */
 	template <typename T>
-	auto ref(T&&) noexcept -> xns::reference<T> = delete;
+	auto ref(T&&) noexcept -> void = delete;
 
 	/* deleted const rvalue ref */
 	template <typename T>
-	auto ref(const T&&) noexcept -> xns::reference<const T> = delete;
+	auto cref(const T&&) noexcept -> void = delete;
 
 
+	/* create mutable reference */
+	template <typename T>
+	inline constexpr auto ref(xns::reference_wrapper<T> ref) noexcept -> xns::reference_wrapper<T> {
+		return ref;
+	}
+
+	/* create const reference */
+	template <typename T>
+	constexpr auto cref(xns::reference_wrapper<T> ref) noexcept -> xns::reference_wrapper<const T> {
+		return ref;
+	}
 
 
+}; // namespace xns
 
-
-
-};
-
-#endif
+#endif // XNS_REFERENCE_WRAPPER_HPP
