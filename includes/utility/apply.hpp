@@ -1,10 +1,24 @@
-#ifndef XNS_APPLY_HEADER
-#define XNS_APPLY_HEADER
+/*****************************************************************************/
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*****************************************************************************/
+
+#pragma once
+
+#ifndef XNS_APPLY_HPP
+#define XNS_APPLY_HPP
 
 // local headers
 #include "is_function.hpp"
+#include "is_member_pointer.hpp"
 #include "tuple.hpp"
 #include "integer_sequence.hpp"
+#include "invoke.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -14,34 +28,30 @@ namespace xns {
 
 	// -- A P P L Y -----------------------------------------------------------
 
+
+	// -- detail --------------------------------------------------------------
+
 	namespace impl {
 
 		/* apply implementation */
 		template <typename F, typename T, xns::size_t... I>
-		constexpr auto apply(F&& function, T&& tuple, xns::index_sequence<I...>) noexcept {
-			return function(xns::get<I>(xns::forward<T>(tuple))...);
+		inline constexpr auto apply(F&& func, T&& tuple, xns::index_sequence<I...>) noexcept {
+			return xns::invoke(xns::forward<F>(func),
+							   xns::get<I>(xns::forward<T>(tuple))...);
 		}
 
 	}
 
+	/* apply */
 	template <typename F, typename T>
-	constexpr auto apply(F&& function, T&& tuple) noexcept -> auto {
-		// check T is a tuple
-		static_assert(xns::is_tuple<T>, "): APPLY: T IS NOT A TUPLE! :(");
-
-		constexpr auto size = xns::tuple_size<T>;
-
-		// check F is a function
-		//static_assert(xns::is_function<F>, "): APPLY: F IS NOT A FUNCTION! :(");
-
+	inline constexpr auto apply(F&& function, T&& tuple) noexcept -> auto {
+		// return implementation
 		return impl::apply(xns::forward<F>(function),
 						   xns::forward<T>(tuple),
-						   xns::make_index_sequence<size>());
+						   xns::make_index_sequence<xns::tuple_size<T>>());
 	}
 
+} // namespace xns
 
-
-}
-
-#endif // APPLY_HEADER
+#endif // XNS_APPLY_HPP
 
