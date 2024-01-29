@@ -1,27 +1,49 @@
 #include "unit_tests.hpp"
-#include "reference.hpp"
+#include "reference_wrapper.hpp"
 
 #include <vector>
 
+class A final {
+	public:
+		void print(const char* str) {
+			std::cout << str << std::endl;
+		}
+};
 
-auto unit_tests_reference(void) -> int {
+void print(const char* str) {
+	std::cout << str << std::endl;
+}
+
+auto unit_tests_reference_wrapper(void) -> int {
+
+
+	{
+		A a;
+
+		auto ref = xns::ref(a);
+
+		xns::invoke(&A::print, ref, "Hello World!");
+
+	}
+
+
 
 	int i = 5;
 	int j = 6;
 	int k = 7;
 	int l = 8;
-	xns::reference ref{i};
+	xns::reference_wrapper ref{i};
 
-	xns::reference refref{ref};
-	xns::reference<xns::reference<int>> refrefref{ref};
+	xns::reference_wrapper refref{ref};
+	xns::reference_wrapper<xns::reference_wrapper<int>> refrefref{ref};
 
-	xns::reference<int>& val = refrefref;
+	xns::reference_wrapper<int>& val = refrefref;
 
 
 	int& iref = ref;
 
 
-	std::vector<xns::reference<int>> vec{};
+	std::vector<xns::reference_wrapper<int>> vec{};
 	//std::vector<xns::reference<int>> vec{{ref, j, k, l}};
 	//vec.push_back(i); // NEED TO FIX THIS
 
@@ -29,9 +51,9 @@ auto unit_tests_reference(void) -> int {
 
 }
 
-#if defined(XNS_TEST_REFERENCE)
+#if defined(XNS_TEST_REFERENCE_WRAPPER)
 int main(void) {
-	return unit_tests_reference();
+	return unit_tests_reference_wrapper();
 }
 #endif
 
