@@ -1,24 +1,8 @@
 #!/usr/bin/env -S zsh --no-rcs --no-globalrcs
 
-ARRRAY=(1 2 3 4 5 6 7 8 9 10)
-
-#
-echo $ARRRAY
-#
-REMOVE=3
-ARRRAY=("${ARRRAY[@]/$REMOVE}")
-#
-#ARRRAY=(${ARRRAY:|REMOVE})
-#
-echo $ARRRAY
-#
-#exit
-
-
 # This script is used to compile the project.
 # Makefile forever, but not really lol.
 
-OPS=$(uname -s)
 
 BANNER2=\
 '   ▁▁▁▁▁▁▁▁  ▁▁▁▁▁▁▁▁  ▁▁▁▁ ▁▁▁  ▁▁▁▁▁▁▁▁ \n'\
@@ -26,16 +10,6 @@ BANNER2=\
 ' ╱         ╱         ╱         ╱         ╱\n'\
 '╱         ╱         ╱        ▁╱       ▁▁╱ \n'\
 '╲▁▁╱▁▁╱▁▁╱╲▁▁▁╱▁▁▁▁╱╲▁▁▁▁╱▁▁▁╱╲▁▁▁▁▁▁▁▁╱  \n'
-
-BANNER1=\
-'\n'\
-':::    ::: ::::    :::  ::::::::  \n'\
-':+:    :+: :+:+:   :+: :+:    :+: \n'\
-' +:+  +:+  :+:+:+  +:+ +:+        \n'\
-'  +#++:+   +#+ +:+ +#+ +#++:++#++ \n'\
-' +#+  +#+  +#+  +#+#+#        +#+ \n'\
-'#+#    #+# #+#   #+#+# #+#    #+# \n'\
-'###    ### ###    ####  ########  \n'
 
 BANNER=\
 '\n'\
@@ -48,6 +22,37 @@ BANNER=\
 '###    ### ###    ####  ########      \n'
 
 
+# -- O P E R A T I N G  S Y S T E M -------------------------------------------
+
+# check if operating system is supported
+function check_os {
+
+	if [[ -z $OSTYPE ]]; then
+		if ! OSTYPE=$(uname -s); then
+			echo 'could not detect operating system.'
+			exit 1
+		fi
+	fi
+
+	# check for macosx
+	if   [[ $OSTYPE =~ 'darwin' ]]; then
+		OS='macosx'
+	# check for linux
+	elif [[ $OSTYPE =~ 'linux' ]]; then
+		OS='linux'
+	# check for other
+	else
+		echo 'unsupported operating system:' $OSTYPE
+		exit 1
+	fi
+}
+
+
+# operating system
+OS=''
+
+# call check_os function
+check_os
 
 
 
@@ -212,7 +217,7 @@ DEFINES=()
 LDFLAGS=()
 
 
-if [[ $OPS =~ 'Darwin' ]]; then
+if [[ $OS =~ 'macos' ]]; then
 	LDFLAGS+=('-framework' 'CoreMIDI' '-framework' 'CoreAudio' '-framework' 'CoreFoundation')
 fi
 
@@ -225,7 +230,8 @@ FZF_OPTS=('--algo=v2' '--height=50%' '--no-multi' '--layout=reverse' '--border=r
 
 
 MAX_JOBS=''
-if [[ $OPS =~ 'Darwin' ]]; then
+
+if [[ $OP =~ 'macos' ]]; then
 	MAX_JOBS=$(sysctl -n hw.ncpu)
 else
 	MAX_JOBS=$(nproc)
@@ -264,30 +270,6 @@ function banner() {
 function target_info() {
 	echo $COLOR$scriptname$RESET \
 		'launching' '['$COLOR${1##*/}$RESET']' 'build'
-}
-
-
-
-# -- O P E R A T I N G  S Y S T E M -------------------------------------------
-
-# check if operating system is supported
-function check_os {
-
-	if [[ -z $OSTYPE ]]; then
-		OSTYPE=$(uname -s)
-	fi
-
-	# check for macosx
-	if   [[ $OSTYPE =~ 'darwin' ]]; then
-		#echo 'detected OS:' $color'macosx'$reset
-	# check for linux
-	elif [[ $OSTYPE =~ 'linux' ]]; then
-		#echo 'detected OS:' $color'linux'$reset
-	# check for other
-	else
-		echo 'unsupported OS:' $COLOR$OSTYPE$RESET
-		exit 1
-	fi
 }
 
 
@@ -798,7 +780,6 @@ function setup_mode {
 function main {
 
 	banner
-	check_os
 	required $CXX $ARCHIVER
 	repository
 	initialize_separator
