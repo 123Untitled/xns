@@ -3,6 +3,7 @@
 
 // local headers
 #include "is_convertible.hpp"
+#include "move.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -27,9 +28,9 @@ namespace xns {
 			a.swap(b);
 		}
 		else {
-			T tmp = a;
-			a = b;
-			b = tmp;
+			T tmp = xns::move(a);
+				a = xns::move(b);
+				b = xns::move(tmp);
 		}
 	}
 
