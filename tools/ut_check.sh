@@ -37,10 +37,7 @@ fi
 # -- C H E C K  G I T  S T A T U S --------------------------------------------
 
 # check if there is staged files
-git diff --cached --exit-code --quiet
-
-# check status
-if [ $? -ne 0 ]; then
+if ! git diff --cached --exit-code --quiet; then
 	echo 'please' $CE'commit'$NC 'or' $CE'stash'$NC 'your changes first.'
 	exit 1
 fi
