@@ -69,19 +69,25 @@ namespace xns {
 
 			/* default constructor */
 			inline unique_ptr(void) noexcept
-			: _data{nullptr} {}
+			: _data{nullptr} {
+			}
 
 			/* nullptr constructor */
 			inline unique_ptr(xns::null) noexcept
-			: unique_ptr{} {}
+			: _data{nullptr} {
+			}
+
+			/* pointer constructor */
+			inline unique_ptr(mut_ptr ptr) noexcept
+			: _data{ptr} {
+			}
 
 			/* non-copyable class */
-			NON_COPYABLE(unique_ptr);
+			non_copyable(unique_ptr);
 
 			/* self move constructor */
 			inline unique_ptr(self&& other) noexcept
 			: _data(other._data) {
-				// invalidate other
 				other._data = nullptr;
 			}
 
@@ -96,7 +102,7 @@ namespace xns {
 			/* destructor */
 			inline ~unique_ptr(void) noexcept {
 				// deallocate memory
-				free_ptr();
+				free();
 			}
 
 
@@ -113,7 +119,7 @@ namespace xns {
 				// check for self assignment
 				if (this != &other) {
 					// deallocate memory
-					free_ptr();
+					free();
 					// move other
 					_data = other._data;
 					// invalidate other
@@ -126,7 +132,7 @@ namespace xns {
 				// check for self assignment
 				if (this != reinterpret_cast<self*>(&other)) {
 					// deallocate memory
-					free_ptr();
+					free();
 					// move other
 					_data = other._data;
 					// invalidate other
@@ -181,11 +187,22 @@ namespace xns {
 				return _data;
 			}
 
+			/* get */
+			inline auto get(void) noexcept -> mut_ptr {
+				return _data;
+			}
+
+			/* const get */
+			inline auto get(void) const noexcept -> const_ptr {
+				return _data;
+			}
+
+
 
 			// -- public boolean operators ------------------------------------
 
 			/* boolean operator */
-			inline operator bool(void) const noexcept {
+			inline explicit operator bool(void) const noexcept {
 				return _data != nullptr;
 			}
 
@@ -199,35 +216,40 @@ namespace xns {
 
 			/* equality operator */
 			inline auto operator==(const self& other) const noexcept -> bool {
-				// return pointer equality
 				return _data == other._data;
 			}
 
 			/* inequality operator */
 			inline auto operator!=(const self& other) const noexcept -> bool {
-				// return pointer inequality
 				return _data != other._data;
 			}
 
 			/* nullptr equality operator */
 			inline auto operator==(xns::null) const noexcept -> bool {
-				// return pointer invalidity
 				return _data == nullptr;
 			}
 
 			/* nullptr inequality operator */
 			inline auto operator!=(xns::null) const noexcept -> bool {
-				// return pointer validity
 				return _data != nullptr;
 			}
 
 
 			// -- public modifiers --------------------------------------------
 
-			/* reset pointer */
+			/* reset */
 			inline auto reset(void) noexcept -> void {
-				free_ptr();
-				init();
+				free(); init();
+			}
+
+			/* release */
+			inline auto release(void) noexcept -> mut_ptr {
+				// get pointer
+				mut_ptr ptr = _data;
+				// invalidate pointer
+				_data = nullptr;
+				// return pointer
+				return ptr;
 			}
 
 
@@ -257,19 +279,18 @@ namespace xns {
 
 			/* init */
 			inline auto init(void) noexcept -> void {
-				// initialize pointer
 				_data = nullptr;
 			}
 
 			/* deallocate memory */
-			inline auto free_ptr(void) noexcept -> void {
+			inline auto free(void) noexcept -> void {
 				// check pointer validity
-				if (_data != nullptr) {
-					// destroy object
-					allocator::destroy(_data);
-					// deallocate memory
-					allocator::deallocate(_data);
-				}
+				if (_data == nullptr)
+					return;
+				// destroy object
+				allocator::destroy(_data);
+				// deallocate memory
+				allocator::deallocate(_data);
 			}
 
 
