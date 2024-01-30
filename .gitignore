@@ -1,6 +1,11 @@
 plot.py
 plot.sh
 
+external/
+
+jomt*/
+benchmark.json
+
 # release output directory
 xns/
 #ignore single header
