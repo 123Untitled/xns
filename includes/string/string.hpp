@@ -111,7 +111,7 @@ namespace xns {
 	/* strlen (null-terminated string) */
 	template <typename T>
 	constexpr auto strlen(const T* str) noexcept -> typename basic_string<T>::size_type {
-		std::cout << "strlen (null-terminated string)" << std::endl;
+		//std::cout << "strlen (null-terminated string)" << std::endl;
 		// check T is a character type
 		static_assert(xns::is_char<T>,
 				"): strlen requires a character type :(");
@@ -140,7 +140,7 @@ namespace xns {
 	/* strlen (character) */
 	template <typename T> requires(xns::is_char<T>)
 	constexpr inline auto strlen(const T& character) noexcept -> auto {
-		std::cout << "strlen (character)" << std::endl;
+		//std::cout << "strlen (character)" << std::endl;
 		return typename basic_string<T>::size_type{1};
 	}
 
@@ -276,7 +276,7 @@ namespace xns {
 				_str = allocate(capacity);
 				// set nullchar
 				null_terminator();
-				std::cout << "capacity constructor" << std::endl;
+				//std::cout << "capacity constructor" << std::endl;
 			}
 
 
@@ -306,7 +306,7 @@ namespace xns {
 				// copy string
 				xns::memcpy(_str, str, _size);
 
-				std::cout << "array constructor" << std::endl;
+				//std::cout << "array constructor" << std::endl;
 			}
 
 			/* buffer constructor */
@@ -320,7 +320,7 @@ namespace xns {
 				null_terminator();
 				// copy string
 				xns::memcpy(_str, str, size);
-				std::cout << "buffer constructor" << std::endl;
+				//std::cout << "buffer constructor" << std::endl;
 			}
 
 			/* fill constructor */
@@ -334,19 +334,19 @@ namespace xns {
 				null_terminator();
 				// fill string
 				xns::memset(_str, character, count);
-				std::cout << "fill constructor" << std::endl;
+				//std::cout << "fill constructor" << std::endl;
 			}
 
 			/* string view constructor */
 			explicit inline basic_string(const self::view& view)
 			: basic_string{view.data(), view.size()} {
-				std::cout << "string view constructor" << std::endl;
+				//std::cout << "string view constructor" << std::endl;
 			}
 
 			/* copy constructor */
 			inline basic_string(const self& other)
 			: basic_string{other._str, other._size} {
-				std::cout << "copy constructor" << std::endl;
+				//std::cout << "copy constructor" << std::endl;
 			}
 
 			/* move constructor */
