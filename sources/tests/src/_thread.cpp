@@ -1,13 +1,14 @@
 #include "unit_tests.hpp"
 #include "thread.hpp"
 #include <thread>
-#include "reference.hpp"
+#include "reference_wrapper.hpp"
 #include "apply.hpp"
 
 class A {
 
 	public:
-		A(void) = default;
+		A(void) {
+		}
 		A(const A&) {
 			std::cout << "copy" << std::endl;
 		}
@@ -16,6 +17,10 @@ class A {
 		}
 		void print(void) const {
 			std::cout << "Hello, World!" << std::endl;
+		}
+
+		void inc(void) {
+			++toto;
 		}
 		int toto;
 };
@@ -35,7 +40,17 @@ auto unit_tests_thread(void) -> int {
 	xns::apply(printer, t);
 	*/
 
-	void(A::*f0)(void) const = &A::print;
+	{
+		const A a;
+
+		std::function<void(const A&)> f0 = &A::print;
+
+		xns::invoke(f0, a);
+	}
+
+	return 0;
+
+
 	A a0;
 
 	xns::invoke(&A::print, a0);
@@ -50,6 +65,10 @@ auto unit_tests_thread(void) -> int {
 	xns::invoke(&A::print, ref);
 
 	xns::thread t0{&A::print, xns::ref(a)};
+
+
+
+
 	std::cout << "joinable: " << t0.joinable() << std::endl;
 	t0.join();
 	std::cout << "joinable: " << t0.joinable() << std::endl;

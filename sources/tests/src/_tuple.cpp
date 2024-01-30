@@ -12,11 +12,22 @@ const int&& foo(void) {
 
 auto unit_tests_tuple(void) -> int {
 
-	xns::tuple<> t0;
-	std::tuple<> t1;
+	int i = 0;
+	float f = 0.0f;
 
-	std::cout << "sizeof: " << sizeof(t0) << std::endl;
-	std::cout << "sizeof: " << sizeof(t1) << std::endl;
+	xns::tuple t0{i, f};
+	xns::tuple t1{0, 0.0f};
+
+	t0 = t1; // here error
+
+
+
+	//
+	//xns::get<0>(t0) = 1;
+	//std::get<0>(t1) = 1;
+	//
+	//std::cout << "sizeof: " << sizeof(t0) << std::endl;
+	//std::cout << "sizeof: " << sizeof(t1) << std::endl;
 	return 0;
 
 

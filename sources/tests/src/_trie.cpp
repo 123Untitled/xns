@@ -1,6 +1,6 @@
 #include "unit_tests.hpp"
 #include "trie.hpp"
-#include "reference.hpp"
+#include "reference_wrapper.hpp"
 
 
 /* unit test */
