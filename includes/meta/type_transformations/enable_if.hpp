@@ -1,5 +1,17 @@
-#ifndef XNS_ENABLE_IF_HEADER
-#define XNS_ENABLE_IF_HEADER
+/*****************************************************************************/
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*****************************************************************************/
+
+#pragma once
+
+#ifndef XNS_ENABLE_IF_HPP
+#define XNS_ENABLE_IF_HPP
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -9,22 +21,30 @@ namespace xns {
 
 	// -- E N A B L E  I F ----------------------------------------------------
 
-	/* enable if */
-	template <bool B, class T>
-	struct _enable_if;
+	// -- detail --------------------------------------------------------------
 
-	/* true specialization */
-	template <class T>
-	struct _enable_if<true, T> { using type = T; };
+	namespace impl {
 
-	/* false specialization */
-	template <class T>
-	struct _enable_if<false, T> {};
+		/* enable if */
+		template <bool, typename>
+		struct enable_if;
+
+		/* true specialization */
+		template <typename T>
+		struct enable_if<true, T> final { using type = T; };
+
+		/* false specialization */
+		template <typename T>
+		struct enable_if<false, T> final {};
+
+	} // namespace impl
+
 
 	/* enable if type */
-	template <bool B, class T>
-	using enable_if = typename _enable_if<B, T>::type;
+	template <bool B, typename T = void>
+	using enable_if = typename impl::enable_if<B, T>::type;
 
-}
 
-#endif
+} // namespace xns
+
+#endif // XNS_ENABLE_IF_HPP
