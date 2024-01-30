@@ -1,5 +1,17 @@
-#ifndef XNS_ALLOCATOR_HEADER
-#define XNS_ALLOCATOR_HEADER
+/*****************************************************************************/
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*****************************************************************************/
+
+#pragma once
+
+#ifndef XNS_ALLOCATOR_HPP
+#define XNS_ALLOCATOR_HPP
 
 // local headers
 #include "types.hpp"
@@ -10,14 +22,12 @@
 #include "numeric_limits.hpp"
 #include "policy.hpp"
 #include "is_scalar.hpp"
-#include "is_constructible.hpp"
-#include "is_destructible.hpp"
-#include "is_trivially_destructible.hpp"
+#include "supported_operations.hpp"
+
+#include "addressof.hpp"
 
 // standard headers
 #include <cstdlib>
-
-
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -63,7 +73,7 @@ namespace xns {
 			// -- public lifecycle --------------------------------------------
 
 			/* non-instantiable class */
-			NON_INSTANCIABLE(allocator);
+			non_instanciable(allocator);
 
 
 			// -- public static methods ---------------------------------------
@@ -71,49 +81,37 @@ namespace xns {
 			/* allocate */
 			static inline auto allocate(const size_type size = 1) -> mut_ptr {
 				// allocate memory
-				mut_ptr ptr = static_cast<mut_ptr>(std::malloc(size * sizeof(type)));
+				mut_ptr ptr = static_cast<mut_ptr>(::malloc(size * sizeof(type)));
 				// check failed allocation
-				if (!ptr) { throw xns::exception(-2, "FAILED TO ALLOCATE MEMORY"); }
-				// return pointer
+				if (ptr == nullptr)
+					throw xns::exception(-2, "allocator, failed to allocate memory");
 				return ptr;
 			}
 
 			/* realloc */
 			static inline auto realloc(mut_ptr addrs, const size_type size = 1) -> mut_ptr {
-				// check type is scalar (need to replace by is_trivially_copyable)
-				static_assert(xns::is_scalar<type>, "TYPE IS NOT SCALAR");
+
+				// check type is trivially copyable
+				static_assert(xns::is_trivially_copyable<type>, "allocator, type is not trivially copyable");
+
 				// reallocate memory
-				mut_ptr ptr = static_cast<mut_ptr>(std::realloc(addrs, size * sizeof(type)));
+				mut_ptr ptr = static_cast<mut_ptr>(::realloc(addrs, size * sizeof(type)));
 				// check failed reallocation
-				if (!ptr) { throw xns::exception(-2, "FAILED TO REALLOCATE MEMORY"); }
-				// return pointer
+				if (ptr == nullptr)
+					throw xns::exception(-2, "allocator, failed to reallocate memory");
 				return ptr;
 			}
 
 			/* deallocate */
 			static inline auto deallocate(mut_ptr pointer) noexcept -> void {
-				// deallocate memory
-				std::free(pointer);
+				::free(pointer);
 			}
 
 
 			// -- public accessors --------------------------------------------
 
-			/* address */
-			static inline auto address(mut_ref value) -> mut_ptr {
-				// return address
-				return &value;
-			}
-
-			/* const address */
-			static inline auto address(const_ref value) -> const_ptr {
-				// return constant address
-				return &value;
-			}
-
 			/* max size */
-			static inline consteval auto max_size(void) -> size_type {
-				// return max size
+			static inline consteval auto max_size(void) noexcept -> size_type {
 				return xns::limits::max<size_type>() / sizeof(type);
 			}
 
@@ -121,43 +119,39 @@ namespace xns {
 			// -- public construct methods ------------------------------------
 
 			/* copy construct */
-			static inline auto construct(mut_ptr addrs, const_ref value) -> void {
+			static inline auto construct(mut_ptr addrs, const_ref value) noexcept(xns::is_nothrow_copy_constructible<type>) -> void {
 				// assert type is copy constructible
-				static_assert(xns::is_copy_constructible<type>,
-						"TYPE IS NOT COPY CONSTRUCTIBLE");
+				static_assert(xns::is_copy_constructible<type>, "allocator, type is not copy constructible");
 				// construct object by copy
-				new(addrs) type{value};
+				new(self::voidify(*addrs)) type{value};
 			}
 
 			/* move construct */
-			static inline auto construct(mut_ptr addrs, move_ref value) -> void {
+			static inline auto construct(mut_ptr addrs, move_ref value) noexcept(xns::is_nothrow_move_constructible<type>) -> void {
 				// assert type is move constructible
-				static_assert(xns::is_move_constructible<type>,
-						"TYPE IS NOT MOVE CONSTRUCTIBLE");
+				static_assert(xns::is_move_constructible<type>, "allocator, type is not move constructible");
 				// construct object by move
-				new(addrs) type{xns::move(value)};
+				new(self::voidify(*addrs)) type{xns::move(value)};
 			}
 
 			/* forward construct */
-			template <typename... A>
-			static inline auto construct(mut_ptr addrs, A&&... args) -> void {
+			template <typename... A> // here require is not move_ref or const_ref !!! IMPORTANT
+			static inline auto construct(mut_ptr addrs, A&&... args) noexcept(xns::is_nothrow_constructible<type, A...>) -> void {
 				// assert type is constructible
-				static_assert(xns::is_constructible<type, A...>,
-						"TYPE IS NOT CONSTRUCTIBLE");
+				static_assert(xns::is_constructible<type, A...>, "allocator, type is not constructible");
 				// construct object by forwarding arguments
-				new(addrs) type{xns::forward<A>(args)...};
+				new(self::voidify(*addrs)) type{xns::forward<A>(args)...};
 			}
 
 
 			// -- public destroy methods --------------------------------------
 
 			/* destroy */
-			static inline auto destroy(mut_ptr addrs) -> void {
+			static inline auto destroy(mut_ptr addrs) noexcept(xns::is_nothrow_destructible<type>) -> void {
 				// check type is trivially destructible
 				if constexpr (xns::is_trivially_destructible<type> == false) {
 					// check type is destructible
-					static_assert(xns::is_destructible<type>,
-							"TYPE IS NOT DESTRUCTIBLE");
+					static_assert(xns::is_destructible<type>, "allocator, type is not destructible");
 					// call object destructor
 					addrs->~type();
 				}
@@ -167,26 +161,33 @@ namespace xns {
 			// -- public assign methods ---------------------------------------
 
 			/* copy assign */
-			static inline auto assign(mut_ref dst, const_ref src) -> void {
+			static inline auto assign(mut_ref dst, const_ref src) noexcept(xns::is_nothrow_copy_assignable<type>) -> void {
 				// assert type is copy assignable
-				static_assert(xns::is_copy_assignable<type>,
-						"TYPE IS NOT COPY ASSIGNABLE");
-				// assign object by copy
+				static_assert(xns::is_copy_assignable<type>, "allocator, type is not copy assignable");
 				dst = src;
 			}
 
 			/* move assign */
-			static inline auto assign(mut_ref dst, move_ref src) -> void {
+			static inline auto assign(mut_ref dst, move_ref src) noexcept(xns::is_nothrow_move_assignable<type>) -> void {
 				// assert type is move assignable
-				static_assert(xns::is_move_assignable<type>,
-						"TYPE IS NOT MOVE ASSIGNABLE");
-				// assign object by move
+				static_assert(xns::is_move_assignable<type>, "allocator, type is not move assignable");
 				dst = xns::move(src);
 			}
 
 
-	};
+		private:
 
-}
+			// -- private static methods --------------------------------------
 
-#endif
+			/* voidify */
+			template <typename U>
+			static inline constexpr auto voidify(U& value) noexcept -> void* {
+				return const_cast<void*>(static_cast<const volatile void*>(xns::addressof(value)));
+			}
+
+
+	}; // class allocator
+
+} // namespace xns
+
+#endif // XNS_ALLOCATOR_HPP

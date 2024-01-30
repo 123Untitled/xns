@@ -248,7 +248,8 @@ namespace xns {
 
 
 	/* deduction guide */
-	template <class... A>
+	template <typename... A>
+	//tuple(A&&...) -> tuple<xns::remove_cvr<A>...>;
 	tuple(A&&...) -> tuple<A...>;
 
 

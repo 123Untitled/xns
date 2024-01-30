@@ -2,6 +2,14 @@
 #define XNS_PAIR_HEADER
 
 // local headers
+#include "is_nothrow_constructible.hpp"
+#include "is_nothrow_default_constructible.hpp"
+#include "is_nothrow_copy_constructible.hpp"
+#include "is_nothrow_move_constructible.hpp"
+#include "is_nothrow_copy_assignable.hpp"
+#include "is_nothrow_move_assignable.hpp"
+#include "is_nothrow_destructible.hpp"
+
 #include "types.hpp"
 #include "move.hpp"
 #include "forward.hpp"
@@ -23,7 +31,7 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = pair<T1, T2>;
+			using self = xns::pair<T1, T2>;
 
 			/* first type */
 			using first = T1;
@@ -35,54 +43,46 @@ namespace xns {
 			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			inline constexpr pair(void)
-			: _first{}, _second{} {}
+			constexpr pair(void)
+			noexcept(xns::are_nothrow_default_constructible<T1, T2>) = default;
 
 			/* copy pair constructor */
 			inline constexpr pair(const first& first, const second& second)
+			noexcept(xns::are_nothrow_copy_constructible<T1, T2>)
 			: _first{first}, _second{second} {}
 
 			/* forward constructor */
 			template <typename U1 = T1, typename U2 = T2>
-			inline constexpr pair(U1&& first, U2&& second)
-			: _first{xns::forward<U1>(first)}, _second{xns::forward<U2>(second)} {}
+			inline constexpr pair(U1&& t1, U2&& t2)
+			noexcept(xns::is_nothrow_constructible<first, U1>
+				  && xns::is_nothrow_constructible<second, U2>)
+			: _first{xns::forward<U1>(t1)}, _second{xns::forward<U2>(t2)} {}
 
 			/* copy constructor */
-			inline constexpr pair(const self& other)
-			: _first{other._first}, _second{other._second} {}
+			constexpr pair(const self&)
+			noexcept(xns::are_nothrow_copy_constructible<T1, T2>) = default;
 
 			/* move constructor */
-			inline constexpr pair(self&& other) noexcept
-			: _first{xns::move(other._first)}, _second{xns::move(other._second)} { }
+			constexpr pair(self&&)
+			noexcept(xns::are_nothrow_move_constructible<T1, T2>) = default;
 
 			/* destructor */
-			inline constexpr ~pair(void) noexcept = default;
+			~pair(void) noexcept(xns::are_nothrow_destructible<T1, T2>) = default;
 
 
 			// -- public assignment operators ---------------------------------
 
 			/* copy operator */
-			inline constexpr auto operator=(const self& other) -> self& {
-				// copy first object
-				_first = other._first;
-				// copy second object
-				_second = other._second;
-				// return self reference
-				return *this;
-			}
+			constexpr auto operator=(const self&)
+			noexcept(xns::are_nothrow_copy_assignable<T1, T2>) -> self& = default;
 
 			/* move operator */
-			inline constexpr auto operator=(self&& other) noexcept -> self& {
-				// move first object
-				_first = xns::move(other._first);
-				// move second object
-				_second = xns::move(other._second);
-				// return self reference
-				return *this;
-			}
+			constexpr auto operator=(self&&)
+			noexcept(xns::are_nothrow_move_assignable<T1, T2>) -> self& = default;
 
 
 		private:
+		public:
 
 			// -- private members ---------------------------------------------
 
@@ -146,6 +146,74 @@ namespace xns {
 			/* get indexed const rvalue reference as friend */
 			template < xns::size_t I, typename A, typename B>
 			friend inline constexpr auto get(const xns::pair<A, B>&&) noexcept -> const xns::indexed_element<I, xns::pair<A, B>>&&;
+
+	};
+
+	template <typename T1, typename T2>
+	class pair2 final {
+
+		public:
+
+			// -- public types ------------------------------------------------
+
+			/* self type */
+			using self = xns::pair2<T1, T2>;
+
+			/* first type */
+			using first = T1;
+
+			/* second type */
+			using second = T2;
+
+
+			// -- public lifecycle --------------------------------------------
+
+			/* copy pair constructor */
+			inline constexpr pair2(const first& first, const second& second)
+			noexcept(xns::are_nothrow_copy_constructible<T1, T2>)
+			: _first{first}, _second{second} {}
+
+			/* default constructor */
+			constexpr pair2(void)
+			noexcept(xns::are_nothrow_default_constructible<T1, T2>) = default;
+
+			/* copy constructor */
+			constexpr pair2(const self&)
+			noexcept(xns::are_nothrow_copy_constructible<T1, T2>) = default;
+
+			/* move constructor */
+			constexpr pair2(self&&)
+			noexcept(xns::are_nothrow_move_constructible<T1, T2>) = default;
+
+			/* destructor */
+			~pair2(void) noexcept(xns::are_nothrow_destructible<T1, T2>) = default;
+
+
+			// -- public assignment operators ---------------------------------
+
+			/* copy operator */
+			//constexpr auto operator=(const self& other) noexcept(xns::are_nothrow_copy_assignable<T1, T2>) -> self& {
+			//	_first = other._first;
+			//	_second = other._second;
+			//	return *this;
+			//}
+
+			constexpr auto operator=(const self& other) noexcept(xns::are_nothrow_copy_assignable<T1, T2>) -> self&  = default;
+
+			/* move operator */
+			constexpr auto operator=(self&&)
+			noexcept(xns::are_nothrow_move_assignable<T1, T2>) -> self& = default;
+
+
+		public:
+
+			// -- private members ---------------------------------------------
+
+			/* first */
+			first _first;
+
+			/* second */
+			second _second;
 
 	};
 

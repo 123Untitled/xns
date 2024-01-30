@@ -57,22 +57,18 @@ namespace xns {
 
 			/* lvalue reference constructor */
 			template <typename U> requires xns::is_not_same<xns::remove_cvr<U>, self> 
-			inline constexpr reference_wrapper(U&& ref)
+			inline constexpr reference_wrapper(U&& ref) noexcept
 			: _ptr{xns::addressof(ref)} {
 				// check if U is not a rvalue reference
 				static_assert(xns::is_lvalue_convertible<type, U>,
-						"reference_wrapper can only be constructed from lvalue references");
+						"reference_wrapper cannot be constructed from rvalue reference.");
 			}
 
 			/* copy constructor */
-			inline reference_wrapper(const self& other) noexcept
-			: _ptr{other._ptr} {
-			}
+			reference_wrapper(const self&) noexcept = default;
 
 			/* move constructor */
-			inline reference_wrapper(self&& other) noexcept
-			: _ptr{other._ptr} {
-			}
+			reference_wrapper(self&&) noexcept = default;
 
 			/* destructor */
 			~reference_wrapper(void) noexcept = default;
@@ -81,16 +77,10 @@ namespace xns {
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			inline auto operator=(const self& other) noexcept -> self& {
-				_ptr = other._ptr;
-				return *this;
-			}
+			auto operator=(const self&) noexcept -> self& = default;
 
 			/* move assignment operator */
-			inline auto operator=(self&& other) noexcept -> self& {
-				_ptr = other._ptr;
-				return *this;
-			}
+			auto operator=(self&& other) noexcept -> self& = default;
 
 
 			// -- public accessors --------------------------------------------

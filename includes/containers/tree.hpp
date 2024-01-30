@@ -92,9 +92,9 @@ namespace xns {
 			using node_type   = self::node;
 
 			/* allocator type */
-			using allocator   = xns::memory::pool<node_type>;
+			//using allocator   = xns::memory::pool<node_type>;
 
-			//using allocator   = xns::allocator<node_type>;
+			using allocator   = xns::allocator<node_type>;
 
 			/* node pointer */
 			using node_ptr    = node_type*;
@@ -240,13 +240,13 @@ namespace xns {
 			/* copy assignment operator */
 			auto operator=(const self& other) -> self& {
 				// check for self-assignment
-				if (this != &other) {
-					free_tree();
-					init();
-					for (auto it = other.bfs_begin(); it != nullptr; ++it) {
-						insert(*it);
-					}
-				} // return self reference
+				if (this == &other)
+					return *this;
+				free_tree();
+				init();
+				for (auto it = other.bfs_begin(); it != nullptr; ++it)
+					insert(*it);
+				// return self reference
 				return *this;
 			}
 
@@ -272,25 +272,21 @@ namespace xns {
 
 			/* size */
 			inline auto size(void) const noexcept -> size_type {
-				// return size of tree
 				return _size;
 			}
 
-			/* deep size */
-			inline auto deep_size(void) const noexcept -> size_type {
-				// return deep size of tree
+			/* size in bytes */
+			inline auto size_in_bytes(void) const noexcept -> size_type {
 				return _size * sizeof(node_type);
 			}
 
 			/* empty */
 			inline auto empty(void) const noexcept -> bool {
-				// return if tree is empty
 				return _size == 0;
 			}
 
 			/* depth */
 			inline auto depth(void) const noexcept -> size_type {
-				// return depth of tree
 				return _root ? static_cast<size_type>(_root->_depth) : 0U;
 			}
 
@@ -302,7 +298,8 @@ namespace xns {
 				// loop over tree
 				while (node != nullptr) {
 					// equality
-					if (value == node->_value) { return true; }
+					if (value == node->_value)
+						return true;
 					// ternary compare
 					node = (value < node->_value) ? node->_left : node->_right;
 				} // return false
@@ -985,7 +982,7 @@ namespace xns {
 			/* free tree */ // INFO: this is only used in destructor
 			inline void free_tree(void) noexcept {
 				// declare post-order iterator
-				post_order_iterator it{_root};
+				self::post_order_iterator it{_root};
 				// loop until end
 				while (it) {
 					// get node

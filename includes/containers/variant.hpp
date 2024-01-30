@@ -1,5 +1,17 @@
-#ifndef XNS_VARIANT_HEADER
-#define XNS_VARIANT_HEADER
+/*****************************************************************************/
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*****************************************************************************/
+
+#pragma once
+
+#ifndef XNS_VARIANT_HPP
+#define XNS_VARIANT_HPP
 
 // local headers
 #include "move.hpp"
@@ -20,21 +32,15 @@
 namespace xns {
 
 
+
+	template <typename... A>
+	concept is_all_trivially_destructible = (xns::is_trivially_destructible<A> && ...);
+
+
 	// -- V A R I A N T -------------------------------------------------------
 
 	template <typename... A>
 	class variant final {
-
-
-		// -- assertions ------------------------------------------------------
-
-		/* check unique types */
-		static_assert(xns::is_all_unique<A...>,
-				"): TYPES MUST BE UNIQUE IN VARIANT :(");
-
-		/* disallow const types */
-		static_assert(((xns::is_const<A> == false) && ...),
-				"): CONST TYPES ARE NOT ALLOWED IN VARIANT :(");
 
 
 		private:
@@ -43,7 +49,7 @@ namespace xns {
 
 			/* storage type */
 			using storage = xns::aligned_storage<xns::sizeof_max<A...>(),
-												xns::alignof_max<A...>()>;
+												 xns::alignof_max<A...>()>;
 
 
 			// -- private enums -----------------------------------------------
@@ -467,4 +473,4 @@ namespace xns {
 }
 
 
-#endif // VARIANT_HEADER
+#endif // XNS_VARIANT_HPP
