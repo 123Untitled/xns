@@ -36,7 +36,7 @@ function check_os {
 
 	# check for macosx
 	if   [[ $OSTYPE =~ 'darwin' ]]; then
-		OS='macosx'
+		OS='macos'
 	# check for linux
 	elif [[ $OSTYPE =~ 'linux' ]]; then
 		OS='linux'
@@ -107,6 +107,9 @@ LOGDIR=$BLDDIR'/log'
 # cache directory
 CACHEDIR=$ABSDIR'/.cache'
 
+# external directory
+EXTDIR=$ABSDIR'/external'
+
 # install directory
 INSTALLDIR=''
 
@@ -159,8 +162,8 @@ LOCK=$BLDDIR'/.lock'
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-#CXX='/opt/homebrew/Cellar/llvm/17.0.6_1/bin/clang++'
-CXX='clang++'
+CXX='/opt/homebrew/Cellar/llvm/17.0.6_1/bin/clang++'
+#CXX='clang++'
 
 # archiver
 ARCHIVER='ar'
@@ -172,7 +175,7 @@ ARFLAGS='-rcs'
 LINKER=$CXX
 
 # standard
-STD='-std=c++2a'
+STD=('-std=c++2a' '-stdlib=libc++')
 
 # debug
 DEBUG='-g3'
@@ -210,6 +213,9 @@ CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing'
 # shadowing
 CXXFLAGS+=('-Wshadow')
 
+# exception
+CXXFLAGS+=('-fexceptions' '-Wexceptions')
+
 # defines
 DEFINES=()
 
@@ -217,7 +223,7 @@ DEFINES=()
 LDFLAGS=()
 
 
-if [[ $OS =~ 'macos' ]]; then
+if [[ $OS == 'macos' ]]; then
 	LDFLAGS+=('-framework' 'CoreMIDI' '-framework' 'CoreAudio' '-framework' 'CoreFoundation')
 fi
 
@@ -231,11 +237,12 @@ FZF_OPTS=('--algo=v2' '--height=50%' '--no-multi' '--layout=reverse' '--border=r
 
 MAX_JOBS=''
 
-if [[ $OP =~ 'macos' ]]; then
+if [[ $OS =~ 'macos' ]]; then
 	MAX_JOBS=$(sysctl -n hw.ncpu)
 else
 	MAX_JOBS=$(nproc)
 fi
+
 
 
 # -- C O L O R  S E T T I N G S -----------------------------------------------
@@ -697,9 +704,16 @@ function setup_files {
 		fi
 		# append defines
 		DEFINES+=('-DXNS_TEST_'${TEST:u})
-		#echo $DEFINES
 		# set optimization level
 		OPT=$FAST
+		#OPT=$SLOW
+
+		if [[ -d $EXTDIR'/google_benchmark' ]]; then
+			# append includes
+			INCLUDES+=($EXTDIR'/google_benchmark/include')
+			# append linker flags
+			LDFLAGS+=('-L'$EXTDIR'/google_benchmark/lib' '-lbenchmark')
+		fi
 	fi
 	# insert -I prefix to each directory
 	INCLUDES=("${INCLUDES[@]/#/-I}")
