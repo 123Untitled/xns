@@ -151,6 +151,33 @@ namespace xns {
 
 	}; // class thread
 
+
+
+	class thread_pool final {
+
+		public:
+
+			// -- public types ------------------------------------------------
+
+			/* self type */
+			using self = xns::thread_pool;
+
+
+			// -- public lifecycle --------------------------------------------
+
+			/* default constructor */
+			thread_pool(void) noexcept;
+
+
+		private:
+
+
+
+
+	}; // class thread_pool
+
+
+
 } // namespace xns
 
 #endif // XNS_THREAD_HPP
