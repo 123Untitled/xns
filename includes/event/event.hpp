@@ -71,6 +71,9 @@ namespace xns {
 		public:
 
 
+			/* self type */
+			using self = xns::event;
+
 			/* string type */
 			using string = xns::string;
 
@@ -99,7 +102,7 @@ namespace xns {
 			// -- S T A T I C  M E T H O D S ----------------------------------
 
 			/* get singleton instance */
-			static event& shared(void);
+			static auto shared(void) -> self&;
 
 
 			// -- P U B L I C  M E T H O D S ----------------------------------
@@ -235,7 +238,7 @@ namespace xns {
 			// -- S T A T I C  P R I V A T E  M E M B E R S -------------------
 
 			/* singleton instance */
-			static event _instance;
+			//static event _instance;
 
 
 	};
