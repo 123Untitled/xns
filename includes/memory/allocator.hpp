@@ -1,4 +1,5 @@
 /*****************************************************************************/
+/*                                                                           */
 /*                       :::    ::: ::::    :::  ::::::::                    */
 /*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
 /*                      +:+  +:+  :+:+:+  +:+ +:+                            */
@@ -6,6 +7,7 @@
 /*                    +#+  +#+  +#+  +#+#+#        +#+                       */
 /*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
 /*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
 /*****************************************************************************/
 
 #pragma once
@@ -20,14 +22,18 @@
 #include "exceptions.hpp"
 #include "move.hpp"
 #include "numeric_limits.hpp"
-#include "policy.hpp"
-#include "is_scalar.hpp"
-#include "supported_operations.hpp"
+
+#include "type_traits/supported_operations/supported_operations.hpp"
+#include "type_traits/type_properties/type_properties.hpp"
 
 #include "addressof.hpp"
 
 // standard headers
 #include <cstdlib>
+#include <new>
+
+
+#include <iostream>
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -79,26 +85,33 @@ namespace xns {
 			// -- public static methods ---------------------------------------
 
 			/* allocate */
-			static inline auto allocate(const size_type size = 1) -> mut_ptr {
+			static inline auto allocate(const size_type size = 1) noexcept(xns::no_exceptions) -> mut_ptr {
+
 				// allocate memory
 				mut_ptr ptr = static_cast<mut_ptr>(::malloc(size * sizeof(type)));
-				// check failed allocation
-				if (ptr == nullptr)
-					throw xns::exception(-2, "allocator, failed to allocate memory");
+
+				if constexpr (xns::no_exceptions == false)
+					// check failed allocation
+					if (ptr == nullptr)
+						throw xns::exception(-2, "allocator, failed to allocate memory");
+
 				return ptr;
 			}
 
 			/* realloc */
-			static inline auto realloc(mut_ptr addrs, const size_type size = 1) -> mut_ptr {
+			static inline auto realloc(mut_ptr addrs, const size_type size = 1) noexcept(xns::no_exceptions) -> mut_ptr {
 
 				// check type is trivially copyable
 				static_assert(xns::is_trivially_copyable<type>, "allocator, type is not trivially copyable");
 
 				// reallocate memory
 				mut_ptr ptr = static_cast<mut_ptr>(::realloc(addrs, size * sizeof(type)));
-				// check failed reallocation
-				if (ptr == nullptr)
-					throw xns::exception(-2, "allocator, failed to reallocate memory");
+
+				if constexpr (xns::no_exceptions == false)
+					// check failed reallocation
+					if (ptr == nullptr)
+						throw xns::exception(-2, "allocator, failed to reallocate memory");
+
 				return ptr;
 			}
 
@@ -118,29 +131,33 @@ namespace xns {
 
 			// -- public construct methods ------------------------------------
 
+			/* default construct */
+			static inline auto construct(mut_ptr addrs) noexcept(xns::is_nothrow_default_constructible<type>) -> void {
+				// assert type is default constructible
+				static_assert(xns::is_default_constructible<type>, "allocator, type is not default constructible");
+				::new(self::voidify(*addrs)) type{};
+			}
+
 			/* copy construct */
 			static inline auto construct(mut_ptr addrs, const_ref value) noexcept(xns::is_nothrow_copy_constructible<type>) -> void {
 				// assert type is copy constructible
 				static_assert(xns::is_copy_constructible<type>, "allocator, type is not copy constructible");
-				// construct object by copy
-				new(self::voidify(*addrs)) type{value};
+				::new(self::voidify(*addrs)) type{value};
 			}
 
 			/* move construct */
 			static inline auto construct(mut_ptr addrs, move_ref value) noexcept(xns::is_nothrow_move_constructible<type>) -> void {
 				// assert type is move constructible
 				static_assert(xns::is_move_constructible<type>, "allocator, type is not move constructible");
-				// construct object by move
-				new(self::voidify(*addrs)) type{xns::move(value)};
+				::new(self::voidify(*addrs)) type{xns::move(value)};
 			}
 
 			/* forward construct */
-			template <typename... A> // here require is not move_ref or const_ref !!! IMPORTANT
+			template <typename... A> requires (sizeof...(A) > 1 || xns::is_not_same<type, xns::remove_cvr<A>...>)
 			static inline auto construct(mut_ptr addrs, A&&... args) noexcept(xns::is_nothrow_constructible<type, A...>) -> void {
 				// assert type is constructible
-				static_assert(xns::is_constructible<type, A...>, "allocator, type is not constructible");
-				// construct object by forwarding arguments
-				new(self::voidify(*addrs)) type{xns::forward<A>(args)...};
+				static_assert(xns::is_constructible<type, A...>, "allocator, type is not constructible with given arguments");
+				::new(self::voidify(*addrs)) type{xns::forward<A>(args)...};
 			}
 
 
