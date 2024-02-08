@@ -969,7 +969,6 @@ namespace xns {
 			/* replace */
 			auto replace(const size_type index, const size_type size, const_ptr str) -> void {
 				// not implemented yet...
-				throw;
 			}
 
 
