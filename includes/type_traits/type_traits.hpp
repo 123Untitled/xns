@@ -23,6 +23,8 @@
 #include "type_properties/type_properties.hpp"
 
 
+#endif // XNS_TYPE_TRAITS_HPP
+
 
 // -- C L A N G / G C C  B U I L T I N S --------------------------------------
 
