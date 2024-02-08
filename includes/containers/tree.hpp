@@ -769,16 +769,16 @@ namespace xns {
 						std::cout << "no children case" << std::endl;
 						*get_side(node) = nullptr;
 						erase_balance(parent);
-						try {
-							check_tree(*this);
+						int ret = check_tree(*this);
+						if (ret == -1) {
+							std::cout << "tree is unbalanced" << std::endl;
+							exit(1);
 						}
-						catch (const std::exception& e) {
-							std::cout << e.what() << std::endl;
-							print();
+						else if (ret == -2) {
+							std::cout << "three is not sorted" << std::endl;
 							exit(1);
 						}
 						print();
-
 					}
 				}
 
@@ -2273,12 +2273,12 @@ namespace xns {
 
 
 	template <typename T>
-	auto check_tree(const xns::tree<T>& tree) -> void {
+	auto check_tree(const xns::tree<T>& tree) -> int {
 		// check balance factor
 		for (auto it = tree.pre_order_begin(); it != nullptr; ++it) {
 			if (it.balance_factor() > 1
 				|| it.balance_factor() < -1)
-				throw std::runtime_error("tree is not balanced");
+				return -1;
 		}
 		// check sorted
 		const T* last = nullptr;
@@ -2286,7 +2286,7 @@ namespace xns {
 		if (it) { last = &*it; ++it; }
 		while (it) {
 			if (*last > *it)
-				throw std::runtime_error("tree is not sorted");
+				return -2;
 			last = &*it;
 			++it;
 		}
