@@ -15,14 +15,15 @@ xns::event::~event(void) {}
 
 /* get singleton instance */
 xns::event& xns::event::shared(void) {
-	return _instance;
+	static self instance;
+	return instance;
 }
 
 
 // -- S T A T I C  P R I V A T E  M E M B E R S -------------------------------
 
-/* singleton instance */
-xns::event xns::event::_instance;
+///* singleton instance */
+//xns::event xns::event::_instance;
 
 
 // -- P U B L I C  M E T H O D S ----------------------------------------------
