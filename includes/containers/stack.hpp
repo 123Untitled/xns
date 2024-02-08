@@ -66,8 +66,8 @@ namespace xns {
 			using node_pointer = node*;
 
 			/* allocator type */
-			using allocator = xns::memory::pool<node>;
-			//using allocator = xns::allocator<node>;
+			//using allocator = xns::memory::pool<node>;
+			using allocator = xns::allocator<node>;
 
 
 		public:

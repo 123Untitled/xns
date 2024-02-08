@@ -48,7 +48,7 @@ namespace xns {
 			using node_ptr    = node_type*;
 
 			/* allocator type */
-			using allocator   = xns::memory::pool<node>;
+			using allocator   = xns::allocator<node>;
 
 
 		public:
