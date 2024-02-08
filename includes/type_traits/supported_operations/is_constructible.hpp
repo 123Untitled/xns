@@ -23,17 +23,22 @@ namespace xns {
 
 	// -- I S  C O N S T R U C T I B L E --------------------------------------
 
-	/* is constructible concept */
-	template <class T, class... A>
-	concept is_constructible = requires {
-		T(xns::declval<A>()...);
-	};
+	/* is constructible */
+	template <typename T, typename... A>
+	concept is_constructible = __is_constructible(T, A...);
 
-	/* is copy constructible concept (no implicit conversion) */
-	template <class T, class... A>
-	concept is_constructible_strict = requires {
-		T{xns::declval<A>()...};
-	};
+
+	///* is constructible concept */
+	//template <class T, class... A>
+	//concept is_constructible = requires {
+	//	T(xns::declval<A>()...);
+	//};
+	//
+	///* is copy constructible concept (no implicit conversion) */
+	//template <class T, class... A>
+	//concept is_constructible_strict = requires {
+	//	T{xns::declval<A>()...};
+	//};
 
 
 

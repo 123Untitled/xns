@@ -19,6 +19,9 @@
 /* supported operations */
 #include "supported_operations/supported_operations.hpp"
 
+/* type properties */
+#include "type_properties/type_properties.hpp"
+
 
 
 // -- C L A N G / G C C  B U I L T I N S --------------------------------------
