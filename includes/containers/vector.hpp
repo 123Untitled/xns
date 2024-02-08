@@ -1,15 +1,19 @@
-///////////////////////////////////////////////////////////////////////////////
-//       :::    ::: ::::    :::  ::::::::                                    //
-//      :+:    :+: :+:+:   :+: :+:    :+:                                    //
-//      +:+  +:+  :+:+:+  +:+ +:+                                            //
-//      +#++:+   +#+ +:+ +#+ +#++:++#++                                      //
-//    +#+  +#+  +#+  +#+#+#        +#+                                       //
-//  #+#    #+# #+#   #+#+# #+#    #+#                                        //
-// ###    ### ###    ####  ########                                          //
-///////////////////////////////////////////////////////////////////////////////
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
 
-#ifndef XNS_VECTOR_HEADER
-#define XNS_VECTOR_HEADER
+#pragma once
+
+#ifndef XNS_VECTOR_HPP
+#define XNS_VECTOR_HPP
 
 // local headers
 #include "types.hpp"
@@ -35,6 +39,25 @@ namespace xns {
 	class vector final {
 
 
+		// -- assertions ------------------------------------------------------
+
+		/* requires nothrow move operations */
+		static_assert(xns::is_nothrow_move_constructible<T>
+				   && xns::is_nothrow_move_assignable<T>,
+					  "vector, requires nothrow move operations.");
+
+		/* requires nothrow destructible */
+		static_assert(xns::is_nothrow_destructible<T>,
+					  "vector, requires nothrow destructible type.");
+
+
+		// -- friends ---------------------------------------------------------
+
+		/* make vector as friend */
+		template <typename U, typename... A>
+		friend auto make_vector(A&&...) -> xns::vector<U>;
+
+
 		private:
 
 			// -- forward declarations ----------------------------------------
@@ -50,44 +73,63 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = xns::vector<T>;
+			using self           = xns::vector<T>;
 
 			/* value type */
-			using value_type = T;
+			using value_type     = T;
 
 			/* size type */
-			using size_type = xns::size_t;
+			using size_type      = xns::size_t;
 
-			/* reference type */
-			using reference = value_type&;
+			/* mutable reference type */
+			using mut_ref        = T&;
 
 			/* const reference type */
-			using const_reference = const value_type&;
+			using const_ref      = const T&;
 
 			/* move reference type */
-			using move_reference = value_type&&;
+			using move_ref       = T&&;
 
-			/* pointer type */
-			using pointer = value_type*;
+			/* mutable pointer type */
+			using mut_ptr        = T*;
 
 			/* const pointer type */
-			using const_pointer = const value_type*;
+			using const_ptr      = const T*;
 
 			/* allocator type */
-			using allocator = xns::allocator<value_type>;
+			using allocator      = xns::allocator<T>;
 
 			/* iterator type */
-			using iterator = vector_iterator<false>;
+			using iterator       = vector_iterator<false>;
 
 			/* const iterator type */
 			using const_iterator = vector_iterator<true>;
 
 
-			// -- friends -----------------------------------------------------
+		private:
 
-			/* make vector as friend */
-			template <typename U, typename... A>
-			friend auto make_vector(A&&...) -> xns::vector<U>;
+			// -- private members ---------------------------------------------
+
+			/* data */
+			mut_ptr _vector;
+
+			/* capacity */
+			size_type _capacity;
+
+			/* size */
+			size_type _size;
+
+
+			// -- private lifecycle -------------------------------------------
+
+			/* member constructor */
+			inline vector(mut_ptr   ptr,
+					const size_type capacity,
+					const size_type size) noexcept
+			: _vector{ptr}, _capacity{capacity}, _size{size} {}
+
+
+		public:
 
 
 			// -- public lifecycle --------------------------------------------
@@ -98,7 +140,7 @@ namespace xns {
 
 
 			/* allocation constructor */
-			explicit inline vector(pointer ptr, const size_type size) noexcept
+			explicit inline vector(mut_ptr ptr, const size_type size) noexcept
 			: _vector{ptr}, _capacity{ptr ? size : 0}, _size{_capacity} {}
 			// WARNING: this constructor is dangerous, use with caution
 			// need to use same allocator as the one used to allocate ptr
@@ -106,34 +148,34 @@ namespace xns {
 
 			/* copy constructor */
 			explicit vector(const self& other)
-			: _vector{nullptr}, _capacity{other._capacity}, _size{other._size} {
-
-				if (other._vector == nullptr) { return; }
-
-				// allocate memory
-				_vector = allocator::allocate(_capacity);
+			: _vector{other._vector != nullptr ? allocator::allocate(other._size)
+											   : nullptr},
+			  _capacity{other._size}, _size{_capacity} {
 
 				// loop through other vector
-				for (size_type x = 0; x < _size; ++x) {
-					// construct value by copy
-					allocator::construct(_vector + x, other._vector[x]);
-				}
+				for (size_type i = 0; i < _size; ++i)
+					allocator::construct(_vector + i, other._vector[i]);
 			}
 
 			/* move constructor */
 			inline vector(self&& other) noexcept
 			: _vector{other._vector}, _capacity{other._capacity}, _size{other._size} {
+
 				// invalidate other
-				other.init();
+				other._init();
 			}
 
 			/* destructor */
 			inline ~vector(void) noexcept {
-				// clear vector
-				clear();
+
+				if (_vector == nullptr)
+					return;
+
+				// destroy elements
+				_clear();
+
 				// deallocate memory
-				if (_vector)
-					allocator::deallocate(_vector);
+				allocator::deallocate(_vector);
 			}
 
 
@@ -171,64 +213,110 @@ namespace xns {
 			}
 
 
+			// important need to setup member like _capacity before operation may throw !
+
+
 			// -- public assignment operators ---------------------------------
 
-			/* copy operator */
-			auto operator=(const self& other) -> self& {
+			/* copy assignment operator */
+			auto operator=(const self& other) -> self& requires (not xns::is_trivially_copyable<T>) {
+
 				// check for self-assignment
-				if (this != &other) {
-					// clear vector
-					clear();
-					allocator::deallocate(_vector);
-					// !!!!!!! NOTE : optimize this one
-					// reserve other size
-					reserve(other._size);
-					// loop through other vector
-					for (size_type x = 0; x < other._size; ++x) {
-						// construct value by copy
-						allocator::construct(_vector + x, other._vector[x]);
-					} // set size
+				if (this == &other)
+					return *this;
+
+				// destroy elements
+				_clear();
+
+				// allocate / reallocate memory
+				if (_capacity < other._size)
+					_vector = allocator::reallocate(_vector, other._size);
+
+				// reset members
+				_vector   = nullptr;
+				_size     = 0;
+				_capacity = 0;
+
+				// reserve other size
+				reserve(other._size);
+
+
+				// copy construct elements
+				for (size_type i = 0; i < other._size; ++i) {
+
+					allocator::construct(_vector + i, other._vector[i]);
+
+					if constexpr (not xns::is_nothrow_copy_constructible<T>)
+						/* info: increment size after each construct
+						   if throw, size reflects the number of valid elements */
+						++_size;
+				}
+
+				if constexpr (xns::is_nothrow_copy_constructible<T>)
+					// update size
 					_size = other._size;
-				} // return self reference
+
+				// return self reference
 				return *this;
 			}
 
-			/* move operator */
-			auto operator=(self&& other) noexcept -> self& {
+			/* copy assignment operator (trivially copyable) */
+			auto operator=(const self& other) -> self& requires (xns::is_trivially_copyable<T>) {
+
 				// check for self-assignment
-				if (this != &other) {
-					// clear vector
-					clear();
-					allocator::deallocate(_vector);
-					// move other vector
-					_vector = other._vector;
-					// move other capacity
-					_capacity = other._capacity;
-					// move other size
-					_size = other._size;
-					// invalidate other vector
-					other.init();
-				} // return self reference
+				if (this == &other)
+					return *this;
+
+				// destroy elements
+				_clear();
+
+				// deallocate memory
+				allocator::deallocate(_vector); /* info: no nullptr check */
+
+				return *this;
+			}
+
+			/* move assignment operator */
+			auto operator=(self&& other) noexcept -> self& {
+
+				// check for self-assignment
+				if (this == &other)
+					return *this;
+
+				// destroy elements
+				_clear();
+
+				// deallocate memory
+				allocator::deallocate(_vector); /* info: no nullptr check */
+
+				// move other members
+				_vector   = other._vector;
+				_capacity = other._capacity;
+				_size     = other._size;
+
+				// invalidate other
+				other._init();
+
 				return *this;
 			}
 
 			/* subscript operator */
-			inline auto operator[](const size_type index) -> reference {
+			inline auto operator[](const size_type index) noexcept -> mut_ref {
 				return _vector[index];
 			}
 
 			/* const subscript operator */
-			inline auto operator[](const size_type index) const -> const_reference {
+			inline auto operator[](const size_type index) const noexcept -> const_ref {
 				return _vector[index];
 			}
 
 			/* at */
-			auto at(const size_type index) -> reference {
+			auto at(const size_type index) noexcept -> mut_ref {
 				return _vector[index];
 			}
 
 			/* const at */
-			auto at(const size_type index) const -> const_reference {
+			auto at(const size_type index) const noexcept -> const_ref {
 				return _vector[index];
 			}
 
@@ -251,32 +339,32 @@ namespace xns {
 			}
 
 			/* front */
-			inline auto front(void) noexcept -> reference {
+			inline auto front(void) noexcept -> mut_ref {
 				return *_vector;
 			}
 
 			/* const front */
-			inline auto front(void) const noexcept -> const_reference {
+			inline auto front(void) const noexcept -> const_ref {
 				return *_vector;
 			}
 
 			/* back */
-			inline auto back(void) noexcept -> reference {
-				return *(_vector + (_size - 1));
+			inline auto back(void) noexcept -> mut_ref {
+				return _vector[_size - 1];
 			}
 
 			/* const back */
-			inline auto back(void) const noexcept -> const_reference {
-				return *(_vector + (_size - 1));
+			inline auto back(void) const noexcept -> const_ref {
+				return _vector[_size - 1];
 			}
 
 			/* data */
-			inline auto data(void) noexcept -> pointer {
+			inline auto data(void) noexcept -> mut_ptr {
 				return _vector;
 			}
 
 			/* const data */
-			inline auto data(void) const noexcept -> const_pointer {
+			inline auto data(void) const noexcept -> const_ptr {
 				return _vector;
 			}
 
@@ -286,133 +374,198 @@ namespace xns {
 			// -- public memory management ------------------------------------
 
 			/* reserve */
-			auto reserve(const size_type capacity) -> void {
+			inline auto reserve(const size_type capacity) -> void {
+
 				// check capacity
-				if (capacity <= _capacity) { return; }
-				// allocate memory
-				pointer tmp = allocator::allocate(capacity);
-				// loop through vector
-				for (size_type x = 0; x < _size; ++x) {
-					// move element
-					allocator::construct(tmp + x, xns::move(_vector[x]));
-					// destroy element
-					allocator::destroy(_vector + x);
-				} // deallocate old memory
-				allocator::deallocate(_vector); // INFO: do not check for nullptr
-				// assign capacity
-				_capacity = capacity;
-				// assign pointer
-				_vector = tmp;
+				if (capacity <= _capacity) 
+					return;
+
+				// call reserve implementation
+				_reserve(capacity);
 			}
+
 
 			/* resize */
 			auto resize(const size_type size) -> void {
 
-				// check size
-				if (size < _size) {
-					// loop through vector
-					for (size_type x = size; x < _size; ++x) {
-						// destroy elements
-						allocator::destroy(_vector + x);
-					}
-				}
-				else if (size > _size) {
+				// superior size
+				if (size > _size) {
+
 					// check capacity
-					if (size > _capacity) {
-						// reserve size
+					if (size > _capacity)
 						reserve(size);
-					} // loop through vector
-					for (size_type x = _size; x < size; ++x) {
-						// construct elements
-						allocator::construct(_vector + x);
-					}
+
+					// construct default elements
+					for (size_type i = _size; i < size; ++i)
+						allocator::construct(_vector + i);
 				}
-				// assign size
+
+				// inferior size
+				else
+					// destroy only non-trivially destructible types
+					if constexpr (not xns::is_trivially_destructible<T>)
+
+						// destroy excess elements (if not equal size)
+						for (size_type i = size; i < _size; ++i)
+							allocator::destroy(_vector + i);
+
+				// update size
 				_size = size;
-
-
 			}
 
 
 
 			// -- public modifiers --------------------------------------------
 
-			/* clear (non-trivially destructible) */
-			auto clear(void) noexcept -> void
-				requires (xns::is_trivially_destructible<T> == false) {
-				// loop over vector
-				for (size_type x = 0; x < _size; ++x) {
-					// destroy object
-					allocator::destroy(_vector + x);
-				} // reset size
+			/* clear */
+			auto clear(void) noexcept(xns::is_nothrow_destructible<T>) -> void {
+
+				// destroy elements
+				_clear();
+
+				// update size
 				_size = 0;
 			}
 
-			/* clear (trivially destructible) */
-			inline auto clear(void) noexcept -> void
-				requires (xns::is_trivially_destructible<T> == true) {
-				_size = 0;
-			}
 
 			/* emplace */
 			template <typename... A>
-			auto emplace(size_type pos, A&&... args) -> void {
-				// check position
-				if (pos > _size) { return; }
-				// check capacity
-				if (!available()) {
-					// double capacity
-					reserve(grow());
-				} // move elements
-				for (size_type x = _size; x > pos; --x) {
-					// move element
-					_vector[x] = xns::move(_vector[x - 1]);
-				} // construct element
-				allocator::construct(_vector + pos, xns::forward<A>(args)...);
-				// increment size
-				++_size;
+			auto emplace(const size_type pos, A&&... args) -> void {
+
+				/* info: if construct throws, elements are not moved back.
+						 so construct new element before and call insert */
+
+				if constexpr (not xns::is_nothrow_constructible<T, A...>) {
+					insert(pos, value_type{xns::forward<A>(args)...});
+					return;
+				}
+				else {
+
+					// call emplace if pos is equal to size
+					if (pos == _size)
+						return emplace_back(xns::forward<A>(args)...);
+
+					// return if position is out of range
+					if (pos > _size)
+						return;
+
+					// expand if no available space
+					if (_available_capacity() == 0)
+						_reserve(_expand());
+
+
+					if constexpr (xns::is_trivially_copyable<T>)
+						::memmove(_vector + pos + 1,           // destination
+								  _vector + pos,               // source
+								   (_size - pos) * sizeof(T)); // size
+
+					else
+						if constexpr (xns::is_nothrow_move_constructible<T>
+								   && xns::is_nothrow_destructible<T>) {
+
+							// move construct last element
+							allocator::construct(_vector + _size, xns::move(_vector[_size - 1]));
+
+							/* info: it is better for performance
+									 to destroy and move construct than move assign */
+
+							// move elements
+							for (size_type i = _size - 1; i > pos; --i) {
+								allocator::destroy(_vector + i);
+								allocator::construct(_vector + i, xns::move(_vector[i - 1]));
+							}
+						}
+						else
+							static_assert(xns::always_false<T>, "vector, emplace not supports throw move operations");
+
+					// construct new element in place
+					allocator::construct(_vector + pos,
+							xns::forward<A>(args)...);
+
+					// update size
+					++_size;
+				}
 			}
 
 			/* emplace back */
-			template <class... A>
+			template <typename... A>
 			auto emplace_back(A&&... args) -> void {
-				// check capacity
-				if (!available()) {
-					// double capacity
-					reserve(grow());
-				} // construct element
-				allocator::construct(_vector + _size, xns::forward<A>(args)...);
-				// increment size
+
+				// expand if no available space
+				if (_available_capacity() == 0)
+					_reserve(_expand());
+
+				// construct new element
+				allocator::construct(_vector + _size,
+					  xns::forward<A>(args)...);
+
+				// update size
 				++_size;
 			}
 
 			/* push back */
 			template <typename U>
 			auto push_back(U&& value) -> void {
-				// check capacity
-				if (not available()) {
-					// double capacity
-					reserve(grow());
-				} // construct element
-				allocator::construct(_vector + _size, xns::forward<U>(value));
-				// increment size
+
+				// expand if no available space
+				if (_available_capacity() == 0)
+					_reserve(_expand());
+
+				// construct new element
+				allocator::construct(_vector + _size,
+					  xns::forward<U>(value));
+
+				// update size
 				++_size;
 			}
 
-			/* pop back (non-trivially destructible) */
-			inline auto pop_back(void) noexcept -> void
-				requires (xns::is_trivially_destructible<T> == false) {
-				// check size
-				if (not _size) { return; }
-				// destroy object
-				allocator::destroy(_vector + (--_size));
+			/* pop back */
+			inline auto pop_back(void) noexcept -> void {
+
+				// return if size is zero
+				if (_size == 0)
+					return;
+
+				// destroy only non-trivially destructible types
+				if constexpr (not xns::is_trivially_destructible<T>)
+					allocator::destroy(_vector + --_size);
+				else
+					--_size;
 			}
 
-			/* pop back (trivially destructible) */
-			inline auto pop_back(void) noexcept -> void
-				requires (xns::is_trivially_destructible<T> == true) {
-				// decrement size
-				_size -= (_size > 0);
+
+
+
+			/* insert */
+			template <typename U> requires (xns::is_same<value_type, xns::remove_cvr<U>>)
+			auto insert(size_type pos, U&& value) -> void {
+
+				// call emplace if pos is equal to size
+				if (pos == _size)
+					return push_back(xns::forward<U>(value));
+
+				// return if position is out of range
+				if (pos > _size)
+					return;
+
+				// check capacity
+				if (_available_capacity() == 0)
+					reserve(_expand());
+
+				// move elements
+				for (size_type x = _size; x > pos; --x) {
+					// move element
+					_vector[x] = xns::move(_vector[x - 1]);
+				}
+
+				// increment size
+				++_size;
+
+				allocator::destroy(_vector + pos);
+				// copy or move value (need to check if U is nothrow copy constructible or nothrow move constructible) !!!
+				allocator::construct(_vector + pos, xns::forward<U>(value));
+				
+				//_vector[pos] = xns::forward<U>(value);
 			}
 
 
@@ -439,14 +592,16 @@ namespace xns {
 			}
 
 
+
+
+
+
 			/* swap */
 			auto swap(self& other) noexcept -> void {
-				// swap pointers
-				xns::swap(_vector, other._vector);
-				// swap capacities
+				// swap members
+				xns::swap(_vector,   other._vector);
 				xns::swap(_capacity, other._capacity);
-				// swap sizes
-				xns::swap(_size, other._size);
+				xns::swap(_size,     other._size);
 			}
 
 
@@ -480,10 +635,8 @@ namespace xns {
 						// declare tmp
 						value_type tmp = xns::move(_vector[x]);
 						// move elements
-						for (size_type z = x; z < (_size - 1); ++z) {
-							// move element
+						for (size_type z = x; z < (_size - 1); ++z)
 							_vector[z] = xns::move(_vector[z + 1]);
-						}
 						// move tmp
 						_vector[_size - 1] = xns::move(tmp);
 						// return
@@ -527,7 +680,7 @@ namespace xns {
 			}
 
 			/* dichotomic insert */
-			auto dichotomic_insert(const_reference value) -> void
+			auto dichotomic_insert(const_ref value) -> void
 				requires (xns::is_comparable<value_type>) {
 
 				// check if U is comparable to value_type
@@ -565,21 +718,6 @@ namespace xns {
 			}
 
 
-			/* insert */
-			auto insert(size_type pos, const_reference value) -> void {
-				// check position
-				if (pos > _size) { return; }
-				// check capacity
-				if (available() == 0) { reserve(grow()); }
-				// move elements
-				for (size_type x = _size; x > pos; --x) {
-					// move element
-					_vector[x] = xns::move(_vector[x - 1]);
-				} // increment size
-				++_size;
-				// copy value
-				_vector[pos] = value;
-			}
 
 
 
@@ -588,36 +726,61 @@ namespace xns {
 			// -- private methods ---------------------------------------------
 
 			/* init */
-			inline auto init(void) noexcept -> void {
-				// initialize members
+			inline auto _init(void) noexcept -> void {
 				_vector   = nullptr;
-				_capacity = _size = 0;
+				_capacity = 0;
+				_size     = 0;
 			}
 
-			/* available */
-			inline auto available(void) const noexcept -> size_type {
+			/* available capacity */
+			inline auto _available_capacity(void) const noexcept -> size_type {
 				// return available memory
 				return _capacity - _size;
 			}
 
-			/* check capacity */
-			inline auto grow(void) const noexcept -> size_type {
-				return (_capacity * 2) + (_capacity == 0);
+			/* expand */
+			inline auto _expand(void) const noexcept -> size_type {
+				return _capacity ? _capacity << 1 : 1;
 			}
 
+			/* _reserve */
+			auto _reserve(const size_type capacity) -> void requires (not xns::is_trivially_copyable<T>) {
 
+				// allocate memory
+				mut_ptr tmp = allocator::allocate(capacity);
 
-			// -- private members ---------------------------------------------
+				// reconstruct elements
+				for (size_type i = 0; i < _size; ++i) {
+					allocator::construct(tmp + i, xns::move(_vector[i]));
+					allocator::destroy(_vector + i);
+				}
 
-			/* data */
-			pointer _vector;
+				// deallocate memory
+				allocator::deallocate(_vector); /* info: no nullptr check */
 
-			/* capacity */
-			size_type _capacity;
+				// update members
+				_capacity = capacity;
+				  _vector = tmp;
+			}
 
-			/* size */
-			size_type _size;
+			/* _reserve (trivially copyable) */
+			auto _reserve(const size_type capacity) -> void requires (xns::is_trivially_copyable<T> == true) {
 
+				// reallocate memory
+				  _vector = allocator::realloc(_vector, capacity);
+				_capacity = capacity;
+			}
+
+			/* clear */
+			auto _clear(void) noexcept -> void {
+
+				// destroy only non-trivially destructible types
+				if constexpr (not xns::is_trivially_destructible<T>)
+
+					// destroy elements
+					for (size_type i = 0; i < _size; ++i)
+						allocator::destroy(_vector + i);
+			}
 
 
 	};
@@ -627,23 +790,22 @@ namespace xns {
 	// -- M A K E  V E C T O R ------------------------------------------------
 
 	/* make vector */
-	template <class T, class... A>
-	xns::vector<T> make_vector(A&&... args) {
+	template <typename T, typename... A>
+	inline auto make_vector(A&&... args) -> xns::vector<T> {
 
+		// allocator type
 		using allocator = typename xns::vector<T>::allocator;
 
 		// create vector
-		xns::vector<T> vec;
+		xns::vector<T> vec{
+			allocator::allocate(sizeof...(A)),
+			sizeof...(A),
+			sizeof...(A)
+		};
 
-		// allocate memory
-		vec._vector = allocator::allocate(sizeof...(A));
-
-		typename vector<T>::size_type x = 0;
+		typename xns::vector<T>::size_type x = 0;
 		// fold expression to construct by forwarding
-		(allocator::construct(&vec._vector[x++], xns::forward<A>(args)), ...);
-
-		// assign sizes
-		vec._size = vec._capacity = sizeof...(A);
+		(allocator::construct(&vec._vector[x], xns::forward<A>(args)), ..., ++x);
 
 		return vec;
 	}
@@ -686,15 +848,13 @@ namespace xns {
 			/* self type */
 			using self = vector_type::vector_iterator<C>;
 
-
-
 			/* reference type */
-			using reference = typename xns::conditional<C, vector_type::const_reference,
-														   vector_type::reference>;
+			using cond_ref = typename xns::conditional<C, vector_type::const_ref,
+														  vector_type::mut_ref>;
 
 			/* pointer type */
-			using pointer   = typename xns::conditional<C, vector_type::const_pointer,
-														   vector_type::pointer>;
+			using cond_ptr   = typename xns::conditional<C, vector_type::const_ptr,
+															vector_type::mut_ptr>;
 
 
 			// -- public lifecycle --------------------------------------------
@@ -704,7 +864,7 @@ namespace xns {
 			: _ptr{nullptr} {}
 
 			/* pointer constructor */
-			inline vector_iterator(pointer ptr) noexcept
+			inline vector_iterator(cond_ptr ptr) noexcept
 			: _ptr{ptr} {}
 
 			/* copy constructor (non-const) */
@@ -728,13 +888,13 @@ namespace xns {
 			: vector_iterator{other._ptr} {}
 
 			/* destructor */
-			inline ~vector_iterator(void) noexcept = default;
+			~vector_iterator(void) noexcept = default;
 
 
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator (non-const) */
-			inline self& operator=(const vector_type::iterator& other) noexcept {
+			inline auto operator=(const vector_type::iterator& other) noexcept -> self& {
 				// copy pointer
 				_ptr = other._ptr;
 				// return self reference
@@ -742,10 +902,9 @@ namespace xns {
 			}
 
 			/* copy assignment operator (const) */
-			inline self& operator=(const vector_type::const_iterator& other) noexcept {
+			inline auto operator=(const vector_type::const_iterator& other) noexcept -> self& {
 				// assert invalid conversion
-				static_assert(_const,
-						"): CANNOT CONVERT CONST TO NON-CONST VECTOR ITERATOR :(");
+				static_assert(_const, "iterator, cannot convert const to non-const vector iterator.");
 				// copy pointer
 				_ptr = other._ptr;
 				// return self reference
@@ -753,14 +912,12 @@ namespace xns {
 			}
 
 			/* move assignment operator */
-			inline self& operator=(vector_type::iterator&& other) noexcept {
-				// call copy assignment operator
+			inline auto operator=(vector_type::iterator&& other) noexcept -> self& {
 				return operator=(other);
 			}
 
 			/* move assignment operator (const) */
-			inline self& operator=(vector_type::const_iterator&& other) noexcept {
-				// call copy assignment operator
+			inline auto operator=(vector_type::const_iterator&& other) noexcept -> self& {
 				return operator=(other);
 			}
 
@@ -768,14 +925,12 @@ namespace xns {
 			// -- public accessor operators -----------------------------------
 
 			/* dereference operator */
-			inline reference operator*(void) const noexcept {
-				// return value
+			inline auto operator*(void) const noexcept -> cond_ref {
 				return *_ptr;
 			}
 
 			/* arrow operator */
-			inline pointer operator->(void) const noexcept {
-				// return address
+			inline auto operator->(void) const noexcept -> cond_ptr {
 				return _ptr;
 			}
 
@@ -783,7 +938,7 @@ namespace xns {
 			// -- public increment operators ----------------------------------
 
 			/* pre-increment operator */
-			inline self& operator++(void) noexcept {
+			inline auto operator++(void) noexcept -> self& {
 				// increment pointer
 				++_ptr;
 				// return self reference
@@ -791,7 +946,7 @@ namespace xns {
 			}
 
 			/* post-increment operator */
-			inline self operator++(int) noexcept {
+			inline auto operator++(int) noexcept -> self {
 				// copy self
 				self tmp{*this};
 				// increment pointer
@@ -804,7 +959,7 @@ namespace xns {
 			// -- public decrement operators ----------------------------------
 
 			/* pre-decrement operator */
-			inline self& operator--(void) noexcept {
+			inline auto operator--(void) noexcept -> self& {
 				// decrement pointer
 				--_ptr;
 				// return self reference
@@ -812,7 +967,7 @@ namespace xns {
 			}
 
 			/* post-decrement operator */
-			inline self operator--(int) noexcept {
+			inline auto operator--(int) noexcept -> self {
 				// copy self
 				self tmp{*this};
 				// decrement pointer
@@ -826,27 +981,24 @@ namespace xns {
 
 			/* equality operator */
 			template <bool D>
-			inline bool operator==(const vector_iterator<D>& other) const noexcept {
+			inline auto operator==(const vector_iterator<D>& other) const noexcept -> bool {
 				// return pointer equality
 				return _ptr == other._ptr;
 			}
 
 			/* inequality operator */
 			template <bool D>
-			inline bool operator!=(const vector_iterator<D>& other) const noexcept {
-				// return pointer inequality
+			inline auto operator!=(const vector_iterator<D>& other) const noexcept -> bool {
 				return _ptr != other._ptr;
 			}
 
 			/* null equality operator */
-			inline bool operator==(xns::null) const noexcept {
-				// return pointer invalidity
+			inline auto operator==(xns::null) const noexcept -> bool {
 				return _ptr == nullptr;
 			}
 
 			/* null inequality operator */
-			inline bool operator!=(xns::null) const noexcept {
-				// return pointer validity
+			inline auto operator!=(xns::null) const noexcept -> bool {
 				return _ptr != nullptr;
 			}
 
@@ -855,13 +1007,11 @@ namespace xns {
 
 			/* boolean operator */
 			inline explicit operator bool(void) const noexcept {
-				// return pointer validity
 				return _ptr != nullptr;
 			}
 
 			/* not operator */
-			inline bool operator!(void) const noexcept {
-				// return pointer invalidity
+			inline auto operator!(void) const noexcept -> bool {
 				return _ptr == nullptr;
 			}
 
@@ -871,12 +1021,10 @@ namespace xns {
 			// -- private members ---------------------------------------------
 
 			/* pointer */
-			pointer _ptr;
+			cond_ptr _ptr;
 
-	};
+	}; // vector_iterator
 
+} // namespace xns
 
-
-}
-
-#endif
+#endif // XNS_VECTOR_HPP
