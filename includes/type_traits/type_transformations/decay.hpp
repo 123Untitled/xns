@@ -14,6 +14,7 @@ namespace xns {
 
 		using type = xns::remove_reference<T>;
 
+	};
 
 
 } // namespace xns
