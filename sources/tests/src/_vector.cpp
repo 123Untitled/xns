@@ -1,5 +1,5 @@
-#include "unit_tests.hpp"
 #include "vector.hpp"
+#include <benchmark/benchmark.h>
 #include "random.hpp"
 #include "time.hpp"
 
@@ -54,28 +54,63 @@ static auto simd_test(void) -> void {
 
 	std::cout << "copy: " << end - start << " ns" << std::endl;
 
-
-
-
-
-
 }
 
+class A {
+public:
+	A(void) = default;
+	A(const A&) = default;
+	A(A&&) noexcept(false) = default;
+	A& operator=(const A&) = default;
+	A& operator=(A&&) = default;
+	~A(void) = default;
+};
+
+#include "malloc.hpp"
 
 /* unit test */
-
 auto unit_tests_vector(void) -> int {
 
-	simd_test();
-	xns::vector<int> v;
-	// code here...
+	//simd_test();
+
+	//xns::vector<A> v;
+	//xns::malloc();
+
+
+
+
 	return 0;
 }
 
+
+#include <vector>
+
 #if defined(XNS_TEST_VECTOR)
-int main(void) { {
+int main(void) {
 	return unit_tests_vector();
-}
 }
 #endif
 
+
+
+//template <typename T>
+//static auto _test_(benchmark::State& state) -> void {
+//
+//		T v1;
+//	for (auto _ : state) {
+//		v1.clear();
+//		for (auto i = 0; i < state.range(0); ++i) {
+//			v1.emplace_back(xns::random::integral<int>());
+//			benchmark::DoNotOptimize(v1.size());
+//		}
+//	}
+//}
+//
+//#define START 100
+//#define END 10'000'000
+//#define REPEAT 1
+//
+//BENCHMARK(_test_<std::vector<int>>)  -> Range(START, END) -> Repetitions(REPEAT) -> RangeMultiplier(2) -> Unit(benchmark::kMillisecond);
+//BENCHMARK(_test_<xns::vector<int>>)  -> Range(START, END) -> Repetitions(REPEAT) -> RangeMultiplier(2) -> Unit(benchmark::kMillisecond);
+//
+//BENCHMARK_MAIN();
