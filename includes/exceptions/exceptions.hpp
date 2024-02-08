@@ -1,12 +1,35 @@
+/*****************************************************************************/
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_EXCEPTIONS_HEADER
 #define XNS_EXCEPTIONS_HEADER
 
 #include "types.hpp"
 
 
+
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
+
+
+	/* no exceptions */
+	#if defined(__cpp_exceptions) || defined(__EXCEPTIONS)
+	/* exceptions enabled */
+	constexpr bool no_exceptions = false;
+	#else
+	/* exceptions disabled */
+	constexpr bool no_exceptions = true;
+	#endif
 
 
 	// -- E X C E P T I O N ---------------------------------------------------
