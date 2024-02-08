@@ -72,7 +72,7 @@ namespace xns {
 			using const_ptr  = const type*;
 
 			/* allocator type */
-			using allocator  = xns::memory::pool<type>;
+			using allocator  = xns::allocator<type>;
 
 
 		public:
