@@ -2242,6 +2242,11 @@ namespace xns {
 				~node_info(void) noexcept = default;
 
 
+				//auto operator=(const node_info& other) -> node_info& = delete;
+
+				auto operator=(node_info&& other) noexcept -> node_info& = default;
+
+
 				// -- public members --------------------------------------
 
 				node_info* parent;
@@ -2291,6 +2296,7 @@ namespace xns {
 			++it;
 		}
 		xns::println("check tree: \x1b[32mOK\x1b[0m");
+		return 0;
 	}
 
 

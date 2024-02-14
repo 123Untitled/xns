@@ -1,8 +1,19 @@
-#ifndef XNS_IS_ARRAY_HEADER
-#define XNS_IS_ARRAY_HEADER
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
 
-#include "integral_constant.hpp"
-#include "types.hpp"
+#pragma once
+
+#ifndef XNS_IS_ARRAY_HPP
+#define XNS_IS_ARRAY_HPP
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -10,21 +21,27 @@
 namespace xns {
 
 
-	// -- D E T A I L ---------------------------------------------------------
+	// -- detail --------------------------------------------------------------
 
 	namespace impl {
 
 		/* false type */
-		template <class T>
-		struct is_array       : public xns::no  {};
+		template <typename T>
+		struct is_array      final {
+			static constexpr bool value = false;
+		};
 
 		/* true type */
-		template <class T>
-		struct is_array<T[]>  : public xns::yes {};
+		template <typename T>
+		struct is_array<T[]> final {
+			static constexpr bool value = true;
+		};
 
 		/* true type */
-		template <class T, xns::size_t N>
-		struct is_array<T[N]> : public xns::yes {};
+		template <typename T, decltype(sizeof(0)) N>
+		struct is_array<T[N]> final {
+			static constexpr bool value = true;
+		};
 
 	}
 
@@ -32,11 +49,9 @@ namespace xns {
 	// -- I S  A R R A Y ------------------------------------------------------
 
 	/* is array concept */
-	template <class T>
+	template <typename T>
 	concept is_array = impl::is_array<T>::value;
 
+} // namespace xns
 
-}
-
-
-#endif
+#endif // XNS_IS_ARRAY_HPP

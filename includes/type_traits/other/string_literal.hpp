@@ -4,7 +4,6 @@
 #include "is_char.hpp"
 #include "is_same.hpp"
 #include "is_comparable.hpp"
-//#include "types.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

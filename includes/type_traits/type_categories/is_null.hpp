@@ -1,8 +1,21 @@
-#ifndef XNS_IS_NULL_HEADER
-#define XNS_IS_NULL_HEADER
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
+#ifndef XNS_IS_NULL_HPP
+#define XNS_IS_NULL_HPP
 
 #include "is_same.hpp"
-#include "types.hpp"
 #include "remove.hpp"
 
 
@@ -15,7 +28,7 @@ namespace xns {
 
 	/* is null concept */
 	template <class T>
-	concept is_null = xns::is_same<xns::remove_cv<T>, xns::null>;
+	concept is_null = xns::is_same<xns::remove_cv<T>, decltype(nullptr)>;
 
 
 }

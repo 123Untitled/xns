@@ -329,10 +329,10 @@ BENCHMARK(_boost) -> Range(START, END) -> RangeMultiplier(2) -> Unit(benchmark::
 
 
 #if defined(XNS_TEST_TREE)
-	BENCHMARK_MAIN();
-//int main(int argc, char** argv) {
-//	return unit_tests_tree();
-//}
+	//BENCHMARK_MAIN();
+int main(int argc, char** argv) {
+	return unit_tests_tree();
+}
 #endif
 
 

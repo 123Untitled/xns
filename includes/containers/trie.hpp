@@ -81,7 +81,7 @@ namespace xns {
 			using node_addr = self::node**;
 
 			/* allocator type */
-			using allocator = xns::memory::pool<self::node>;
+			using allocator = xns::allocator<self::node>;
 
 
 
@@ -131,17 +131,17 @@ namespace xns {
 			// -- P U B L I C  M E T H O D S ----------------------------------
 
 			/* insert */
-			template <typename... A>
-			void insert(const xns::string& key, A&&... value) {
-				// insert key
-				node_ptr node = insert_impl(key);
-				// allocate default value
-				node->_value = xns::memory::pool<type>::allocate();
-				// construct value
-				xns::memory::pool<type>::construct(node->_value, xns::forward<A>(value)...);
-				// increment size
-				++_size;
-			}
+			//template <typename... A>
+			//void insert(const xns::string& key, A&&... value) {
+			//	// insert key
+			//	node_ptr node = insert_impl(key);
+			//	// allocate default value
+			//	node->_value = xns::memory::pool<type>::allocate();
+			//	// construct value
+			//	xns::memory::pool<type>::construct(node->_value, xns::forward<A>(value)...);
+			//	// increment size
+			//	++_size;
+			//}
 
 
 			/* contains */

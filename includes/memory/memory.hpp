@@ -1,3 +1,17 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_MEMORY_HEADER
 #define XNS_MEMORY_HEADER
 
@@ -6,9 +20,11 @@
 #include "types.hpp"
 #include "exceptions.hpp"
 #include "macros.hpp"
-#include "is_constructible.hpp"
-#include "is_destructible.hpp"
-#include "is_trivially_destructible.hpp"
+#include "move.hpp"
+#include "forward.hpp"
+
+#include "type_traits/supported_operations/supported_operations.hpp"
+
 
 // operating system headers
 #include <unistd.h>
@@ -24,7 +40,8 @@
 namespace xns {
 
 
-	// -- M E M O R Y  C L A S S ----------------------------------------------
+
+	// -- M E M O R Y ---------------------------------------------------------
 
 	class memory final {
 
@@ -40,7 +57,107 @@ namespace xns {
 			// -- public lifecycle --------------------------------------------
 
 			/* non-instantiable class */
-			uninstantiable(memory);
+			non_instantiable(memory);
+
+
+		private:
+
+			// -- private enums -----------------------------------------------
+
+			/* mmap flags */
+			enum : int {
+				M_PROTECTION =   PROT_READ | PROT_WRITE,
+				M_FLAGS      = MAP_PRIVATE | MAP_ANONYMOUS
+			};
+
+			/* memory constants */
+			enum : size_type {
+				ALIGNMENT = sizeof(void*),
+				DEFAULT_PAGE_SIZE = 4096
+			};
+
+
+		public:
+
+			// -- private static methods --------------------------------------
+
+			/* map */
+			static inline auto map(const size_type size = page_size(), void* addr = nullptr) noexcept(xns::no_exceptions) -> void* {
+				// map memory
+				void* ptr = ::mmap(addr, size, M_PROTECTION, M_FLAGS, -1, 0);
+
+				if constexpr (xns::no_exceptions == false)
+					if (ptr == MAP_FAILED)
+						throw xns::exception(-2, "mmap failed");
+
+				return ptr;
+			}
+
+			/* unmap */
+			static inline auto unmap(void* ptr, const size_type size) noexcept -> void {
+				if (::munmap(ptr, size) == -1)
+					;// not good idea to throw exception in destructor
+			}
+
+			/* page size */
+			static inline auto page_size(void) -> size_type {
+				static const size_type page_size = [](void) noexcept -> size_type {
+					const auto size = ::sysconf(_SC_PAGESIZE);
+					return size > 0 ? static_cast<size_type>(size) : DEFAULT_PAGE_SIZE;
+				}();
+				return page_size;
+			}
+
+			/* padding */
+			template <typename T>
+			static consteval auto padding(void) noexcept -> decltype(sizeof(void*)) {
+				// padding
+				return (ALIGNMENT - (sizeof(T) & (ALIGNMENT - 1))) & (ALIGNMENT - 1);
+				// alternative: (-sizeof(T)) & (sizeof(void*) - 1);
+			}
+
+			/* align */
+			static inline auto align(const size_type size) noexcept -> size_type {
+				return (size + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
+			}
+
+			/* power of two padding */
+			template <typename T>
+			static consteval auto padding_power(void) noexcept -> decltype(sizeof(void*)) {
+				xns::size_t align = 1;
+				while (align < sizeof(T))
+					align <<= 1;
+				return align - sizeof(T);
+			}
+
+	}; // class memory
+
+} // namespace xns
+
+
+
+
+
+namespace xns {
+
+
+	// -- M E M O R Y  C L A S S ----------------------------------------------
+
+	class memory2 final {
+
+
+		public:
+
+			// -- public types ------------------------------------------------
+
+			/* size type */
+			using size_type = xns::size_t;
+
+
+			// -- public lifecycle --------------------------------------------
+
+			/* non-instantiable class */
+			uninstantiable(memory2);
 
 
 		public:
@@ -53,16 +170,23 @@ namespace xns {
 				M_FLAGS      = MAP_PRIVATE | MAP_ANONYMOUS
 			};
 
+			/* default page size */
+			enum : size_type {
+				DEFAULT_PAGE_SIZE = 4096
+			};
+
 
 			// -- private static methods --------------------------------------
 
 			/* map */
-			static inline auto map(const size_type size = page_size(), void* addr = nullptr) -> void* {
-				//std::cout << "\nmmap allocate: " << size << std::endl;
+			static inline auto map(const size_type size = page_size(), void* addr = nullptr) noexcept(xns::no_exceptions) -> void* {
+				// map memory
 				void* ptr = ::mmap(addr, size, M_PROTECTION, M_FLAGS, -1, 0);
-				//std::cout << "mmap address: " << ptr << std::endl << std::endl;
-				if (ptr == MAP_FAILED)
-					throw xns::exception(-2, "mmap failed");
+
+				if constexpr (xns::no_exceptions == false)
+					if (ptr == MAP_FAILED)
+						throw xns::exception(-2, "mmap failed");
+
 				return ptr;
 			}
 
@@ -81,11 +205,10 @@ namespace xns {
 			}
 
 			/* system page size */
-			static inline auto init_page_size(void) -> size_type {
-				if (const auto page_size = ::sysconf(_SC_PAGESIZE); page_size > 0) {
+			static inline auto init_page_size(void) noexcept -> size_type {
+				if (const auto page_size = ::sysconf(_SC_PAGESIZE); page_size > 0)
 					return static_cast<size_type>(page_size);
-				}
-				throw xns::exception(-2, "sysconf failed");
+				return DEFAULT_PAGE_SIZE;
 			}
 
 			/* padding */
@@ -124,7 +247,7 @@ namespace xns {
 					// -- public types ----------------------------------------
 
 					/* self type */
-					using self = xns::memory::pool_impl<N>;
+					using self = xns::memory2::pool_impl<N>;
 
 
 				private:
@@ -221,7 +344,7 @@ namespace xns {
 						/* extend */
 						inline auto extend(void) noexcept -> void {
 							auto ncap = _capacity;// << 1;
-							_next = new (xns::memory::map(ncap)) page{ncap};
+							_next = new (xns::memory2::map(ncap)) page{ncap};
 						}
 
 
@@ -244,7 +367,7 @@ namespace xns {
 
 					/* default constructor */
 					inline pool_impl(void) noexcept
-					:	_head{new (xns::memory::map()) page{xns::memory::page_size()}},
+					:	_head{new (xns::memory2::map()) page{xns::memory2::page_size()}},
 						_tail{_head},
 						_current{_head->chunks()} {}
 
@@ -258,7 +381,7 @@ namespace xns {
 						// loop over pages
 						while (page != nullptr) {
 							auto next = page->_next;
-							xns::memory::unmap(page, page->capacity());
+							xns::memory2::unmap(page, page->capacity());
 							page = next;
 						}
 					}
@@ -338,8 +461,8 @@ namespace xns {
 					// -- private types ---------------------------------------
 
 					/* allocator type */
-					using allocator = xns::memory::pool_impl<
-						  sizeof(T) + xns::memory::padding<T>()>;
+					using allocator = xns::memory2::pool_impl<
+						  sizeof(T) + xns::memory2::padding<T>()>;
 
 
 				public:
@@ -347,7 +470,7 @@ namespace xns {
 					// -- public types ----------------------------------------
 
 					/* self type */
-					using self      = xns::memory::pool<T>;
+					using self      = xns::memory2::pool<T>;
 
 					/* value type */
 					using type      = T;
@@ -594,7 +717,7 @@ namespace xns {
 					/* extend */
 					inline auto extend(void) noexcept -> void {
 						auto ncap = _capacity << 1;
-						_next = new (xns::memory::map(ncap)) self{ncap};
+						_next = new (xns::memory2::map(ncap)) self{ncap};
 					}
 
 					/* chunks */
@@ -629,8 +752,10 @@ namespace xns {
 				chunk* ch = reinterpret_cast<chunk*>(
 						reinterpret_cast<xns::ubyte*>(addr) - sizeof(typename self::chunk::meta));
 
+				#if XNS_EXCEPTIONS
 				if (ch->data() != addr)
 					throw xns::exception(-2, "invalid address");
+				#endif
 
 				return ch;
 			}
@@ -699,7 +824,7 @@ namespace xns {
 
 			/* default constructor */
 			inline locality(void)
-				: _head{new (xns::memory::map()) self::block{xns::memory::page_size()}}, _tail{_head} {
+				: _head{new (xns::memory2::map()) self::block{xns::memory2::page_size()}}, _tail{_head} {
 				}
 
 			/* destructor */
@@ -709,7 +834,7 @@ namespace xns {
 				// loop over pages
 				while (block != nullptr) {
 					auto next = block->next();
-					xns::memory::unmap(block, block->capacity());
+					xns::memory2::unmap(block, block->capacity());
 					block = next;
 				}
 			}
@@ -737,9 +862,9 @@ namespace xns {
 	template <typename T>
 	inline auto reinterpret_block(void) -> void {
 
-		const xns::size_t size = xns::memory::page_size();
+		const xns::size_t size = xns::memory2::page_size();
 
-		void* ptr = xns::memory::map(size);
+		void* ptr = xns::memory2::map(size);
 
 		struct node final {
 			xns::ubyte data[sizeof(T)];

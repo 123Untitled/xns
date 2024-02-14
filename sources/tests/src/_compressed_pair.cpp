@@ -83,10 +83,10 @@ auto unit_tests_compressed_pair(void) -> int {
 	return 0;
 }
 
-	BENCHMARK_MAIN();
+	//BENCHMARK_MAIN();
 #if defined(XNS_TEST_COMPRESSED_PAIR)
-//int main(void) {
-//	return unit_tests_compressed_pair();
-//}
+int main(void) {
+	return unit_tests_compressed_pair();
+}
 #endif
 

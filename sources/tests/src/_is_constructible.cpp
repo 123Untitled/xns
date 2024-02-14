@@ -1,5 +1,6 @@
 #include "unit_tests.hpp"
 #include "is_constructible.hpp"
+#include "is_assignable.hpp"
 
 struct AA {
 	AA(int) { std::cout << "A constructor" << std::endl; }

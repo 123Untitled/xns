@@ -1,7 +1,19 @@
-#ifndef XNS_MAKE_UNSIGNED_HEADER
-#define XNS_MAKE_UNSIGNED_HEADER
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
 
-#include "types.hpp"
+#pragma once
+
+#ifndef XNS_MAKE_UNSIGNED_HPP
+#define XNS_MAKE_UNSIGNED_HPP
 
 #include "is_bool.hpp"
 #include "is_enum.hpp"
@@ -9,6 +21,7 @@
 #include "is_const.hpp"
 #include "is_volatile.hpp"
 
+#include "types.hpp"
 #include "conditional.hpp"
 
 
@@ -25,17 +38,18 @@ namespace xns {
 	namespace impl {
 
 
-		template <class T>
+		template <typename T>
 		struct make_unsigned {
 
 
 			// -- assertions --------------------------------------------------
 
 			// check if T is an integral type
-			static_assert(xns::is_integral<T> || xns::is_enum<T>, "): MAKE_UNSIGNED REQUIRES AN INTEGRAL TYPE :(");
+			static_assert(xns::is_integral<T>
+					   || xns::is_enum<T>, "make_unsigned requires an integral type");
 
 			// check if T is not a bool
-			static_assert(xns::is_bool<T> == false, "): MAKE_UNSIGNED DOES NOT SUPPORT BOOL :(");
+			static_assert(xns::is_bool<T> == false, "make_unsigned does not support bool");
 
 
 			// -- types -------------------------------------------------------
@@ -61,6 +75,6 @@ namespace xns {
 	template <class T>
 	using make_unsigned = typename impl::make_unsigned<T>::type;
 
-}
+} // namespace xns
 
-#endif
+#endif // XNS_MAKE_UNSIGNED_HPP

@@ -1,10 +1,19 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
 #pragma once
 
 #ifndef XNS_IN_PLACE_HPP
 #define XNS_IN_PLACE_HPP
-
-// local headers
-#include "types.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -28,12 +37,11 @@ namespace xns {
 	};
 
 	/* in place index */
-	template <xns::size_t T>
+	template <decltype(sizeof(0)) I>
 	struct in_place_index final {
 		explicit in_place_index(void) noexcept = default;
 	};
 
-
-};
+}; // namespace xns
 
 #endif // XNS_IN_PLACE_HPP
