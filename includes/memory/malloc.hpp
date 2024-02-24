@@ -21,57 +21,57 @@
 namespace xns {
 
 
-	template <typename T>
-	class ptr final {
+	//template <typename T>
+	//class ptr final {
 
 
-		private:
+	//	private:
 
-			// -- private types -----------------------------------------------
+	//		// -- private types -----------------------------------------------
 
-			/* self type */
-			using self = xns::ptr<T>;
+	//		/* self type */
+	//		using self = xns::ptr<T>;
 
-			/* mutable pointer type */
-			using mut_ptr = T*;
+	//		/* mutable pointer type */
+	//		using mut_ptr = T*;
 
-			/* size type */
-			using size_type = decltype(sizeof(0));
-
-
-			// -- private lifecycle -------------------------------------------
-
-			/* default constructor */
-			ptr(mut_ptr ptr, const size_type size) noexcept
-			: _ptr{ptr} {
-
-				// set size
-				*reinterpret_cast<size_type*>(_ptr) = size;
-
-				// activate least significant bit
-				*reinterpret_cast<size_type*>(_ptr) |= 1;
-			}
-
-		public:
-
-			// -- public conversion operators ---------------------------------
-
-			/* conversion to mutable pointer */
-			operator mut_ptr(void) const noexcept {
-				return reinterpret_cast<size_type*>(_ptr) + 1;
-			}
+	//		/* size type */
+	//		using size_type = decltype(sizeof(0));
 
 
+	//		// -- private lifecycle -------------------------------------------
 
-		private:
+	//		/* default constructor */
+	//		ptr(mut_ptr ptr, const size_type size) noexcept
+	//		: _ptr{ptr} {
+
+	//			// set size
+	//			*reinterpret_cast<size_type*>(_ptr) = size;
+
+	//			// activate least significant bit
+	//			*reinterpret_cast<size_type*>(_ptr) |= 1;
+	//		}
+
+	//	public:
+
+	//		// -- public conversion operators ---------------------------------
+
+	//		/* conversion to mutable pointer */
+	//		operator mut_ptr(void) const noexcept {
+	//			return reinterpret_cast<size_type*>(_ptr) + 1;
+	//		}
 
 
-			// -- private members ---------------------------------------------
 
-			/* data pointer */
-			mut_ptr _ptr;
+	//	private:
 
-	};
+
+	//		// -- private members ---------------------------------------------
+
+	//		/* data pointer */
+	//		mut_ptr _ptr;
+
+	//};
 
 	constexpr unsigned int alignment = sizeof(void*);
 
