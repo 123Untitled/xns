@@ -42,7 +42,7 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = terminal;
+			using self = xns::terminal;
 
 			/* terminal size type */
 			using term_size = decltype(xns::declval<struct winsize>().ws_row);
@@ -61,7 +61,7 @@ namespace xns {
 
 			/* instance */
 			static inline auto shared(void) -> xns::terminal& {
-				static xns::terminal instance{};
+				static self instance{};
 				return instance;
 			}
 
