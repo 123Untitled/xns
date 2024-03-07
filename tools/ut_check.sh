@@ -112,13 +112,12 @@ function model {
 '#include "unit_tests.hpp"\n'\
 '#include "'$1'.hpp"\n\n'\
 '/* unit test */\n'\
-'template <>\n'\
-'int UT::unit_tests<"'$1'">(void) {\n'\
+'int unit_tests_'$1'(void) {\n'\
 '\treturn 0;\n'\
 '}\n\n'\
 '#if defined(XNS_TEST_'${1:u}')\n'\
 'int main(void) {\n'\
-'\treturn UT::unit_tests<"'$1'">();\n'\
+'\treturn unit_tests_'$1'();\n'\
 '}\n'\
 '#endif\n'
 
@@ -223,12 +222,3 @@ function missing_header {
 
 missing_header
 missing_test
-
-
-
-
-
-
-
-
-
