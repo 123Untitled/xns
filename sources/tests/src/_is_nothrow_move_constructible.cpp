@@ -1,8 +1,11 @@
-#include "unit_tests.hpp"
+//#include "unit_tests.hpp"
 #include "is_nothrow_move_constructible.hpp"
 
 /* unit test */
 int unit_tests_is_nothrow_move_constructible(void) {
+
+	constexpr bool b = xns::is_nothrow_move_constructible<int>;
+
 	return 0;
 }
 
