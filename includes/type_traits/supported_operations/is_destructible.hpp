@@ -13,10 +13,15 @@
 #ifndef XNS_IS_DESTRUCTIBLE_HPP
 #define XNS_IS_DESTRUCTIBLE_HPP
 
+#include "config.hpp"
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
+
+#if not XNS_HAS_BUILTIN(__is_destructible)
+#	error "compiler does not support __is_destructible"
+#endif
 
 
 	// -- I S  D E S T R U C T I B L E ----------------------------------------

@@ -15,11 +15,16 @@
 
 #include "add_const.hpp"
 #include "add_lvalue_reference.hpp"
+#include "config.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
+
+#if not XNS_HAS_BUILTIN(__is_nothrow_constructible)
+#	error "compiler does not support __is_nothrow_constructible"
+#endif
 
 
 	// -- I S  N O T H R O W  C O P Y  C O N S T R U C T I B L E --------------

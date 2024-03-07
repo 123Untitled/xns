@@ -16,12 +16,16 @@
 #include "is_trivially_assignable.hpp"
 #include "add_lvalue_reference.hpp"
 #include "add_const.hpp"
+#include "config.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
 
+#if not XNS_HAS_BUILTIN(__is_trivially_assignable)
+#	error "compiler does not support __is_trivially_assignable"
+#endif
 
 	// -- I S  T R I V I A L L Y  C O P Y  A S S I G N A B L E ----------------
 
