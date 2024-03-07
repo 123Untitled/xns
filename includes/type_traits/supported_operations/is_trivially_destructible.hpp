@@ -1,5 +1,19 @@
-#ifndef XNS_IS_TRIVIALLY_DESTRUCTIBLE_HEADER
-#define XNS_IS_TRIVIALLY_DESTRUCTIBLE_HEADER
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
+#ifndef XNS_IS_TRIVIALLY_DESTRUCTIBLE_HPP
+#define XNS_IS_TRIVIALLY_DESTRUCTIBLE_HPP
 
 // local headers
 #include "config.hpp"
@@ -13,7 +27,7 @@ namespace xns {
 
 	// -- I S  T R I V I A L L Y  D E S T R U C T I B L E ----------------------
 
-#if __has_builtin(__is_trivially_destructible)
+#if XNS_HAS_BUILTIN(__is_trivially_destructible)
 
 	/* is trivially destructible concept */
 	template <class T>
@@ -26,12 +40,9 @@ namespace xns {
 	concept is_trivially_destructible = xns::is_destructible<T> && __has_trivial_destructor(T);
 
 #else
-
-#error "Compiler does not support __is_trivially_destructible or __has_trivial_destructor"
-
+#	error "compiler does not support __is_trivially_destructible or __has_trivial_destructor"
 #endif
 
-
-}
+} // namespace xns
 
 #endif // IS_TRIVIALLY_DESTRUCTIBLE_HEADER

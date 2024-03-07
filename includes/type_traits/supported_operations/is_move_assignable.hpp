@@ -34,7 +34,6 @@ namespace xns {
 	template <typename... T>
 	concept are_move_assignable = (xns::is_move_assignable<T> && ...);
 
-
 } // namespace xns
 
 #endif // XNS_IS_MOVE_ASSIGNABLE_HPP

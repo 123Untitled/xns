@@ -15,16 +15,12 @@
 
 #include "add_lvalue_reference.hpp"
 #include "add_rvalue_reference.hpp"
-#include "config.hpp"
+#include "is_nothrow_assignable.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
-
-#if not XNS_HAS_BUILTIN(__is_nothrow_assignable)
-#	error "compiler does not support __is_nothrow_assignable"
-#endif
 
 
 	// -- I S  N O T H R O W  M O V E  A S S I G N A B L E --------------------
@@ -32,8 +28,8 @@ namespace xns {
 	/* is nothrow move assignable */
 	template <typename T>
 	concept is_nothrow_move_assignable
-		= __is_nothrow_assignable(xns::add_lvalue_reference<T>,
-								  xns::add_rvalue_reference<T>);
+		= xns::is_nothrow_assignable<xns::add_lvalue_reference<T>,
+									 xns::add_rvalue_reference<T>>;
 
 	/* are nothrow move assignable */
 	template <typename... T>

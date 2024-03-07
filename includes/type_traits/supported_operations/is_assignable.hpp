@@ -20,6 +20,7 @@
 
 namespace xns {
 
+
 #if not XNS_HAS_BUILTIN(__is_assignable)
 #	error "compiler does not support __is_assignable"
 #endif
@@ -34,13 +35,3 @@ namespace xns {
 } // namespace xns
 
 #endif // XNS_IS_ASSIGNABLE_HPP
-
-
-/*
-template <class T, class U>
-concept is_assignable = requires(T t) {
-	{ t = xns::declval<U>() } -> xns::is_convertible<T&>;
-};
-*/
-
-

@@ -13,7 +13,6 @@
 #ifndef XNS_IS_CONSTRUCTIBLE_HPP
 #define XNS_IS_CONSTRUCTIBLE_HPP
 
-#include "declval.hpp"
 #include "config.hpp"
 
 
@@ -21,31 +20,17 @@
 
 namespace xns {
 
+
 #if not XNS_HAS_BUILTIN(__is_constructible)
 #	error "compiler does not support __is_constructible"
 #endif
+
 
 	// -- I S  C O N S T R U C T I B L E --------------------------------------
 
 	/* is constructible */
 	template <typename T, typename... A>
 	concept is_constructible = __is_constructible(T, A...);
-
-
-	///* is constructible concept */
-	//template <class T, class... A>
-	//concept is_constructible = requires {
-	//	T(xns::declval<A>()...);
-	//};
-	//
-	///* is copy constructible concept (no implicit conversion) */
-	//template <class T, class... A>
-	//concept is_constructible_strict = requires {
-	//	T{xns::declval<A>()...};
-	//};
-
-
-
 
 } // namespace xns
 

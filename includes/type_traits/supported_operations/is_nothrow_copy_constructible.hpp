@@ -15,16 +15,12 @@
 
 #include "add_const.hpp"
 #include "add_lvalue_reference.hpp"
-#include "config.hpp"
+#include "is_nothrow_constructible.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
-
-#if not XNS_HAS_BUILTIN(__is_nothrow_constructible)
-#	error "compiler does not support __is_nothrow_constructible"
-#endif
 
 
 	// -- I S  N O T H R O W  C O P Y  C O N S T R U C T I B L E --------------
@@ -32,7 +28,7 @@ namespace xns {
 	/* is nothrow copy constructible */
 	template <typename T>
 	concept is_nothrow_copy_constructible
-		= __is_nothrow_constructible(T, xns::add_lvalue_reference<xns::add_const<T>>);
+		= xns::is_nothrow_constructible<T, xns::add_lvalue_reference<xns::add_const<T>>>;
 
 	/* are nothrow copy constructible */
 	template <typename... T>
