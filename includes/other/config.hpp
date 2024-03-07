@@ -1,3 +1,5 @@
+//#pragma once
+
 #ifndef XNS_CONFIG_HEADER
 #define XNS_CONFIG_HEADER
 
@@ -7,19 +9,19 @@
 
 
 #ifndef XNS_CPP_VERSION
-#if   __cplusplus <= 201103L
-#define XNS_CPP_VERSION 11
-#elif __cplusplus <= 201402L
-#define XNS_CPP_VERSION 14
-#elif __cplusplus <= 201703L
-#define XNS_CPP_VERSION 17
-#elif __cplusplus <= 202002L
-#define XNS_CPP_VERSION 20
-#elif __cplusplus <= 202302L
-#define XNS_CPP_VERSION 23
-#else
-#define _LIBCPP_STD_VER 26
-#endif
+#	if __cplusplus <= 201103L
+#		define XNS_CPP_VERSION 11
+#	elif __cplusplus <= 201402L
+#		define XNS_CPP_VERSION 14
+#	elif __cplusplus <= 201703L
+#		define XNS_CPP_VERSION 17
+#	elif __cplusplus <= 202002L
+#		define XNS_CPP_VERSION 20
+#	elif __cplusplus <= 202302L
+#		define XNS_CPP_VERSION 23
+#	else
+#		define _LIBCPP_STD_VER 26
+#	endif
 #endif // XNS_CPP_VERSION
 
 // check if __always_inline__
@@ -31,6 +33,15 @@
 	#else
 		#define XNS_FORCE_INLINE inline
 	#endif
+#endif
+
+// check for 'has_builtin'
+#if not defined(XNS_HAS_BUILTIN)
+#	if not defined(__has_builtin)
+#		define XNS_HAS_BUILTIN(x) 0
+#	else
+#		define XNS_HAS_BUILTIN(x) __has_builtin(x)
+#	endif
 #endif
 
 
