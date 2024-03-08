@@ -104,8 +104,8 @@ namespace xns {
 				if (_instance._buffer.empty()) { return; }
 
 				// write buffer to file descriptor
-				(void)::write(fd, _instance._buffer.data(),
-								  _instance._buffer.size());
+				static_cast<void>(::write(fd, _instance._buffer.data(),
+								  _instance._buffer.size()));
 
 				// clear buffer
 				_instance._buffer.clear();

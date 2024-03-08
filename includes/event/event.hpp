@@ -65,7 +65,7 @@ namespace xns {
 			non_assignable(event);
 
 			/* destructor */
-			~event(void);
+			~event(void) noexcept = default;
 
 
 		public:

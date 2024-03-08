@@ -53,13 +53,13 @@ namespace xns {
 			// -- private lifecycle -------------------------------------------
 
 			/* addrs constructor */
-			inline fragmentation(const xns::vector<void*>&);
+			fragmentation(const xns::vector<void*>&);
 
 			/* non-assignable class */
 			unassignable(fragmentation);
 
 			/* destructor */
-			inline ~fragmentation(void) = default;
+			~fragmentation(void) = default;
 
 
 

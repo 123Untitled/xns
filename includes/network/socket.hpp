@@ -50,8 +50,8 @@ namespace xns {
 				/* self type */
 				using self = xns::network::socket;
 
-				/* descriptor type */
-				using descriptor = xns::unique_descriptor::descriptor;
+				/* id type */
+				using id_type = xns::unique_descriptor::id_type;
 
 				/* link type */
 				using link = xns::link<self, xns::network::poller>;
@@ -64,12 +64,12 @@ namespace xns {
 				: unique_descriptor{}, link{} {}
 
 				/* descriptor constructor */
-				inline socket(const descriptor& socket) noexcept
-				: unique_descriptor{socket}, link{} {}
+				inline socket(const id_type sock) noexcept
+				: unique_descriptor{sock}, link{} {}
 
 				/* unique descriptor constructor */
-				inline socket(unique_descriptor&& socket) noexcept
-				: unique_descriptor{xns::move(socket)}, link{} {}
+				inline socket(unique_descriptor&& sock) noexcept
+				: unique_descriptor{xns::move(sock)}, link{} {}
 
 				/* non-copyable class */
 				NON_COPYABLE(socket);
@@ -92,8 +92,8 @@ namespace xns {
 				}
 
 				/* descriptor assignment operator */
-				inline auto operator=(const descriptor& socket) noexcept -> self& {
-					unique_descriptor::operator=(socket);
+				inline auto operator=(const id_type& sock) noexcept -> self& {
+					unique_descriptor::operator=(sock);
 					return *this;
 				}
 

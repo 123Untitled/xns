@@ -1414,7 +1414,9 @@ namespace xns {
 
 			self str;
 
-			constexpr size_type size = xns::limits::digits<T>();
+			// debug !!!!
+			constexpr size_type size = 1000;//xns::limits::digits<T>();
+			//static_assert(size > 0, "size must be greater than zero");
 
 			str._str = str.allocate(size);
 			str._capacity = size;

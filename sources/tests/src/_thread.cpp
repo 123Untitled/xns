@@ -1,8 +1,5 @@
-#include "unit_tests.hpp"
 #include "thread.hpp"
-#include <thread>
 #include "reference_wrapper.hpp"
-#include "apply.hpp"
 
 class A {
 
@@ -31,38 +28,10 @@ void printer(const A& a, int i) {
 	std::cout << i << std::endl;
 }
 
-/* unit test */
-#include "invoke.hpp"
 
 auto unit_tests_thread(void) -> int {
-	/*
-	const xns::tuple<A, int> t{A{}, 123};
-	xns::apply(printer, t);
-	*/
 
-	{
-		const A a;
-
-		std::function<void(const A&)> f0 = &A::print;
-
-		xns::invoke(f0, a);
-	}
-
-	return 0;
-
-
-	A a0;
-
-	xns::invoke(&A::print, a0);
-
-	return 0;
-
-
-	void(&f)(const A&, int) = printer;
-
-	A a;
-	auto ref = xns::ref(a);
-	xns::invoke(&A::print, ref);
+	A a{};
 
 	xns::thread t0{&A::print, xns::ref(a)};
 

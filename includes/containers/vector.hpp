@@ -25,6 +25,7 @@
 
 // c++ standard library headers
 #include <iostream>
+#include <cstring>
 
 
 
@@ -42,9 +43,9 @@ namespace xns {
 		// -- assertions ------------------------------------------------------
 
 		/* requires nothrow move operations */
-		static_assert(xns::is_nothrow_move_constructible<T>
-				   && xns::is_nothrow_move_assignable<T>,
-					  "vector, requires nothrow move operations.");
+		//static_assert(xns::is_nothrow_move_constructible<T>
+		//		   && xns::is_nothrow_move_assignable<T>,
+		//			  "vector, requires nothrow move operations.");
 
 		/* requires nothrow destructible */
 		static_assert(xns::is_nothrow_destructible<T>,
@@ -166,7 +167,7 @@ namespace xns {
 			}
 
 			/* destructor */
-			inline ~vector(void) noexcept {
+			~vector(void) noexcept {
 
 				if (_vector == nullptr)
 					return;

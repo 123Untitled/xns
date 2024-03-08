@@ -42,6 +42,6 @@ namespace xns {
 		explicit in_place_index(void) noexcept = default;
 	};
 
-}; // namespace xns
+} // namespace xns
 
 #endif // XNS_IN_PLACE_HPP

@@ -19,6 +19,10 @@
 #include "config.hpp"
 #include "is_destructible.hpp"
 
+#if not XNS_HAS_BUILTIN(__is_trivially_destructible) and not XNS_HAS_BUILTIN(__has_trivial_destructor)
+#	include <type_traits>
+#endif
+
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
@@ -33,14 +37,18 @@ namespace xns {
 	template <class T>
 	concept is_trivially_destructible = __is_trivially_destructible(T);
 
-#elif __has_builtin(__has_trivial_destructor)
+#elif XNS_HAS_BUILTIN(__has_trivial_destructor)
 
 	/* is trivially destructible concept */
 	template <class T>
 	concept is_trivially_destructible = xns::is_destructible<T> && __has_trivial_destructor(T);
 
 #else
-#	error "compiler does not support __is_trivially_destructible or __has_trivial_destructor"
+
+	/* is trivially destructible concept */
+	template <class T>
+	concept is_trivially_destructible = std::is_trivially_destructible_v<T>;
+
 #endif
 
 } // namespace xns

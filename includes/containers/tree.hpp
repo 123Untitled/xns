@@ -374,7 +374,7 @@ namespace xns {
 					node_type** node = &_root;
 					node_ptr parent = nullptr;
 
-					while (__builtin_unpredictable(*node != nullptr)) {
+					while (*node != nullptr) {
 						// set parent
 						parent = *node;
 						// get next node
@@ -459,15 +459,15 @@ namespace xns {
 				node_type** node = &_root;
 				node_ptr parent = nullptr;
 
-				while (__builtin_unpredictable(*node != nullptr)) {
-
+				while (*node != nullptr) {
 
 					// set parent
 					parent = *node;
 
-
 					// equal compare
-					if (__builtin_expect(value == (**node)._value, 0)) { return; }
+					if (value == (**node)._value)
+						return;
+
 					// get next node
 					node = &(value < (**node)._value ? (**node)._left : (**node)._right);
 				}
@@ -608,13 +608,15 @@ namespace xns {
 			 * goal is to balance memory fragmentation
 			 */
 
-			//     ?
-			//     |
-			//     C
-			//    / \
-			//   ?   R
-			//      / \
-			//     ?   ?
+			/*
+			 *     ?
+			 *     |
+			 *     C
+			 *    / \
+			 *   ?   R
+			 *      / \
+			 *     ?   ?
+			 */
 
 			auto swap_right(node_ptr current, node_ptr right) {
 				xns::swap(current->_value, right->_value);
@@ -1024,22 +1026,26 @@ namespace xns {
 				// connect root
 				replace(node, root);
 
-				//       N
-				//      /
-				//     R
-				//    /
-				//   C
+				/*
+				 *       N
+				 *      /
+				 *     R
+				 *    /
+				 *   C
+				 */
 
 				// update root parent
 				root->_parent = node->_parent;
 				// update node parent
 				node->_parent = root;
 
-				//       N
-				//      /
-				//     R
-				//    / \
-				//   C   ?
+				/*
+				 *       N
+				 *      /
+				 *     R
+				 *    / \
+				 *   C   ?
+				 */
 
 				// handle root right
 				if (root->_right) {
@@ -1049,11 +1055,13 @@ namespace xns {
 				// connect node
 				root->_right = node;
 
-				//     R
-				//    / \
-				//   C   N
-				//      /
-				//     ?
+				/*
+				 *     R
+				 *    / \
+				 *   C   N
+				 *      /
+				 *     ?
+				 */
 
 				// update depth
 				node->_depth -= 2;
@@ -1068,22 +1076,26 @@ namespace xns {
 				// connect root
 				replace(node, root);
 
-				//   N
-				//    \
-				//     R
-				//      \
-				//       C
+				/*
+				 *   N
+				 *    \
+				 *     R
+				 *      \
+				 *       C
+				 */
 
 				// update root parent
 				root->_parent = node->_parent;
 				// update node parent
 				node->_parent = root;
 
-				//   N
-				//    \
-				//     R
-				//    / \
-				//   ?   C
+				/*
+				 *   N
+				 *    \
+				 *     R
+				 *    / \
+				 *   ?   C
+				 */
 
 				// handle root left
 				if (root->_left) {
@@ -1093,11 +1105,13 @@ namespace xns {
 				// connect node
 				root->_left = node;
 
-				//     R
-				//    / \
-				//   N   C
-				//    \
-				//     ?
+				/*
+				 *     R
+				 *    / \
+				 *   N   C
+				 *    \
+				 *     ?
+				 */
 
 				// update depth
 				node->_depth -= 2;
@@ -1116,34 +1130,40 @@ namespace xns {
 				// connect root
 				replace(node, root);
 
-				//     N
-				//    /
-				//   L
-				//    \
-				//     R
-				//    / \
-				//   ?1 ?2
+				/*
+				 *     N
+				 *    /
+				 *   L
+				 *    \
+				 *     R
+				 *    / \
+				 *   ?1 ?2
+				 */
 
 				// handle root left
 				if (root->_left) {
 					root->_left->_parent = left;
 				} left->_right = root->_left;
 
-				//     N
-				//    /
-				//   L
-				//    \
-				//    ?1
+				/*
+				 *     N
+				 *    /
+				 *   L
+				 *    \
+				 *    ?1
+				 */
 
 				// connect root
 				root->_left = left;
 				left->_parent = root;
 
-				//     R
-				//    / \
-				//   L  ?2
-				//    \
-				//    ?1
+				/*
+				 *     R
+				 *    / \
+				 *   L  ?2
+				 *    \
+				 *    ?1
+				 */
 
 				// update root parent
 				root->_parent = node->_parent;
@@ -1158,11 +1178,13 @@ namespace xns {
 				// connect node
 				root->_right = node;
 
-				//      R
-				//    /   \
-				//   L     N
-				//    \   /
-				//    ?1 ?2
+				/*
+				 *      R
+				 *    /   \
+				 *   L     N
+				 *    \   /
+				 *    ?1 ?2
+				 */
 
 				left->_depth -= 1;
 				root->_depth += 1;

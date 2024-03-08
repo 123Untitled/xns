@@ -31,9 +31,9 @@ auto xns::thread::operator=(self&& other) noexcept -> self& {
 
 	// check if this thread is not null
 #if defined(__MVS__)
-	if (_thread.__ != 0)
+	//if (_thread.__ != 0)
 #else
-	if (_thread != 0)
+	//if (_thread != 0)
 #endif
 		;// terminate()
 

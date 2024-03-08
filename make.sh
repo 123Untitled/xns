@@ -176,7 +176,8 @@ ARFLAGS='-rcs'
 LINKER=$CXX
 
 # standard
-STD=('-std=c++2a' '-stdlib=libc++')
+STD=('-std=c++2a')
+	#'-stdlib=libc++')
 
 # debug
 DEBUG='-g3'
@@ -203,19 +204,19 @@ CXXFLAGS+=('-Werror')
 CXXFLAGS+=('-Wpedantic' '-Weffc++')
 
 # unused suppression
-CXXFLAGS+=('-Wno-unused' '-Wno-unused-variable' '-Wno-unused-parameter')
+CXXFLAGS+=('-Wno-unused' '-Wno-unused-variable' '-Wno-unused-parameter' '-Wno-unused-result')
 
 # optimization
 CXXFLAGS+=('-Winline')
 
 # type conversion
-CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
+#CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
 
 # shadowing
-CXXFLAGS+=('-Wshadow')
+#CXXFLAGS+=('-Wshadow')
 
 # exception
-CXXFLAGS+=('-fexceptions' '-Wexceptions')
+#CXXFLAGS+=('-fexceptions' '-Wexceptions')
 
 # defines
 DEFINES=()
@@ -406,6 +407,7 @@ function check_dependency {
 function handle_compilation {
 	# openssl hash
 	local HASH=$(openssl md5 <<< $FILE)
+	HASH=${HASH#* }
 	# add object file extension
 	local OBJ=$OBJDIR'/'$HASH'.o'
 	# add dependency file extension
@@ -423,8 +425,9 @@ function handle_compilation {
 
 		# compile source file
 		$CXX $STD $OPT $DEBUG $CXXFLAGS $DEFINES $INCLUDES \
-			-MJ $JSN -MT $OBJ -MMD -MF $DEP -c $FILE -o $OBJ 2> $LOG
+			-MT $OBJ -MMD -MF $DEP -c $FILE -o $OBJ 2> $LOG
 
+			#-MJ $JSN
 		# check if compilation failed
 		if [[ $? -ne 0 ]]; then
 			echo -n   $ERROR'[x]'$RESET
@@ -587,8 +590,15 @@ function linkage {
 }
 
 function database {
+
 	# get all json files
 	JSNS=($JSNDIR'/'*'.json'(.N))
+
+	# check if JSNS is empty
+	if [[ $JSNS[@] -eq 0 ]]; then
+		return
+	fi
+
 	# check if need to (re)generate database
 	if [[ ! -e $DATABASE ]] || is_link_required $DATABASE $JSNS; then
 		# start json string

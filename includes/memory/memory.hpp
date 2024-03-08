@@ -95,8 +95,8 @@ namespace xns {
 
 			/* unmap */
 			static inline auto unmap(void* ptr, const size_type size) noexcept -> void {
-				if (::munmap(ptr, size) == -1)
-					;// not good idea to throw exception in destructor
+				// not good idea to throw exception in destructor
+				::munmap(ptr, size);
 			}
 
 			/* page size */
@@ -192,8 +192,8 @@ namespace xns {
 
 			/* unmap */
 			static inline auto unmap(void* ptr, const size_type size) noexcept -> void {
-				if (::munmap(ptr, size) == -1)
-					;// not good idea to throw exception in destructor
+				::munmap(ptr, size);
+				// not good idea to throw exception in destructor
 			}
 
 			/* page size */

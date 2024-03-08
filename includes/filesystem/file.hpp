@@ -40,17 +40,17 @@ namespace xns {
 
 			/* default constructor */
 			inline file(void) noexcept
-			: _descriptor{}, _buffer{} {}
+			: _descriptor{}, _buffer{}, _readed{0} {}
 
 			/* variadic constructor */
 			template <typename... A>
 			inline file(const xns::string& path, A&&... args) noexcept
-			: _descriptor{xns::trust{}, ::open(path.data(), args...)},
-			  _buffer{} {}
+			: _descriptor{::open(path.data(), args...)},
+			  _buffer{}, _readed{0} {}
 
 			/* move constructor */
 			inline file(self&& other) noexcept
-			: unique_descriptor{xns::move(other)}, _buffer{} {}
+			: unique_descriptor{xns::move(other)}, _buffer{}, _readed{0} {}
 
 			/* non-copyable class */
 			non_copyable(file);

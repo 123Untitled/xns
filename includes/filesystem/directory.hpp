@@ -2,6 +2,7 @@
 #define XNS_DIRECTORY_HEADER
 
 // local headers
+#include "os.hpp"
 #include "string_literal.hpp"
 #include "string.hpp"
 #include "types.hpp"
@@ -58,17 +59,13 @@ namespace xns {
 				// -- public types --------------------------------------------
 
 				/* self type */
-				using self = directory_iterator<recursive>;
+				using self = xns::filesystem::directory_iterator<recursive>;
 
 
 				// -- public constructors -------------------------------------
 
 				/* deleted default constructor */
 				directory_iterator(void) = delete;
-
-				/* nullptr constructor */
-				inline directory_iterator(xns::null) noexcept
-				: _container{}, _entity{nullptr} {}
 
 				/* path constructor (non-recursive) */
 				directory_iterator(const xns::string& path) requires (recursive == false)
@@ -165,20 +162,20 @@ namespace xns {
 
 
 				/* post-increment operator */
-				directory_iterator& operator++(int) = delete;
+				auto operator++(int) -> self = delete;
 
 
 
 				// -- comparison operators ------------------------------------
 
 				/* equality operator */
-				inline auto operator==(const directory_iterator& other) const noexcept -> bool {
+				inline auto operator==(const self& other) const noexcept -> bool {
 					// compare inodes of entities
-					#if defined(BSD_OS) || defined(APPLE_OS)
+					#if defined(XNS_BSD) || defined(XNS_APPLE)
 						return  _entity
 							&&  other._entity
 							&& (_entity->d_ino == other._entity->d_ino);
-					#elif defined(LINUX_OS)
+					#elif defined(XNS_LINUX)
 						return  _entity
 							&&  other._entity
 							&& (_entity->d_fileno == other._entity->d_fileno);
@@ -186,7 +183,7 @@ namespace xns {
 				}
 
 				/* inequality operator */
-				inline auto operator!=(const directory_iterator& other) const noexcept -> bool {
+				inline auto operator!=(const self& other) const noexcept -> bool {
 					return operator==(other) == false;
 				}
 

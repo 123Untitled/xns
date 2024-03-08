@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef XNS_UNIQUE_DESCRIPTOR_HEADER
 #define XNS_UNIQUE_DESCRIPTOR_HEADER
 
@@ -11,10 +13,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-// c++ standard headers
-#include <iostream>
-#include <type_traits>
-
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
@@ -23,12 +21,12 @@ namespace xns {
 
 	// -- T R U S T  T A G  S T R U C T ---------------------------------------
 
-	struct trust {
-
-		/* trust constructor */
-		explicit constexpr trust(void) noexcept = default;
-
-	};
+	//struct trust {
+	//
+	//	/* trust constructor */
+	//	explicit constexpr trust(void) noexcept = default;
+	//
+	//};
 
 
 	// -- forward declarations ------------------------------------------------
@@ -47,8 +45,8 @@ namespace xns {
 		// -- friends ---------------------------------------------------------
 
 		/* file class as friend */
-		template <decltype(sizeof(0))>
-		friend class file;
+		//template <decltype(sizeof(0))>
+		//friend class file;
 
 
 		public:
@@ -58,8 +56,8 @@ namespace xns {
 			/* self type */
 			using self = xns::unique_descriptor;
 
-			/* descriptor type */
-			using descriptor = int;
+			/* id type */
+			using id_type = int;
 
 
 			// -- public lifecycle --------------------------------------------
@@ -69,9 +67,9 @@ namespace xns {
 			: _descriptor{NULL_DESCRIPTOR} {}
 
 			/* descriptor constructor */
-			inline unique_descriptor(const descriptor& descriptor) noexcept
-			: _descriptor{check_descriptor(descriptor)} {
-					std::cout << "checking descriptor: " << _descriptor << std::endl;
+			inline unique_descriptor(const id_type& descriptor) noexcept
+			: _descriptor{descriptor} {
+			//: _descriptor{self::check_descriptor(descriptor)} {
 			}
 
 			/* non-copyable class */
@@ -87,7 +85,7 @@ namespace xns {
 			/* destructor */
 			inline ~unique_descriptor(void) noexcept {
 				// close descriptor
-				close_descriptor();
+				this->close_descriptor();
 			}
 
 
@@ -108,9 +106,10 @@ namespace xns {
 			}
 
 			/* descriptor assignment operator */
-			inline auto operator=(const descriptor& descriptor) noexcept -> self& {
+			inline auto operator=(const id_type& descriptor) noexcept -> self& {
+				_descriptor = descriptor;
 				// set descriptor
-				_descriptor = check_descriptor(descriptor);
+				//_descriptor = self::check_descriptor(descriptor);
 				// return self reference
 				return *this;
 			}
@@ -134,7 +133,7 @@ namespace xns {
 			// -- public conversion operators -----------------------------
 
 			/* descriptor conversion operator */
-			inline operator descriptor(void) const noexcept {
+			inline operator id_type(void) const noexcept {
 				// return descriptor
 				return _descriptor;
 			}
@@ -170,7 +169,7 @@ namespace xns {
 			}
 
 			/* get descriptor */
-			inline auto get(void) const noexcept -> const descriptor& {
+			inline auto get(void) const noexcept -> const id_type& {
 				// return descriptor
 				return _descriptor;
 			}
@@ -181,15 +180,15 @@ namespace xns {
 			/* reset descriptor */
 			inline auto reset(void) noexcept -> void {
 				// close descriptor
-				close_descriptor();
+				this->close_descriptor();
 				// invalidate descriptor
 				_descriptor = NULL_DESCRIPTOR;
 			}
 
 			/* set descriptor */
-			inline auto set(const descriptor& descriptor) noexcept -> void {
+			inline auto set(const id_type& descriptor) noexcept -> void {
 				// close descriptor
-				close_descriptor();
+				this->close_descriptor();
 				// set descriptor
 				_descriptor = descriptor;
 			}
@@ -201,9 +200,9 @@ namespace xns {
 
 			// -- private lifecycle -------------------------------------------
 
-			/* private trusted constructor */
-			inline unique_descriptor(const trust, const descriptor& descriptor) noexcept
-			: _descriptor{descriptor} {}
+			///* private trusted constructor */
+			//inline unique_descriptor(const trust, const id_type& descriptor) noexcept
+			//: _descriptor{descriptor} {}
 
 
 			// -- private methods ---------------------------------------------
@@ -220,32 +219,26 @@ namespace xns {
 			}
 
 			/* check descriptor */
-			inline auto check_descriptor(const descriptor& descriptor)
-				noexcept -> unique_descriptor::descriptor {
-				// check if descriptor is valid
-				return (::fcntl(descriptor, F_GETFD) != -1 || errno != EBADF)
-					? descriptor : NULL_DESCRIPTOR;
-			}
+			//static inline auto check_descriptor(const id_type& descriptor) noexcept -> unique_descriptor::id_type {
+			//	// check if descriptor is valid
+			//	return (::fcntl(descriptor, F_GETFD) != -1 || errno != EBADF)
+			//		? descriptor : NULL_DESCRIPTOR;
+			//}
 
 
 			// -- private enums -----------------------------------------------
 
 			/* descriptor type */
-			enum { NULL_DESCRIPTOR = -1 };
+			enum : id_type { NULL_DESCRIPTOR = -1 };
 
 
 			// -- private members ---------------------------------------------
 
-
 			/* descriptor */
-			descriptor _descriptor;
+			id_type _descriptor;
 
-	};
+	}; // class unique_descriptor
 
+} // namespace xns
 
-
-
-}
-
-#endif
-
+#endif // XNS_UNIQUE_DESCRIPTOR_HEADER

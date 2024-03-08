@@ -17,7 +17,7 @@ static bool checker(void) {
 	// standard result
 	constexpr bool std_result = std::is_signed<T>::value;
 	// all tests
-	constexpr bool all_tests = result == std_result == expected;
+	constexpr bool all_tests = (result == std_result) and (result == expected);
 
 
 	if constexpr (all_tests) {

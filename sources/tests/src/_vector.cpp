@@ -1,5 +1,5 @@
 #include "vector.hpp"
-#include <benchmark/benchmark.h>
+//#include <benchmark/benchmark.h>
 #include "random.hpp"
 #include "time.hpp"
 
@@ -75,8 +75,6 @@ auto unit_tests_vector(void) -> int {
 
 	//xns::vector<A> v;
 	//xns::malloc();
-
-
 
 
 	return 0;

@@ -373,6 +373,6 @@ namespace xns {
 
 
 
-};
+}
 
 #endif

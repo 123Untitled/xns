@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef XNS_STACK_HEADER
 #define XNS_STACK_HEADER
 
@@ -5,11 +7,8 @@
 #include "types.hpp"
 #include "move.hpp"
 #include "forward.hpp"
-#include "memory.hpp"
 #include "swap.hpp"
 #include "allocator.hpp"
-
-#include <iostream>
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -36,20 +35,20 @@ namespace xns {
 			/* size type */
 			using size_type       = xns::size_t;
 
-			/* reference type */
-			using reference       = value_type&;
+			/* mutable reference type */
+			using mut_ref         = value_type&;
 
 			/* const reference type */
-			using const_reference = const value_type&;
+			using const_ref       = const value_type&;
 
 			/* move reference type */
-			using move_reference  = value_type&&;
+			using move_ref        = value_type&&;
 
-			/* pointer type */
-			using mutable_pointer = value_type*;
+			/* mutable pointer type */
+			using mutable_ptr     = value_type*;
 
 			/* const pointer type */
-			using const_pointer   = const value_type*;
+			using const_ptr       = const value_type*;
 
 
 		private:
@@ -63,10 +62,9 @@ namespace xns {
 			// -- private types -----------------------------------------------
 
 			/* node pointer type */
-			using node_pointer = node*;
+			using node_ptr = node*;
 
 			/* allocator type */
-			//using allocator = xns::memory::pool<node>;
 			using allocator = xns::allocator<node>;
 
 
@@ -82,13 +80,13 @@ namespace xns {
 			stack(const self& other)
 			: stack{} {
 				// get other top
-				node_pointer node = other._top;
+				node_ptr it = other._top;
 				// loop through other
-				while (node) {
+				while (it) {
 					// push node value
-					push(node->_value);
+					this->push(it->_value);
 					// get next node
-					node = node->_next;
+					it = it->_next;
 				}
 			}
 
@@ -115,13 +113,13 @@ namespace xns {
 					free_stack();
 					init();
 					// get other top
-					node_pointer node = other._top;
+					node_ptr it = other._top;
 					// loop through other stack
-					while (node) {
+					while (it) {
 						// push node value
-						push(node->_value);
+						this->push(it->_value);
 						// get next node
-						node = node->_next;
+						it = it->_next;
 					} // return self reference
 				} return *this;
 			}
@@ -133,7 +131,7 @@ namespace xns {
 					// free stack
 					free_stack();
 					// move members
-					_top = other._top;
+					_top  = other._top;
 					_size = other._size;
 					// invalidate other
 					other.init();
@@ -145,13 +143,13 @@ namespace xns {
 			// -- public accessors --------------------------------------------
 
 			/* top */
-			inline auto top(void) noexcept -> reference {
+			inline auto top(void) noexcept -> mut_ref {
 				// return top value reference
 				return _top->_value;
 			}
 
 			/* const top */
-			inline auto top(void) const noexcept -> const_reference {
+			inline auto top(void) const noexcept -> const_ref {
 				// return top value const reference
 				return _top->_value;
 			}
@@ -176,10 +174,10 @@ namespace xns {
 			template <typename U>
 			auto push(U&& value) -> void {
 				// allocate and link node
-				node_pointer node = allocator::allocate();
-				allocator::construct(node, xns::forward<U>(value));
-				node->_next = _top;
-				_top = node;
+				node_ptr ptr = allocator::allocate();
+				allocator::construct(ptr, xns::forward<U>(value));
+				ptr->_next = _top;
+				_top = ptr;
 				// increment size
 				++_size;
 			}
@@ -188,10 +186,10 @@ namespace xns {
 			template <typename... A>
 			auto emplace(A&&... args) -> void {
 				// allocate and link node
-				node_pointer node = allocator::allocate();
-				allocator::construct(node, xns::forward<A>(args)...);
-				node->_next = _top;
-				_top = node;
+				node_ptr ptr = allocator::allocate();
+				allocator::construct(ptr, xns::forward<A>(args)...);
+				ptr->_next = _top;
+				_top = ptr;
 				// increment size
 				++_size;
 			}
@@ -199,23 +197,23 @@ namespace xns {
 			/* pop */
 			auto pop(void) noexcept -> void {
 				// check for non-empty stack
-				if (_top) {
-					// get top node
-					node_pointer node = _top;
-					_top = _top->_next;
-					// destroy node
-					allocator::destroy(node);
-					// deallocate node
-					allocator::deallocate(node);
-					// decrement size
-					--_size;
-				}
+				if (_top == nullptr)
+					return;
+				// get top node
+				node_ptr ptr = _top;
+				_top = _top->_next;
+				// destroy node
+				allocator::destroy(ptr);
+				// deallocate node
+				allocator::deallocate(ptr);
+				// decrement size
+				--_size;
 			}
 
 			/* swap */
 			auto swap(self& other) noexcept -> void {
 				// swap members
-				xns::swap(_top, other._top);
+				xns::swap(_top,  other._top);
 				xns::swap(_size, other._size);
 			}
 
@@ -225,20 +223,6 @@ namespace xns {
 				free_stack();
 				// initialize members
 				init();
-			}
-
-			/* print stack */
-			auto print(void) noexcept -> void {
-				std::cout << "size: " << _size << std::endl;
-				// get top node
-				node_pointer node = _top;
-				// loop through stack
-				while (node) {
-					// print value
-					std::cout << node->_value << std::endl;
-					// get next node
-					node = node->_next;
-				}
 			}
 
 
@@ -256,17 +240,17 @@ namespace xns {
 			/* free stack */
 			auto free_stack(void) noexcept -> void {
 				// get top node
-				node_pointer node = _top;
+				node_ptr it = _top;
 				// loop through stack
-				while (node) {
+				while (it) {
 					// get next node
-					node_pointer next = node->_next;
+					node_ptr next = it->_next;
 					// destroy node
-					allocator::destroy(node);
+					allocator::destroy(it);
 					// deallocate node
-					allocator::deallocate(node);
+					allocator::deallocate(it);
 					// set node to next
-					node = next;
+					it = next;
 				}
 			}
 
@@ -274,7 +258,7 @@ namespace xns {
 			// -- private members ---------------------------------------------
 
 			/* top */
-			node_pointer _top;
+			node_ptr _top;
 
 			/* size */
 			size_type _size;
@@ -299,11 +283,11 @@ namespace xns {
 			unassignable(node);
 
 			/* value copy constructor */
-			inline explicit node(stack<T>::const_reference value)
+			inline explicit node(const_ref value)
 			: _value{value}, _next{nullptr} {}
 
 			/* value move constructor */
-			inline explicit node(stack<T>::move_reference value) noexcept
+			inline explicit node(move_ref value) noexcept
 			: _value{xns::move(value)}, _next{nullptr} {}
 
 			/* value emplace constructor */
@@ -318,14 +302,13 @@ namespace xns {
 			// -- public members ----------------------------------------------
 
 			/* value */
-			stack<T>::value_type _value;
+			value_type _value;
 
 			/* next */
-			stack<T>::node_pointer _next;
+			node_ptr _next;
 
 	};
 
-
 }
 
-#endif
+#endif // XNS_STACK_HPP

@@ -96,14 +96,14 @@ namespace xns {
 			}
 
 			/* destructor */
-			~callable(void) {
+			~callable(void) noexcept {
 				// deallocate base
-				if (_base) {
-					// destroy base
-					xns::allocator<base>::destroy(_base);
-					// deallocate memory
-					xns::allocator<base>::deallocate(_base);
-				}
+				if (_base == nullptr)
+					return;
+				// destroy base
+				xns::allocator<base>::destroy(_base);
+				// deallocate memory
+				xns::allocator<base>::deallocate(_base);
 			}
 
 

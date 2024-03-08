@@ -1,6 +1,8 @@
 plot.py
 plot.sh
 
+.nvimlog
+
 external/
 
 jomt*/

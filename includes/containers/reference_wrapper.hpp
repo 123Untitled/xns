@@ -161,6 +161,6 @@ namespace xns {
 	}
 
 
-}; // namespace xns
+} // namespace xns
 
 #endif // XNS_REFERENCE_WRAPPER_HPP

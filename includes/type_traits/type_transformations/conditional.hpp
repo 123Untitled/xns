@@ -24,7 +24,7 @@ namespace xns {
 		template <typename T, typename F>
 		struct conditional<false, T, F> final { using type = F; };
 
-	};
+	}
 
 	/* conditional */
 	template <bool B, typename T, typename F>

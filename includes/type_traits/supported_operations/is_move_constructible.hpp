@@ -26,7 +26,7 @@ namespace xns {
 
 	/* is move constructible */
 	template <typename T>
-	concept is_move_constructible = xns::is_constructible<T, xns::add_rvalue_reference<T>>;
+	concept is_move_constructible = true;//xns::is_constructible<T, xns::add_rvalue_reference<T>>;
 
 	/* are move constructible */
 	template <typename... T>

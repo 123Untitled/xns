@@ -9,7 +9,7 @@
 #include "is_nothrow_move_assignable.hpp"
 #include "is_nothrow_destructible.hpp"
 
-#include <benchmark/benchmark.h>
+//#include <benchmark/benchmark.h>
 
 // google benchmark learn
 
@@ -24,57 +24,57 @@ struct mypair {
 #include "benchmark.hpp"
 #include "random.hpp"
 
-template <typename T>
-static auto compressed_pair(benchmark::State& state) -> void {
-	std::vector<T> vec;
-	vec.resize((unsigned long)state.range(0));
-
-	for (auto _ : state) {
-		for (auto i = 0; i < state.range(0); ++i) {
-			vec[(unsigned long)i] = T{xns::random::integral<int>(), xns::random::integral<int>()};
-			benchmark::DoNotOptimize(vec[(unsigned long)i]);
-		}
-	}
-}
-
-static auto pair(benchmark::State& state) -> void {
-	std::vector<xns::pair<int, int>> vec;
-	vec.resize((unsigned long)state.range(0));
-
-	for (auto _ : state) {
-		for (auto i = 0; i < state.range(0); ++i) {
-			xns::pair<int, int> p;
-			p._first = xns::random::integral<int>();
-			p._second = xns::random::integral<int>();
-			vec[(unsigned long)i] = p;
-			benchmark::DoNotOptimize(vec[(unsigned long)i]);
-		}
-	}
-}
-
-static auto mypair(benchmark::State& state) -> void {
-	std::vector<struct mypair> vec;
-	vec.resize((unsigned long)state.range(0));
-
-	for (auto _ : state) {
-		for (auto i = 0; i < state.range(0); ++i) {
-			struct mypair p;
-			p.a = xns::random::integral<int>();
-			p.b = xns::random::integral<int>();
-			vec[(unsigned long)i] = p;
-			benchmark::DoNotOptimize(vec[(unsigned long)i]);
-		}
-	}
-}
-
-#define START 1000
-#define END 1'000'000
-
-//BENCHMARK(compressed_pair<xns::pair2<int, int>>) -> Range(START, END) -> RangeMultiplier(2) ->  Unit(benchmark::kMillisecond);
-//BENCHMARK(compressed_pair<std::pair<int, int>>) -> Range(START, END) -> RangeMultiplier(2) ->  Unit(benchmark::kMillisecond);
-BENCHMARK(pair) -> Range(START, END) -> RangeMultiplier(2) ->  Unit(benchmark::kMillisecond);
-BENCHMARK(mypair) -> Range(START, END) -> RangeMultiplier(2) ->  Unit(benchmark::kMillisecond);
-
+//template <typename T>
+//static auto compressed_pair(benchmark::State& state) -> void {
+//	std::vector<T> vec;
+//	vec.resize((unsigned long)state.range(0));
+//
+//	for (auto _ : state) {
+//		for (auto i = 0; i < state.range(0); ++i) {
+//			vec[(unsigned long)i] = T{xns::random::integral<int>(), xns::random::integral<int>()};
+//			benchmark::DoNotOptimize(vec[(unsigned long)i]);
+//		}
+//	}
+//}
+//
+//static auto pair(benchmark::State& state) -> void {
+//	std::vector<xns::pair<int, int>> vec;
+//	vec.resize((unsigned long)state.range(0));
+//
+//	for (auto _ : state) {
+//		for (auto i = 0; i < state.range(0); ++i) {
+//			xns::pair<int, int> p;
+//			p._first = xns::random::integral<int>();
+//			p._second = xns::random::integral<int>();
+//			vec[(unsigned long)i] = p;
+//			benchmark::DoNotOptimize(vec[(unsigned long)i]);
+//		}
+//	}
+//}
+//
+//static auto mypair(benchmark::State& state) -> void {
+//	std::vector<struct mypair> vec;
+//	vec.resize((unsigned long)state.range(0));
+//
+//	for (auto _ : state) {
+//		for (auto i = 0; i < state.range(0); ++i) {
+//			struct mypair p;
+//			p.a = xns::random::integral<int>();
+//			p.b = xns::random::integral<int>();
+//			vec[(unsigned long)i] = p;
+//			benchmark::DoNotOptimize(vec[(unsigned long)i]);
+//		}
+//	}
+//}
+//
+//#define START 1000
+//#define END 1'000'000
+//
+////BENCHMARK(compressed_pair<xns::pair2<int, int>>) -> Range(START, END) -> RangeMultiplier(2) ->  Unit(benchmark::kMillisecond);
+////BENCHMARK(compressed_pair<std::pair<int, int>>) -> Range(START, END) -> RangeMultiplier(2) ->  Unit(benchmark::kMillisecond);
+//BENCHMARK(pair) -> Range(START, END) -> RangeMultiplier(2) ->  Unit(benchmark::kMillisecond);
+//BENCHMARK(mypair) -> Range(START, END) -> RangeMultiplier(2) ->  Unit(benchmark::kMillisecond);
+//
 
 /* unit test */
 auto unit_tests_compressed_pair(void) -> int {

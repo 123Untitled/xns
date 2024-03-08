@@ -12,8 +12,8 @@
 #include <algorithm>
 
 // boost
-#include <benchmark/benchmark.h>
-#include <boost/container/set.hpp>
+//#include <benchmark/benchmark.h>
+//#include <boost/container/set.hpp>
 
 // standard library
 #include <set>
@@ -170,15 +170,15 @@ static void benchmark01(void) {
 		}
 	});
 
-	bench.run("boost insert", [&]() -> void {
-		for (xns::size_t j = 0; j < ITERATIONS; ++j) {
-			boost::container::set<type> bset;
-			for (xns::size_t i = 0; i < NSIZE; ++i) {
-				bset.insert(vec[i]);
-				checksum ^= bset.size();
-			}
-		}
-	});
+	//bench.run("boost insert", [&]() -> void {
+	//	for (xns::size_t j = 0; j < ITERATIONS; ++j) {
+	//		boost::container::set<type> bset;
+	//		for (xns::size_t i = 0; i < NSIZE; ++i) {
+	//			bset.insert(vec[i]);
+	//			checksum ^= bset.size();
+	//		}
+	//	}
+	//});
 
 	bench.result("insert");
 	std::cout << "checksum: " << checksum << std::endl;
@@ -274,58 +274,58 @@ auto unit_tests_tree(void) -> int {
 	return 0;
 }
 
-template <bool sorted = false>
-auto random_vector_int(const int size) -> std::vector<int> {
-	std::vector<int> vec;
-	for (int i = 0; i < size; ++i)
-		vec.push_back(xns::random::integral<int>());
-	if constexpr (sorted)
-		std::sort(vec.begin(), vec.end());
-	return vec;
-}
+//template <bool sorted = false>
+//auto random_vector_int(const int size) -> std::vector<int> {
+//	std::vector<int> vec;
+//	for (int i = 0; i < size; ++i)
+//		vec.push_back(xns::random::integral<int>());
+//	if constexpr (sorted)
+//		std::sort(vec.begin(), vec.end());
+//	return vec;
+//}
 
-static auto rvector = random_vector_int<false>(1'000'000);
-
-
-static auto _tree(benchmark::State& state) -> void {
-
-	for (auto _ : state) {
-	xns::tree<int> tree;
-		for (auto i = 0; i < state.range(0); ++i) {
-			tree.insert(rvector[(unsigned long)i]);
-			benchmark::DoNotOptimize(tree.size());
-		}
-	}
-}
-
-static auto _set(benchmark::State& state) -> void {
-
-	for (auto _ : state) {
-	std::set<int> set;
-		for (auto i = 0; i < state.range(0); ++i) {
-			set.insert(rvector[(unsigned long)i]);
-			benchmark::DoNotOptimize(set.size());
-		}
-	}
-}
-
-static auto _boost(benchmark::State& state) -> void {
-
-	for (auto _ : state) {
-	boost::container::set<int> bset;
-		for (auto i = 0; i < state.range(0); ++i) {
-			bset.insert(rvector[(unsigned long)i]);
-			benchmark::DoNotOptimize(bset.size());
-		}
-	}
-}
-#define START 100
-#define END 1'000'000
-
-BENCHMARK(_tree)  -> Range(START, END) -> RangeMultiplier(2) -> Unit(benchmark::kMillisecond);
-BENCHMARK(_set)   -> Range(START, END) -> RangeMultiplier(2) -> Unit(benchmark::kMillisecond);
-BENCHMARK(_boost) -> Range(START, END) -> RangeMultiplier(2) -> Unit(benchmark::kMillisecond);
-
+//static auto rvector = random_vector_int<false>(1'000'000);
+//
+//
+//static auto _tree(benchmark::State& state) -> void {
+//
+//	for (auto _ : state) {
+//	xns::tree<int> tree;
+//		for (auto i = 0; i < state.range(0); ++i) {
+//			tree.insert(rvector[(unsigned long)i]);
+//			benchmark::DoNotOptimize(tree.size());
+//		}
+//	}
+//}
+//
+//static auto _set(benchmark::State& state) -> void {
+//
+//	for (auto _ : state) {
+//	std::set<int> set;
+//		for (auto i = 0; i < state.range(0); ++i) {
+//			set.insert(rvector[(unsigned long)i]);
+//			benchmark::DoNotOptimize(set.size());
+//		}
+//	}
+//}
+//
+//static auto _boost(benchmark::State& state) -> void {
+//
+//	for (auto _ : state) {
+//	boost::container::set<int> bset;
+//		for (auto i = 0; i < state.range(0); ++i) {
+//			bset.insert(rvector[(unsigned long)i]);
+//			benchmark::DoNotOptimize(bset.size());
+//		}
+//	}
+//}
+//#define START 100
+//#define END 1'000'000
+//
+//BENCHMARK(_tree)  -> Range(START, END) -> RangeMultiplier(2) -> Unit(benchmark::kMillisecond);
+//BENCHMARK(_set)   -> Range(START, END) -> RangeMultiplier(2) -> Unit(benchmark::kMillisecond);
+//BENCHMARK(_boost) -> Range(START, END) -> RangeMultiplier(2) -> Unit(benchmark::kMillisecond);
+//
 
 
 #if defined(XNS_TEST_TREE)

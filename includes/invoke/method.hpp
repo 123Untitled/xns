@@ -25,7 +25,7 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self        = method<O, R(A...)>;
+			using self        = xns::method<O, R(A...)>;
 
 			/* object type */
 			using object      = O;
@@ -168,6 +168,13 @@ namespace xns {
 			prototype _method;
 
 	};
+
+
+	// -- deduction guides ----------------------------------------------------
+
+	/* method deduction guide */
+	template <typename O, typename R, typename... A>
+	method(R(O::*)(A...)) -> method<O, R(A...)>;
 
 }
 

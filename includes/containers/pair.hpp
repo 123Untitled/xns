@@ -44,7 +44,8 @@ namespace xns {
 
 			/* default constructor */
 			constexpr pair(void)
-			noexcept(xns::are_nothrow_default_constructible<T1, T2>) = default;
+			noexcept(xns::are_nothrow_default_constructible<T1, T2>)
+			: _first{}, _second{} {}
 
 			/* copy pair constructor */
 			inline constexpr pair(const first& first, const second& second)
@@ -67,7 +68,7 @@ namespace xns {
 			noexcept(xns::are_nothrow_move_constructible<T1, T2>) = default;
 
 			/* destructor */
-			~pair(void) noexcept(xns::are_nothrow_destructible<T1, T2>) = default;
+			~pair(void) noexcept(xns::are_nothrow_destructible<T1, T2>) {/* error here if we set to = default */}
 
 
 			// -- public assignment operators ---------------------------------

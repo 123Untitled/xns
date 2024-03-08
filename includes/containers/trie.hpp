@@ -256,6 +256,6 @@ namespace xns {
 	// so it's same as a trie, but with a hash table instead of a tree
 
 
-};
+}
 
 #endif

@@ -15,6 +15,10 @@
 
 #include "config.hpp"
 
+#if not XNS_HAS_BUILTIN(__is_assignable)
+#	include <type_traits>
+#endif
+
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
@@ -22,15 +26,20 @@ namespace xns {
 
 
 #if not XNS_HAS_BUILTIN(__is_assignable)
-#	error "compiler does not support __is_assignable"
-#endif
 
+	/* is assignable */
+	template <typename T, typename U>
+	concept is_assignable = std::is_assignable_v<T, U>;
+
+#else
 
 	// -- I S  A S S I G N A B L E --------------------------------------------
 
 	/* is assignable */
 	template <typename T, typename U>
 	concept is_assignable = __is_assignable(T, U);
+
+#endif
 
 } // namespace xns
 
