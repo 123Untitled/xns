@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef XNS_TYPE_TRAITS_HPP
-#define XNS_TYPE_TRAITS_HPP
+#ifndef XNS_TYPE_TRAITS_HEADER
+#define XNS_TYPE_TRAITS_HEADER
 
 
 // -- T Y P E  T R A I T S ----------------------------------------------------

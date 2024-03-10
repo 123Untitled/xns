@@ -1,8 +1,21 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_BASE_HEADER
 #define XNS_BASE_HEADER
 
 #include "types.hpp"
-#include "integral_constant.hpp"
 #include "is_one_of.hpp"
 
 
@@ -38,11 +51,12 @@ namespace xns {
 
 	/* is base */
 	template <class T>
-	concept is_base = xns::is_one_of<T, xns::hex, xns::dec, xns::oct, xns::bin>;
+	concept is_base = xns::is_one_of<T, xns::hex,
+										xns::dec,
+										xns::oct,
+										xns::bin>;
 
 
-}
+} // namespace xns
 
-
-
-#endif
+#endif // XNS_BASE_HEADER

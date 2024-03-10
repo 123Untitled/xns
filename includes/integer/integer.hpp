@@ -35,14 +35,16 @@ namespace xns {
 
 
 
+	// -- I N T E G E R -------------------------------------------------------
 
-	template <xns::size_t BYTES, bool SIGNED>
+	template <xns::size_t bytes, bool is_signed>
 	class integer final {
+
 
 		// -- friends ---------------------------------------------------------
 
 		/* other integers as friends */
-		template <xns::size_t B, bool S>
+		template <xns::size_t, bool>
 		friend class integer;
 
 
@@ -51,11 +53,11 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = integer;
+			using self = xns::integer<bytes, is_signed>;
 
 			/* underlying type */
-			using underlying = xns::conditional<SIGNED, xns::_signed<BYTES / xns::bits_per_byte>,
-														xns::_unsigned<BYTES / xns::bits_per_byte>>;
+			using underlying = xns::conditional<is_signed, xns::_signed<bytes / xns::bits_per_byte>,
+														   xns::_unsigned<bytes / xns::bits_per_byte>>;
 
 			enum : underlying {
 				MIN = xns::limits<underlying>::min(),
@@ -67,20 +69,20 @@ namespace xns {
 
 			/* default constructor */
 			inline constexpr integer(void) noexcept
-			: _value{0} {}
+			: _value{static_cast<underlying>(0)} {
+			}
 
 			/* copy constructor */
-			inline constexpr integer(const self& other) noexcept
-			: _value{other._value} {}
+			constexpr integer(const self&) noexcept = default;
 
 			/* move constructor */
-			inline constexpr integer(self&& other) noexcept
-			: integer{other} {}
+			constexpr integer(self&&) noexcept = default;
 
 			/* natif integer constructor */
 			template <xns::is_integral T>
 			inline explicit constexpr integer(const T& value) noexcept
-			: _value{xns::conversion<underlying>(value)} {}
+			: _value{xns::conversion<underlying>(value)} {
+			}
 
 			/* other integer constructor */
 			template <xns::size_t B, bool S>
@@ -88,7 +90,7 @@ namespace xns {
 			: _value{xns::conversion<integer<B, S>::underlying>(other._value)} {}
 
 			/* destructor */
-			inline ~integer(void) noexcept = default;
+			~integer(void) noexcept = default;
 
 
 			// -- public conversion operators ---------------------------------
@@ -97,8 +99,6 @@ namespace xns {
 			inline constexpr explicit operator underlying(void) const noexcept {
 				return _value;
 			}
-
-
 
 
 			// -- public accessors --------------------------------------------
@@ -110,31 +110,38 @@ namespace xns {
 
 			auto print(void) const noexcept -> void {
 				xns::string str = xns::to_string(_value);
-				std::cout << (SIGNED ? "int" : "uint") << BYTES << ": " <<
+				std::cout << (is_signed ? "int" : "uint") << bytes << ": " <<
 					str.data() << std::endl;
 			}
 
 
 			// -- public modifiers --------------------------------------------
 
-			/* reset value */
+			/* reset */
 			inline constexpr auto reset(void) noexcept -> void {
-				_value = 0;
+				_value = static_cast<underlying>(0);
 			}
 
 
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			template <xns::size_t B, bool S>
-			inline constexpr auto operator=(const integer<B, S>& other) noexcept -> self& {
+			constexpr auto operator=(const self&) noexcept -> self& = default;
+
+			/* move assignment operator */
+			constexpr auto operator=(self&&) noexcept -> self& = default;
+
+
+			/* copy assignment operator */
+			template <xns::size_t B, bool S> requires (B != bytes || S != is_signed)
+			inline constexpr auto operator=(const xns::integer<B, S>& other) noexcept -> self& {
 				_value = xns::conversion<underlying>(other._value);
 				return *this;
 			}
 
 			/* move assignment operator */
-			template <xns::size_t B, bool S>
-			inline constexpr auto operator=(integer<B, S>&& other) noexcept -> self& {
+			template <xns::size_t B, bool S> requires (B != bytes || S != is_signed)
+			inline constexpr auto operator=(xns::integer<B, S>&& other) noexcept -> self& {
 				return operator=(other);
 			}
 

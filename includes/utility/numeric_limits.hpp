@@ -23,7 +23,8 @@
 #include "is_scalar.hpp"
 #include "is_signed.hpp"
 #include "is_unsigned.hpp"
-#include "remove.hpp"
+
+//#include "remove.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

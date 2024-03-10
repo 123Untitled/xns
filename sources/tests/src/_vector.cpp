@@ -66,7 +66,6 @@ public:
 	~A(void) = default;
 };
 
-#include "malloc.hpp"
 
 /* unit test */
 auto unit_tests_vector(void) -> int {
