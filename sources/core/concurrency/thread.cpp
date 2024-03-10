@@ -1,5 +1,17 @@
-#include "thread.hpp"
-#include "swap.hpp"
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#include "concurrency/thread.hpp"
+#include "other/swap.hpp"
 
 
 // -- public lifecycle --------------------------------------------------------
@@ -26,6 +38,7 @@ xns::thread::~thread(void) noexcept {
 
 /* move assignment operator */
 auto xns::thread::operator=(self&& other) noexcept -> self& {
+
 	if (this == &other)
 		return *this;
 
@@ -35,7 +48,7 @@ auto xns::thread::operator=(self&& other) noexcept -> self& {
 #else
 	//if (_thread != 0)
 #endif
-		;// terminate()
+	// terminate()
 
 	_thread = other._thread;
 	other._thread = thread_type{};
@@ -59,6 +72,7 @@ auto xns::thread::detach(void) noexcept -> void {
 
 /* swap */
 auto xns::thread::swap(self& other) noexcept -> void {
+
 	xns::swap(_thread, other._thread);
 }
 

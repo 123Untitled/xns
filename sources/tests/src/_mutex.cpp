@@ -1,8 +1,14 @@
-#include "unit_tests.hpp"
 #include "mutex.hpp"
+#include "guard_lock.hpp"
 
 /* unit test */
 int unit_tests_mutex(void) {
+
+	xns::mutex mutex;
+	{
+		xns::guard_lock lock{mutex};
+	}
+
 	return 0;
 }
 

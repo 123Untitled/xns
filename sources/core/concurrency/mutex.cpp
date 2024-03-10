@@ -11,13 +11,14 @@
 /*****************************************************************************/
 
 #include "concurrency/mutex.hpp"
+#include <pthread.h>
 
 
 // -- public lifecycle --------------------------------------------------------
 
 /* default constructor */
 xns::mutex::mutex(void) noexcept
-: _mutex (PTHREAD_MUTEX_INITIALIZER) {
+: _mutex PTHREAD_MUTEX_INITIALIZER {
 }
 
 /* attribute constructor */
