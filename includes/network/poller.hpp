@@ -170,7 +170,7 @@ namespace xns {
 
 				auto run(void) noexcept -> void {
 
-					bool range = xns::limits::in_range<int>(_kevents.size());
+					bool range = xns::limits<int>::in_range(_kevents.size());
 
 					if (range == false) { return; }
 

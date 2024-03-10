@@ -10,8 +10,12 @@
 
 #pragma once
 
-#ifndef XNS_IS_REFERENCEABLE_HPP
-#define XNS_IS_REFERENCEABLE_HPP
+#ifndef XNS_IS_REFERENCEABLE_HEADER
+#define XNS_IS_REFERENCEABLE_HEADER
+
+#include "integral_constant.hpp"
+#include "is_same.hpp"
+#include "macros.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -19,13 +23,40 @@
 namespace xns {
 
 
-	// -- I S  R E F E R E N C E A B L E --------------------------------------
+	// -- detail --------------------------------------------------------------
 
-	#if __has_builtin(__is_referenceable)
+	namespace impl {
+
+		/* is referenceable */
+		struct is_referenceable final {
+
+			// -- lifecycle ---------------------------------------------------
+
+			/* not instantiable */
+			XNS_NOT_INSTANTIABLE(is_referenceable);
+
+
+			// -- static methods ----------------------------------------------
+
+			/* test */
+			template <typename T>
+			static auto test(int) noexcept -> T&;
+
+			/* test */
+			template <typename T>
+			static auto test(...) noexcept -> xns::false_type;
+
+		}; // struct is_referenceable
+
+	} // namespace impl
+
+
+	/* is referenceable */
 	template <typename T>
-	concept is_referenceable = __is_referenceable(T);
-	#endif
+	concept is_referenceable = not xns::is_same<
+							   decltype(impl::is_referenceable::test<T>(0)),
+							   xns::false_type>;
 
 } // namespace xns
 
-#endif // XNS_IS_REFERENCEABLE_HPP
+#endif // XNS_IS_REFERENCEABLE_HEADER

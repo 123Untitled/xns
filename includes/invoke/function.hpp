@@ -12,11 +12,11 @@ namespace xns {
 
 	// -- F U N C T I O N -----------------------------------------------------
 
-	/* empty declaration */
+	/* forward declaration */
 	template <typename, typename...>
 	class function;
 
-	/* specialization for function prototypes */
+	/* specialization */
 	template <typename R, typename... A>
 	class function<R(A...)> final {
 
@@ -42,24 +42,20 @@ namespace xns {
 			}
 
 			/* nullptr constructor */
-			inline constexpr function(xns::null) noexcept
+			inline constexpr function(decltype(nullptr)) noexcept
 			: _function{nullptr} {
 			}
 
 			/* function pointer constructor */
-			inline constexpr function(const prototype function) noexcept
-			: _function{function} {
+			inline constexpr function(const prototype func) noexcept
+			: _function{func} {
 			}
 
 			/* copy constructor */
-			inline constexpr function(const self& other) noexcept
-			: _function{other._function} {
-			}
+			inline constexpr function(const self&) noexcept = default;
 
 			/* move constructor */
-			inline constexpr function(self&& other) noexcept
-			: self{other} /* copy */ {
-			}
+			inline constexpr function(self&&) noexcept = default;
 
 			/* destructor */
 			~function(void) noexcept = default;
@@ -68,13 +64,13 @@ namespace xns {
 			// -- public assignments ------------------------------------------
 
 			/* nullptr assignment */
-			inline constexpr auto assign(xns::null) noexcept -> void {
+			inline constexpr auto assign(decltype(nullptr)) noexcept -> void {
 				_function = nullptr;
 			}
 
 			/* function pointer assignment */
-			inline constexpr auto assign(const prototype function) noexcept -> void {
-				_function = function;
+			inline constexpr auto assign(const prototype func) noexcept -> void {
+				_function = func;
 			}
 
 			/* copy assignment */
@@ -84,32 +80,29 @@ namespace xns {
 
 			/* move assignment */
 			inline constexpr auto assign(self&& other) noexcept -> void {
-				this->assign(other); /* copy */
+				_function = other._function;
 			}
 
 
 			// -- public assignment operators ---------------------------------
 
 			/* nullptr assignment operator */
-			inline constexpr auto operator=(xns::null) noexcept -> self& {
+			inline constexpr auto operator=(decltype(nullptr)) noexcept -> self& {
 				return assign(nullptr), *this;
 			}
 
 
 			/* function pointer assignment operator */
-			inline constexpr auto operator=(const prototype function) noexcept -> self& {
-				return assign(function), *this;
+			inline constexpr auto operator=(const prototype func) noexcept -> self& {
+				_function = func;
+				return *this;
 			}
 
 			/* copy assignment operator */
-			inline constexpr auto operator=(const self& other) noexcept -> self& {
-				return assign(other), *this;
-			}
+			inline constexpr auto operator=(const self&) noexcept -> self& = default;
 
 			/* move assignment operator */
-			inline constexpr auto operator=(self&& other) noexcept -> self& {
-				return assign(other), /* copy */ *this;
-			}
+			inline constexpr auto operator=(self&&) noexcept -> self& = default;
 
 
 			// -- public boolean operators ------------------------------------

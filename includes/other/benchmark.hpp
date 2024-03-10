@@ -29,7 +29,7 @@ namespace xns {
 			: _benchs{} {}
 
 			/* destructor */
-			inline ~benchmark(void) noexcept = default;
+			~benchmark(void) noexcept = default;
 
 
 
@@ -41,7 +41,7 @@ namespace xns {
 
 				cycle_type count = 0;
 
-				constexpr xns::size_t max = xns::limits::max<xns::size_t>();
+				constexpr xns::size_t max = xns::limits<xns::size_t>::max();
 
 				time_type start = xns::time::now();
 

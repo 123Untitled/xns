@@ -4,21 +4,31 @@
 class A {
 
 	public:
-		A(void) {
+		A(void)
+		: toto{0} {
 		}
-		A(const A&) {
+		A(const A& other)
+		: toto{other.toto} {
 			std::cout << "copy" << std::endl;
 		}
-		A(A&&) {
+
+		A(A&& other) noexcept
+		: toto{other.toto} {
 			std::cout << "move" << std::endl;
 		}
+
 		void print(void) const {
 			std::cout << "Hello, World!" << std::endl;
+		}
+
+		~A(void) {
+			std::cout << "destroy" << std::endl;
 		}
 
 		void inc(void) {
 			++toto;
 		}
+
 		int toto;
 };
 
@@ -33,7 +43,8 @@ auto unit_tests_thread(void) -> int {
 
 	A a{};
 
-	xns::thread t0{&A::print, xns::ref(a)};
+	xns::thread t0{&A::print, a};
+	//xns::thread t0{&A::print, xns::ref(a)};
 
 
 

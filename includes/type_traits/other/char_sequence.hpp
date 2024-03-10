@@ -140,13 +140,13 @@ namespace xns {
 				/* specialization for I == E, end of recursion */
 				template <size_t I, char_t... SEQ> requires (I == E)
 				struct implementation<I, SEQ...> final {
-					using type = xns::character_sequence<char_t, SEQ...>;
+					using internal_type = xns::character_sequence<char_t, SEQ...>;
 				};
 
 				/* specialization for I < E, continue recursion */
 				template <size_t I, char_t... SEQ> requires (I < E)
 				struct implementation<I, SEQ...> final {
-					using type = typename implementation<I + 1, SEQ..., lit._data[I]>::type;
+					using internal_type = typename implementation<I + 1, SEQ..., lit._data[I]>::internal_type;
 				};
 
 
@@ -155,10 +155,10 @@ namespace xns {
 				// -- public types ------------------------------------------------
 
 				/* self type */
-				using self = make_character_sequence<lit, B, E>;
+				using self = xns::impl::make_character_sequence<lit, B, E>;
 
 				/* character sequence type */
-				using type = typename implementation<B>::type;
+				using type = typename implementation<B>::internal_type;
 
 		};
 

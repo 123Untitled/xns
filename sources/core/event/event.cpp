@@ -33,26 +33,26 @@ auto xns::event::new_mode(void) -> evntmode {
 }
 
 /* remove mode */
-auto xns::event::remove_mode(evntmode& mode) -> void {
+auto xns::event::remove_mode(evntmode& md) -> void {
 	// check if index is valid
-	if (not mode._state) { return; }
+	if (not md._state) { return; }
 	// invalid index
-	mode._state = false;
+	md._state = false;
 	// remove mode
-	_modes.erase(mode._idx);
+	_modes.erase(md._idx);
 }
 
 /* set mode */
-auto xns::event::set_mode(const evntmode& mode, const evntopt opt) -> void {
+auto xns::event::set_mode(const evntmode& md, const evntopt opt) -> void {
 	// check if index is valid
-	if (not mode._state) { return; }
+	if (not md._state) { return; }
 	// check if mode is forced
 	if (opt == evntopt::FORCE) {
 		// stack current mode
-		_current = &mode._idx;
+		_current = &md._idx;
 		return;
 	} // set next mode
-	_next = &mode._idx;
+	_next = &md._idx;
 }
 
 /* apply mode */
@@ -80,11 +80,11 @@ auto xns::event::has_mode(void) const -> bool {
 }
 
 /* is mode active */
-auto xns::event::is_mode(const evntmode& mode) const -> bool {
+auto xns::event::is_mode(const evntmode& md) const -> bool {
 	// check if there is a current mode and mode is valid
-	if (!_current || !mode._state) { return false; }
+	if (!_current || !md._state) { return false; }
 	// check if mode is active
-	return *_current == mode._idx ? true : false;
+	return *_current == md._idx ? true : false;
 }
 
 
@@ -119,21 +119,23 @@ void xns::event::call_input(const xns::string& input) {
 // -- P R I V A T E  M E T H O D S --------------------------------------------
 
 /* subscribe function to event */
-void xns::event::_subscribe(const evntmode& mode, const xns::evntype type, event_function function) {
+void xns::event::_subscribe(const evntmode& md, const xns::evntype type, event_function function) {
 	// check invalid pointers and event type
-	if (!function || type >= xns::evntype::EVNT_MAX) { return; }
+	if (not function || type >= xns::evntype::EVNT_MAX)
+		return;
 	// get event subscriber vector
-	event_vector& subscribers = xns::get<1>(_modes[mode._idx])[type];
+	event_vector& subscribers = xns::get<1>(_modes[md._idx])[type];
 	// add new subscriber
 	subscribers.emplace_back(function);
 }
 
 /* subscribe function to input */
-void xns::event::_subscribe(const evntmode& mode, input_function function) {
+void xns::event::_subscribe(const evntmode& md, input_function function) {
 	// check invalid pointers
-	if (!function) { return; }
+	if (not function) 
+		return;
 	// get input subscriber vector
-	input_vector& subscribers = xns::get<0>(_modes[mode._idx]);//._first;
+	input_vector& subscribers = xns::get<0>(_modes[md._idx]);//._first;
 	// add new subscriber
 	subscribers.emplace_back(function);
 }

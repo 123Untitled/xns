@@ -62,8 +62,7 @@ namespace xns {
 				}
 
 				else {
-					rnd %= (xns::limits::max<
-							xns::make_unsigned<type>>());// + 1);
+					rnd %= (xns::limits<xns::make_unsigned<type>>::max());// + 1);
 
 					return static_cast<type>(rnd);
 				}

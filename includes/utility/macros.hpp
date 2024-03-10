@@ -1,26 +1,50 @@
-#ifndef XNS_MACROS_HPP
-#define XNS_MACROS_HPP
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
+#ifndef XNS_MACROS_HEADER
+#define XNS_MACROS_HEADER
+
+
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
 
 
-	#define NON_COPYABLE(obj)					\
-		obj(const obj&)				= delete;	\
-		obj& operator=(const obj&)	= delete
+	#define NON_COPYABLE(_) \
+		_(const _&) = delete; \
+		_& operator=(const _&) = delete
 
-	#define NON_MOVABLE(obj)					\
-		obj(obj&&)					= delete;	\
-		obj& operator=(obj&&)		= delete
+	#define NON_MOVABLE(_) \
+		_(_&&) = delete; \
+		_& operator=(_&&) = delete
 
-	#define NON_INSTANCIABLE(obj)				\
-		obj(void)					= delete;	\
-		~obj(void)					= delete;	\
-		NON_COPYABLE(obj);						\
-		NON_MOVABLE(obj)
+	#define NON_INSTANCIABLE(_) \
+		_(void) = delete; \
+		~_(void) = delete; \
+		NON_COPYABLE(_); \
+		NON_MOVABLE(_)
 
-	#define NON_ASSIGNABLE(obj) \
-		NON_COPYABLE(obj); \
-		NON_MOVABLE(obj)
+	#define NON_ASSIGNABLE(_) \
+		NON_COPYABLE(_); \
+		NON_MOVABLE(_)
+
+
+	#define XNS_NOT_INSTANTIABLE(_) NON_INSTANCIABLE(_)
+	#define XNS_NOT_COPYABLE(_) NON_COPYABLE(_)
+	#define XNS_NOT_MOVABLE(_) NON_MOVABLE(_)
+	#define XNS_NOT_ASSIGNABLE(_) NON_ASSIGNABLE(_)
+
 
 
 	#define non_instanciable(obj) NON_INSTANCIABLE(obj)
@@ -39,4 +63,4 @@ namespace xns {
 
 } // namespace xns
 
-#endif // XNS_MACROS_HPP
+#endif // XNS_MACROS_HEADER

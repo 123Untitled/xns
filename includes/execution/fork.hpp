@@ -37,7 +37,7 @@ namespace xns {
 
 			/* default constructor */
 			template <class C>
-			fork(C& instance, xns::u8 (C::*child)(void), int (C::*parent)(void))
+			fork(C& instance, xns::u8 (C::*child_f)(void), int (C::*parent_f)(void))
 			: _schild{0}, _sparent{0} {
 
 
@@ -51,12 +51,12 @@ namespace xns {
 				// check for child process
 				else if (pid == 0) {
 
-					::_exit((instance.*child)());
+					::_exit((instance.*child_f)());
 				}
 				// check for parent process
 				else {
 
-					_sparent = (instance.*parent)();
+					_sparent = (instance.*parent_f)();
 
 					::waitpid(pid, &_schild, 0);
 

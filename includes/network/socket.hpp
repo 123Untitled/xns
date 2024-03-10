@@ -79,7 +79,7 @@ namespace xns {
 				: unique_descriptor{xns::move(other)}, link{xns::move(other)} {}
 
 				/* destructor */
-				inline ~socket(void) noexcept = default;
+				~socket(void) noexcept { /* error when set = default; */ }
 
 
 				// -- public assignment operators -----------------------------

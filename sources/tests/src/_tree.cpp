@@ -268,7 +268,7 @@ class toto {
 
 auto unit_tests_tree(void) -> int {
 
-	//insert_test();
+	insert_test();
 	//benchmark01();
 	//interactive();
 	return 0;
@@ -326,10 +326,10 @@ auto unit_tests_tree(void) -> int {
 //BENCHMARK(_set)   -> Range(START, END) -> RangeMultiplier(2) -> Unit(benchmark::kMillisecond);
 //BENCHMARK(_boost) -> Range(START, END) -> RangeMultiplier(2) -> Unit(benchmark::kMillisecond);
 //
+	//BENCHMARK_MAIN();
 
 
 #if defined(XNS_TEST_TREE)
-	//BENCHMARK_MAIN();
 int main(int argc, char** argv) {
 	return unit_tests_tree();
 }

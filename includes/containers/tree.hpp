@@ -1,33 +1,36 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_TREE_HPP
 #define XNS_TREE_HPP
 
 #include "string.hpp"
+
 #include "stack.hpp"
+#include "queue.hpp"
+
 #include "types.hpp"
-#include "tuple.hpp"
-#include "safe_enum.hpp"
+
 #include "output.hpp"
 #include "escape.hpp"
 #include "terminal.hpp"
-#include "math.hpp"
-#include "memory.hpp"
+
 #include "fragmentation.hpp"
-#include "swap.hpp"
+
 #include "conditional.hpp"
-#include "queue.hpp"
-#include "stack.hpp"
+#include "is_comparable.hpp"
 
-#include "variant.hpp"
-#include "terminal.hpp"
-#include "color.hpp"
-#include "escape.hpp"
-#include <cmath>
-
-#include "is_convertible.hpp"
-
-#include <compare>
-
-#include "random.hpp"
 
 
 
@@ -35,34 +38,24 @@
 
 namespace xns {
 
-					//xns::f64 hue_offset = 280.0;
-					//xns::f64 hue_range = 60.0;
-					//xns::f64 hue_min = std::fmod(      0.0 + hue_offset, 360.0);
-					//xns::f64 hue_max = std::fmod(hue_range + hue_offset, 360.0);
-
-
-	//inline auto deviation(void) -> double {
-	//	xns::vector<int> data;
-	//	double sum = 0.0, mean, standardDeviation = 0.0;
-	//	for (xns::size_t i = 0; i < data.size(); ++i) {
-	//		sum += data[i];
-	//	}
-	//	mean = sum / data.size();
-	//	for (xns::size_t i = 0; i < data.size(); ++i) {
-	//		standardDeviation += std::pow(data[i] - mean, 2);
-	//	}
-	//	return std::sqrt(standardDeviation / data.size());
-	//}
-
-
 
 	// -- T R E E -------------------------------------------------------------
 
 	template <typename T>
 	class tree {
 
+
+		// -- assertions ------------------------------------------------------
+
 		/* assert T is comparable */
-		static_assert(xns::is_comparable<T>, "): TREE: T must be comparable :(");
+		static_assert(xns::is_comparable<T>, "tree: template type must be comparable");
+
+
+		// -- friends ---------------------------------------------------------
+
+		/* swap as friend */
+		template <typename U>
+		friend auto swap(xns::tree<U>&, xns::tree<U>&) noexcept -> void;
 
 
 		private:
@@ -77,7 +70,7 @@ namespace xns {
 		public:
 
 			/* forward declaration */
-			class node;
+			class internal_node;
 
 
 			// -- public types ------------------------------------------------
@@ -89,18 +82,16 @@ namespace xns {
 			using value_type  = T;
 
 			/* node type */
-			using node_type   = self::node;
+			using node_type   = self::internal_node;
 
 			/* allocator type */
-			//using allocator   = xns::memory::pool<node_type>;
-
 			using allocator   = xns::allocator<node_type>;
 
 			/* node pointer */
 			using node_ptr    = node_type*;
 
 			/* const node pointer */
-			using const_node_ptr = const node*;
+			using const_node_ptr = const node_type*;
 
 			/* reference type */
 			using mut_ref     = value_type&;
@@ -197,8 +188,8 @@ namespace xns {
 
 			/* balance factor */
 			enum : signed_type {
-				BALANCED =  0,
-				LEFT_HEAVY = +1,
+				BALANCED    =  0,
+				LEFT_HEAVY  = +1,
 				RIGHT_HEAVY = -1
 			};
 
@@ -209,7 +200,7 @@ namespace xns {
 			// -- constructors ------------------------------------------------
 
 			/* default constructor */
-			inline tree(void) noexcept
+			tree(void) noexcept
 			: _root{nullptr}, _lower{nullptr}, _upper{nullptr}, _size{0} {}
 
 
@@ -222,15 +213,13 @@ namespace xns {
 			}
 
 			/* move constructor */
-			inline tree(self&& other) noexcept
+			tree(self&& other) noexcept
 			: _root{other._root}, _lower{other._lower}, _upper{other._upper}, _size{other._size} {
-				// invalidate other
 				other.init();
 			}
 
 			/* destructor */
 			~tree(void) noexcept {
-				// free tree
 				free_tree();
 			}
 
@@ -253,17 +242,17 @@ namespace xns {
 			/* move assignment operator */
 			auto operator=(self&& other) noexcept -> self& {
 				// check for self-assignment
-				if (this != &other) {
-					// deallocate tree
-					free_tree();
-					// move other members
-					_root = other._root;
-					_lower = other._lower;
-					_upper = other._upper;
-					_size = other._size;
-					// reset other tree
-					other.init();
-				} // return self reference
+				if (this == &other)
+					return *this;
+				// deallocate tree
+				free_tree();
+				// move other members
+				 _root = other._root;
+				_lower = other._lower;
+				_upper = other._upper;
+				 _size = other._size;
+				 // reset other tree
+				 other.init();
 				return *this;
 			}
 
@@ -602,51 +591,6 @@ namespace xns {
 			}
 
 
-			/* swap nodes
-			 * exchange node pointers
-			 * but keep node values
-			 * goal is to balance memory fragmentation
-			 */
-
-			/*
-			 *     ?
-			 *     |
-			 *     C
-			 *    / \
-			 *   ?   R
-			 *      / \
-			 *     ?   ?
-			 */
-
-			auto swap_right(node_ptr current, node_ptr right) {
-				xns::swap(current->_value, right->_value);
-
-				replace(current, right);
-
-				// swap left
-				auto tmp = current->_left;
-				current->left(right->_left); // left method sets parent
-				right->left(tmp);
-
-				current->right(right->_right); // right method sets parent
-				right->right(current);
-
-			}
-
-			auto swap_left(node_ptr current, node_ptr left) {
-				xns::swap(current->_value, left->_value);
-
-				replace(current, left);
-
-				// swap right
-				auto tmp = current->_right;
-				current->right(left->_right); // right method sets parent
-				left->right(tmp);
-
-				current->left(left->_left); // left method sets parent
-				left->left(current);
-
-			}
 
 
 			/* erase */
@@ -655,10 +599,10 @@ namespace xns {
 
 				// assert K is comparable to T
 				static_assert(xns::is_comparable<K, T>,
-					"): TREE: K must be comparable to T :(");
+						"tree: K must be comparable to T");
 
 				// get root address
-				node_type** node = &_root;
+				node_type**  node = &_root;
 				node_type* parent = nullptr;
 
 				// loop over tree
@@ -795,18 +739,6 @@ namespace xns {
 
 
 
-
-			/* get root */
-			node_ptr root(void) noexcept {
-				return _root;
-			}
-
-			/* set root */
-			void root(node_ptr node) noexcept {
-				_root = node;
-			}
-
-
 			// -- node creation -----------------------------------------------
 
 			/* new node by construct in place */
@@ -921,21 +853,14 @@ namespace xns {
 
 			/* clear */
 			inline auto clear(void) noexcept -> void {
-				// free tree
 				free_tree();
-				// initialize members
 				init();
 			}
 
 			/* swap */
 			inline auto swap(self& other) noexcept -> void {
-				// swap members
-				xns::swap(_root, other._root);
-				xns::swap(_size, other._size);
+				xns::swap(*this, other);
 			}
-
-
-
 
 
 		private:
@@ -946,7 +871,7 @@ namespace xns {
 				(node->_parent ?
 				(node->_parent->_left == node ? node->_parent->_left
 											: node->_parent->_right)
-							: _root) = child;
+											: _root) = child;
 			}
 
 
@@ -982,7 +907,7 @@ namespace xns {
 			// -- memory management -------------------------------------------
 
 			/* free tree */ // INFO: this is only used in destructor
-			inline void free_tree(void) noexcept {
+			void free_tree(void) noexcept {
 				// declare post-order iterator
 				self::post_order_iterator it{_root};
 				// loop until end
@@ -1314,32 +1239,46 @@ namespace xns {
 			}
 
 
-
-
-
-
 			/* iterator end */
-			inline auto end(void) noexcept -> xns::null {
-				// return iterator to null
-				return nullptr;
-			}
-
-			/* const iterator end */
-			inline auto end(void) const noexcept -> xns::null {
-				// return iterator to null
+			inline auto end(void) const noexcept -> decltype(nullptr) {
 				return nullptr;
 			}
 
 
+	}; // class tree
 
-	};
+
+	// -- friend functions ----------------------------------------------------
+
+	/* swap */
+	template <typename T>
+	inline auto swap(xns::tree<T>& lhs, xns::tree<T>& rhs) noexcept -> void {
+
+		typename xns::tree<T>::node_ptr ptr;
+
+		ptr = lhs._root;
+		lhs._root = rhs._root;
+		rhs._root = ptr;
+
+		ptr = lhs._lower;
+		lhs._lower = rhs._lower;
+		rhs._lower = ptr;
+
+		ptr = lhs._upper;
+		lhs._upper = rhs._upper;
+		rhs._upper = ptr;
+
+		const auto size = lhs._size;
+			  lhs._size = rhs._size;
+			  rhs._size = size;
+	}
 
 
 
 	// -- N O D E -------------------------------------------------------------
 
 	template <typename T>
-	class xns::tree<T>::node final {
+	class xns::tree<T>::internal_node final {
 
 		// -- friends ---------------------------------------------------------
 
@@ -1353,7 +1292,7 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = xns::tree<T>::node;
+			using self = xns::tree<T>::internal_node;
 
 
 		private:
@@ -1375,21 +1314,19 @@ namespace xns {
 			// -- public lifecycle --------------------------------------------
 
 			/* deleted default constructor */
-			node(void) = delete;
+			internal_node(void) = delete;
 
-			/* non-assignable class */
-			unassignable(node);
+			/* not assignable class */
+			XNS_NOT_ASSIGNABLE(internal_node);
 
 			/* varidic constructor */
 			template <class... A>
-			inline node(node* parent, A&&... args)
-			:	_value{xns::forward<A>(args)...},
-				_left{nullptr}, _right{nullptr}, _parent{parent},
-				_depth{1} {
+			inline internal_node(node_ptr parent, A&&... args)
+			: _value{xns::forward<A>(args)...}, _left{nullptr}, _right{nullptr}, _parent{parent}, _depth{1} {
 			}
 
 			/* destructor */
-			inline ~node(void) noexcept = default;
+			~internal_node(void) noexcept = default;
 
 
 
@@ -1645,8 +1582,8 @@ namespace xns {
 
 
 			/* pre-order constructor */
-			iterator(node_ptr node) requires(O == PRE_ORDER)
-			: _node{node}, _container{} {
+			iterator(node_ptr ptr) requires(O == PRE_ORDER)
+			: _node{ptr}, _container{} {
 				// check for null node
 				if (_node == nullptr) return;
 				// push right
@@ -1656,8 +1593,8 @@ namespace xns {
 			}
 
 			/* in-order constructor */
-			iterator(node_ptr node) requires(O == IN_ORDER)
-			: _node{node}, _container{} {
+			iterator(node_ptr ptr) requires(O == IN_ORDER)
+			: _node{ptr}, _container{} {
 
 				// check for null node
 				if (_node == nullptr) return;
@@ -1904,13 +1841,13 @@ namespace xns {
 				return _node != other._node;
 			}
 
-			/* null pointer equality */
-			inline auto operator==(xns::null) const noexcept -> bool {
+			/* nullptr equality */
+			inline auto operator==(decltype(nullptr)) const noexcept -> bool {
 				return _node == nullptr;
 			}
 
-			/* null pointer inequality */
-			inline auto operator!=(xns::null) const noexcept -> bool {
+			/* nullptr inequality */
+			inline auto operator!=(decltype(nullptr)) const noexcept -> bool {
 				return _node != nullptr;
 			}
 
@@ -2245,17 +2182,14 @@ namespace xns {
 
 				/* default constructor */
 				node_info(void) noexcept
-				: parent{nullptr}, left{nullptr}, right{nullptr},
-				level{0}, pos{0}, depth{0}, value{} {}
+				: parent{nullptr}, left{nullptr}, right{nullptr}, level{0}, pos{0}, depth{0}, value{} {}
 
 				/* members constructor */
-				node_info(node_info* parent, node_info* left, node_info* right,
-							xns::size_t level, xns::s64 pos, xns::s64 depth, xns::string value)
-				: parent{parent}, left{left}, right{right},
-				level{level}, pos{pos}, depth{depth}, value{value} {}
+				node_info(node_info* pa, node_info* le, node_info* ri, xns::size_t lev, xns::s64 po, xns::s64 de, xns::string va)
+				: parent{pa}, left{le}, right{ri}, level{lev}, pos{po}, depth{de}, value{va} {}
 
 				/* move constructor */
-				node_info(node_info&& other) noexcept = default;
+				node_info(node_info&&) noexcept = default;
 
 				/* non-copyable struct */
 				NON_COPYABLE(node_info);

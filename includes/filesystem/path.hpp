@@ -107,7 +107,7 @@ namespace xns {
 			using string_type  = T;
 
 			/* self type */
-			using self         = path<T>;
+			using self         = xns::path<T>;
 			//using self         = path<S, P, C, T>;
 
 			/* character type */
@@ -134,10 +134,10 @@ namespace xns {
 
 			/* path constructor */
 			template <xns::is_string U>
-			path(const U& path)
+			path(const U& p)
 			: _segments{}, _type{path_type::UNDEFINED} {
 				// resolve path
-				resolve(path);
+				resolve(p);
 			}
 
 			/* copy constructor */
@@ -155,9 +155,8 @@ namespace xns {
 			// -- public assignments ------------------------------------------
 
 			/* path assignment */
-			void assign(const string_type& path) {
+			void assign(const string_type& p) {
 				// resolve path
-				resolve(path);
 			}
 
 			/* copy assignment */
@@ -184,22 +183,16 @@ namespace xns {
 			// -- A S S I G N M E N T  O P E R A T O R S ----------------------
 
 			/* path assignment operator */
-			path& operator=(const string_type& path) {
-				// return path assignment
-				return assign(path), *this;
+			auto operator=(const string_type& p) -> self& {
+				resolve(p);
+				return *this;
 			}
 
 			/* copy assignment operator */
-			path& operator=(const path& other) {
-				// return copy assignment
-				return assign(other), *this;
-			}
+			auto operator=(const self&) -> self& = default;
 
 			/* move assignment operator */
-			path& operator=(path&& other) noexcept {
-				// return move assignment
-				return assign(xns::move(other)), *this;
-			}
+			auto operator=(path&& other) noexcept -> self& = default;
 
 
 			// -- S E G M E N T  A C C E S S O R S ----------------------------
@@ -266,21 +259,21 @@ namespace xns {
 
 			/* make path */
 			xns::string get(void) const {
-				xns::string path;
+				xns::string p;
 
 				if (_type == path_type::ABSOLUTE) {
-					path += SEP;
+					p += SEP;
 				}
 
 				// loop over segments
 				for (size_type x = 0; x < _segments.size(); ++x) {
 
-					path += xns::get<0>(_segments[x]);
+					p += xns::get<0>(_segments[x]);
 					if (x < _segments.size() - 1) {
-						path += SEP;
+						p += SEP;
 					}
 				}
-				return path;
+				return p;
 			}
 
 
@@ -305,7 +298,7 @@ namespace xns {
 
 			/* resolve path */
 			template <xns::is_string U>
-			void resolve(const U& path) {
+			void resolve(const U& p) {
 
 				// clear previous segments if any
 				_segments.clear();
@@ -313,36 +306,36 @@ namespace xns {
 				_segments.reserve(16);
 
 				// loop over characters in path
-				for (string_size x = 0, z = 0; x < path.size(); x += z, z = 0) {
+				for (string_size x = 0, z = 0; x < p.size(); x += z, z = 0) {
 
 					// skip separator
-					while (path[x] == SEP) { ++x; }
+					while (p[x] == SEP) { ++x; }
 					// count characters
-					while (path[x + z] != EOS && path[x + z] != SEP) { ++z; }
+					while (p[x + z] != EOS && p[x + z] != SEP) { ++z; }
 					// check for empty segment
 					if (z == 0) { continue; }
 					// skip current segment
-					if (z == 1 && path[x] == CUR) { continue; }
+					if (z == 1 && p[x] == CUR) { continue; }
 
 					// check for parent segment
-					if (z == 2 && path[x] == CUR && path[x + 1] == CUR) {
+					if (z == 2 && p[x] == CUR && p[x + 1] == CUR) {
 						// check for previous parent segment
 						if (_segments.empty()
 							|| xns::get<1>(_segments.back()) == segment_type::PARENT) {
 							// add parent segment
-							_segments.emplace_back(string_type{&path[x], z}, segment_type::PARENT); // this call need make_tuple() !!!
+							_segments.emplace_back(string_type{&p[x], z}, segment_type::PARENT); // this call need make_tuple() !!!
 						} // else remove previous segment
 						else { _segments.pop_back(); }
 					}
 
 					// add entity segment
 					else {
-						_segments.emplace_back(string_type{&path[x], z}, segment_type::ENTITY);
+						_segments.emplace_back(string_type{&p[x], z}, segment_type::ENTITY);
 					}
 				}
 
 				// set path type
-				if (!path.empty() && path[0] == SEP) {
+				if (!p.empty() && p[0] == SEP) {
 					// set absolute path type
 					_type = path_type::ABSOLUTE;
 				} // set relative path type

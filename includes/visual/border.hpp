@@ -32,11 +32,14 @@ namespace xns {
 
 			// -- public types ------------------------------------------------
 
+			/* self type */
+			using self = xns::border;
+
 			/* terminal size type */
 			using term_size = xns::term_size;
 
 			/* rect type */
-			using rect = xns::rect<term_size>;
+			using rect_type = xns::rect<term_size>;
 
 			/* string type */
 			using string = xns::string;
@@ -45,28 +48,28 @@ namespace xns {
 			// -- public constructors -----------------------------------------
 
 			/* default constructor */
-			border(void);
+			border(void) = default;
 
 			/* size and position constructor */
-			border(const rect& rect);
+			border(const rect_type&);
 
 			/* copy constructor */
-			border(const border& other);
+			border(const self&) = default;
 
 			/* move constructor */
-			border(border&& other) noexcept;
+			border(self&&) noexcept = default;
 
 			/* destructor */
-			~border(void);
+			~border(void) = default;
 
 
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			border& operator=(const border& other);
+			auto operator=(const self&) -> self&;
 
 			/* move assignment operator */
-			border& operator=(border&& other) noexcept;
+			auto operator=(self&&) noexcept -> self&;
 
 
 			// -- public boolean operators ------------------------------------
@@ -84,7 +87,7 @@ namespace xns {
 			void draw(void);
 
 			/* set size and position */
-			void set(const rect& rect,
+			void set(const rect_type&,
 					const xns::hexcolor color = xns::color::GREY_COLOR);
 
 			/* set border color */
@@ -122,8 +125,6 @@ namespace xns {
 
 			/* symbol array */
 			static constinit symbol _symb;
-
-
 
 	};
 

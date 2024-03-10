@@ -117,19 +117,19 @@ namespace xns {
 		static inline constexpr auto addition(const L& lhs, const R& rhs) noexcept -> T
 			requires (only_unsigned and T_EQUAL_L_EQUAL_R == true) {
 			// overflow check
-			return (lhs > (xns::limits::max<T>() - rhs))
-					? xns::limits::max<T>() : (lhs + rhs);
+			return (lhs > (xns::limits<T>::max() - rhs))
+					? xns::limits<T>::max() : (lhs + rhs);
 		}
 
 		/* addition */ // [only_unsigned] T < R < L
 		static inline constexpr auto addition(const L& lhs, const R& rhs) noexcept -> T
 			requires (only_unsigned and T_LESS_R_LESS_L == true) {
 			// compute calcul into larger type
-			L tmp = (rhs > xns::limits::max<L>() - lhs)
-				    ? xns::limits::max<L>() : lhs + static_cast<L>(rhs);
+			L tmp = (rhs > xns::limits<L>::max() - lhs)
+				    ? xns::limits<L>::max() : lhs + static_cast<L>(rhs);
 			// overflow check
-			return (tmp > xns::limits::max<R>())
-				    ? xns::limits::max<T>() : static_cast<T>(tmp);
+			return (tmp > xns::limits<R>::max())
+				    ? xns::limits<T>::max() : static_cast<T>(tmp);
 		}
 
 		/* addition */ // [only_unsigned] T < L < R // inverse call
@@ -154,8 +154,8 @@ namespace xns {
 			// get lhs into result type
 			T tmp = static_cast<T>(lhs);
 
-			tmp = (rhs > xns::limits::max<T>() - tmp)
-				    ? xns::limits::max<T>() : tmp + static_cast<T>(rhs);
+			tmp = (rhs > xns::limits<T>::max() - tmp)
+				    ? xns::limits<T>::max() : tmp + static_cast<T>(rhs);
 			return tmp;
 		}
 

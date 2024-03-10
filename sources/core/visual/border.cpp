@@ -12,54 +12,11 @@ constinit xns::border::symbol xns::border::_symb = {
 };
 
 
-/* default constructor */
-xns::border::border(void)
-: _border{} {
-	// code here...
-}
-
 /* size and position constructor */
-xns::border::border(const rect& rect)
+xns::border::border(const rect_type& rect)
 : _border{} {
 	// call set method
 	set(rect);
-}
-
-/* copy constructor */
-xns::border::border(const border& other)
-: _border{other._border} {
-	// code here...
-}
-
-/* move constructor */
-xns::border::border(border&& other) noexcept
-: _border{xns::move(other._border)} {
-	// code here...
-}
-
-/* destructor */
-xns::border::~border(void) {
-	// code here...
-}
-
-/* copy assignment operator */
-xns::border& xns::border::operator=(const border& other) {
-	// check for self assignment
-	if (this != &other) {
-		// copy border
-		_border.operator=(other._border);
-	} // return self reference
-	return *this;
-}
-
-/* move assignment operator */
-xns::border& xns::border::operator=(border&& other) noexcept {
-	// check for self assignment
-	if (this != &other) {
-		// move border
-		_border.operator=(xns::move(other._border));
-	} // return self reference
-	return *this;
 }
 
 /* bool operator */
@@ -83,7 +40,7 @@ void xns::border::draw(void) {
 }
 
 
-void xns::border::set(const rect& rect, const xns::hexcolor color) {
+void xns::border::set(const rect_type& rect, const xns::hexcolor color) {
 	// avoid namespace pollution
 	using esc = xns::escape;
 
@@ -92,10 +49,10 @@ void xns::border::set(const rect& rect, const xns::hexcolor color) {
 	// clear previous border
 	_border.clear();
 
-	auto x = rect.x;
-	auto y = rect.y;
-	auto w = rect.w;
-	auto h = rect.h;
+	auto x = rect.x();
+	auto y = rect.y();
+	auto w = rect.w();
+	auto h = rect.h();
 
 
 	_border.append(esc::hex_color(color));

@@ -1,7 +1,6 @@
 #ifndef XNS_METHOD_HPP
 #define XNS_METHOD_HPP
 
-#include "types.hpp"
 #include "forward.hpp"
 
 
@@ -41,76 +40,48 @@ namespace xns {
 
 			/* default constructor */
 			inline constexpr method(void) noexcept
-			: _method{nullptr} {}
+			: _method{nullptr} {
+			}
 
 			/* nullptr constructor */
-			inline constexpr method(xns::null) noexcept
-			: _method{nullptr} {}
+			inline constexpr method(decltype(nullptr)) noexcept
+			: _method{nullptr} {
+			}
 
 			/* method pointer constructor */
-			inline constexpr method(const prototype method) noexcept
-			: _method{method} {}
+			inline constexpr method(const prototype m) noexcept
+			: _method{m} {
+			}
 
 			/* copy constructor */
-			inline constexpr method(const self& other) noexcept
-			: _method{other._method} {}
+			constexpr method(const self&) noexcept = default;
 
 			/* move constructor */
-			inline constexpr method(self&& other) noexcept
-			: method{other} {}
+			constexpr method(self&&) noexcept = default;
 
 			/* destructor */
-			inline constexpr ~method(void) noexcept = default;
-
-
-			// -- public assignments ------------------------------------------
-
-			/* nullptr assignment */
-			inline constexpr auto assign(xns::null) noexcept -> void {
-				_method = nullptr;
-			}
-
-			/* method pointer assignment */
-			inline constexpr auto assign(const prototype method) noexcept -> void {
-				_method = method;
-			}
-
-			/* copy assignment */
-			inline constexpr auto assign(const self& other) noexcept -> void {
-				_method = other._method;
-			}
-
-			/* move assignment */
-			inline constexpr auto assign(self&& other) noexcept -> void {
-				assign(other);
-			}
+			~method(void) noexcept = default;
 
 
 			// -- public assignment operators ---------------------------------
 
 			/* nullptr assignment operator */
-			inline constexpr auto operator=(xns::null) noexcept -> self& {
-				assign(nullptr);
+			inline constexpr auto operator=(decltype(nullptr)) noexcept -> self& {
+				_method = nullptr;
 				return *this;
 			}
 
 			/* method pointer assignment operator */
-			inline constexpr auto operator=(const prototype method) noexcept -> self& {
-				assign(method);
+			inline constexpr auto operator=(const prototype m) noexcept -> self& {
+				_method = m;
 				return *this;
 			}
 
 			/* copy assignment operator */
-			inline constexpr auto operator=(const self& other) noexcept -> self& {
-				assign(other);
-				return *this;
-			}
+			constexpr auto operator=(const self&) noexcept -> self& = default;
 
 			/* move assignment operator */
-			inline constexpr auto operator=(self&& other) noexcept -> self& {
-				operator=(other);
-				return *this;
-			}
+			constexpr auto operator=(self&&) noexcept -> self& = default;
 
 
 			// -- public boolean operators ------------------------------------

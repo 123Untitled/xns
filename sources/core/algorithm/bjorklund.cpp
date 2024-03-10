@@ -18,9 +18,9 @@ inline xns::bjorklund::node::node(const size_type data) noexcept
 : _data{data}, _up{nullptr}, _last{this} {}
 
 /* push */
-auto xns::bjorklund::node::push(node_ptr node) noexcept -> void {
-	_last->_up = node;
-	_last = node->_last;
+auto xns::bjorklund::node::push(node_ptr ptr) noexcept -> void {
+	_last->_up = ptr;
+	_last = ptr->_last;
 }
 
 /* compute */

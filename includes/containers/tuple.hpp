@@ -169,12 +169,12 @@ namespace xns {
 			: _impl{xns::forward<U>(args)...} {}
 
 			/* copy constructor */
-			inline constexpr tuple(const self& tuple)
-			: _impl{tuple._impl} {}
+			inline constexpr tuple(const self& other)
+			: _impl{other._impl} {}
 
 			/* move constructor */
-			inline constexpr tuple(self&& tuple) noexcept
-			: _impl{xns::move(tuple._impl)} {}
+			inline constexpr tuple(self&& other) noexcept
+			: _impl{xns::move(other._impl)} {}
 
 			/* destructor */
 			inline constexpr ~tuple(void) noexcept = default;

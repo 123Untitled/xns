@@ -58,6 +58,7 @@ namespace xns {
 			/* use linked list to store read */
 			inline auto next(line_t& line) noexcept -> bool {
 
+				return true;
 			}
 
 

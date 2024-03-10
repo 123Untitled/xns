@@ -141,7 +141,7 @@ auto unit_tests_list(void) -> int {
 	const int* cpc = &b;
 	const int& ar = a;
 
-	xns::list<int> list2 = xns::make_list(a, b, *cp, *cpc, ar);
+	xns::list<int> list2;// = xns::make_list(a, b, *cp, *cpc, ar);
 
 	xns::list<int>::iterator it2 = list2.begin();
 

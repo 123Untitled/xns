@@ -125,7 +125,7 @@ namespace xns {
 
 			/* max size */
 			static inline consteval auto max_size(void) noexcept -> size_type {
-				return xns::limits::max<size_type>() / sizeof(type);
+				return xns::limits<size_type>::max() / sizeof(type);
 			}
 
 

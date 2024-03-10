@@ -342,22 +342,22 @@ namespace xns {
 
 	/* subscribe method to event */
 	template <typename C>
-	void xns::event::_subscribe(const evntmode& mode, const xns::evntype type, event_method<C> method, pointer<C> instance) {
+	void xns::event::_subscribe(const evntmode& md, const xns::evntype type, event_method<C> method, pointer<C> instance) {
 		// check invalid pointers and event type
 		if (!method || !instance || type >= xns::evntype::EVNT_MAX) { return; }
 		// get event subscriber vector
-		event_vector& subscribers = xns::get<1>(_modes[mode._idx])[type];
+		event_vector& subscribers = xns::get<1>(_modes[md._idx])[type];
 		// add new subscriber
 		subscribers.emplace_back(method, instance);
 	}
 
 	/* subscribe method to input */
 	template <typename C>
-	void xns::event::_subscribe(const evntmode& mode, input_method<C> method, pointer<C> instance) {
+	void xns::event::_subscribe(const evntmode& md, input_method<C> method, pointer<C> instance) {
 		// check invalid pointers
 		if (!method || !instance) { return; }
 		// get input subscriber vector
-		input_vector& subscribers = xns::get<0>(_modes[mode._idx]);
+		input_vector& subscribers = xns::get<0>(_modes[md._idx]);
 		// add new subscriber
 		subscribers.emplace_back(method, instance);
 	}

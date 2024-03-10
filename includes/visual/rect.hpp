@@ -8,7 +8,7 @@
 #include "is_arithmetic.hpp"
 
 
-#define PRECT(rect) std::cout << "Rect(" << rect.x << ", " << rect.y << ", " << rect.w << ", " << rect.h << ")" << std::endl;
+#define PRECT(rect) std::cout << "Rect(" << rect.x() << ", " << rect.y() << ", " << rect.w() << ", " << rect.h() << ")" << std::endl;
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -16,174 +16,219 @@
 namespace xns {
 
 
-	// -- R E C T  S T R U C T ------------------------------------------------
+	// -- R E C T -------------------------------------------------------------
 
 	template <typename P, typename D = P>
-	struct rect final {
+	class rect final {
 
 
-		// -- assertions ------------------------------------------------------
+		public:
 
-		/* check P and D are arithmetic types */
-		static_assert(xns::is_arithmetic<P>
-					&& xns::is_arithmetic<D>, "): RECT: P AND D MUST BE ARITHMETIC TYPES :(");
+			// -- public types ------------------------------------------------
 
+			/* self type */
+			using self = xns::rect<P, D>;
 
-		// -- types -----------------------------------------------------------
+			/* position type */
+			using pos_type = P;
 
-		/* self type */
-		using self = rect<P, D>;
-
-		/* position type */
-		using pos = P;
-
-		/* dimension type */
-		using dim = D;
+			/* dimension type */
+			using dim_type = D;
 
 
-		// -- members ---------------------------------------------------------
+		private:
 
-		/* position */
-		pos x, y;
+			// -- private members ---------------------------------------------
 
-		/* dimension */
-		dim w, h;
+			/* position */
+			pos_type _x, _y;
 
-
-		// -- constructors ----------------------------------------------------
-
-		/* default constructor */
-		inline constexpr rect(void) noexcept
-		: x{0}, y{0}, w{0}, h{0} {}
-
-		/* size and position constructor */
-		inline constexpr rect(const pos x,
-							  const pos y,
-							  const dim w,
-							  const dim h) noexcept
-		: x{x}, y{y}, w{w}, h{h} {}
-
-		/* copy constructor */
-		inline constexpr rect(const self& other) noexcept
-		: x{other.x}, y{other.y}, w{other.w}, h{other.h} {}
-
-		/* move constructor */
-		inline constexpr rect(self&& other) noexcept
-		: rect{other} {}
-
-		/* destructor */
-		~rect(void) noexcept = default;
+			/* dimension */
+			dim_type _w, _h;
 
 
-		// -- assignment operators --------------------------------------------
-
-		/* copy assignment operator */
-		inline constexpr auto operator=(const self& other) noexcept -> self& {
-			// copy dimension
-			w = other.w; h = other.h;
-			// copy position
-			x = other.x; y = other.y;
-			// return self reference
-			return *this;
-		}
-
-		/* move assignment operator */
-		inline constexpr auto operator=(self&& other) noexcept -> self& {
-			// call copy assignment
-			return operator=(other);
-		}
+		public:
 
 
-		// -- boolean operators -----------------------------------------------
+			// -- public lifecycle --------------------------------------------
 
-		/* bool operator */
-		inline constexpr explicit operator bool(void) const noexcept {
-			// check if empty
-			return !empty();
-		}
+			/* default constructor */
+			inline constexpr rect(void) noexcept
+			: _x{0}, _y{0}, _w{0}, _h{0} {}
 
-		/* bool not operator */
-		inline constexpr auto operator!(void) const noexcept -> bool {
-			// check if empty
-			return empty();
-		}
+			/* size and position constructor */
+			inline constexpr rect(const pos_type x,
+								  const pos_type y,
+								  const dim_type w,
+								  const dim_type h) noexcept
+			: _x{x}, _y{y}, _w{w}, _h{h} {}
 
+			/* copy constructor */
+			constexpr rect(const self&) noexcept = default;
 
-		// -- comparison operators --------------------------------------------
+			/* move constructor */
+			constexpr rect(self&&) noexcept = default;
 
-		/* equality operator */
-		inline constexpr auto operator==(const self& other) const noexcept -> bool {
-			// return equality
-			return w == other.w && h == other.h;
-		}
-
-		/* inequality operator */
-		inline constexpr auto operator!=(const self& other) const noexcept -> bool {
-			// return inequality
-			return !operator==(other);
-		}
-
-		/* less than operator */
-		inline constexpr auto operator<(const self& other) const noexcept -> bool {
-			// return less than
-			return w * h < other.w * other.h;
-		}
-
-		/* less than or equal operator */
-		inline constexpr auto operator<=(const self& other) const noexcept -> bool {
-			// return less than or equal
-			return *this < other || *this == other;
-		}
-
-		/* greater than operator */
-		inline constexpr auto operator>(const self& other) const noexcept -> bool {
-			// return greater than
-			return !operator<=(other);
-		}
-
-		/* greater than or equal operator */
-		inline constexpr auto operator>=(const self& other) const noexcept -> bool {
-			// return greater than or equal
-			return !operator<(other);
-		}
+			/* destructor */
+			~rect(void) noexcept = default;
 
 
-		// -- accessors -------------------------------------------------------
+			// -- public assignment operators ---------------------------------
 
-		/* empty */
-		inline constexpr auto empty(void) const noexcept -> bool {
-			// check if empty
-			return w == 0 || h == 0;
-		}
+			/* copy assignment operator */
+			constexpr auto operator=(const self&) noexcept -> self& = default;
+
+			/* move assignment operator */
+			constexpr auto operator=(self&&) noexcept -> self& = default;
 
 
-	};
+			// -- public accessors --------------------------------------------
+
+			/* empty */
+			inline constexpr auto empty(void) const noexcept -> bool {
+				return _w == 0 || _h == 0;
+			}
+
+			/* x */
+			inline constexpr auto x(void) noexcept -> pos_type& {
+				return _x;
+			}
+
+			/* const x */
+			inline constexpr auto x(void) const noexcept -> const pos_type& {
+				return _x;
+			}
+
+			/* y */
+			inline constexpr auto y(void) noexcept -> pos_type& {
+				return _y;
+			}
+
+			/* const y */
+			inline constexpr auto y(void) const noexcept -> const pos_type& {
+				return _y;
+			}
+
+			/* w */
+			inline constexpr auto w(void) noexcept -> dim_type& {
+				return _w;
+			}
+
+			/* const w */
+			inline constexpr auto w(void) const noexcept -> const dim_type& {
+				return _w;
+			}
+
+			/* h */
+			inline constexpr auto h(void) noexcept -> dim_type& {
+				return _h;
+			}
+
+			/* const h */
+			inline constexpr auto h(void) const noexcept -> const dim_type& {
+				return _h;
+			}
+
+
+			// -- public modifiers --------------------------------------------
+
+			/* x */
+			inline constexpr auto x(const pos_type& x) noexcept -> void {
+				_x = x;
+			}
+
+			/* y */
+			inline constexpr auto y(const pos_type& y) noexcept -> void {
+				_y = y;
+			}
+
+			/* w */
+			inline constexpr auto w(const dim_type& w) noexcept -> void {
+				_w = w;
+			}
+
+			/* h */
+			inline constexpr auto h(const dim_type& h) noexcept -> void {
+				_h = h;
+			}
+
+
+			// -- public conversion operators ---------------------------------
+
+			/* bool conversion operator */
+			inline constexpr explicit operator bool(void) const noexcept {
+				return not empty();
+			}
+
+
+			// -- public boolean operators ------------------------------------
+
+			/* not operator */
+			inline constexpr auto operator!(void) const noexcept -> bool {
+				return empty();
+			}
+
+
+			// -- public comparison operators ---------------------------------
+
+			/* equality operator */
+			inline constexpr auto operator==(const self& other) const noexcept -> bool {
+				return _w == other._w && _h == other._h;
+			}
+
+			/* inequality operator */
+			inline constexpr auto operator!=(const self& other) const noexcept -> bool {
+				return !operator==(other);
+			}
+
+			/* less than operator */
+			inline constexpr auto operator<(const self& other) const noexcept -> bool {
+				return (_w * _h) < (other._w * other._h);
+			}
+
+			/* less than or equal operator */
+			inline constexpr auto operator<=(const self& other) const noexcept -> bool {
+				return *this < other || *this == other;
+			}
+
+			/* greater than operator */
+			inline constexpr auto operator>(const self& other) const noexcept -> bool {
+				return !operator<=(other);
+			}
+
+			/* greater than or equal operator */
+			inline constexpr auto operator>=(const self& other) const noexcept -> bool {
+				return !operator<(other);
+			}
+
+
+	}; // class rect
 
 
 	// -- R E C T  F U N C T I O N S ------------------------------------------
 
-	template <auto N, typename P, typename D>
+	template <decltype(sizeof(0)) N, typename P, typename D>
 	constexpr auto horizontal_split(const xns::rect<P, D>& rect) noexcept -> xns::array<xns::rect<P, D>, N> {
-
-		// check N is not zero
-		static_assert(N > 0, "): HORITZONTAL_SPLIT: DIVISION BY ZERO ? GO IN HELL :(");
-
-		// check N
-
-		D width = rect.w / N;
-		D rest = rect.w % N;
-
-
-		xns::array<xns::rect<P, D>, N> rects;
-
-		for (decltype(N) i = 0; i < N; ++i) {
-			rects[i].x = rect.x + (i * width);
-			rects[i].y = rect.y;
-			rects[i].w = width + (i == N - 1 ? rest : 0);
-			rects[i].h = rect.h;
-		}
-
-		return rects;
+		//
+		//// check N is not zero
+		//static_assert(N > 0, "horizontal_split: cannot divide by zero");
+		//
+		//// check N
+		//
+		//D width = rect.w / N;
+		//D rest = rect.w % N;
+		//
+		//
+		//xns::array<xns::rect<P, D>, N> rects;
+		//
+		//for (decltype(N) i = 0; i < N; ++i) {
+		//	rects[i].x = rect.x + (i * width);
+		//	rects[i].y = rect.y;
+		//	rects[i].w = width + (i == N - 1 ? rest : 0);
+		//	rects[i].h = rect.h;
+		//}
+		//
+		return {};
 	}
 
 

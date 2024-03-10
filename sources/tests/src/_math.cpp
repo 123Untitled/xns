@@ -47,7 +47,7 @@ int unit_tests_math(void) {
 
 	std::cout << static_cast<int>(static_cast<unsigned char>(nn)) << std::endl;
 
-	double f = (double)xns::limits::max<unsigned int>();
+	double f = (double)xns::limits<unsigned int>::max();
 
 	std::cout << "max: " << f << std::endl;
 

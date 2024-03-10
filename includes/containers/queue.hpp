@@ -28,25 +28,25 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self            = queue<T>;
+			using self            = xns::queue<T>;
 
 			/* value type */
 			using value_type      = T;
 
 			/* reference type */
-			using reference       = value_type&;
+			using mut_ref       = value_type&;
 
 			/* move reference type */
-			using move_reference  = value_type&&;
+			using move_ref  = value_type&&;
 
 			/* const reference type */
-			using const_reference = const value_type&;
+			using const_ref = const value_type&;
 
 			/* pointer type */
-			using mutable_pointer = value_type*;
+			using mut_ptr = value_type*;
 
 			/* const pointer type */
-			using const_pointer   = const value_type*;
+			using const_ptr   = const value_type*;
 
 			/* size type */
 			using size_type       = xns::size_t;
@@ -56,29 +56,29 @@ namespace xns {
 
 			// -- forwared declarations ---------------------------------------
 
-			/* node class */
-			class node;
+			/* internal_node class */
+			class internal_node;
 
 
 			// -- private types -----------------------------------------------
 
 			/* node type */
-			using node_type       = self::node;
+			using node_type       = self::internal_node;
 
 			/* allocator type */
 			using allocator       = xns::allocator<node_type>;
 
 			/* node pointer type */
-			using node_pointer    = node_type*;
+			using node_ptr    = node_type*;
 
 
 			// -- private members ---------------------------------------------
 
 			/* head pointer */
-			node_pointer _head;
+			node_ptr _head;
 
 			/* tail pointer */
-			node_pointer _tail;
+			node_ptr _tail;
 
 			/* size */
 			size_type _size;
@@ -96,7 +96,7 @@ namespace xns {
 			queue(const self& other)
 			: _head{nullptr}, _tail{nullptr}, _size{0} {
 				// declare node
-				node_pointer node = other._head;
+				node_ptr node = other._head;
 				// loop over other queue
 				while (node != nullptr) {
 					// enqueue copy of value
@@ -131,7 +131,7 @@ namespace xns {
 					free_queue();
 					init();
 					// get other head
-					node_pointer node = other._head;
+					node_ptr node = other._head;
 					// loop over other queue
 					while (node != nullptr) {
 						// enqueue value by copy
@@ -192,13 +192,13 @@ namespace xns {
 			}
 
 			/* get first enqueued element */
-			inline auto next(void) noexcept -> reference {
+			inline auto next(void) noexcept -> mut_ref {
 				// return front
 				return _head->_value;
 			}
 
 			/* get first enqueued const element */
-			inline auto next(void) const noexcept -> const_reference {
+			inline auto next(void) const noexcept -> const_ref {
 				// return front
 				return _head->_value;
 			}
@@ -213,7 +213,7 @@ namespace xns {
 				//static_assert(xns::is_same<xns::remove_cvr<U>, value_type>, // TODO: replace with is_convertible ?
 				//		"): QUEUE: U MUST BE SAME AS T :(");
 				// allocate node
-				node_pointer node = allocator::allocate();
+				node_ptr node = allocator::allocate();
 				allocator::construct(node, xns::forward<U>(value));
 				// link node
 				link(node);
@@ -226,7 +226,7 @@ namespace xns {
 				static_assert(xns::is_constructible<value_type, A...>,
 						"): QUEUE: T MUST BE CONSTRUCTIBLE FROM A... :(");
 				// allocate node
-				node_pointer node = allocator::allocate();
+				node_ptr node = allocator::allocate();
 				allocator::construct(node, xns::forward<A>(args)...);
 				// link node
 				link(node);
@@ -237,7 +237,7 @@ namespace xns {
 				// check for non-empty queue
 				if (_head != nullptr) {
 					// get first enqueued node
-					node_pointer node = _head;
+					node_ptr node = _head;
 					// unlink node
 					_head = _head->_next;
 					// destroy node
@@ -263,7 +263,7 @@ namespace xns {
 			// -- private modifiers -------------------------------------------
 
 			/* link node */
-			inline void link(node_pointer node) noexcept {
+			inline void link(node_ptr node) noexcept {
 				// check head
 				_head != nullptr ?
 					// link to tail
@@ -286,11 +286,11 @@ namespace xns {
 			/* free queue */
 			auto free_queue(void) noexcept -> void {
 				// get head node
-				node_pointer node = _head;
+				node_ptr node = _head;
 				// loop over queue
 				while (node) {
 					// get next node
-					node_pointer next = node->_next;
+					node_ptr next = node->_next;
 					// destroy node
 					allocator::destroy(node);
 					// deallocate node
@@ -306,43 +306,43 @@ namespace xns {
 	// -- N O D E  C L A S S --------------------------------------------------
 
 	template <class T>
-	class xns::queue<T>::node final {
+	class xns::queue<T>::internal_node final {
 
 		public:
 
 			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			inline node(void) noexcept
+			inline internal_node(void) noexcept
 			: _next{nullptr} {}
 
-			/* non-assignable class */
-			unassignable(node);
+			/* not assignable */
+			XNS_NOT_ASSIGNABLE(internal_node);
 
 			/* value copy constructor */
-			inline explicit node(queue<T>::const_reference value)
+			inline explicit internal_node(const_ref value)
 			: _value{value}, _next{nullptr} {}
 
 			/* value move constructor */
-			inline explicit node(queue<T>::move_reference value) noexcept
+			inline explicit internal_node(move_ref value) noexcept
 			: _value{xns::move(value)}, _next{nullptr} {}
 
 			/* value emplace constructor */
 			template <typename... A>
-			inline explicit node(A&&... args)
+			inline explicit internal_node(A&&... args)
 			: _value{xns::forward<A>(args)...}, _next{nullptr} {}
 
 			/* destructor */
-			inline ~node(void) noexcept = default;
+			inline ~internal_node(void) noexcept = default;
 
 
 			// -- public members ----------------------------------------------
 
 			/* value */
-			queue<T>::value_type _value;
+			value_type _value;
 
 			/* next */
-			queue<T>::node_pointer _next;
+			node_ptr _next;
 
 	};
 

@@ -279,7 +279,7 @@ namespace xns {
 
 		// unsigned case
 
-		constexpr bool overflow = (b != 0) && (a > (xns::limits::max<xns::umax>() / b));
+		constexpr bool overflow = (b != 0) && (a > (xns::limits<xns::umax>::max() / b));
 
 		// check for overflow
 		static_assert(!overflow, "): MULTIPLICATION OVERFLOW :(");
@@ -295,7 +295,7 @@ namespace xns {
 
 	consteval inline auto testmulti(void) {
 
-		constexpr xns::umax a = xns::limits::max<xns::umax>();
+		constexpr xns::umax a = xns::limits<xns::umax>::max();
 		constexpr xns::smax b = 1;
 
 		//xns::integral c{2};

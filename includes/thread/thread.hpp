@@ -55,7 +55,8 @@ namespace xns {
 
 			/* function constructor */
 			template <typename F, typename... A>
-			explicit thread(F&& func, A&&... args) {
+			explicit thread(F&& func, A&&... args)
+			: _thread{} {
 
 				// declare tuple type
 				using tuple_type = xns::tuple<std::decay_t<F>,

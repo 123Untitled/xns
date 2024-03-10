@@ -3,15 +3,7 @@
 # This script is used to compile the project.
 # Makefile forever, but not really lol.
 
-
-BANNER2=\
-'   ▁▁▁▁▁▁▁▁  ▁▁▁▁▁▁▁▁  ▁▁▁▁ ▁▁▁  ▁▁▁▁▁▁▁▁ \n'\
-'  ╱        ╲╱        ╲╱    ╱   ╲╱        ╲\n'\
-' ╱         ╱         ╱         ╱         ╱\n'\
-'╱         ╱         ╱        ▁╱       ▁▁╱ \n'\
-'╲▁▁╱▁▁╱▁▁╱╲▁▁▁╱▁▁▁▁╱╲▁▁▁▁╱▁▁▁╱╲▁▁▁▁▁▁▁▁╱  \n'
-
-BANNER=\
+local BANNER=\
 '\n'\
 '      :::    ::: ::::    :::  ::::::::\n'\
 '     :+:    :+: :+:+:   :+: :+:    :+:\n'\
@@ -163,7 +155,8 @@ LOCK=$BLDDIR'/.lock'
 
 # compiler
 #CXX='/opt/homebrew/Cellar/llvm/17.0.6_1/bin/clang++'
-CXX='clang++'
+CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
+#CXX='clang++'
 #CXX='g++'
 
 # archiver
@@ -177,7 +170,6 @@ LINKER=$CXX
 
 # standard
 STD=('-std=c++2a')
-	#'-stdlib=libc++')
 
 # debug
 DEBUG='-g3'
@@ -213,7 +205,7 @@ CXXFLAGS+=('-Winline')
 #CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
 
 # shadowing
-#CXXFLAGS+=('-Wshadow')
+CXXFLAGS+=('-Wshadow')
 
 # exception
 #CXXFLAGS+=('-fexceptions' '-Wexceptions')
@@ -224,10 +216,6 @@ DEFINES=()
 # linker flags
 LDFLAGS=()
 
-
-if [[ $OS == 'macos' ]]; then
-	LDFLAGS+=('-framework' 'CoreMIDI' '-framework' 'CoreAudio' '-framework' 'CoreFoundation')
-fi
 
 # memory checker
 LEAKER='valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes'
@@ -404,6 +392,43 @@ function check_dependency {
 	return 1
 }
 
+function generate_compile_command {
+	# $1: file
+	# $2: object
+	# $3: json
+	CMPCMD=('\t{\n'
+			'\t\t"directory": "'$ABSDIR'",\n'
+			'\t\t"file": "'$1'",\n'
+			'\t\t"output": "'$2'"\n'
+			'\t\t"arguments": [\n'
+			'\t\t\t"'$CXX'",\n'
+			'\t\t\t"-c",\n'
+			'\t\t\t"'$1'",\n'
+			'\t\t\t"-o",\n'
+			'\t\t\t"'$2'",\n'
+			'\t\t\t"'$STD'",\n'
+			'\t\t\t"'$OPT'",\n'
+			'\t\t\t"'$DEBUG'",\n'
+		)
+
+		for FLAG in $CXXFLAGS; do
+			CMPCMD+=('\t\t\t"'$FLAG'",\n')
+		done
+
+		for DEFINE in $DEFINES; do
+			CMPCMD+=('\t\t\t"'$DEFINE'",\n')
+		done
+
+		for INCLUDE in $INCLUDES; do
+			CMPCMD+=('\t\t\t"'$INCLUDE'",\n')
+		done
+
+		CMPCMD+=('\t\t]\n\t}')
+
+		echo $CMPCMD > $3
+
+}
+
 function handle_compilation {
 	# openssl hash
 	local HASH=$(openssl md5 <<< $FILE)
@@ -423,11 +448,14 @@ function handle_compilation {
 
 		echo >> $COMPILED
 
+		generate_compile_command $FILE $OBJ $JSN
+
 		# compile source file
 		$CXX $STD $OPT $DEBUG $CXXFLAGS $DEFINES $INCLUDES \
-			-MT $OBJ -MMD -MF $DEP -c $FILE -o $OBJ 2> $LOG
-
+					-MT $OBJ -MMD -MF $DEP -c $FILE -o $OBJ 2> $LOG
 			#-MJ $JSN
+
+
 		# check if compilation failed
 		if [[ $? -ne 0 ]]; then
 			echo -n   $ERROR'[x]'$RESET
@@ -436,6 +464,7 @@ function handle_compilation {
 			echo -n $SUCCESS'[✓]'$RESET
 			exit 0
 		fi
+
 
 	fi
 
@@ -595,25 +624,40 @@ function database {
 	JSNS=($JSNDIR'/'*'.json'(.N))
 
 	# check if JSNS is empty
-	if [[ $JSNS[@] -eq 0 ]]; then
+	if [[ ${#JSNS[@]} -eq 0 ]]; then
 		return
 	fi
 
 	# check if need to (re)generate database
 	if [[ ! -e $DATABASE ]] || is_link_required $DATABASE $JSNS; then
 		# start json string
-		local CONTENT='['
+		local CONTENT='[\n'
 		# get all json files content
 		for JSN in $JSNS; do
-			CONTENT+=$(<$JSN)
+			CONTENT+=$(<$JSN)',\n'
 		done
 		# erase last comma with bracket
-		CONTENT[-1]=']'
+		CONTENT+=']\n'
 		# format json content with jq
-		jq <<< $CONTENT > $DATABASE
+		echo $CONTENT > $DATABASE
+		#jq <<< $CONTENT > $DATABASE
 		# check if compilation database succeeded
 		description $DATABASE
 	fi
+	#if [[ ! -e $DATABASE ]] || is_link_required $DATABASE $JSNS; then
+	#	# start json string
+	#	local CONTENT='['
+	#	# get all json files content
+	#	for JSN in $JSNS; do
+	#		CONTENT+=$(<$JSN)
+	#	done
+	#	# erase last comma with bracket
+	#	CONTENT[-1]=']'
+	#	# format json content with jq
+	#	jq <<< $CONTENT > $DATABASE
+	#	# check if compilation database succeeded
+	#	description $DATABASE
+	#fi
 }
 
 
@@ -814,6 +858,7 @@ function main {
 	setup_mode
 	setup_files
 
+
 	# switch build mode
 	case $MODE in
 
@@ -837,9 +882,5 @@ function main {
 	echo '💫' "[$MODE]" 'All targets are up to date !\n';
 }
 
-
-
 # call main function
 main; exit 0
-
-

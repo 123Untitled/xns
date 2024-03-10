@@ -27,7 +27,7 @@ namespace xns {
 
 	/* is copy constructible */
 	template <typename T>
-	concept is_copy_constructible = true;//xns::is_constructible<T, xns::add_lvalue_reference<xns::add_const<T>>>;
+	concept is_copy_constructible = xns::is_constructible<T, xns::add_lvalue_reference<xns::add_const<T>>>;
 
 	/* are copy constructible */
 	template <typename... T>

@@ -53,8 +53,8 @@ namespace xns {
 		// check T is signed
 		if constexpr (xns::is_signed<T>) {
 			// return absolute value
-			return value < 0 ? value == xns::limits::min<T>()
-									  ? xns::limits::max<T>()
+			return value < 0 ? value == xns::limits<T>::min()
+									  ? xns::limits<T>::max()
 									  : -value
 									  :  value;
 		}
@@ -215,7 +215,7 @@ namespace xns {
 
 			/* default constructor */
 			inline constexpr min_max(void) noexcept
-			: _min{xns::limits::max<T>()}, _max{xns::limits::min<T>()} {}
+			: _min{xns::limits<T>::max()}, _max{xns::limits<T>::min()} {}
 
 			/* copy constructor */
 			inline constexpr min_max(const self& other) noexcept

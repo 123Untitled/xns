@@ -6,6 +6,7 @@
 
 #include "bit_view.hpp"
 #include "terminal.hpp"
+#include <limits>
 
 #include <string>
 
@@ -92,8 +93,9 @@ static void reserve_test(void) {
 	}
 	{
 		Str s;
+		using size_type = typename Str::size_type;
 		try {
-			s.reserve(std::numeric_limits<typename Str::size_type>::max() - 1);
+			s.reserve(std::numeric_limits<size_type>::max() - 1);
 		}
 		catch (const xns::exception& e) {
 			write(1, "\x1b[31mexcept has been thrown\x1b[0m\n", 34);
@@ -675,10 +677,12 @@ static int func(void) {
 #if defined(XNS_TEST_STRING)
 int main(int ac, char** av) {
 
-	const char* str = av[1];
+	xns::string::to_basic_string(42U);
 
-
-	xns::string s0{str};
+	//const char* str = av[1];
+	//
+	//
+	//xns::string s0{str};
 
 	//xns::string s{"hello world!"};
 

@@ -104,23 +104,23 @@ namespace xns {
 			// -- public modifiers --------------------------------------------
 
 			/* attach observer */
-			void attach(inverse& observer) noexcept {
+			void attach(inverse& observ) noexcept {
 				// WARNING: need to check if observer is already attached (very important !!!)
-				std::cout << "link[" << this << "] attach: " << &observer << std::endl;
+				std::cout << "link[" << this << "] attach: " << &observ << std::endl;
 				// add observer
-				_observers.copy_back(&observer);
-				std::cout << "link[" << &observer << "] attach: " << this << std::endl;
+				_observers.copy_back(&observ);
+				std::cout << "link[" << &observ << "] attach: " << this << std::endl;
 				// also add self to observer
-				observer._observers.copy_back(this);
+				observ._observers.copy_back(this);
 			}
 
 			/* detach observer */
-			void detach(inverse& observer) noexcept {
+			void detach(inverse& observ) noexcept {
 				std::cout << "in detach of: " << this << std::endl;
 				// remove observer
-				_observers.filter(&observer);
+				_observers.filter(&observ);
 				// also remove self from observer
-				observer._observers.filter(this);
+				observ._observers.filter(this);
 			}
 
 			/* notify observers */

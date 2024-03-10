@@ -58,8 +58,8 @@ namespace xns {
 														xns::_unsigned<BYTES / xns::bits_per_byte>>;
 
 			enum : underlying {
-				MIN = xns::limits::min<underlying>(),
-				MAX = xns::limits::max<underlying>()
+				MIN = xns::limits<underlying>::min(),
+				MAX = xns::limits<underlying>::max()
 			};
 
 
@@ -244,7 +244,7 @@ namespace xns {
 					  xns::is_unsigned_integral L,
 					  xns::is_unsigned_integral R>
 			static inline constexpr auto add(const L& left, const R& right) noexcept -> T {
-				return left > (xns::limits::max<T>() - right) ? xns::limits::max<T>()
+				return left > (xns::limits<T>::max() - right) ? xns::limits<T>::max()
 					: left + right;
 			}
 

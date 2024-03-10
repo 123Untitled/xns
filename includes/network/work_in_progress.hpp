@@ -330,9 +330,6 @@ namespace xns {
 			/* self type */
 			using self = socket<D, T>;
 
-			/* protocol type */
-			using protocol = int;
-
 			/* size type */
 			using size_type = xns::size_t;
 

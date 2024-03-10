@@ -33,8 +33,8 @@ namespace xns {
 			  xns::is_unsigned_integral T> requires (sizeof(R) < sizeof(T))
 	inline constexpr auto conversion(const T& value) noexcept -> R {
 		// smaller return type
-		return value > xns::limits::max<R>()
-			? xns::limits::max<R>()
+		return value > xns::limits<R>::max()
+			? xns::limits<R>::max()
 			: static_cast<R>(value);
 	}
 
@@ -43,10 +43,10 @@ namespace xns {
 			  xns::is_signed_integral T> requires (sizeof(R) < sizeof(T))
 	inline constexpr auto conversion(const T& value) noexcept -> R {
 		// smaller return type
-		return value > xns::limits::max<R>()
-			? xns::limits::max<R>()
-			: value < xns::limits::min<R>()
-				? xns::limits::min<R>()
+		return value > xns::limits<R>::max()
+			? xns::limits<R>::max()
+			: value < xns::limits<R>::min()
+				? xns::limits<R>::min()
 				: static_cast<R>(value);
 	}
 
@@ -61,8 +61,8 @@ namespace xns {
 		} else {
 			// smaller return type
 			return value < 0 ? 0
-				: value > xns::limits::max<R>()
-				? xns::limits::max<R>()
+				: value > xns::limits<R>::max()
+				? xns::limits<R>::max()
 				: static_cast<R>(value);
 		}
 	}
@@ -75,8 +75,8 @@ namespace xns {
 			return static_cast<R>(value);
 		} else {
 			// smaller or equal return type
-			return value > xns::limits::max<R>()
-				? xns::limits::max<R>()
+			return value > xns::limits<R>::max()
+				? xns::limits<R>::max()
 				: static_cast<R>(value);
 		}
 	}

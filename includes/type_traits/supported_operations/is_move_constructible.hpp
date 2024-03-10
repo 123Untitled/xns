@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef XNS_IS_MOVE_CONSTRUCTIBLE_HPP
-#define XNS_IS_MOVE_CONSTRUCTIBLE_HPP
+#ifndef XNS_IS_MOVE_CONSTRUCTIBLE_HEADER
+#define XNS_IS_MOVE_CONSTRUCTIBLE_HEADER
 
 #include "is_constructible.hpp"
 #include "add_rvalue_reference.hpp"
@@ -26,7 +26,7 @@ namespace xns {
 
 	/* is move constructible */
 	template <typename T>
-	concept is_move_constructible = true;//xns::is_constructible<T, xns::add_rvalue_reference<T>>;
+	concept is_move_constructible = xns::is_constructible<T, xns::add_rvalue_reference<T>>;
 
 	/* are move constructible */
 	template <typename... T>
@@ -34,4 +34,4 @@ namespace xns {
 
 } // namespace xns
 
-#endif // XNS_IS_MOVE_CONSTRUCTIBLE_HPP
+#endif // XNS_IS_MOVE_CONSTRUCTIBLE_HEADER

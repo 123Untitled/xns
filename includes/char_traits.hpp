@@ -65,7 +65,7 @@ namespace xns {
 		// -- non instanciable ------------------------------------------------
 
 		/* non instanciable */
-		non_instanciable(char_traits<_char>);
+		non_instanciable(char_traits);
 
 
 

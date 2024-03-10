@@ -29,30 +29,31 @@ namespace xns {
 	template <typename T, decltype(sizeof(0)) N>
 	class static_vector {
 
+
 		public:
 
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = xns::static_vector<T, N>;
+			using self       = xns::static_vector<T, N>;
 
 			/* value type */
 			using value_type = T;
 
 			/* size type */
-			using size_type = decltype(N);
+			using size_type  = decltype(N);
 
 			/* mutable reference type */
-			using mut_ref = T&;
+			using mut_ref    = T&;
 
 			/* constant reference type */
-			using const_ref = const T&;
+			using const_ref  = const T&;
 
 			/* mutable pointer type */
-			using mut_ptr = T*;
+			using mut_ptr    = T*;
 
 			/* constant pointer type */
-			using const_ptr = const T*;
+			using const_ptr  = const T*;
 
 
 			// -- public lifecycle --------------------------------------------
@@ -197,6 +198,16 @@ namespace xns {
 			/* capacity */
 			constexpr auto capacity(void) const noexcept -> size_type {
 				return N;
+			}
+
+			/* data */
+			constexpr auto data(void) noexcept -> mut_ptr {
+				return reinterpret_cast<mut_ptr>(_data);
+			}
+
+			/* data */
+			constexpr auto data(void) const noexcept -> const_ptr {
+				return reinterpret_cast<const_ptr>(_data);
 			}
 
 

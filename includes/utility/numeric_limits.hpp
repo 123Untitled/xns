@@ -1,3 +1,17 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_NUMERIC_LIMITS_HEADER
 #define XNS_NUMERIC_LIMITS_HEADER
 
@@ -6,6 +20,7 @@
 #include "types.hpp"
 
 #include "is_integral.hpp"
+#include "is_scalar.hpp"
 #include "is_signed.hpp"
 #include "is_unsigned.hpp"
 #include "remove.hpp"
@@ -16,86 +31,102 @@
 namespace xns {
 
 
+	template <typename T>
 	class limits final {
+
+
+		// -- assertions ------------------------------------------------------
+
+		/* assert that T is an scalar type */
+		static_assert(xns::is_scalar<T>, "limits: T must be an integral type");
 
 
 		public:
 
+			// -- public types ------------------------------------------------
+
+			/* self type */
+			using self = xns::limits<T>;
+
+
 			// -- public static methods ---------------------------------------
 
 			/* max */
-			template <xns::is_integral T> requires xns::is_not_same<T, bool>
-			static consteval xns::remove_cvr<T> max(void) {
-				// remove const volatile reference
-				using type = xns::remove_cvr<T>;
-				// number of bits in type
-				constexpr type bits = (sizeof(type) * 8) - xns::is_signed<type>;
-				// max value of type
-				type type_max = 0;
-				// loop through bits
-				for (type x = 0; x < bits; ++x) {
-					// add shifted bit to max
-					type_max |= static_cast<type>(static_cast<type>(1) << x);
-				} // return max
-				return type_max;
+			static consteval auto max(void) -> T {
+
+				if constexpr (xns::is_same<T, bool>)
+					return true;
+
+				else if constexpr (xns::is_floating<T>) {
+
+					if constexpr (sizeof(T) == 4)
+						// return IEEE 754 single precision max
+						return 0x1.fffffep+127f;
+
+					else if constexpr (sizeof(T) == 8)
+						// return IEEE 754 double precision max
+						return 0x1.fffffffffffffp+1023;
+				}
+
+				else {
+
+					// number of bits in type
+					constexpr T bits = static_cast<T>((sizeof(T) * 8) - xns::is_signed<T>);
+
+					T count = 0;
+
+					// loop through bits
+					for (T i = 0; i < bits; ++i)
+						// add shifted bit to max
+						count |= static_cast<T>(static_cast<T>(1) << i);
+
+					return count;
+				}
 			}
 
 			/* min */
-			template <xns::is_integral T> requires xns::is_not_same<T, bool>
-			static consteval xns::remove_cvr<T> min(void) {
-				// return inverse of max
-				return ~max<T>();
-			}
+			static consteval auto min(void) -> T {
 
-			/* max for bool */
-			template <class T> requires xns::is_same<T, bool>
-			static consteval auto max(void) {
-				return true;
-			}
+				if constexpr (xns::is_same<T, bool>)
+					return false;
 
-			/* min for bool */
-			template <class T> requires xns::is_same<T, bool>
-			static consteval auto min(void) {
-				return false;
-			}
+				else if constexpr (xns::is_floating<T>) {
 
-			/* max for floating */
-			template <xns::is_floating T>
-			static consteval auto max(void) {
-				return 0;
-			}
+					if constexpr (sizeof(T) == 4)
+						// return IEEE 754 single precision min
+						return -0x1.fffffep+127f;
 
-			/* min for floating */
-			template <xns::is_floating T>
-			static consteval auto min(void) {
-				return 0;
+					else if constexpr (sizeof(T) == 8)
+						// return IEEE 754 double precision min
+						return -0x1.fffffffffffffp+1023;
+				}
+				else {
+					T max = self::max();
+					return ~max;
+				}
 			}
-
 
 			/* max number of digits */
-			template <xns::is_integral T, xns::is_base B = xns::dec>
-			static consteval xns::umax digits(void) {
+			template <xns::is_base B = xns::dec>
+			static consteval auto digits(void) -> decltype(sizeof(0)) {
 
 				// max value of type
-				auto type_max = max<T>();
+				auto limit = self::max();
 
 				// number of digits
-				xns::umax digits = 0;
+				decltype(sizeof(0)) digits = 0;
 
 				do { // increment digits
 					++digits;
-					// divide max by 10
-				} while (type_max /= B::base);
+					// divide max by base
+				} while (limit /= B::base);
 
-				// return digits
 				return digits;
 			}
 
 			/* compile time max number of digits */
-			template <auto N, xns::is_base B>
+			template <T N, xns::is_base B>
 			static consteval xns::umax digits(void) {
-
-				static_assert(xns::is_integral<decltype(N)>, "): N MUST BE INTEGRAL :(");
 
 				decltype(N) num = N;
 
@@ -114,16 +145,14 @@ namespace xns {
 
 
 
-			template <typename R, typename T>
-			static inline auto in_range(const T& value) -> bool {
+			template <typename U>
+			static inline auto in_range(const U& value) -> bool {
 
 				// check types are integral
-				static_assert(xns::is_integral<R> && xns::is_integral<T>,
-						"): IN_RANGE: TYPES MUST BE INTEGRAL :(");
+				static_assert(xns::is_integral<U>, "in_range: type must be integral");
 
-				constexpr auto min = limits::min<R>();
-				constexpr auto max = limits::max<R>();
-
+				constexpr auto min = self::min();
+				constexpr auto max = self::max();
 
 
 				// remove: comparison of integers of different signs: warning

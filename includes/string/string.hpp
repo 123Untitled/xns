@@ -127,8 +127,8 @@ namespace xns {
 
 	/* strlen (basic string) */
 	template <typename T>
-	constexpr inline auto strlen(const xns::basic_string<T>& string) noexcept -> auto {
-		return typename basic_string<T>::size_type{string.size()};
+	constexpr inline auto strlen(const xns::basic_string<T>& str) noexcept -> auto {
+		return typename basic_string<T>::size_type{str.size()};
 	}
 
 	/* strlen (basic string view) */
@@ -236,7 +236,7 @@ namespace xns {
 			using allocator   = xns::allocator<char_t>;
 
 			/* string view type */
-			using view        = xns::basic_string_view<char_t>;
+			using view_type        = xns::basic_string_view<char_t>;
 
 			/* iterator type */
 			using iterator    = xns::basic_string_iterator<char_t, false>;
@@ -338,7 +338,7 @@ namespace xns {
 			}
 
 			/* string view constructor */
-			explicit inline basic_string(const self::view& view)
+			explicit inline basic_string(const view_type& view)
 			: basic_string{view.data(), view.size()} {
 				//std::cout << "string view constructor" << std::endl;
 			}
@@ -390,7 +390,7 @@ namespace xns {
 			// -- public assignments ------------------------------------------
 
 			/* string view assignment */
-			inline auto assign(const self::view& view) -> void {
+			inline auto assign(const view_type& view) -> void {
 				// return buffer assignment
 				assign(view.data(), view.size());
 			}
@@ -479,7 +479,7 @@ namespace xns {
 			}
 
 			/* string view assignment operator */
-			inline auto operator=(const self::view& view) -> self& {
+			inline auto operator=(const view_type& view) -> self& {
 				assign(view);
 				return *this;
 			}
@@ -518,7 +518,7 @@ namespace xns {
 			}
 
 			/* string view append operator */
-			auto operator+=(const self::view& view) -> self& {
+			auto operator+=(const view_type& view) -> self& {
 				// return string view append
 				return append(view);
 			}
@@ -560,7 +560,7 @@ namespace xns {
 			}
 
 			/* string view equality operator */
-			inline auto operator==(const self::view& view) const noexcept -> bool {
+			inline auto operator==(const view_type& view) const noexcept -> bool {
 				// call compare method
 				return compare(view) == 0;
 			}
@@ -658,16 +658,14 @@ namespace xns {
 
 
 			/* get subview */
-			auto subview(const size_type pos, const size_type size) const noexcept -> self::view {
+			auto subview(const size_type pos, const size_type size) const noexcept -> view_type {
 				// check if index is out of bounds
-				if (_str != nullptr && pos < _size) {
-					// return subview
-					return pos + size < _size
-							? view{_str + pos, size}
-							// return clamped subview
-							: view{_str + pos, _size - pos};
-				} // return default subview
-				return view{};
+				if (_str == nullptr || pos < _size)
+					return view_type{};
+
+				// return subview
+				return (pos + size) < _size ? view_type{_str + pos, size}
+											: view_type{_str + pos, _size - pos}; // return clamped subview
 			}
 
 			/* get substring */
@@ -760,7 +758,7 @@ namespace xns {
 			}
 
 			/* string view append */
-			inline auto append(const self::view& view) -> self& {
+			inline auto append(const view_type& view) -> self& {
 				// call buffer append
 				return append(view.data(), view.size());
 			}
@@ -926,7 +924,7 @@ namespace xns {
 			}
 
 			/* string view insert */
-			auto insert(const size_type index, const self::view& view) -> self& {
+			auto insert(const size_type index, const view_type& view) -> self& {
 				// call buffer insert with size
 				return insert(index, view.data(), view.size());
 			}
@@ -1362,9 +1360,9 @@ namespace xns {
 				U value = vlue;
 				self str;
 
-				str.reserve(xns::limits::digits<U>() + 1); // INFO: +1 for negative sign
+				str.reserve(xns::limits<U>::digits() + 1); // INFO: +1 for negative sign
 
-				constexpr U type_min = xns::limits::min<U>();
+				constexpr U type_min = xns::limits<U>::min();
 
 				U base = 10;
 
@@ -1415,7 +1413,9 @@ namespace xns {
 			self str;
 
 			// debug !!!!
-			constexpr size_type size = 1000;//xns::limits::digits<T>();
+			//constexpr size_type size = 100;
+			constexpr size_type size = xns::limits<U>::digits();
+			std::cout << "size: " << size << std::endl;
 			//static_assert(size > 0, "size must be greater than zero");
 
 			str._str = str.allocate(size);
@@ -1470,7 +1470,7 @@ namespace xns {
 				}
 			}
 
-			const constexpr integer max = xns::limits::max<integer>();
+			const constexpr integer max = xns::limits<integer>::max();
 
 			// loop through digits
 			while (x < str.size() && xns::is_digit(str[x])) {
@@ -1482,7 +1482,7 @@ namespace xns {
 				integer test = (max - add) / 10;
 
 				if (value > test) {
-					value = negative > 0 ? max : xns::limits::min<integer>();
+					value = negative > 0 ? max : xns::limits<integer>::min();
 					return false;
 				}
 
@@ -1556,11 +1556,11 @@ namespace xns {
 	// -- <<  O P E R A T O R  ------------------------------------------------
 
 	/* output stream operator */
-	inline std::ostream& operator<<(std::ostream& os, const xns::basic_string<char>& string) {
+	inline std::ostream& operator<<(std::ostream& os, const xns::basic_string<char>& str) {
 			// check if string is null
-			if (string._str) {
+			if (str._str) {
 				// write string to os
-				os.write(string._str, (long)string._size);
+				os.write(str._str, (long)str._size);
 			}
 			else { os.write("nullptr", 7); }
 		return os;
@@ -1932,9 +1932,9 @@ namespace xns {
 	basic_string_view(const T*) -> basic_string_view<T>;
 
 
-	inline std::ostream& operator<<(std::ostream& os, const xns::basic_string_view<char>& string) {
+	inline std::ostream& operator<<(std::ostream& os, const xns::basic_string_view<char>& str) {
 		// write string
-		os.write(string.data(), (std::streamsize)string.size());
+		os.write(str.data(), (std::streamsize)str.size());
 		// return stream
 		return os;
 	}
@@ -2139,9 +2139,9 @@ namespace xns {
 
 			/* constructor */
 			template <xns::is_string S>
-			constexpr formated_string_iterator(const S& string, const xns::size_t size) noexcept
-			: _min{string.data()},
-			  _max{string.data() + string.size()},
+			constexpr formated_string_iterator(const S& str, const xns::size_t size) noexcept
+			: _min{str.data()},
+			  _max{str.data() + str.size()},
 			  _size{size},
 			  _view{} {
 				*this += size;
@@ -2356,18 +2356,18 @@ namespace xns {
 			// -- private methods ---------------------------------------------
 
 			/* compute length */
-			static constexpr typename basic_string<T>::size_type vlength(const basic_string<T>& string) noexcept {
+			static constexpr typename basic_string<T>::size_type vlength(const basic_string<T>& str) noexcept {
 
 				typename basic_string<T>::size_type x = 0;
 
 				bool escape = false;
 
 				// loop over string
-				for (typename basic_string<T>::size_type i = 0; i < string.size(); ++i) {
+				for (typename basic_string<T>::size_type i = 0; i < str.size(); ++i) {
 
 					escape == false
-					? string[i] == 27   ? escape = true : ++x
-					: string[i] == 'm' && (escape = false);
+					? str[i] == 27   ? escape = true : ++x
+					: str[i] == 'm' && (escape = false);
 				}
 
 				return x;
@@ -2376,7 +2376,7 @@ namespace xns {
 			// -- private members ---------------------------------------------
 
 			/* string */
-			basic_string<T> _string;
+			xns::basic_string<T> _string;
 
 			/* visual length */
 			xns::size_t _size;
@@ -2388,14 +2388,14 @@ namespace xns {
 
 	/* sub-formated string */
 	template <class T>
-	auto sub_fmt_string(const T& string, const xns::size_t size) noexcept -> basic_string<typename T::char_t> {
+	auto sub_fmt_string(const T& str, const xns::size_t size) noexcept -> basic_string<typename T::char_t> {
 
 		using const_pointer = typename T::const_ptr;
 		using size_type = typename T::size_type;
 
 		size_type x = 0;
-		const_pointer ptr = string.data();
-		const_pointer end = string.data() + string.size();
+		const_pointer ptr = str.data();
+		const_pointer end = str.data() + str.size();
 		const_pointer esc = nullptr;
 		size_type m = 0;
 

@@ -377,12 +377,12 @@ namespace xns {
 					/* destructor */
 					inline ~pool_impl(void) noexcept {
 						// get head page
-						auto page = _head;
+						auto ptr = _head;
 						// loop over pages
-						while (page != nullptr) {
-							auto next = page->_next;
-							xns::memory2::unmap(page, page->capacity());
-							page = next;
+						while (ptr != nullptr) {
+							auto next = ptr->_next;
+							xns::memory2::unmap(ptr, ptr->capacity());
+							ptr = next;
 						}
 					}
 
@@ -830,12 +830,12 @@ namespace xns {
 			/* destructor */
 			inline ~locality(void) noexcept(false) {
 				// get head page
-				auto block = _head;
+				auto ptr = _head;
 				// loop over pages
-				while (block != nullptr) {
-					auto next = block->next();
-					xns::memory2::unmap(block, block->capacity());
-					block = next;
+				while (ptr != nullptr) {
+					auto next = ptr->next();
+					xns::memory2::unmap(ptr, ptr->capacity());
+					ptr = next;
 				}
 			}
 
