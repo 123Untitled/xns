@@ -1,20 +1,20 @@
-#include "unit_tests.hpp"
 #include "literal_map.hpp"
+#include <iostream>
 
 
 
 auto unit_tests_literal_map(void) -> int {
 
 
-	//xns::literal_map<int, "a", "b"> m1 = { 1, 2 };
-	//
-	//m1.have_key<"a">();
-	//
-	//std::cout << xns::get<"a">(m1) << std::endl;
-	//
-	//xns::get<"a">(m1) = xns::move(xns::get<"b">(m1));
-	//
-	//std::cout << xns::get<"a">(m1) << std::endl;
+	xns::literal_map<int, "a", "b"> m1 = { 1, 2 };
+
+	m1.have_key<"a">();
+
+	std::cout << xns::get<"a">(m1) << std::endl;
+
+	xns::get<"a">(m1) = xns::move(xns::get<"b">(m1));
+
+	std::cout << xns::get<"a">(m1) << std::endl;
 
 
 	return 0;

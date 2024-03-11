@@ -19,7 +19,7 @@
 #include "utility/macros.hpp"
 
 // operating system headers
-#include <sys/_pthread/_pthread_mutex_t.h>
+#include <pthread.h>
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

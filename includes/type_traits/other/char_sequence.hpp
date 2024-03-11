@@ -1,3 +1,17 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_CHAR_SEQUENCE_HEADER
 #define XNS_CHAR_SEQUENCE_HEADER
 
@@ -16,14 +30,14 @@ namespace xns {
 
 	// -- C H A R A C T E R  S E Q U E N C E ----------------------------------
 
-	template <typename T, T... C>
+	template <typename __type, __type... __chars>
 	class character_sequence {
 
 
 		// -- assertions ------------------------------------------------------
 
-		/* check if T is a character type */
-		static_assert(xns::is_char<T>, "T MUST BE A CHARACTER TYPE");
+		/* check if __char_t is a character type */
+		static_assert(xns::is_char<__type>, "character_sequence: must be a character type");
 
 
 		public:
@@ -31,10 +45,10 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = character_sequence<T, C...>;
+			using self = xns::character_sequence<__type, __chars...>;
 
 			/* character type */
-			using char_type = T;
+			using char_type = __type;
 
 			/* size type */
 			using size_type = xns::size_t;
@@ -45,27 +59,8 @@ namespace xns {
 
 			/* size accessor */
 			static inline consteval auto size(void) noexcept -> size_type {
-				return sizeof...(C);
+				return sizeof...(__chars);
 			}
-
-			/* data accessor */
-			static inline consteval auto data(void) noexcept -> const char_type* {
-				return _data;
-			}
-
-			/* print accessor */
-			static auto print(void) noexcept -> void {
-				char_type data[] = { C..., '\0' };
-				std::cout << data << std::endl;
-			}
-
-
-		private:
-
-			// -- private constants // INFO: to be deprecated -----------------
-
-			/* character sequence */
-			static constexpr char_type _data[sizeof...(C) + 1] = { C..., '\0' };
 
 	};
 
@@ -96,58 +91,30 @@ namespace xns {
 
 	// -- M A K E  C H A R A C T E R  S E Q U E N C E -------------------------
 
-	// -- detail --------------------------------------------------------------
+	/* implementation */
+	namespace __impl {
 
-	namespace impl {
 
-
-		template <xns::basic_string_literal lit, xns::size_t B, xns::size_t E>
-		class make_character_sequence {
+		/* make character sequence */
+		template <xns::basic_string_literal __literal,
+				  xns::size_t               __begin,
+				  xns::size_t               __end>
+		class make_character_sequence final {
 
 
 			// -- assertions ------------------------------------------------------
 
-			/* check if 'begin' is less than 'end' */
-			static_assert(B < E,          "START MUST BE LESS THAN END");
+			/* check if begin is less than end */
+			static_assert(__begin < __end,
+					"make_character_sequence: begin must be less than end");
 
-			/* check if 'begin' is less than literal size */
-			static_assert(B <= lit.size(), "BEGIN MUST BE LESS THAN LITERAL SIZE");
+			/* check if begin is less than literal size */
+			static_assert(__begin <= __literal.size(),
+					"make_character_sequence: begin must be less than literal size");
 
-			/* check if 'end' is less than literal size */
-			static_assert(E <= lit.size(), "END MUST BE LESS THAN LITERAL SIZE");
-
-
-			public:
-
-				// -- public types ------------------------------------------------
-
-				/* character type */
-				using char_t = typename decltype(lit)::char_t;
-
-				/* size type */
-				using size_t = xns::size_t;
-
-
-			private:
-			public:
-
-				// -- private implementation --------------------------------------
-
-				/* forward declaration */
-				template <char_t...>
-				struct implementation;
-
-				/* specialization for I == E, end of recursion */
-				template <size_t I, char_t... SEQ> requires (I == E)
-				struct implementation<I, SEQ...> final {
-					using internal_type = xns::character_sequence<char_t, SEQ...>;
-				};
-
-				/* specialization for I < E, continue recursion */
-				template <size_t I, char_t... SEQ> requires (I < E)
-				struct implementation<I, SEQ...> final {
-					using internal_type = typename implementation<I + 1, SEQ..., lit._data[I]>::internal_type;
-				};
+			/* check if end is less than literal size */
+			static_assert(__end <= __literal.size(),
+					"make_character_sequence: end must be less than literal size");
 
 
 			public:
@@ -155,10 +122,42 @@ namespace xns {
 				// -- public types ------------------------------------------------
 
 				/* self type */
-				using self = xns::impl::make_character_sequence<lit, B, E>;
+				using self = xns::__impl::make_character_sequence<__literal,
+																  __begin,
+																  __end>;
+
+				/* character type */
+				using char_type = typename decltype(__literal)::char_t;
+
+				/* size type */
+				using size_type = decltype(__literal)::size_type;
+
+
+				// -- private implementation --------------------------------------
+
+				/* forward declaration */
+				template <char_type...>
+				struct implementation;
+
+				/* specialization for I == E, end of recursion */
+				template <size_type __idx, char_type... __sequence> requires (__idx == __end)
+				struct implementation<__idx, __sequence...> final {
+					using __type = xns::character_sequence<char_type, __sequence...>;
+				};
+
+				/* specialization for I < E, continue recursion */
+				template <size_type __idx, char_type... __sequence> requires (__idx < __end)
+				struct implementation<__idx, __sequence...> final {
+					using __type = typename implementation<__idx + 1, __sequence..., __literal._data[__idx]>::__type;
+				};
+
+
+			public:
+
+				// -- public types ------------------------------------------------
 
 				/* character sequence type */
-				using type = typename implementation<B>::internal_type;
+				using type = typename implementation<__begin>::__type;
 
 		};
 
@@ -172,11 +171,11 @@ namespace xns {
 	//template <xns::is_char T, xns::basic_string_literal lit>
 	//using make_character_sequence = typename impl::make_character_sequence<T, 0, lit.size() - 1, lit>::type;
 
-	template <xns::basic_string_literal lit> // here i removed the size() - 1, because it was causing a bug
-	using make_character_sequence = typename impl::make_character_sequence<lit, 0, lit.size()>::type;
+	template <xns::basic_string_literal __literal> // here i removed the size() - 1, because it was causing a bug
+	using make_character_sequence = typename xns::__impl::make_character_sequence<__literal, 0, __literal.size()>::type;
 
-	template <xns::basic_string_literal lit, xns::size_t B, xns::size_t E>
-	using make_character_subsequence = typename impl::make_character_sequence<lit, B, E>::type;
+	template <xns::basic_string_literal __literal, xns::size_t __begin, xns::size_t __end>
+	using make_character_subsequence = typename xns::__impl::make_character_sequence<__literal, __begin, __end>::type;
 
 
 	/* make character sequence of char */

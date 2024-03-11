@@ -68,17 +68,13 @@ class b {
 		}
 };
 
-struct tp {
-
-};
-
 
 auto unit_tests_tuple(void) -> int {
 
 	xns::tuple<int, b, b> tt1{1, b{}, b{}};
 	xns::tuple<int, b, b> tt2{1, b{}, b{}};
 
-	if (tt1 != tt2)
+	if (tt1 == tt2)
 		std::cout << "equal" << std::endl;
 	else
 		std::cout << "not equal" << std::endl;

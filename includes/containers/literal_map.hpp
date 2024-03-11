@@ -1,3 +1,17 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_LITERAL_MAP_HEADER
 #define XNS_LITERAL_MAP_HEADER
 
@@ -25,16 +39,15 @@ namespace xns {
 			// -- private types -----------------------------------------------
 
 			/* key helper */
-			template <xns::basic_string_literal lit>
-			using key = xns::make_character_sequence<lit>;
+			template <xns::basic_string_literal __literal>
+			using __key = xns::make_character_sequence<__literal>;
 
 
 		// -- assertions ------------------------------------------------------
 
 		/* check all string literals are unique */
-		static_assert(xns::is_all_unique
-					 <key<L>...>,
-					 "All keys must be unique.");
+		static_assert(xns::is_all_unique<__key<L>...>,
+					 "literal_map: all string literals must be unique");
 
 		/* check for map size */
 		static_assert(sizeof...(L) > 0,
@@ -79,30 +92,30 @@ namespace xns {
 
 			// -- implementation ----------------------------------------------
 
-			struct impl final : public element<key<L>>... {
+			struct impl final : public element<__key<L>>... {
 
 
 				// -- lifecycle -----------------------------------------------
 
 				/* default constructor */
 				inline constexpr impl(void)
-				: element<key<L>>{}... {}
+				: element<__key<L>>{}... {}
 
 				/* variadic constructor */
 				template <class... A>
 				inline constexpr impl(A&&... args) requires (sizeof...(A) > 1)
-				: element<key<L>>{xns::forward<A>(args)}... {}
+				: element<__key<L>>{xns::forward<A>(args)}... {}
 
 				/* copy constructor */
 				inline constexpr impl(const impl& other)
-				: element<key<L>>{other}... {}
+				: element<__key<L>>{other}... {}
 
 				/* move constructor */
 				inline constexpr impl(impl&& other) noexcept
-				: element<key<L>>{xns::move(other)}... {}
+				: element<__key<L>>{xns::move(other)}... {}
 
 				/* destructor */
-				inline ~impl(void) noexcept = default;
+				~impl(void) noexcept = default;
 
 
 				// -- assignment operators ------------------------------------
@@ -110,7 +123,7 @@ namespace xns {
 				/* copy assignment operator */
 				inline auto operator=(const impl& other) -> impl& {
 					// copy other elements
-					((element<key<L>>::operator=(other)), ...);
+					((element<__key<L>>::operator=(other)), ...);
 					// return self reference
 					return *this;
 				}
@@ -118,7 +131,7 @@ namespace xns {
 				/* move assignment operator */
 				inline auto operator=(impl&& other) noexcept -> impl& {
 					// move other elements
-					((element<key<L>>::operator=(xns::move(other))), ...);
+					((element<__key<L>>::operator=(xns::move(other))), ...);
 					// return self reference
 					return *this;
 				}
@@ -142,7 +155,7 @@ namespace xns {
 			: _impl{} {}
 
 			/* variadic constructor */
-			template <class... A>
+			template <typename... A>
 			inline constexpr literal_map(A&&... args) requires (sizeof...(A) > 1)
 			: _impl{xns::forward<A>(args)...} {
 				static_assert(sizeof...(A) == sizeof...(L),
@@ -195,7 +208,7 @@ namespace xns {
 
 			/* contains */
 			constexpr auto contains(const_ref value) const -> bool {
-				return ((value == _impl.element<key<L>>::data) || ...);
+				return ((value == _impl.element<__key<L>>::data) || ...);
 			}
 
 
@@ -204,7 +217,7 @@ namespace xns {
 			/* clear */
 			constexpr auto clear(void) -> void {
 				// clear all elements
-				((_impl.element<key<L>>::data = value_type{}), ...);
+				((_impl.element<__key<L>>::data = value_type{}), ...);
 			}
 
 
@@ -213,13 +226,13 @@ namespace xns {
 			/* for each element */
 			template <typename F, typename... A>
 			constexpr auto for_each(F&& f, A&&... args) -> void {
-				(f(_impl.element<key<L>>::data, xns::forward<A>(args)...), ...);
+				(f(_impl.element<__key<L>>::data, xns::forward<A>(args)...), ...);
 			}
 
 			/* for each const element */
 			template <typename F, typename... A>
 			constexpr auto for_each(F&& f, A&&... args) const -> void {
-				(f(_impl.element<key<L>>::data, xns::forward<A>(args)...), ...);
+				(f(_impl.element<__key<L>>::data, xns::forward<A>(args)...), ...);
 			}
 
 
@@ -230,7 +243,7 @@ namespace xns {
 			template <xns::basic_string_literal l>
 			static consteval auto have_key(void) noexcept -> bool {
 				// return true if key is in map
-				return xns::is_one_of<key<l>, key<L>...>;
+				return xns::is_one_of<__key<l>, __key<L>...>;
 			}
 
 
@@ -248,41 +261,53 @@ namespace xns {
 		template <xns::basic_string_literal K, typename U, xns::basic_string_literal... S>
 		friend constexpr auto get(const xns::literal_map<U, S...>&&) noexcept -> const U&&;
 
-
 	};
 
 
-	/* get literal map reference */
-	template <xns::basic_string_literal K, typename T, xns::basic_string_literal... L>
-	constexpr auto get(xns::literal_map<T, L...>& map) noexcept -> T& {
-		// check if key is in map
-		static_assert(xns::literal_map<T, L...>::template have_key<K>(), "): LITERAL_MAP: KEY NOT FOUND :(");
+	/* get */
+	template <xns::basic_string_literal __key, typename __type, xns::basic_string_literal... __keys>
+	constexpr auto get(xns::literal_map<__type, __keys...>& __lmp) noexcept -> __type& {
+
+		// assertions
+		static_assert(xns::literal_map<__type, __keys...>::template have_key<__key>(),
+					 "literal_map: key not found");
+
 		// get map key type
-		using key = typename xns::literal_map<T, L...>::template key<K>;
-		// return map element
-		return  map._impl.template element<key>::data;
+		using key = typename xns::literal_map<__type, __keys...>::template __key<__key>;
+
+		return static_cast<__type&>(static_cast<key&>(__lmp._impl).data);
 	}
 
 	/* get literal map rvalue reference */
 	template <xns::basic_string_literal K, typename T, xns::basic_string_literal... L>
 	constexpr auto get(xns::literal_map<T, L...>&& map) noexcept -> T&& {
+
 		// check if key is in map
 		static_assert(xns::literal_map<T, L...>::template have_key<K>(), "): LITERAL_MAP: KEY NOT FOUND :(");
+
 		// get map key type
-		using key = typename xns::literal_map<T, L...>::template key<K>;
+		using key = typename xns::literal_map<T, L...>::template __key<K>;
+
+		return static_cast<T&&>(static_cast<key&&>(map._impl).data);
+
 		// return map element
-		return xns::move(map._impl.template element<key>::data);
+		//return xns::move(map._impl.template element<key>::data);
 	}
 
 	/* get literal map constant reference */
 	template <xns::basic_string_literal K, typename T, xns::basic_string_literal... L>
 	constexpr auto get(const xns::literal_map<T, L...>& map) noexcept -> const T& {
+
 		// check if key is in map
 		static_assert(xns::literal_map<T, L...>::template have_key<K>(), "): LITERAL_MAP: KEY NOT FOUND :(");
+
 		// get map key type
-		using key = typename xns::literal_map<T, L...>::template key<K>;
+		using key = typename xns::literal_map<T, L...>::template __key<K>;
+
+		return static_cast<const T&>(static_cast<const key&>(map._impl).data);
+
 		// return map element
-		return map._impl.template element<key>::data;
+		//return map._impl.template element<key>::data;
 	}
 
 	/* get literal map constant rvalue reference */
@@ -291,51 +316,15 @@ namespace xns {
 		// check if key is in map
 		static_assert(xns::literal_map<T, L...>::template have_key<K>(), "): LITERAL_MAP: KEY NOT FOUND :(");
 		// get map key type
-		using key = typename xns::literal_map<T, L...>::template key<K>;
+		using key = typename xns::literal_map<T, L...>::template __key<K>;
+
+
+		return static_cast<const T&&>(static_cast<const key&&>(map._impl).data);
+
 		// return map element
-		return xns::move(map._impl.template element<key>::data);
+		//return xns::move(map._impl.template element<key>::data);
 	}
 
+} // namespace xns
 
-
-			/* get element */
-			//template <xns::basic_string_literal l>
-			//constexpr auto get(void) noexcept -> mut_ref {
-			//	// return element indexed by key
-			//	return _impl.element<key<l>>::data;
-			//}
-			//
-			///* const get element */
-			//template <xns::basic_string_literal l>
-			//constexpr auto get(void) const noexcept -> const_ref {
-			//	// return const element indexed by key
-			//	return _impl.element<key<l>>::data;
-			//}
-
-
-			// -- public setters ----------------------------------------------
-
-			/* set element by copy */
-			//template <xns::basic_string_literal l>
-			//constexpr auto set(const_ref value) -> void {
-			//	// set element by copy
-			//	_impl.element<key<l>>::data = value;
-			//}
-			//
-			///* set element by move */
-			//template <xns::basic_string_literal l>
-			//constexpr auto set(move_ref value) noexcept -> void {
-			//	// set element by move
-			//	_impl.element<key<l>>::data = xns::move(value);
-			//}
-			//
-			///* emplace element */
-			//template <xns::basic_string_literal l, class... A>
-			//constexpr auto emplace(A&&... args) -> void {
-			//	// forward arguments to element
-			//	_impl.element<key<l>>::data = value_type{xns::forward<A>(args)...};
-			//}
-
-}
-
-#endif
+#endif // XNS_LITERAL_MAP_HEADER

@@ -4,6 +4,10 @@
 /* unit test */
 
 auto unit_tests_char_sequence(void) -> int {
+
+
+	using seq = xns::make_character_sequence<"hello">;
+
 	// code here...
 	return 0;
 }

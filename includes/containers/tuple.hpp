@@ -70,20 +70,20 @@ namespace xns {
 
 			// -- private structs ---------------------------------------------
 
+			/* wrapper */
 			template <size_type, typename, bool>
 			struct wrapper;
 
-			template <size_type I, typename T>
-			struct wrapper<I, T, false> {
+
+			/* wrapper no ebo specialization */
+			template <size_type __idx, typename __value_type>
+			struct wrapper<__idx, __value_type, false> {
 
 
 				// -- types ---------------------------------------------------
 
 				/* self type */
-				using _self = wrapper<I, T, false>;
-
-				/* value type */
-				using value_type = T;
+				using __self = wrapper<__idx, __value_type, false>;
 
 
 				// -- constants -----------------------------------------------
@@ -95,50 +95,62 @@ namespace xns {
 				// -- members -------------------------------------------------
 
 				/* value */
-				T value;
+				__value_type value;
 
 
 				/* explicit default constructor */
-				constexpr wrapper(void) noexcept(xns::is_nothrow_default_constructible<T>)
-				requires (not xns::is_trivially_default_constructible<T>)
+				constexpr wrapper(void) noexcept(xns::is_nothrow_default_constructible<__value_type>)
+				requires (not xns::is_trivially_default_constructible<__value_type>)
 				: value{} {
 				}
 
 				/* implicit default constructor */
-				constexpr wrapper(void) noexcept(xns::is_nothrow_default_constructible<T>)
-				requires (xns::is_trivially_default_constructible<T>) = default;
+				constexpr wrapper(void) noexcept(xns::is_nothrow_default_constructible<__value_type>)
+				requires (xns::is_trivially_default_constructible<__value_type>) = default;
 
 
+				/* value constructor */
 				template <typename U>
-				constexpr wrapper(U&& val) noexcept(xns::is_nothrow_constructible<T, U&&>)
+				constexpr wrapper(U&& val) noexcept(xns::is_nothrow_constructible<__value_type, U&&>)
 				: value{xns::forward<U>(val)} {
 				}
 
-				constexpr wrapper(const _self&) = default;
-				constexpr wrapper(_self&&) noexcept = default;
+				/* copy constructor */
+				constexpr wrapper(const __self&) = default;
 
-				auto constexpr operator=(const _self&) -> _self& = default;
+				/* move constructor */
+				constexpr wrapper(__self&&) noexcept = default;
 
-				auto constexpr operator=(_self&&) noexcept -> _self& = default;
-
-
-				constexpr auto operator==(const _self&) const noexcept -> bool = default;
-
+				/* destructor */
 				~wrapper(void) noexcept = default;
-			};
 
 
-			template <size_type I, typename T>
-			struct wrapper<I, T, true> : public T {
+				// -- assignment operators ------------------------------------
+
+				/* copy assignment operator */
+				constexpr auto operator=(const __self&) -> __self& = default;
+
+				/* move assignment operator */
+				constexpr auto operator=(__self&&) noexcept -> __self& = default;
+
+
+				// -- comparison operators ------------------------------------
+
+				/* equality operator */
+				constexpr auto operator==(const __self&) const noexcept -> bool = default;
+
+			}; // struct wrapper
+
+
+			/* wrapper ebo specialization */
+			template <size_type __idx, typename __value_type>
+			struct wrapper<__idx, __value_type, true> : public __value_type {
 
 
 				// -- types ---------------------------------------------------
 
 				/* self type */
-				using _self = wrapper<I, T, true>;
-
-				/* value type */
-				using value_type = T;
+				using __self = wrapper<__idx, __value_type, true>;
 
 
 				// -- constants -----------------------------------------------
@@ -147,69 +159,59 @@ namespace xns {
 				enum : bool { EBO = true };
 
 
-				wrapper(void) = default;
+				// -- lifecycle ----------------------------------------------
 
+				/* default constructor */
+				constexpr wrapper(void) = default;
+
+				/* value constructor */
 				template <typename U>
-				wrapper(U&& val) : T{xns::forward<U>(val)} {}
+				constexpr wrapper(U&& val)
+				: __value_type{xns::forward<U>(val)} {
+				}
 
-				wrapper(const _self&) = default;
-				wrapper(_self&&) noexcept = default;
-				auto operator=(const _self&) -> _self& = default;
-				auto operator=(_self&&) noexcept -> _self& = default;
+				/* copy constructor */
+				constexpr wrapper(const __self&) = default;
 
+				/* move constructor */
+				constexpr wrapper(__self&&) noexcept = default;
+
+				/* destructor */
 				~wrapper(void) noexcept = default;
 
-				//constexpr auto operator==(const _self&) const noexcept -> bool = default;
+
+				// -- assignment operators ------------------------------------
+
+				/* copy assignment operator */
+				constexpr auto operator=(const __self&) -> __self& = default;
+
+				/* move assignment operator */
+				constexpr auto operator=(__self&&) noexcept -> __self& = default;
+
 
 
 				// -- comparison operators ------------------------------------
 
 				/* equality operator */
-				auto constexpr operator==(const _self& __other) const -> bool {
-					return static_cast<value_type>(*this)
-						== static_cast<value_type>(__other);
-				}
+				auto constexpr operator==(const __self&) const -> bool = default;
 
 				/* inequality operator */
-				auto constexpr operator!=(const _self&) const -> bool = default;
+				auto constexpr operator!=(const __self&) const -> bool = default;
 
 				/* less than operator */
-				auto constexpr operator<(const _self&) const -> bool = default;
+				auto constexpr operator<(const __self&) const -> bool = default;
 
 				/* greater than operator */
-				auto constexpr operator>(const _self&) const -> bool = default;
+				auto constexpr operator>(const __self&) const -> bool = default;
 
 				/* less than or equal operator */
-				auto constexpr operator<=(const _self&) const -> bool = default;
+				auto constexpr operator<=(const __self&) const -> bool = default;
 
 				/* greater than or equal operator */
-				auto constexpr operator>=(const _self&) const -> bool = default;
+				auto constexpr operator>=(const __self&) const -> bool = default;
 
-			};
+			}; // struct wrapper
 
-			/* wrapper */
-			//template <size_type, typename T /*, bool EBO */>
-			//struct wrapper {
-			//
-			//	T value;
-			//
-			//	wrapper(void) requires (not xns::is_trivially_default_constructible<T>)
-			//	: value{} {
-			//		std::cout << "wrapper ctor" << std::endl;
-			//	}
-			//
-			//	wrapper(void) requires (xns::is_trivially_default_constructible<T>) = default;
-			//
-			//	template <typename U>
-			//	wrapper(U&& val) : value{xns::forward<U>(val)} {}
-			//
-			//	wrapper(const wrapper&) = default;
-			//	wrapper(wrapper&&) noexcept = default;
-			//	auto operator=(const wrapper&) -> wrapper& = default;
-			//	auto operator=(wrapper&&) noexcept -> wrapper& = default;
-			//
-			//	~wrapper(void) noexcept = default;
-			//};
 
 			/* impl */
 			template <typename>
@@ -266,9 +268,6 @@ namespace xns {
 
 				/* equality operator */
 				constexpr auto operator==(const __self&) const -> bool = default;
-				//	return ((wrapper<I, A, xns::is_empty_base<A>>::value
-				//		== other.wrapper<I, A, xns::is_empty_base<A>>::value) && ...);
-				//}
 
 			};
 
@@ -307,12 +306,6 @@ namespace xns {
 			impl<sequence> _impl;
 
 
-
-
-			// -- private lifecycle -------------------------------------------
-
-
-
 		public:
 
 			// -- public lifecycle --------------------------------------------
@@ -320,7 +313,6 @@ namespace xns {
 			/* default constructor */
 			constexpr tuple(void) requires (not xns::are_trivially_default_constructible<A...>)
 			: _impl{} {
-				std::cout << "tuple ctor" << std::endl;
 			}
 
 			/* default constructor */
@@ -329,7 +321,8 @@ namespace xns {
 			/* variadic constructor */
 			template <typename... U> requires (sizeof...(U) == sizeof...(A))
 			constexpr tuple(U&&... args)
-			: _impl{xns::forward<U>(args)...} {}
+			: _impl{xns::forward<U>(args)...} {
+			}
 
 			/* copy constructor */
 			constexpr tuple(const self&) = default;
@@ -414,77 +407,84 @@ namespace xns {
 
 
 
-	/* get tuple element reference */
-	template <xns::size_t I, typename... T>
-	auto constexpr get(xns::tuple<T...>& tuple) noexcept -> xns::indexed_element<I, xns::tuple<T...>>& {
+	/* get */
+	template <decltype(sizeof(0)) __idx, typename... __params>
+	auto constexpr get(xns::tuple<__params...>& __tpl)
+	noexcept -> xns::indexed_element<__idx, xns::tuple<__params...>>& {
 
 		// assertions
-		static_assert(I < sizeof...(T), "get: index out of range");
+		static_assert(__idx < sizeof...(__params), "get: index out of range");
 
 		// wrapper type
-		using wrapper_type = typename xns::tuple<T...>::template wrapper_at<I>;
+		using __wrapper = typename xns::tuple<__params...>::template wrapper_at<__idx>;
 		// return type
-		using return_type = xns::indexed_element<I, xns::tuple<T...>>;
+		using __return  = xns::indexed_element<__idx, xns::tuple<__params...>>;
 
-		// return a reference to the tuple element
-		if constexpr (wrapper_type::EBO)
-			return static_cast<return_type&>(static_cast<wrapper_type&>(tuple._impl));
+		// return lvalue reference
+		if constexpr (__wrapper::EBO)
+			return static_cast<__return&>(static_cast<__wrapper&>(__tpl._impl));
 		else
-			return static_cast<wrapper_type&>(tuple._impl).value;
+			return static_cast<__wrapper&>(__tpl._impl).value;
 	}
 
-	/* get tuple element rvalue reference */
-	template <xns::size_t I, typename... T>
-	constexpr auto get(xns::tuple<T...>&& tuple) noexcept -> xns::indexed_element<I, xns::tuple<T...>>&& {
+	/* get */
+	template <decltype(sizeof(0)) __idx, typename... __params>
+	constexpr auto get(xns::tuple<__params...>&& __tpl)
+	noexcept -> xns::indexed_element<__idx, xns::tuple<__params...>>&& {
 
 		// assertions
-		static_assert(I < sizeof...(T), "get: index out of range");
+		static_assert(__idx < sizeof...(__params), "get: index out of range");
 
 		// wrapper type
-		using wrapper_type = typename xns::tuple<T...>::template wrapper_at<I>;
+		using __wrapper = typename xns::tuple<__params...>::template wrapper_at<__idx>;
 		// return type
-		using return_type = xns::indexed_element<I, xns::tuple<T...>>;
+		using __return  = xns::indexed_element<__idx, xns::tuple<__params...>>;
 
-		if constexpr (wrapper_type::EBO)
-			return static_cast<return_type&&>(static_cast<wrapper_type&&>(tuple._impl));
+		// return rvalue reference
+		if constexpr (__wrapper::EBO)
+			return static_cast<__return&&>(static_cast<__wrapper&&>(__tpl._impl));
 		else
-			return static_cast<return_type&&>(static_cast<wrapper_type&&>(tuple._impl).value);
+			return static_cast<__return&&>(static_cast<__wrapper&&>(__tpl._impl).value);
 	}
 
-	/* get constant tuple element reference */
-	template <xns::size_t I, typename... T>
-	constexpr auto get(const xns::tuple<T...>& tuple) noexcept -> const xns::indexed_element<I, xns::tuple<T...>>& {
+	/* get */
+	template <decltype(sizeof(0)) __idx, typename... __params>
+	constexpr auto get(const xns::tuple<__params...>& __tpl)
+	noexcept -> const xns::indexed_element<__idx, xns::tuple<__params...>>& {
 
 		// assertions
-		static_assert(I < sizeof...(T), "get: index out of range");
+		static_assert(__idx < sizeof...(__params), "get: index out of range");
 
 		// wrapper type
-		using wrapper_type = typename xns::tuple<T...>::template wrapper_at<I>;
+		using __wrapper = typename xns::tuple<__params...>::template wrapper_at<__idx>;
 		// return type
-		using return_type = xns::indexed_element<I, xns::tuple<T...>>;
+		using __return  = xns::indexed_element<__idx, xns::tuple<__params...>>;
 
-		if constexpr (wrapper_type::EBO)
-			return static_cast<const return_type&>(static_cast<const wrapper_type&>(tuple._impl));
+		// return const lvalue reference
+		if constexpr (__wrapper::EBO)
+			return static_cast<const __return&>(static_cast<const __wrapper&>(__tpl._impl));
 		else
-			return static_cast<const wrapper_type&>(tuple._impl).value;
+			return static_cast<const __wrapper&>(__tpl._impl).value;
 	}
 
-	/* get constant tuple element rvalue reference */
-	template <xns::size_t I, typename... T>
-	constexpr auto get(const xns::tuple<T...>&& tuple) noexcept -> const xns::indexed_element<I, xns::tuple<T...>>&& {
+	/* get */
+	template <decltype(sizeof(0)) __idx, typename... __params>
+	constexpr auto get(const xns::tuple<__params...>&& __tpl)
+	noexcept -> const xns::indexed_element<__idx, xns::tuple<__params...>>&& {
 
 		// assertions
-		static_assert(I < sizeof...(T), "get: index out of range");
+		static_assert(__idx < sizeof...(__params), "get: index out of range");
 
 		// wrapper type
-		using wrapper_type = typename xns::tuple<T...>::template wrapper_at<I>;
+		using __wrapper = typename xns::tuple<__params...>::template wrapper_at<__idx>;
 		// return type
-		using return_type = xns::indexed_element<I, xns::tuple<T...>>;
+		using __return  = xns::indexed_element<__idx, xns::tuple<__params...>>;
 
-		if constexpr (wrapper_type::EBO)
-			return static_cast<const return_type&&>(static_cast<const wrapper_type&&>(tuple._impl));
+		// return const rvalue reference
+		if constexpr (__wrapper::EBO)
+			return static_cast<const __return&&>(static_cast<const __wrapper&&>(__tpl._impl));
 		else
-			return static_cast<const return_type&&>(static_cast<const wrapper_type&&>(tuple._impl).value);
+			return static_cast<const __return&&>(static_cast<const __wrapper&&>(__tpl._impl).value);
 	}
 
 
@@ -580,23 +580,26 @@ namespace xns {
 
 	// -- I S  T U P L E ------------------------------------------------------
 
-	namespace impl {
+	/* detail */
+	namespace __impl {
 
-		template <typename T>
-		struct is_tuple final {
-			constexpr static bool value = false;
+		/* is tuple false */
+		template <typename __type>
+		struct __is_tuple final : public xns::false_type {
+			XNS_NOT_INSTANTIABLE(__is_tuple);
 		};
 
-		template <typename... A>
-		struct is_tuple<xns::tuple<A...>> final {
-			constexpr static bool value = true;
+		/* is tuple true */
+		template <typename... __types>
+		struct __is_tuple<xns::tuple<__types...>> final : public xns::true_type {
+			XNS_NOT_INSTANTIABLE(__is_tuple);
 		};
 
-	}
+	} // namespace __impl
 
-	/* is tuple concept */
+	/* is tuple */
 	template <typename T>
-	concept is_tuple = impl::is_tuple<xns::remove_cvrp<T>>::value;
+	concept is_tuple = __impl::__is_tuple<xns::remove_cvrp<T>>::value;
 
 
 	// -- make tuple ----------------------------------------------------------
