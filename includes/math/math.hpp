@@ -39,28 +39,27 @@ namespace xns {
 
 	// -- A B S ---------------------------------------------------------------
 
-	template <typename T>
-	constexpr auto abs(const T& value) noexcept -> T {
+	template <typename __type>
+	constexpr auto abs(const __type& __vl) noexcept -> __type {
 
 		// assert that T is an scalar type
-		static_assert(xns::is_scalar<T>, "): ABS: types must be scalar :(");
+		static_assert(xns::is_scalar<__type>, "abs: type must be scalar");
 
 		// check T is floating point
-		if constexpr (xns::is_floating<T>) {
+		if constexpr (xns::is_floating<__type>)
 			// return absolute value
-			return value < 0 ? -value : value;
-		}
+			return __vl < 0 ? -__vl : __vl;
+
 		// check T is signed
-		if constexpr (xns::is_signed<T>) {
+		if constexpr (xns::is_signed<__type>)
 			// return absolute value
-			return value < 0 ? value == xns::limits<T>::min()
-									  ? xns::limits<T>::max()
-									  : -value
-									  :  value;
-		}
-		else {
-			return value;
-		}
+			return __vl < 0 ? __vl == xns::limits<__type>::min()
+									? xns::limits<__type>::max()
+									: -__vl
+									:  __vl;
+
+		else
+			return __vl;
 
 	}
 
@@ -152,6 +151,7 @@ namespace xns {
 		}
 		return guess;
 	}
+
 
 	template <typename T, typename E>
 	auto pow(const T& value, const E& exponent) noexcept -> T {

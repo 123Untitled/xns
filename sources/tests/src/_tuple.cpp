@@ -71,13 +71,21 @@ class b {
 
 auto unit_tests_tuple(void) -> int {
 
-	xns::tuple<int, b, b> tt1{1, b{}, b{}};
-	xns::tuple<int, b, b> tt2{1, b{}, b{}};
+	xns::tuple<int, a> tt1{};
+	std::tuple<int, a> tt2{};
 
-	if (tt1 == tt2)
-		std::cout << "equal" << std::endl;
-	else
-		std::cout << "not equal" << std::endl;
+	std::cout << "sizeof: " << sizeof(tt1) << std::endl;
+	std::cout << "sizeof: " << sizeof(tt2) << std::endl;
+
+	return 0;
+
+
+	//xns::tuple<int, b, b> tt2{1, b{}, b{}};
+	//
+	//if (tt1 == tt2)
+	//	std::cout << "equal" << std::endl;
+	//else
+	//	std::cout << "not equal" << std::endl;
 
 	return 0;
 		

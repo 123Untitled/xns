@@ -86,13 +86,13 @@ auto unit_tests_numeric_limits(void) -> int {
 
 	using namespace xns;
 
-	std::cout << "static digits: " << xns::limits<unsigned int>::digits<10, xns::dec>() << std::endl;
+	//std::cout << "static digits: " << xns::limits<unsigned int>::digits<10, xns::dec>() << std::endl;
 
 
-	std::cout << "max float: " << xns::limits<float>::max() << std::endl;
-	std::cout << "min float: " << xns::limits<float>::min() << std::endl;
-	std::cout << "max float (std): " << std::numeric_limits<float>::max() << std::endl;
-	std::cout << "min float (std): " << std::numeric_limits<float>::min() << std::endl;
+	//std::cout << "max float: " << xns::limits<float>::max() << std::endl;
+	//std::cout << "min float: " << xns::limits<float>::min() << std::endl;
+	//std::cout << "max float (std): " << std::numeric_limits<float>::max() << std::endl;
+	//std::cout << "min float (std): " << std::numeric_limits<float>::min() << std::endl;
 
 
 	return 0;

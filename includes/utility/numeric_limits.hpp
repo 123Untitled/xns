@@ -126,22 +126,29 @@ namespace xns {
 			}
 
 			/* compile time max number of digits */
-			template <T N, xns::is_base B>
-			static consteval xns::umax digits(void) {
-
-				decltype(N) num = N;
-
-				// number of digits
-				xns::size_t digits = 0;
-
-				// increment digits
-				do { ++digits;
-					// divide num by base
-				} while (num /= B::base);
-
-				// return digits
-				return digits;
-			}
+			//template <T N, xns::is_base B> requires (xns::is_integral<T>)
+			//static consteval xns::umax digits(void) {
+			//
+			//	decltype(N) num = N;
+			//
+			//	// number of digits
+			//	xns::size_t digits = 0;
+			//
+			//	// increment digits
+			//	do { ++digits;
+			//		// divide num by base
+			//	} while (num /= B::base);
+			//
+			//	// return digits
+			//	return digits;
+			//}
+			//
+			//template <T N, xns::is_base B> requires (xns::is_floating<T>)
+			//static consteval xns::umax digits(void) {
+			//
+			//
+			//	return 0;
+			//}
 
 
 

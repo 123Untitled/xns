@@ -31,4 +31,3 @@ int main(void) {
 	return unit_tests_vector3d();
 }
 #endif
-

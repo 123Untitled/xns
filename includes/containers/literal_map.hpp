@@ -15,12 +15,13 @@
 #ifndef XNS_LITERAL_MAP_HEADER
 #define XNS_LITERAL_MAP_HEADER
 
-#include "is_char.hpp"
+//#include "is_char.hpp"
 #include "is_all_unique.hpp"
 #include "char_sequence.hpp"
 #include "string_literal.hpp"
 #include "forward.hpp"
 #include "move.hpp"
+
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -79,15 +80,19 @@ namespace xns {
 
 		private:
 
-			// -- private element struct --------------------------------------
+			// -- private structs ---------------------------------------------
 
-			template <typename SEQ>
+			template <typename __sequence>
 			struct element {
 
 				/* value */
 				value_type data;
 
 			};
+
+
+			template <xns::basic_string_literal __literal>
+			using element_by_key = element<__key<__literal>>;
 
 
 			// -- implementation ----------------------------------------------
@@ -99,22 +104,27 @@ namespace xns {
 
 				/* default constructor */
 				inline constexpr impl(void)
-				: element<__key<L>>{}... {}
+				: element<__key<L>>{}... {
+				}
 
 				/* variadic constructor */
 				template <class... A>
 				inline constexpr impl(A&&... args) requires (sizeof...(A) > 1)
-				: element<__key<L>>{xns::forward<A>(args)}... {}
+				: element<__key<L>>{xns::forward<A>(args)}... {
+				}
 
 				/* copy constructor */
 				inline constexpr impl(const impl& other)
-				: element<__key<L>>{other}... {}
+				: element<__key<L>>{other}... {
+				}
 
 				/* move constructor */
 				inline constexpr impl(impl&& other) noexcept
-				: element<__key<L>>{xns::move(other)}... {}
+				: element<__key<L>>{xns::move(other)}... {
+				}
 
 				/* destructor */
+				__attribute__((noinline))
 				~impl(void) noexcept = default;
 
 
@@ -266,63 +276,54 @@ namespace xns {
 
 	/* get */
 	template <xns::basic_string_literal __key, typename __type, xns::basic_string_literal... __keys>
-	constexpr auto get(xns::literal_map<__type, __keys...>& __lmp) noexcept -> __type& {
-
+	constexpr auto get(xns::literal_map<__type, __keys...>& __ltmp) noexcept -> __type& {
+		// literal map type
+		using __map = xns::literal_map<__type, __keys...>;
 		// assertions
-		static_assert(xns::literal_map<__type, __keys...>::template have_key<__key>(),
-					 "literal_map: key not found");
-
-		// get map key type
-		using key = typename xns::literal_map<__type, __keys...>::template __key<__key>;
-
-		return static_cast<__type&>(static_cast<key&>(__lmp._impl).data);
+		static_assert(__map::template have_key<__key>(), "literal_map: key not found");
+		// element type
+		using __element = typename __map::template element_by_key<__key>;
+		// return lvalue reference
+		return static_cast<__type&>(static_cast<__element&>(__ltmp._impl).data);
 	}
 
-	/* get literal map rvalue reference */
-	template <xns::basic_string_literal K, typename T, xns::basic_string_literal... L>
-	constexpr auto get(xns::literal_map<T, L...>&& map) noexcept -> T&& {
-
-		// check if key is in map
-		static_assert(xns::literal_map<T, L...>::template have_key<K>(), "): LITERAL_MAP: KEY NOT FOUND :(");
-
-		// get map key type
-		using key = typename xns::literal_map<T, L...>::template __key<K>;
-
-		return static_cast<T&&>(static_cast<key&&>(map._impl).data);
-
-		// return map element
-		//return xns::move(map._impl.template element<key>::data);
+	/* get */
+	template <xns::basic_string_literal __key, typename __type, xns::basic_string_literal... __keys>
+	constexpr auto get(xns::literal_map<__type, __keys...>&& __ltmp) noexcept -> __type&& {
+		// literal map type
+		using __map = xns::literal_map<__type, __keys...>;
+		// assertions
+		static_assert(__map::template have_key<__key>(), "literal_map: key not found");
+		// element type
+		using __element = typename __map::template element_by_key<__key>;
+		// return rvalue reference
+		return static_cast<__type&&>(static_cast<__element&&>(__ltmp._impl).data);
 	}
 
-	/* get literal map constant reference */
-	template <xns::basic_string_literal K, typename T, xns::basic_string_literal... L>
-	constexpr auto get(const xns::literal_map<T, L...>& map) noexcept -> const T& {
-
-		// check if key is in map
-		static_assert(xns::literal_map<T, L...>::template have_key<K>(), "): LITERAL_MAP: KEY NOT FOUND :(");
-
-		// get map key type
-		using key = typename xns::literal_map<T, L...>::template __key<K>;
-
-		return static_cast<const T&>(static_cast<const key&>(map._impl).data);
-
-		// return map element
-		//return map._impl.template element<key>::data;
+	/* get */
+	template <xns::basic_string_literal __key, typename __type, xns::basic_string_literal... __keys>
+	constexpr auto get(const xns::literal_map<__type, __keys...>& __ltmp) noexcept -> const __type& {
+		// literal map type
+		using __map = xns::literal_map<__type, __keys...>;
+		// assertions
+		static_assert(__map::template have_key<__key>(), "literal_map: key not found");
+		// element type
+		using __element = typename __map::template element_by_key<__key>;
+		// return const lvalue reference
+		return static_cast<const __type&>(static_cast<const __element&>(__ltmp._impl).data);
 	}
 
-	/* get literal map constant rvalue reference */
-	template <xns::basic_string_literal K, typename T, xns::basic_string_literal... L>
-	constexpr auto get(const xns::literal_map<T, L...>&& map) noexcept -> const T&& {
-		// check if key is in map
-		static_assert(xns::literal_map<T, L...>::template have_key<K>(), "): LITERAL_MAP: KEY NOT FOUND :(");
-		// get map key type
-		using key = typename xns::literal_map<T, L...>::template __key<K>;
-
-
-		return static_cast<const T&&>(static_cast<const key&&>(map._impl).data);
-
-		// return map element
-		//return xns::move(map._impl.template element<key>::data);
+	/* get */
+	template <xns::basic_string_literal __key, typename __type, xns::basic_string_literal... __keys>
+	constexpr auto get(const xns::literal_map<__type, __keys...>&& __ltmp) noexcept -> const __type&& {
+		// literal map type
+		using __map = xns::literal_map<__type, __keys...>;
+		// assertions
+		static_assert(__map::template have_key<__key>(), "literal_map: key not found");
+		// element type
+		using __element = typename __map::template element_by_key<__key>;
+		// return const rvalue reference
+		return static_cast<const __type&&>(static_cast<const __element&&>(__ltmp._impl).data);
 	}
 
 } // namespace xns

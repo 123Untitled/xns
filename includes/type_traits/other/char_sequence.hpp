@@ -136,7 +136,7 @@ namespace xns {
 				// -- private implementation --------------------------------------
 
 				/* forward declaration */
-				template <char_type...>
+				template <size_type, char_type...>
 				struct implementation;
 
 				/* specialization for I == E, end of recursion */

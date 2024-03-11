@@ -137,7 +137,9 @@ namespace xns {
 				// -- comparison operators ------------------------------------
 
 				/* equality operator */
-				constexpr auto operator==(const __self&) const noexcept -> bool = default;
+				constexpr auto operator==(const __self& other) const noexcept -> bool {
+					return value == other.value;
+				}
 
 			}; // struct wrapper
 
@@ -193,7 +195,9 @@ namespace xns {
 				// -- comparison operators ------------------------------------
 
 				/* equality operator */
-				auto constexpr operator==(const __self&) const -> bool = default;
+				auto constexpr operator==(const __self&) const -> bool {
+					return true;
+				}
 
 				/* inequality operator */
 				auto constexpr operator!=(const __self&) const -> bool = default;

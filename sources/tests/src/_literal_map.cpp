@@ -1,10 +1,46 @@
 #include "literal_map.hpp"
 #include <iostream>
 
+class a {
 
+	public:
+		a(void) {
+			std::cout << "a ctor" << std::endl;
+		}
+		a(const a&) {
+			std::cout << "a copy ctor" << std::endl;
+		}
+		a(a&&) {
+			std::cout << "a move ctor" << std::endl;
+		}
+		~a(void) {
+			std::cout << "a dtor" << std::endl;
+		}
+		auto operator=(const a&) -> a& {
+			std::cout << "a copy assign" << std::endl;
+			return *this;
+		}
+		auto operator=(a&&) -> a& {
+			std::cout << "a move assign" << std::endl;
+			return *this;
+		}
+
+};
+
+#include <containers/indexed_wrapper.hpp>
 
 auto unit_tests_literal_map(void) -> int {
 
+	std::cout << sizeof(xns::indexed_wrapper<0, a, true>) << std::endl;
+	std::cout << sizeof(xns::indexed_wrapper<0, a, false>) << std::endl;
+
+	return 0;
+
+	xns::literal_map<a, "one", "two", "three"> m;
+
+	std::cout << "sizeof(m): " << sizeof(m) << std::endl;
+
+	return 0;
 
 	xns::literal_map<int, "a", "b"> m1 = { 1, 2 };
 
