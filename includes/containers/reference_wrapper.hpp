@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef XNS_REFERENCE_WRAPPER_HPP
-#define XNS_REFERENCE_WRAPPER_HPP
+#ifndef XNS_REFERENCE_WRAPPER_HEADER
+#define XNS_REFERENCE_WRAPPER_HEADER
 
 // local headers
 #include "move.hpp"

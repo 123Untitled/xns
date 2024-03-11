@@ -27,6 +27,10 @@ namespace xns {
 	template <typename T>
 	concept is_trivially_default_constructible = xns::is_trivially_constructible<T>;
 
+	/* are trivially default constructible */
+	template <typename... T>
+	concept are_trivially_default_constructible = (xns::is_trivially_default_constructible<T> and ...);
+
 } // namespace xns
 
 #endif // XNS_IS_TRIVIALLY_DEFAULT_CONSTRUCTIBLE_HPP

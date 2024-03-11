@@ -12,15 +12,8 @@
 
 #pragma once
 
-#ifndef XNS_DECAY_HEADER
-#define XNS_DECAY_HEADER
-
-#include "type_traits/type_modifications/add_pointer.hpp"
-#include "type_traits/type_modifications/remove_extent.hpp"
-#include "type_traits/type_categories/is_array.hpp"
-#include "type_traits/type_categories/is_function.hpp"
-#include "type_traits/type_modifications/remove.hpp"
-#include "type_traits/type_transformations/conditional.hpp"
+#ifndef XNS_REMOVE_EXTENT_HEADER
+#define XNS_REMOVE_EXTENT_HEADER
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -28,27 +21,37 @@
 namespace xns {
 
 
-	// -- D E C A Y -----------------------------------------------------------
+	// -- R E M O V E  E X T E N T --------------------------------------------
 
 	// -- detail --------------------------------------------------------------
 
 	namespace impl {
 
-		/* decay */
+		/* remove extent */
 		template <typename T>
-		using type = xns::conditional<xns::is_array<T>,
-									 xns::add_pointer<xns::remove_extent<T>>,
-									 xns::conditional<xns::is_function<T>,
-													  xns::add_pointer<T>,
-													  xns::remove_cv<T>>>;
+		struct remove_extent final {
+			using type = T;
+		};
+
+		/* array with unknown bound specialization */
+		template <typename T>
+		struct remove_extent<T[]> final {
+			using type = T;
+		};
+
+		/* array specialization */
+		template <typename T, decltype(sizeof(0)) N>
+		struct remove_extent<T[N]> final {
+			using type = T;
+		};
 
 	} // namespace impl
 
 
-	/* decay */
+	/* remove extent */
 	template <typename T>
-	using decay = impl::type<xns::remove_reference<T>>;
+	using remove_extent = typename impl::remove_extent<T>::type;
 
 } // namespace xns
 
-#endif // XNS_DECAY_HEADER
+#endif // XNS_REMOVE_EXTENT_HEADER

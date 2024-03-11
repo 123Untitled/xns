@@ -1,4 +1,5 @@
 /*****************************************************************************/
+/*                                                                           */
 /*                       :::    ::: ::::    :::  ::::::::                    */
 /*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
 /*                      +:+  +:+  :+:+:+  +:+ +:+                            */
@@ -6,15 +7,18 @@
 /*                    +#+  +#+  +#+  +#+#+#        +#+                       */
 /*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
 /*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
 /*****************************************************************************/
 
 #pragma once
 
-#ifndef XNS_IS_EMPTY_BASE_HEADER
-#define XNS_IS_EMPTY_BASE_HEADER
+#ifndef XNS_ADD_POINTER_HEADER
+#define XNS_ADD_POINTER_HEADER
 
-#include "type_traits/type_properties/is_empty.hpp"
-#include "type_traits/type_properties/is_final.hpp"
+#include "type_traits/type_modifications/remove.hpp"
+#include "type_traits/type_categories/is_void.hpp"
+#include "type_traits/type_properties/is_referenceable.hpp"
+#include "type_traits/type_transformations/conditional.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -22,12 +26,14 @@
 namespace xns {
 
 
-	// -- I S  E M P T Y  B A S E ----------------------------------------------
+	// -- A D D  P O I N T E R ------------------------------------------------
 
-	/* is empty base */
+	/* add pointer */
 	template <typename T>
-	concept is_empty_base = xns::is_empty<T> && not xns::is_final<T>;
+	using add_pointer = xns::conditional<xns::is_void<T> or xns::is_referenceable<T>,
+										 xns::remove_reference<T>*,
+										 T>;
 
 } // namespace xns
 
-#endif // XNS_IS_EMPTY_BASE_HEADER
+#endif // XNS_ADD_POINTER_HEADER

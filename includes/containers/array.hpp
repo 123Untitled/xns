@@ -35,8 +35,7 @@ namespace xns {
 	// -- A R R A Y -----------------------------------------------------------
 
 	template <typename T, xns::size_t... N>
-	class alignas(sizeof(xns::addr_t))
-	array final {
+	class array final {
 
 
 		public:
@@ -44,18 +43,18 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self       = array<T, N...>;
+			using self       = xns::array<T, N...>;
 
 			/* value type */
 			using value_type = T;
 
-			/* reference type */
+			/* mutable reference type */
 			using mut_ref    = value_type&;
 
 			/* const reference type */
 			using const_ref  = const value_type&;
 
-			/* pointer type */
+			/* mutable pointer type */
 			using mut_ptr    = value_type*;
 
 			/* const pointer type */
@@ -82,13 +81,13 @@ namespace xns {
 			// -- assertions --------------------------------------------------
 
 			/* check if T is not void */
-			static_assert(!xns::is_void<T>, "): VOID IS NOT ALLOWED :(");
+			static_assert(not xns::is_void<T>, "): VOID IS NOT ALLOWED :(");
 
 			/* check if there is at least one dimension */
 			static_assert(_ndim > 0,        "): NEED AT LEAST ONE DIMENSION :(");
 
 			/* check if one of the dimensions is zero */
-			static_assert((N * ...) > 0,    "): SOMETHING TIMES ZERO IS ZERO! :(");
+			static_assert(_size > 0,    "): SOMETHING TIMES ZERO IS ZERO! :(");
 
 
 		public:
