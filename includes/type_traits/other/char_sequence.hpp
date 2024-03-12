@@ -36,7 +36,7 @@ namespace xns {
 
 		// -- assertions ------------------------------------------------------
 
-		/* check if __char_t is a character type */
+		/* check if __type is a character type */
 		static_assert(xns::is_char<__type>, "character_sequence: must be a character type");
 
 

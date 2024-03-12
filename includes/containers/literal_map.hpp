@@ -15,6 +15,14 @@
 #ifndef XNS_LITERAL_MAP_HEADER
 #define XNS_LITERAL_MAP_HEADER
 
+#include "type_traits/supported_operations/is_trivially_default_constructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_default_constructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_copy_constructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_move_constructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_constructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_copy_assignable.hpp"
+#include "type_traits/supported_operations/is_nothrow_move_assignable.hpp"
+
 //#include "is_char.hpp"
 #include "is_all_unique.hpp"
 #include "char_sequence.hpp"
@@ -37,11 +45,28 @@ namespace xns {
 
 		private:
 
+			// -- forward declarations ----------------------------------------
+
+			template <typename>
+			struct __element;
+
+
 			// -- private types -----------------------------------------------
 
 			/* key helper */
 			template <xns::basic_string_literal __literal>
 			using __key = xns::make_character_sequence<__literal>;
+
+			/* element by key */
+			template <xns::basic_string_literal __literal>
+			using element_by_key = __element<__key<__literal>>;
+
+
+			// -- private constants -------------------------------------------
+
+			/* __have_key */
+			template <xns::basic_string_literal __literal>
+			static constexpr bool __have_key = xns::is_one_of<__key<__literal>, __key<L>...>;
 
 
 		// -- assertions ------------------------------------------------------
@@ -82,78 +107,125 @@ namespace xns {
 
 			// -- private structs ---------------------------------------------
 
+			/* __element */
 			template <typename __sequence>
-			struct element {
-
-				/* value */
-				value_type data;
-
-			};
+			struct __element {
 
 
-			template <xns::basic_string_literal __literal>
-			using element_by_key = element<__key<__literal>>;
+				// -- types ---------------------------------------------------
 
-
-			// -- implementation ----------------------------------------------
-
-			struct impl final : public element<__key<L>>... {
+				/* self type */
+				using __self = __element<__sequence>;
 
 
 				// -- lifecycle -----------------------------------------------
 
-				/* default constructor */
-				inline constexpr impl(void)
-				: element<__key<L>>{}... {
+				/* explicit default constructor */
+				constexpr __element(void) noexcept(xns::is_nothrow_default_constructible<value_type>)
+				requires (not xns::is_trivially_default_constructible<value_type>)
+				: _data{} {
 				}
 
-				/* variadic constructor */
-				template <class... A>
-				inline constexpr impl(A&&... args) requires (sizeof...(A) > 1)
-				: element<__key<L>>{xns::forward<A>(args)}... {
-				}
+				/* implicit default constructor */
+				constexpr __element(void) noexcept(xns::is_nothrow_default_constructible<value_type>)
+				requires (xns::is_trivially_default_constructible<value_type>) = default;
 
 				/* copy constructor */
-				inline constexpr impl(const impl& other)
-				: element<__key<L>>{other}... {
-				}
+				constexpr __element(const __self&)
+				noexcept(xns::is_nothrow_move_constructible<value_type>) = default;
 
 				/* move constructor */
-				inline constexpr impl(impl&& other) noexcept
-				: element<__key<L>>{xns::move(other)}... {
+				constexpr __element(__self&&)
+				noexcept(xns::is_nothrow_move_constructible<value_type>) = default;
+
+				/* variadic constructor */
+				template <typename... __params>
+				constexpr __element(__params&&... params)
+				: _data{xns::forward<__params>(params)...} {
 				}
 
 				/* destructor */
 				__attribute__((noinline))
-				~impl(void) noexcept = default;
+				~__element(void) noexcept = default;
 
 
 				// -- assignment operators ------------------------------------
 
 				/* copy assignment operator */
-				inline auto operator=(const impl& other) -> impl& {
-					// copy other elements
-					((element<__key<L>>::operator=(other)), ...);
-					// return self reference
-					return *this;
-				}
+				constexpr auto operator=(const __self&)
+				noexcept(xns::is_nothrow_copy_assignable<value_type>) -> __self& = default;
 
 				/* move assignment operator */
-				inline auto operator=(impl&& other) noexcept -> impl& {
-					// move other elements
-					((element<__key<L>>::operator=(xns::move(other))), ...);
-					// return self reference
-					return *this;
+				constexpr auto operator=(__self&&)
+				noexcept(xns::is_nothrow_move_assignable<value_type>) -> __self& = default;
+
+
+				// -- members -------------------------------------------------
+
+				/* value */
+				value_type _data;
+
+			}; // struct __element
+
+
+			/* __impl */
+			struct __impl final : public __element<__key<L>>... {
+
+				// -- types ---------------------------------------------------
+
+				/* self type */
+				using __self = __impl;
+
+
+				// -- lifecycle -----------------------------------------------
+
+				/* default constructor */
+				constexpr __impl(void) noexcept(xns::are_nothrow_default_constructible<__element<__key<L>>...>)
+				requires (not xns::are_trivially_default_constructible<__element<__key<L>>...>)
+				: __element<__key<L>>{}... {
 				}
 
+				/* default constructor */
+				constexpr __impl(void) noexcept(xns::are_nothrow_default_constructible<__element<__key<L>>...>)
+				requires (xns::are_trivially_default_constructible<__element<__key<L>>...>) = default;
 
-			};
+
+				/* variadic constructor */
+				template <typename... __params> requires (sizeof...(__params) > 1)
+				constexpr __impl(__params&&... args)
+				: __element<__key<L>>{xns::forward<__params>(args)}... {
+				}
+
+				/* copy constructor */
+				constexpr __impl(const __self&)
+				noexcept(xns::are_nothrow_copy_constructible<__element<__key<L>>...>) = default;
+
+				/* move constructor */
+				constexpr __impl(__self&&)
+				noexcept(xns::are_nothrow_move_constructible<__element<__key<L>>...>) = default;
+
+				/* destructor */
+				__attribute__((noinline))
+				~__impl(void) noexcept = default;
+
+
+				// -- assignment operators ------------------------------------
+
+				/* copy assignment operator */
+				auto operator=(const __self&)
+				noexcept(xns::are_nothrow_copy_assignable<__element<__key<L>>...>) -> __self& = default;
+
+				/* move assignment operator */
+				auto operator=(__self&&)
+				noexcept(xns::are_nothrow_move_assignable<__element<__key<L>>...>) -> __self& = default;
+
+			}; // struct __impl
 
 
 			// -- private members ---------------------------------------------
 
 			/* implementation */
-			impl _impl;
+			__impl _impl;
 
 
 		public:
@@ -161,24 +233,31 @@ namespace xns {
 			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			inline constexpr literal_map(void)
-			: _impl{} {}
+			constexpr literal_map(void) noexcept(xns::is_nothrow_default_constructible<__impl>)
+			requires (not xns::is_trivially_default_constructible<__impl>)
+			: _impl{} {
+			}
+
+			/* default constructor */
+			constexpr literal_map(void) noexcept(xns::is_nothrow_default_constructible<__impl>)
+			requires (xns::is_trivially_default_constructible<__impl>) = default;
 
 			/* variadic constructor */
-			template <typename... A>
-			inline constexpr literal_map(A&&... args) requires (sizeof...(A) > 1)
-			: _impl{xns::forward<A>(args)...} {
-				static_assert(sizeof...(A) == sizeof...(L),
-							"Map must have exactly one value for each key.");
+			template <typename... __params>
+			constexpr literal_map(__params&&... __args) requires (sizeof...(__args) > 1)
+			: _impl{xns::forward<__params>(__args)...} {
+
+				static_assert(sizeof...(L) == sizeof...(__args),
+							"literal_map: must have exactly one value for each key.");
 			}
 
 			/* copy constructor */
-			inline constexpr literal_map(const self& other)
-			: _impl{other._impl} {}
+			constexpr literal_map(const self&)
+			noexcept(xns::is_nothrow_copy_constructible<__impl>) = default;
 
 			/* move constructor */
-			inline constexpr literal_map(self&& other) noexcept
-			: _impl{xns::move(other._impl)} {}
+			inline constexpr literal_map(self&&)
+			noexcept(xns::is_nothrow_move_constructible<__impl>) = default;
 
 			/* destructor */
 			~literal_map(void) noexcept = default;
@@ -187,26 +266,12 @@ namespace xns {
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			constexpr auto operator=(const self& other) -> self& {
-				// check for self assignment
-				if (this != &other)
-					return *this;
-				// copy other implementation
-				_impl = other._impl;
-				// return self reference
-				return *this;
-			}
+			constexpr auto operator=(const self&)
+			noexcept(xns::is_nothrow_copy_assignable<__impl>) -> self& = default;
 
 			/* move assignment operator */
-			constexpr auto operator=(self&& other) noexcept -> self& {
-				// check for self assignment
-				if (this == &other)
-					return *this;
-				// move other implementation
-				_impl = xns::move(other._impl);
-				// return self reference
-				return *this;
-			}
+			constexpr auto operator=(self&&)
+			noexcept(xns::is_nothrow_move_assignable<__impl>) -> self& = default;
 
 
 			// -- public accessors --------------------------------------------
@@ -217,59 +282,51 @@ namespace xns {
 			}
 
 			/* contains */
-			constexpr auto contains(const_ref value) const -> bool {
-				return ((value == _impl.element<__key<L>>::data) || ...);
-			}
-
-
-			// -- public modifiers --------------------------------------------
-
-			/* clear */
-			constexpr auto clear(void) -> void {
-				// clear all elements
-				((_impl.element<__key<L>>::data = value_type{}), ...);
+			constexpr auto contains(const_ref __vl) const -> bool {
+				return ((__vl == static_cast<element_by_key<L>&>(_impl)._data) || ...);
 			}
 
 
 			// -- public loopers ----------------------------------------------
 
 			/* for each element */
-			template <typename F, typename... A>
-			constexpr auto for_each(F&& f, A&&... args) -> void {
-				(f(_impl.element<__key<L>>::data, xns::forward<A>(args)...), ...);
+			template <typename __invokable, typename... __params>
+			constexpr auto for_each(__invokable&& __func, __params&&... __args) -> void {
+				(__func(static_cast<element_by_key<L>&>(_impl)._data, xns::forward<__params>(__args)...), ...);
 			}
 
 			/* for each const element */
-			template <typename F, typename... A>
-			constexpr auto for_each(F&& f, A&&... args) const -> void {
-				(f(_impl.element<__key<L>>::data, xns::forward<A>(args)...), ...);
-			}
-
-
-
-			// -- static public accessors -------------------------------------
-
-			/* have key */
-			template <xns::basic_string_literal l>
-			static consteval auto have_key(void) noexcept -> bool {
-				// return true if key is in map
-				return xns::is_one_of<__key<l>, __key<L>...>;
+			template <typename __invokable, typename... __params>
+			constexpr auto for_each(__invokable&& __func, __params&&... __args) const -> void {
+				(__func(static_cast<const element_by_key<L>&>(_impl)._data, xns::forward<__params>(__args)...), ...);
 			}
 
 
 		// -- friends ---------------------------------------------------------
 
-		template <xns::basic_string_literal K, typename U, xns::basic_string_literal... S>
-		friend constexpr auto get(xns::literal_map<U, S...>&) noexcept -> U&;
+		/* get as friend */
+		template <xns::basic_string_literal ___key, typename ___type,
+				  xns::basic_string_literal... ___keys>
+		friend constexpr auto get(xns::literal_map<___type, ___keys...>&)
+		noexcept -> ___type&;
 
-		template <xns::basic_string_literal K, typename U, xns::basic_string_literal... S>
-		friend constexpr auto get(xns::literal_map<U, S...>&&) noexcept -> U&&;
+		/* get as friend */
+		template <xns::basic_string_literal ___key, typename ___type,
+				  xns::basic_string_literal... ___keys>
+		friend constexpr auto get(xns::literal_map<___type, ___keys...>&&)
+		noexcept -> ___type&&;
 
-		template <xns::basic_string_literal K, typename U, xns::basic_string_literal... S>
-		friend constexpr auto get(const xns::literal_map<U, S...>&) noexcept -> const U&;
+		/* get as friend */
+		template <xns::basic_string_literal ___key, typename ___type,
+				  xns::basic_string_literal... ___keys>
+		friend constexpr auto get(const xns::literal_map<___type, ___keys...>&)
+		noexcept -> const ___type&;
 
-		template <xns::basic_string_literal K, typename U, xns::basic_string_literal... S>
-		friend constexpr auto get(const xns::literal_map<U, S...>&&) noexcept -> const U&&;
+		/* get as friend */
+		template <xns::basic_string_literal ___key, typename ___type,
+				  xns::basic_string_literal... ___keys>
+		friend constexpr auto get(const xns::literal_map<___type, ___keys...>&&)
+		noexcept -> const ___type&&;
 
 	};
 
@@ -280,11 +337,11 @@ namespace xns {
 		// literal map type
 		using __map = xns::literal_map<__type, __keys...>;
 		// assertions
-		static_assert(__map::template have_key<__key>(), "literal_map: key not found");
+		static_assert(__map::template __have_key<__key>, "literal_map: key not found");
 		// element type
 		using __element = typename __map::template element_by_key<__key>;
 		// return lvalue reference
-		return static_cast<__type&>(static_cast<__element&>(__ltmp._impl).data);
+		return static_cast<__type&>(static_cast<__element&>(__ltmp._impl)._data);
 	}
 
 	/* get */
@@ -293,11 +350,11 @@ namespace xns {
 		// literal map type
 		using __map = xns::literal_map<__type, __keys...>;
 		// assertions
-		static_assert(__map::template have_key<__key>(), "literal_map: key not found");
+		static_assert(__map::template __have_key<__key>, "literal_map: key not found");
 		// element type
 		using __element = typename __map::template element_by_key<__key>;
 		// return rvalue reference
-		return static_cast<__type&&>(static_cast<__element&&>(__ltmp._impl).data);
+		return static_cast<__type&&>(static_cast<__element&&>(__ltmp._impl)._data);
 	}
 
 	/* get */
@@ -306,11 +363,11 @@ namespace xns {
 		// literal map type
 		using __map = xns::literal_map<__type, __keys...>;
 		// assertions
-		static_assert(__map::template have_key<__key>(), "literal_map: key not found");
+		static_assert(__map::template __have_key<__key>, "literal_map: key not found");
 		// element type
 		using __element = typename __map::template element_by_key<__key>;
 		// return const lvalue reference
-		return static_cast<const __type&>(static_cast<const __element&>(__ltmp._impl).data);
+		return static_cast<const __type&>(static_cast<const __element&>(__ltmp._impl)._data);
 	}
 
 	/* get */
@@ -319,11 +376,11 @@ namespace xns {
 		// literal map type
 		using __map = xns::literal_map<__type, __keys...>;
 		// assertions
-		static_assert(__map::template have_key<__key>(), "literal_map: key not found");
+		static_assert(__map::template __have_key<__key>, "literal_map: key not found");
 		// element type
 		using __element = typename __map::template element_by_key<__key>;
 		// return const rvalue reference
-		return static_cast<const __type&&>(static_cast<const __element&&>(__ltmp._impl).data);
+		return static_cast<const __type&&>(static_cast<const __element&&>(__ltmp._impl)._data);
 	}
 
 } // namespace xns

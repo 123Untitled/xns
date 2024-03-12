@@ -27,24 +27,66 @@ class a {
 
 };
 
-#include <containers/indexed_wrapper.hpp>
+template <typename __type, xns::basic_string_literal... __literals>
+auto print(const xns::literal_map<__type, __literals...>& __mp) -> void {
+
+	__mp.for_each([](const __type& v) {
+		std::cout << v << " ";
+	});
+	std::cout << std::endl;
+}
+
+#include <reference_wrapper.hpp>
 
 auto unit_tests_literal_map(void) -> int {
 
-	std::cout << sizeof(xns::indexed_wrapper<0, a, true>) << std::endl;
-	std::cout << sizeof(xns::indexed_wrapper<0, a, false>) << std::endl;
+	double d = 1.0;
+	double e = 2.0;
+
+
+	{
+		xns::literal_map<xns::reference_wrapper<double>, "ref", "o"> m1{d, e};
+		xns::get<"ref">(m1).get() = 3.0;
+	}
 
 	return 0;
 
-	xns::literal_map<a, "one", "two", "three"> m;
+	{
+		xns::literal_map<double, "one", "two", "three"> m1{1.0, 2.0, 3.0};
+		xns::literal_map<double, "one", "two", "three"> m2{};
 
-	std::cout << "sizeof(m): " << sizeof(m) << std::endl;
+		print(m1);
+		print(m2);
+		m2 = xns::move(m1);
+		print(m1);
+		print(m2);
+
+		xns::literal_map<double, "one", "two", "three"> m3{m2};
+		print(m3);
+	}
 
 	return 0;
+
+
+	//bool bbb = (m2 == m) ? true : false;
+
+
+	auto func = [](const a& v) {
+		std::cout << "for_each: " << &v << std::endl;
+	};
+
+	//m.for_each(func);
+
+
+
+	return 0;
+
+	constexpr xns::literal_map<int, "a", "b"> m12 = { 1, 2 };
+
 
 	xns::literal_map<int, "a", "b"> m1 = { 1, 2 };
 
-	m1.have_key<"a">();
+	m1.size();
 
 	std::cout << xns::get<"a">(m1) << std::endl;
 
