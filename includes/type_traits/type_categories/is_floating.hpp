@@ -1,3 +1,17 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_IS_FLOATING_HEADER
 #define XNS_IS_FLOATING_HEADER
 
@@ -13,12 +27,9 @@ namespace xns {
 	// -- I S  F L O A T I N G  P O I N T -------------------------------------
 
 	/* is floating concept */
-	template <class T>
+	template <typename T>
 	concept is_floating = xns::is_one_of<xns::remove_cv<T>, float, double, long double>;
 
+} // namespace xns
 
-}
-
-
-#endif
-
+#endif // XNS_IS_FLOATING_HEADER

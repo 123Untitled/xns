@@ -1,5 +1,19 @@
-#ifndef XNS_IS_ONE_OF_HPP
-#define XNS_IS_ONE_OF_HPP
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
+#ifndef XNS_IS_ONE_OF_HEADER
+#define XNS_IS_ONE_OF_HEADER
 
 #include "is_same.hpp"
 
@@ -8,12 +22,13 @@
 
 namespace xns {
 
+
 	// -- I S  O N E  O F -----------------------------------------------------
 
 	/* is one of concept */
 	template <typename T, typename... A>
 	concept is_one_of = (xns::is_same<T, A> || ...);
 
-}
+} // namespace xns
 
-#endif // XNS_IS_ONE_OF_HPP
+#endif // XNS_IS_ONE_OF_HEADER

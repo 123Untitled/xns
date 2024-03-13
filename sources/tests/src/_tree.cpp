@@ -328,9 +328,27 @@ auto unit_tests_tree(void) -> int {
 //
 	//BENCHMARK_MAIN();
 
+#include "vector3d.hpp"
 
 #if defined(XNS_TEST_TREE)
 int main(int argc, char** argv) {
+
+	using vtype = xns::vector3D<float>;
+
+	vtype v1{-2.0f, -2.0f, 0.0f};
+	vtype v2{ 1.0f,  0.0f, 0.0f};
+
+	v1.print();
+	v2.print();
+
+	auto v3 = xns::reflect(v1, v2);
+
+
+	v3.print();
+
+
+	return 0;
+
 	return unit_tests_tree();
 }
 #endif

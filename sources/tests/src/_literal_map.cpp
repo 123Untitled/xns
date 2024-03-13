@@ -38,6 +38,7 @@ auto print(const xns::literal_map<__type, __literals...>& __mp) -> void {
 
 #include <reference_wrapper.hpp>
 
+
 auto unit_tests_literal_map(void) -> int {
 
 	double d = 1.0;
@@ -48,6 +49,17 @@ auto unit_tests_literal_map(void) -> int {
 		xns::literal_map<xns::reference_wrapper<double>, "ref", "o"> m1{d, e};
 		xns::get<"ref">(m1).get() = 3.0;
 	}
+
+	double& ref = xns::get<"one">(score);
+	ref = 1.0;
+
+
+
+
+
+
+	std::cout << sizeof(xns::indexed_wrapper<0, a, true>) << std::endl;
+	std::cout << sizeof(xns::indexed_wrapper<0, a, false>) << std::endl;
 
 	return 0;
 
