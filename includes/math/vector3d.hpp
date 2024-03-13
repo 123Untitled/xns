@@ -1,5 +1,19 @@
-#ifndef XNS_VECTOR3D_HPP
-#define XNS_VECTOR3D_HPP
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
+#ifndef XNS_VECTOR3D_HEADER
+#define XNS_VECTOR3D_HEADER
 
 #include "math.hpp"
 #include <iostream>
@@ -18,7 +32,7 @@ namespace xns {
 		// -- assertions ------------------------------------------------------
 
 		/* require floating point type */
-		static_assert(xns::is_floating<T>, "): VECTOR3D: T must be a floating point type :(");
+		static_assert(xns::is_floating<T>, "vector3D: T must be a floating point type");
 
 
 		public:
@@ -41,34 +55,28 @@ namespace xns {
 			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			inline constexpr vector3D(void) noexcept
+			constexpr vector3D(void) noexcept
 			: _x{0}, _y{0}, _z{0} {}
 
 			/* value constructor */
-			inline constexpr vector3D(const value_type x, const value_type y, const value_type z) noexcept
+			constexpr vector3D(const value_type x, const value_type y, const value_type z) noexcept
 			: _x{x}, _y{y}, _z{z} {}
 
 			/* copy constructor */
-			inline constexpr vector3D(const self& other) noexcept
-			: _x{other._x}, _y{other._y}, _z{other._z} {}
+			constexpr vector3D(const self&) noexcept = default;
 
 			/* move constructor */
-			inline constexpr vector3D(self&& other) noexcept
-			: self{other} {} // copy
+			constexpr vector3D(self&&) noexcept = default;
 
 			/* destructor */
-			inline ~vector3D(void) noexcept = default;
+			~vector3D(void) noexcept = default;
 
 
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			inline constexpr auto operator=(const self& other) noexcept -> self& {
-				_x = other._x;
-				_y = other._y;
-				_z = other._z;
-				return *this;
-			}
+			constexpr auto operator=(const self&) noexcept -> self& = default;
+
 
 			/* move assignment operator */
 			inline constexpr auto operator=(self&& other) noexcept -> self& {
@@ -144,17 +152,15 @@ namespace xns {
 			}
 
 			/* scale */
-			inline constexpr auto scale(const value_type scalar) noexcept -> void {
+			constexpr auto scale(const value_type scalar) noexcept -> void {
 				_x *= scalar;
 				_y *= scalar;
 				_z *= scalar;
 			}
 
 			/* reset to zero */
-			inline constexpr auto reset(void) noexcept -> void {
-				_x = 0;
-				_y = 0;
-				_z = 0;
+			constexpr auto reset(void) noexcept -> void {
+				_x = 0; _y = 0; _z = 0;
 			}
 
 
@@ -220,11 +226,20 @@ namespace xns {
 				return self{-_x, -_y, -_z};
 			}
 
+			/* unary minus operator */
+			inline constexpr auto operator-(void) noexcept -> void {
+				_x = -_x;
+				_y = -_y;
+				_z = -_z;
+			}
+
 
 
 
 			inline auto print(void) const noexcept -> void {
-				std::cout << "(" << _x << ", " << _y << ", " << _z << ")" << std::endl;
+				// print 2 digits after the decimal point
+				std::cout.precision(2);
+				std::cout << std::fixed  << "(" << _x << ", " << _y << ", " << _z << ")" << std::endl;
 			}
 
 		private:
@@ -301,14 +316,19 @@ namespace xns {
 	}
 
 	/* reflect */
-	template <typename T>
-	inline constexpr auto reflect(const xns::vector3D<T>& v1, const xns::vector3D<T>& v2) noexcept -> xns::vector3D<T> {
-		const auto dot = xns::dot(v1, v2);
-		const auto val = 2 * dot;
-		return xns::vector3D<T>{v1._x - (val * v2._x),
-								v1._y - (val * v2._y),
-								v1._z - (val * v2._z)};
-	}
-}
+	template <typename __type>
+	inline constexpr auto reflect(const xns::vector3D<__type>& __vc,
+								  const xns::vector3D<__type>& __nr) noexcept -> xns::vector3D<__type> {
 
-#endif // XNS_VECTOR3D_HPP
+		const auto __normalized = xns::normalize(__nr);
+		const auto __twodot  = xns::dot(__vc, __normalized) * 2;
+
+		//const auto val = 2 * dot;
+		return xns::vector3D<__type>{__vc._x - (__twodot * __normalized._x),
+									 __vc._y - (__twodot * __normalized._y),
+									 __vc._z - (__twodot * __normalized._z)};
+	}
+
+} // namespace xns
+
+#endif // XNS_VECTOR3D_HEADER
