@@ -35,7 +35,7 @@ namespace xns {
 	// -- A R R A Y -----------------------------------------------------------
 
 	template <typename T, xns::size_t... N>
-	class array final {
+	class array2 final {
 
 
 		public:
@@ -43,7 +43,7 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self       = xns::array<T, N...>;
+			using self       = xns::array2<T, N...>;
 
 			/* value type */
 			using value_type = T;
@@ -341,10 +341,88 @@ namespace xns {
 
 	/* deduction guide */
 	template <typename... A>
+	array2(A&&...) -> array2<xns::common_type<A...>, sizeof...(A)>;
+
+
+
+	// -- A R R A Y -----------------------------------------------------------
+
+	template <typename T, decltype(sizeof(0)) N>
+	class array final {
+
+
+		public:
+
+			// -- public types ------------------------------------------------
+
+			/* self type */
+			using self       = xns::array<T, N>;
+
+			/* value type */
+			using value_type = T;
+
+			/* mutable reference type */
+			using mut_ref    = value_type&;
+
+			/* constant reference type */
+			using const_ref  = const value_type&;
+
+			/* mutable pointer type */
+			using mut_ptr    = value_type*;
+
+			/* constant pointer type */
+			using const_ptr  = const value_type*;
+
+			/* size type */
+			using size_type  = decltype(sizeof(0));
+
+
+			// -- public members ----------------------------------------------
+
+			/* data */
+			value_type _data[N];
+
+
+			// -- public subscript operators ----------------------------------
+
+			/* subscript operator */
+			constexpr auto operator[](const size_type index) noexcept -> mut_ref {
+				return _data[index];
+			}
+
+			/* const subscript operator */
+			constexpr auto operator[](const size_type index) const noexcept -> const_ref {
+				return _data[index];
+			}
+
+
+			// -- public accessors --------------------------------------------
+
+			/* size */
+			constexpr auto size(void) const noexcept -> size_type {
+				return N;
+			}
+
+			/* data */
+			constexpr auto data(void) noexcept -> mut_ptr {
+				return _data;
+			}
+
+			/* const data */
+			constexpr auto data(void) const noexcept -> const_ptr {
+				return _data;
+			}
+
+
+	}; // class array
+
+
+	// -- deduction guides ----------------------------------------------------
+
+	/* variadic constructor */
+	template <typename... A>
 	array(A&&...) -> array<xns::common_type<A...>, sizeof...(A)>;
 
+} // namespace xns
 
-}
-
-#endif
-
+#endif // XNS_ARRAY_HEADER

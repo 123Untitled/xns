@@ -49,7 +49,7 @@ namespace xns {
 			using self = xns::matrix<T, R, C>;
 
 			/* array type */
-			using array_type = xns::array<T, R, C>;
+			using array_type = xns::array2<T, R, C>;
 
 			/* value type */
 			using value_type = T;
