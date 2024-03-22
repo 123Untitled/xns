@@ -102,6 +102,9 @@ CACHEDIR=$ABSDIR'/.cache'
 # external directory
 EXTDIR=$ABSDIR'/external'
 
+# tool directory
+TOOLDIR=$ABSDIR'/tools'
+
 # install directory
 INSTALLDIR=''
 
@@ -867,6 +870,7 @@ function main {
 			target_info $STATIC
 			compile
 			linkage $STATIC make_static
+			$TOOLDIR'/install_xns.sh'
 			;;
 		'test')
 			target_info $TEST
