@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "is_arithmetic.hpp"
+#include "type_traits/type_categories/is_arithmetic.hpp"
 
 /* unit test */
 

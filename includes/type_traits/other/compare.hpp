@@ -1,7 +1,7 @@
 #ifndef XNS_COMPARE_HEADER
 #define XNS_COMPARE_HEADER
 
-#include "conditional.hpp"
+#include "type_traits/type_transformations/conditional.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

@@ -1,15 +1,31 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_RATIO_HEADER
 #define XNS_RATIO_HEADER
 
-#include "types.hpp"
-#include "macros.hpp"
-#include "is_same.hpp"
+#include "config/macros.hpp"
 
-#include "is_integral.hpp"
-#include "is_signed.hpp"
-#include "is_unsigned.hpp"
-#include "numeric_limits.hpp"
-#include "integral_constant.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/relationships_and_property_queries/is_same.hpp"
+
+#include "type_traits/type_categories/is_integral.hpp"
+#include "type_traits/type_properties/is_signed.hpp"
+#include "type_traits/type_properties/is_unsigned.hpp"
+#include "type_traits/type_trait_constants/integral_constant.hpp"
+
+#include "utility/numeric_limits.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

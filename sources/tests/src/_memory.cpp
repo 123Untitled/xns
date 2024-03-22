@@ -1,10 +1,10 @@
 #include "unit_tests.hpp"
-#include "memory.hpp"
-#include "allocator.hpp"
+#include "memory/memory.hpp"
+#include "memory/allocator.hpp"
 
 #include <vector>
-#include "tuple.hpp"
-#include "time.hpp"
+#include "containers/tuple.hpp"
+#include "time/time.hpp"
 
 template <decltype(sizeof(0)) N>
 class test {

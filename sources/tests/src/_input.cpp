@@ -1,6 +1,6 @@
 #include "unit_tests.hpp"
-#include "input.hpp"
-#include "terminal.hpp"
+#include "event/input.hpp"
+#include "terminal/terminal.hpp"
 
 
 auto unit_tests_input(void) -> int {

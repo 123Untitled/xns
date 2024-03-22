@@ -1,7 +1,7 @@
 #include "unit_tests.hpp"
-#include "duration.hpp"
-#include "string.hpp"
-#include "output.hpp"
+#include "time/duration.hpp"
+#include "string/string.hpp"
+#include "terminal/output.hpp"
 
 #include <chrono>
 

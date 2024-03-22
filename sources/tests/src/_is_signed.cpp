@@ -1,9 +1,9 @@
 #include "unit_tests.hpp"
-#include "is_signed.hpp"
+#include "type_traits/type_properties/is_signed.hpp"
 
 #include <unistd.h>
 #include <type_traits>
-#include "string_literal.hpp"
+#include "type_traits/other/string_literal.hpp"
 
 
 template <xns::basic_string_literal msg, class T, bool expected>

@@ -10,21 +10,21 @@
 
 #pragma once
 
-#ifndef XNS_COMPRESSED_PAIR_HPP
-#define XNS_COMPRESSED_PAIR_HPP
+#ifndef XNS_COMPRESSED_PAIR_HEADER
+#define XNS_COMPRESSED_PAIR_HEADER
 
-#include "supported_operations.hpp"
-//#include "is_nothrow_constructible.hpp"
-//#include "is_nothrow_default_constructible.hpp"
-//#include "is_nothrow_copy_constructible.hpp"
-//#include "is_nothrow_move_constructible.hpp"
-//#include "is_nothrow_copy_assignable.hpp"
-//#include "is_nothrow_move_assignable.hpp"
-//#include "is_nothrow_destructible.hpp"
-#include "is_empty_base.hpp"
-#include "is_same.hpp"
-#include "forward.hpp"
-#include "swap.hpp"
+#include "type_traits/supported_operations/is_nothrow_constructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_default_constructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_copy_constructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_move_constructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_copy_assignable.hpp"
+#include "type_traits/supported_operations/is_nothrow_move_assignable.hpp"
+#include "type_traits/supported_operations/is_nothrow_destructible.hpp"
+
+#include "type_traits/type_properties/is_empty_base.hpp"
+#include "type_traits/relationships_and_property_queries/is_same.hpp"
+#include "type_traits/type_operations/forward.hpp"
+#include "utility/swap.hpp"
 
 #include <type_traits> // temporary (for std::decay_t)
 
@@ -297,4 +297,4 @@ namespace xns {
 
 } // namespace xns
 
-#endif // XNS_COMPRESSED_PAIR_HPP
+#endif // XNS_COMPRESSED_PAIR_HEADER

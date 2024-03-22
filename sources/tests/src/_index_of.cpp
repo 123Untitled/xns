@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "index_of.hpp"
+#include "type_traits/other/index_of.hpp"
 
 /* unit test */
 

@@ -1,7 +1,21 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_IS_LVALUE_REFERENCE_HEADER
 #define XNS_IS_LVALUE_REFERENCE_HEADER
 
-#include "integral_constant.hpp"
+#include "type_traits/type_trait_constants/integral_constant.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -15,19 +29,19 @@ namespace xns {
 
 		/* is lvalue reference */
 		template <class T>
-		struct is_lvalue_reference      : public xns::no  {};
+		struct is_lvalue_reference      : public xns::false_type {};
 
 		/* specialisation */
 		template <class T>
-		struct is_lvalue_reference<T&>  : public xns::yes {};
+		struct is_lvalue_reference<T&>  : public xns::true_type  {};
 
 		/* is rvalue reference */
 		template <class T>
-		struct is_rvalue_reference      : public xns::no  {};
+		struct is_rvalue_reference      : public xns::false_type {};
 
 		/* specialisation */
 		template <class T>
-		struct is_rvalue_reference<T&&> : public xns::yes {};
+		struct is_rvalue_reference<T&&> : public xns::true_type  {};
 
 	}
 

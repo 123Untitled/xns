@@ -1,9 +1,23 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_BIT_CAST_HEADER
 #define XNS_BIT_CAST_HEADER
 
-#include "types.hpp"
-#include "is_integral.hpp"
-#include "memcpy.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/type_categories/is_integral.hpp"
+#include "memory/memcpy.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

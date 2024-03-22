@@ -1,14 +1,14 @@
 #ifndef XNS_MAP_HEADER
 #define XNS_MAP_HEADER
 
-#include "types.hpp"
-#include "allocator.hpp"
-#include "unique_ptr.hpp"
-#include "weak_ptr.hpp"
-#include "tree.hpp"
-#include "literal_map.hpp"
-#include "tuple.hpp"
-#include "is_comparable.hpp"
+#include "type_traits/types.hpp"
+#include "memory/allocator.hpp"
+#include "memory/unique_ptr.hpp"
+#include "memory/weak_ptr.hpp"
+#include "containers/tree.hpp"
+#include "containers/literal_map.hpp"
+#include "containers/tuple.hpp"
+#include "type_traits/relationships_and_property_queries/is_comparable.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

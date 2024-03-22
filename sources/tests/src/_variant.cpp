@@ -1,11 +1,11 @@
 #include "unit_tests.hpp"
-#include "variant.hpp"
-#include "string.hpp"
+#include "containers/variant.hpp"
+#include "string/string.hpp"
 
-#include "reference_wrapper.hpp"
+#include "containers/reference_wrapper.hpp"
 
-#include "random.hpp"
-#include "benchmark.hpp"
+#include "random/random.hpp"
+#include "other/benchmark.hpp"
 
 #include <string>
 #include <vector>

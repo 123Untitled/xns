@@ -1,15 +1,31 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_OPTIONAL_HEADER
 #define XNS_OPTIONAL_HEADER
 
 // local headers
-#include "aligned_storage.hpp"
-#include "move.hpp"
-#include "forward.hpp"
-#include "in_place.hpp"
-#include "is_constructible.hpp"
-#include "is_destructible.hpp"
-#include "is_trivially_destructible.hpp"
-#include "allocator.hpp"
+#include "containers/aligned_storage.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_operations/forward.hpp"
+#include "type_traits/other/in_place.hpp"
+
+#include "type_traits/supported_operations/is_constructible.hpp"
+#include "type_traits/supported_operations/is_destructible.hpp"
+#include "type_traits/supported_operations/is_trivially_destructible.hpp"
+
+#include "memory/allocator.hpp"
 
 // c++ standard headers library
 #include <iostream>

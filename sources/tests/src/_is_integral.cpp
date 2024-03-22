@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "is_integral.hpp"
+#include "type_traits/type_categories/is_integral.hpp"
 #include <iostream>
 #include <iomanip>
 

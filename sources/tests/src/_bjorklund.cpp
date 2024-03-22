@@ -1,4 +1,4 @@
-#include "bjorklund.hpp"
+#include "algorithm/bjorklund.hpp"
 
 
 /* unit test */

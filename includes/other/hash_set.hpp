@@ -2,10 +2,10 @@
 #define XNS_UNORDERED_SET_HPP
 
 // local headers
-#include "vector.hpp"
-#include "hash.hpp"
-#include "memory.hpp"
-#include "variant.hpp"
+#include "containers/vector.hpp"
+#include "other/hash.hpp"
+#include "memory/memory.hpp"
+#include "containers/variant.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

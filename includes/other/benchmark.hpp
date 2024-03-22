@@ -2,12 +2,12 @@
 #define XNS_BENCHMARK_HEADER
 
 // local headers
-#include "types.hpp"
-#include "time.hpp"
-#include "output.hpp"
-#include "escape.hpp"
-#include "string.hpp"
-#include "tree.hpp"
+#include "type_traits/types.hpp"
+#include "time/time.hpp"
+#include "terminal/output.hpp"
+#include "terminal/escape.hpp"
+#include "string/string.hpp"
+#include "containers/tree.hpp"
 
 
 

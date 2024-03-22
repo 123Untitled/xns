@@ -1,7 +1,10 @@
 #include "unit_tests.hpp"
+
 #include <iostream>
 #include <iomanip>
-#include "inheritance.hpp"
+
+#include "type_traits/relationships_and_property_queries/is_base_of.hpp"
+#include "type_traits/relationships_and_property_queries/is_derived_from.hpp"
 
 // avoid namespace pollution
 using namespace xns;

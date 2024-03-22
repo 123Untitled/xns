@@ -2,8 +2,8 @@
 #define XNS_IO_CONTROL_HEADER
 
 // local headers
-#include "string_literal.hpp"
-#include "unique_descriptor.hpp"
+#include "type_traits/other/string_literal.hpp"
+#include "system/unique_descriptor.hpp"
 
 // operating system headers
 #include <sys/ioctl.h>

@@ -1,13 +1,5 @@
 #include "unit_tests.hpp"
-#include "map.hpp"
-
-#include "variant.hpp"
-#include "random.hpp"
-#include <chrono>
-#include <map>
-#include <set>
-
-
+#include "containers/map.hpp"
 
 
 auto unit_tests_map(void) -> int {

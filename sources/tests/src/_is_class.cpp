@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "is_class.hpp"
+#include "type_traits/type_categories/is_class.hpp"
 
 class test_class {
 	int u;

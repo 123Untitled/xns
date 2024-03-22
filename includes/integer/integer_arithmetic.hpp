@@ -1,12 +1,26 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_INTEGER_ARITHMETIC_HEADER
 #define XNS_INTEGER_ARITHMETIC_HEADER
 
 // local headers
-#include "numeric_limits.hpp"
-#include "is_integral.hpp"
-#include "is_signed.hpp"
-#include "is_unsigned.hpp"
-#include "types.hpp"
+#include "utility/numeric_limits.hpp"
+#include "type_traits/type_categories/is_integral.hpp"
+#include "type_traits/type_properties/is_signed.hpp"
+#include "type_traits/type_properties/is_unsigned.hpp"
+#include "type_traits/types.hpp"
 
 // T = L = R
 

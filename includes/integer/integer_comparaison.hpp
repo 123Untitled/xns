@@ -1,10 +1,11 @@
 #ifndef XNS_INTEGER_COMPARAISON_HEADER
 #define XNS_INTEGER_COMPARAISON_HEADER
 
-#include "is_integral.hpp"
-#include "is_signed.hpp"
-#include "is_unsigned.hpp"
-#include "conditional.hpp"
+#include "type_traits/type_categories/is_integral.hpp"
+#include "type_traits/type_properties/is_signed.hpp"
+#include "type_traits/type_properties/is_unsigned.hpp"
+
+#include "type_traits/type_transformations/conditional.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

@@ -1,7 +1,7 @@
 #include "unit_tests.hpp"
-#include "bit_view.hpp"
-#include "string.hpp"
-#include "terminal.hpp"
+#include "bit/bit_view.hpp"
+#include "string/string.hpp"
+#include "terminal/terminal.hpp"
 
 #include <string>
 #include <sys/socket.h>

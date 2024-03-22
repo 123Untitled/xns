@@ -1,10 +1,24 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_FIXED_HEADER
 #define XNS_FIXED_HEADER
 
-#include "move.hpp"
-#include "is_integral.hpp"
-#include "is_floating.hpp"
-#include "types.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_categories/is_integral.hpp"
+#include "type_traits/type_categories/is_floating_point.hpp"
+#include "type_traits/types.hpp"
 
 #include <iostream>
 

@@ -10,20 +10,23 @@
 
 #pragma once
 
-#ifndef XNS_VARIANT_HPP
-#define XNS_VARIANT_HPP
+#ifndef XNS_VARIANT_HEADER
+#define XNS_VARIANT_HEADER
 
 // local headers
-#include "move.hpp"
-#include "forward.hpp"
-#include "aligned_storage.hpp"
-#include "in_place.hpp"
-#include "index_of.hpp"
-#include "type_at.hpp"
-#include "is_all_unique.hpp"
-#include "is_const.hpp"
-#include "allocator.hpp"
-#include "indexed_element.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_operations/forward.hpp"
+
+#include "type_traits/other/in_place.hpp"
+#include "type_traits/other/index_of.hpp"
+#include "type_traits/other/type_at.hpp"
+#include "type_traits/other/is_all_unique.hpp"
+#include "type_traits/type_properties/is_const.hpp"
+
+#include "memory/allocator.hpp"
+#include "containers/aligned_storage.hpp"
+
+#include "other/indexed_element.hpp"
 
 
 
@@ -470,7 +473,6 @@ namespace xns {
 		return xns::move(xns::ref<xns::type_at<I, T...>>(variant._storage));
 	}
 
-}
+} // namespace xns
 
-
-#endif // XNS_VARIANT_HPP
+#endif // XNS_VARIANT_HEADER

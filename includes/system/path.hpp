@@ -1,13 +1,27 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_PATH_HEADER
 #define XNS_PATH_HEADER
 
-#include "output.hpp"
-#include "types.hpp"
-#include "string.hpp"
-#include "vector.hpp"
-#include "safe_enum.hpp"
-#include "tuple.hpp"
-#include "string_literal.hpp"
+#include "terminal/output.hpp"
+#include "type_traits/types.hpp"
+#include "string/string.hpp"
+#include "containers/vector.hpp"
+#include "other/safe_enum.hpp"
+#include "containers/tuple.hpp"
+#include "type_traits/other/string_literal.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

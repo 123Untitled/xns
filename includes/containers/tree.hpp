@@ -12,24 +12,24 @@
 
 #pragma once
 
-#ifndef XNS_TREE_HPP
-#define XNS_TREE_HPP
+#ifndef XNS_TREE_HEADER
+#define XNS_TREE_HEADER
 
-#include "string.hpp"
+#include "string/string.hpp"
 
-#include "stack.hpp"
-#include "queue.hpp"
+#include "containers/stack.hpp"
+#include "containers/queue.hpp"
 
-#include "types.hpp"
+#include "type_traits/types.hpp"
 
-#include "output.hpp"
-#include "escape.hpp"
-#include "terminal.hpp"
+#include "terminal/output.hpp"
+#include "terminal/escape.hpp"
+#include "terminal/terminal.hpp"
 
-#include "fragmentation.hpp"
+#include "memory/fragmentation.hpp"
 
-#include "conditional.hpp"
-#include "is_comparable.hpp"
+#include "type_traits/type_transformations/conditional.hpp"
+#include "type_traits/relationships_and_property_queries/is_comparable.hpp"
 
 
 

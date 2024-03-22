@@ -1,11 +1,25 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_DURATION_HEADER
 #define XNS_DURATION_HEADER
 
-#include "macros.hpp"
-#include "types.hpp"
-#include "move.hpp"
-#include "is_arithmetic.hpp"
-#include "ratio.hpp"
+#include "config/macros.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_categories/is_arithmetic.hpp"
+#include "math/ratio.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

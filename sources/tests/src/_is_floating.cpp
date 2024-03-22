@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "is_floating.hpp"
+#include "type_traits/type_categories/is_floating_point.hpp"
 
 /* unit test */
 

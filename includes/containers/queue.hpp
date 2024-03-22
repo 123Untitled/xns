@@ -1,12 +1,26 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_QUEUE_HEADER
 #define XNS_QUEUE_HEADER
 
 // local headers
-#include "types.hpp"
-#include "allocator.hpp"
-#include "memory.hpp"
-#include "move.hpp"
-#include "forward.hpp"
+#include "type_traits/types.hpp"
+#include "memory/allocator.hpp"
+#include "memory/memory.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_operations/forward.hpp"
 
 // c++ standard library headers
 #include <iostream>
@@ -19,7 +33,7 @@ namespace xns {
 
 	// -- Q U E U E -----------------------------------------------------------
 
-	template <class T>
+	template <typename T>
 	class queue final {
 
 

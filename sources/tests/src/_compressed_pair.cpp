@@ -1,13 +1,6 @@
-#include "compressed_pair.hpp"
-#include "pair.hpp"
+#include "containers/compressed_pair.hpp"
+#include "containers/pair.hpp"
 #include <iostream>
-#include "is_nothrow_constructible.hpp"
-#include "is_nothrow_copy_constructible.hpp"
-#include "is_nothrow_move_constructible.hpp"
-#include "is_nothrow_default_constructible.hpp"
-#include "is_nothrow_copy_assignable.hpp"
-#include "is_nothrow_move_assignable.hpp"
-#include "is_nothrow_destructible.hpp"
 
 //#include <benchmark/benchmark.h>
 
@@ -21,8 +14,8 @@ struct mypair {
 	int b;
 };
 
-#include "benchmark.hpp"
-#include "random.hpp"
+#include "other/benchmark.hpp"
+#include "random/random.hpp"
 
 //template <typename T>
 //static auto compressed_pair(benchmark::State& state) -> void {

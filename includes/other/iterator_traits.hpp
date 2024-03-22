@@ -1,11 +1,11 @@
 #ifndef XNS_ITERATOR_TRAITS_HEADER
 #define XNS_ITERATOR_TRAITS_HEADER
 
-#include "types.hpp"
-#include "conditional.hpp"
-#include "integral_constant.hpp"
-#include "is_pointer.hpp"
-#include "is_one_of.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/type_transformations/conditional.hpp"
+#include "type_traits/type_trait_constants/integral_constant.hpp"
+#include "type_traits/type_categories/is_pointer.hpp"
+#include "type_traits/other/is_one_of.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

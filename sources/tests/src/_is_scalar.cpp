@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "is_scalar.hpp"
+#include "type_traits/type_categories/is_scalar.hpp"
 
 /* unit test */
 

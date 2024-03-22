@@ -1,11 +1,25 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_TIME_HEADER
 #define XNS_TIME_HEADER
 
 // local headers
-#include "types.hpp"
-#include "macros.hpp"
-#include "os.hpp"
-#include "duration.hpp"
+#include "type_traits/types.hpp"
+#include "config/macros.hpp"
+#include "config/os.hpp"
+#include "time/duration.hpp"
 
 #include <iostream>
 

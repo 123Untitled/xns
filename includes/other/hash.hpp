@@ -2,9 +2,9 @@
 #define XNS_HASH_HEADER
 
 // local headers
-#include "types.hpp"
-#include "string.hpp"
-#include "make_unsigned.hpp"
+#include "type_traits/types.hpp"
+#include "string/string.hpp"
+#include "type_traits/type_modifications/make_unsigned.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

@@ -1,6 +1,6 @@
 #include "unit_tests.hpp"
-#include "make_signed.hpp"
-#include "string_literal.hpp"
+#include "type_traits/type_modifications/make_signed.hpp"
+#include "type_traits/other/string_literal.hpp"
 
 #include <unistd.h>
 #include <type_traits>

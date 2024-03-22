@@ -1,17 +1,32 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_TRIE_HEADER
 #define XNS_TRIE_HEADER
 
-#include "types.hpp"
-#include "vector.hpp"
-#include "pair.hpp"
-#include "tuple.hpp"
-#include "unique_ptr.hpp"
-#include "shared_ptr.hpp"
-#include "weak_ptr.hpp"
-#include "string.hpp"
+#include "type_traits/types.hpp"
 
+#include "containers/vector.hpp"
+#include "containers/pair.hpp"
+#include "containers/tuple.hpp"
 
-#include "string_literal.hpp"
+#include "memory/unique_ptr.hpp"
+#include "memory/shared_ptr.hpp"
+#include "memory/weak_ptr.hpp"
+
+#include "string/string.hpp"
+#include "type_traits/other/string_literal.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

@@ -1,5 +1,5 @@
-#include "is_referenceable.hpp"
-#include "config.hpp"
+#include "type_traits/type_properties/is_referenceable.hpp"
+#include "config/config.hpp"
 #include <iostream>
 
 

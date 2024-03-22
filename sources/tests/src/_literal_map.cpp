@@ -1,4 +1,5 @@
-#include "literal_map.hpp"
+#include "containers/literal_map.hpp"
+#include "containers/reference_wrapper.hpp"
 #include <iostream>
 
 class a {
@@ -36,7 +37,6 @@ auto print(const xns::literal_map<__type, __literals...>& __mp) -> void {
 	std::cout << std::endl;
 }
 
-#include <reference_wrapper.hpp>
 
 
 auto unit_tests_literal_map(void) -> int {

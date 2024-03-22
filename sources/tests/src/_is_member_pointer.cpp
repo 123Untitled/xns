@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "is_member_pointer.hpp"
+#include "type_traits/type_categories/is_member_pointer.hpp"
 
 /* unit test */
 

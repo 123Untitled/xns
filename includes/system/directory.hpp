@@ -1,15 +1,33 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_DIRECTORY_HEADER
 #define XNS_DIRECTORY_HEADER
 
 // local headers
-#include "os.hpp"
-#include "string_literal.hpp"
-#include "string.hpp"
-#include "types.hpp"
-#include "path.hpp"
-#include "stack.hpp"
-#include "pair.hpp"
-#include "unique_directory.hpp"
+#include "config/os.hpp"
+
+#include "type_traits/other/string_literal.hpp"
+#include "type_traits/types.hpp"
+
+#include "string/string.hpp"
+
+#include "containers/stack.hpp"
+#include "containers/pair.hpp"
+
+#include "system/unique_directory.hpp"
+#include "system/path.hpp"
 
 
 

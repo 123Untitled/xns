@@ -1,11 +1,25 @@
-#ifndef XNS_UNIQUE_DIRECTORY_HPP
-#define XNS_UNIQUE_DIRECTORY_HPP
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
+#ifndef XNS_UNIQUE_DIRECTORY_HEADER
+#define XNS_UNIQUE_DIRECTORY_HEADER
 
 // local headers
-#include "os.hpp"
-#include "macros.hpp"
-#include "string.hpp"
-#include "unique_descriptor.hpp"
+#include "config/os.hpp"
+#include "config/macros.hpp"
+#include "string/string.hpp"
+#include "system/unique_descriptor.hpp"
 
 // macos headers
 #if defined(XNS_APPLE)

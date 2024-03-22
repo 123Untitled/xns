@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "exceptions.hpp"
+#include "diagnostics/exceptions.hpp"
 
 // launch all tests 🚀
 

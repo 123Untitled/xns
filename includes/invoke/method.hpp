@@ -1,7 +1,21 @@
-#ifndef XNS_METHOD_HPP
-#define XNS_METHOD_HPP
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
 
-#include "forward.hpp"
+#pragma once
+
+#ifndef XNS_METHOD_HEADER
+#define XNS_METHOD_HEADER
+
+#include "type_traits/type_operations/forward.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -147,6 +161,6 @@ namespace xns {
 	template <typename O, typename R, typename... A>
 	method(R(O::*)(A...)) -> method<O, R(A...)>;
 
-}
+} // namespace xns
 
-#endif // XNS_METHOD_HPP
+#endif // XNS_METHOD_HEADER

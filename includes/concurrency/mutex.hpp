@@ -16,7 +16,7 @@
 #define XNS_MUTEX_HEADER
 
 // local headers
-#include "utility/macros.hpp"
+#include "config/macros.hpp"
 
 // operating system headers
 #include <pthread.h>

@@ -1,6 +1,6 @@
 #include "unit_tests.hpp"
-#include "numeric_limits.hpp"
-#include "base.hpp"
+#include "utility/numeric_limits.hpp"
+#include "other/base.hpp"
 #include <limits>
 
 

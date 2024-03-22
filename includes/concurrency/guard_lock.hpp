@@ -16,7 +16,7 @@
 #define XNS_GUARD_LOCK_HEADER
 
 #include "concurrency/mutex.hpp"
-#include "utility/macros.hpp"
+#include "config/macros.hpp"
 
 #include <pthread.h>
 

@@ -1,19 +1,33 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_INTEGER_HEADER
 #define XNS_INTEGER_HEADER
 
 // local headers
-#include "types.hpp"
-#include "numeric_limits.hpp"
-#include "conditional.hpp"
-#include "is_signed.hpp"
-#include "is_unsigned.hpp"
+#include "type_traits/types.hpp"
+#include "utility/numeric_limits.hpp"
+#include "type_traits/type_transformations/conditional.hpp"
+#include "type_traits/type_properties/is_signed.hpp"
+#include "type_traits/type_properties/is_unsigned.hpp"
 
-#include "integer_conversion.hpp"
-#include "integer_comparaison.hpp"
-#include "integer_arithmetic.hpp"
+#include "integer/integer_conversion.hpp"
+#include "integer/integer_comparaison.hpp"
+#include "integer/integer_arithmetic.hpp"
 
 
-#include "string.hpp"
+#include "string/string.hpp"
 
 #include <iostream>
 

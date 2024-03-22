@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "escape.hpp"
+#include "terminal/escape.hpp"
 
 /* unit test */
 

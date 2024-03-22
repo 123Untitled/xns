@@ -16,8 +16,8 @@
 #define XNS_SYSTEM_HEADER
 
 // local headers
-#include "types.hpp"
-#include "os.hpp"
+#include "type_traits/types.hpp"
+#include "config/os.hpp"
 
 #if defined(XNS_APPLE) || defined(XNS_BSD)
 # include <sys/sysctl.h>

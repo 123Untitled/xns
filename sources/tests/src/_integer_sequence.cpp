@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "integer_sequence.hpp"
+#include "type_traits/sequences/integer_sequence.hpp"
 
 /* unit test */
 
