@@ -3,8 +3,8 @@
 
 //#include <type_traits>
 
-#include "remove.hpp"
-#include "is_same.hpp"
+#include "type_traits/type_modifications/remove.hpp"
+#include "type_traits/relationships_and_property_queries/is_same.hpp"
 
 #include <type_traits>
 

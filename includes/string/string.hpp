@@ -1,3 +1,15 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
 #ifndef XNS_STRING_HEADER
 #define XNS_STRING_HEADER
 
@@ -7,30 +19,31 @@
 #include <unistd.h>
 
 // local includes
-#include "types.hpp"
-#include "move.hpp"
-#include "is_char.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_categories/is_char.hpp"
+#include "type_traits/type_properties/is_unsigned.hpp"
+#include "type_traits/type_properties/is_signed.hpp"
 
-#include "memcpy.hpp"
-#include "memset.hpp"
-#include "memmove.hpp"
-#include "strcmp.hpp"
-#include "strncmp.hpp"
+#include "other/memcpy.hpp"
+#include "other/memset.hpp"
+#include "other/memmove.hpp"
 
-#include "string_utils.hpp"
-//#include "strlen.hpp"
+#include "string/strcmp.hpp"
+#include "string/strncmp.hpp"
+#include "string/string_utils.hpp"
 
-#include "swap.hpp"
 
-#include "list.hpp"
-#include "tuple.hpp"
-#include "allocator.hpp"
-#include "vector.hpp"
-#include "array.hpp"
+#include "other/swap.hpp"
+
+#include "containers/list.hpp"
+#include "containers/tuple.hpp"
+#include "containers/vector.hpp"
+#include "containers/array.hpp"
+
+#include "memory/allocator.hpp"
 #include "numeric_limits.hpp"
 
-#include "is_unsigned.hpp"
-#include "is_signed.hpp"
 
 
 #include "char_traits.hpp"
@@ -40,7 +53,7 @@
 #include <cstring>
 
 
-#include "string_literal.hpp"
+#include "type_traits/other/string_literal.hpp"
 
 
 

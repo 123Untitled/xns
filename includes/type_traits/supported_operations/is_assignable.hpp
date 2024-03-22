@@ -1,4 +1,5 @@
 /*****************************************************************************/
+/*                                                                           */
 /*                       :::    ::: ::::    :::  ::::::::                    */
 /*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
 /*                      +:+  +:+  :+:+:+  +:+ +:+                            */
@@ -6,17 +7,18 @@
 /*                    +#+  +#+  +#+  +#+#+#        +#+                       */
 /*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
 /*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
 /*****************************************************************************/
 
 #pragma once
 
-#ifndef XNS_IS_ASSIGNABLE_HPP
-#define XNS_IS_ASSIGNABLE_HPP
+#ifndef XNS_IS_ASSIGNABLE_HEADER
+#define XNS_IS_ASSIGNABLE_HEADER
 
-#include "config.hpp"
+#include "other/config.hpp"
 
 #if not XNS_HAS_BUILTIN(__is_assignable)
-#	include <type_traits>
+#	error "compiler does not support __is_assignable"
 #endif
 
 
@@ -25,22 +27,12 @@
 namespace xns {
 
 
-#if not XNS_HAS_BUILTIN(__is_assignable)
-
-	/* is assignable */
-	template <typename T, typename U>
-	concept is_assignable = std::is_assignable_v<T, U>;
-
-#else
-
 	// -- I S  A S S I G N A B L E --------------------------------------------
 
 	/* is assignable */
-	template <typename T, typename U>
-	concept is_assignable = __is_assignable(T, U);
-
-#endif
+	template <typename __type, typename __other>
+	concept is_assignable = __is_assignable(__type, __other);
 
 } // namespace xns
 
-#endif // XNS_IS_ASSIGNABLE_HPP
+#endif // XNS_IS_ASSIGNABLE_HEADER

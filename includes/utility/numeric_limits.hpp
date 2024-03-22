@@ -15,14 +15,14 @@
 #ifndef XNS_NUMERIC_LIMITS_HEADER
 #define XNS_NUMERIC_LIMITS_HEADER
 
-#include "base.hpp"
+#include "other/base.hpp"
 
-#include "types.hpp"
+#include "type_traits/types.hpp"
 
-#include "is_integral.hpp"
-#include "is_scalar.hpp"
-#include "is_signed.hpp"
-#include "is_unsigned.hpp"
+#include "type_traits/type_categories/is_integral.hpp"
+#include "type_traits/type_categories/is_scalar.hpp"
+#include "type_traits/type_properties/is_signed.hpp"
+#include "type_traits/type_properties/is_unsigned.hpp"
 
 //#include "remove.hpp"
 
@@ -58,7 +58,7 @@ namespace xns {
 				if constexpr (xns::is_same<T, bool>)
 					return true;
 
-				else if constexpr (xns::is_floating<T>) {
+				else if constexpr (xns::is_floating_point<T>) {
 
 					if constexpr (sizeof(T) == 4)
 						// return IEEE 754 single precision max
@@ -91,7 +91,7 @@ namespace xns {
 				if constexpr (xns::is_same<T, bool>)
 					return false;
 
-				else if constexpr (xns::is_floating<T>) {
+				else if constexpr (xns::is_floating_point<T>) {
 
 					if constexpr (sizeof(T) == 4)
 						// return IEEE 754 single precision min

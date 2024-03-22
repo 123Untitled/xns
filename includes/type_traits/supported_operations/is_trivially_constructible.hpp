@@ -10,13 +10,13 @@
 
 #pragma once
 
-#ifndef XNS_IS_TRIVIALLY_CONSTRUCTIBLE_HPP
-#define XNS_IS_TRIVIALLY_CONSTRUCTIBLE_HPP
+#ifndef XNS_IS_TRIVIALLY_CONSTRUCTIBLE_HEADER
+#define XNS_IS_TRIVIALLY_CONSTRUCTIBLE_HEADER
 
-#include "config.hpp"
+#include "other/config.hpp"
 
 #if not XNS_HAS_BUILTIN(__is_trivially_constructible)
-#	include <type_traits>
+#	error "compiler does not support __is_trivially_constructible"
 #endif
 
 
@@ -25,22 +25,12 @@
 namespace xns {
 
 
-#if not XNS_HAS_BUILTIN(__is_trivially_constructible)
-
-	/* is trivially constructible */
-	template <typename T, typename... A>
-	concept is_trivially_constructible = std::is_trivially_constructible_v<T, A...>;
-
-#else
-
 	// -- I S  T R I V I A L L Y  C O N S T R U C T I B L E -------------------
 
 	/* is trivially constructible */
 	template <typename T, typename... A>
 	concept is_trivially_constructible = __is_trivially_constructible(T, A...);
 
-#endif
-
 } // namespace xns
 
-#endif // XNS_IS_TRIVIALLY_CONSTRUCTIBLE_HPP
+#endif // XNS_IS_TRIVIALLY_CONSTRUCTIBLE_HEADER

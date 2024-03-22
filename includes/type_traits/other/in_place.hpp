@@ -12,8 +12,8 @@
 
 #pragma once
 
-#ifndef XNS_IN_PLACE_HPP
-#define XNS_IN_PLACE_HPP
+#ifndef XNS_IN_PLACE_HEADER
+#define XNS_IN_PLACE_HEADER
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -44,4 +44,4 @@ namespace xns {
 
 } // namespace xns
 
-#endif // XNS_IN_PLACE_HPP
+#endif // XNS_IN_PLACE_HEADER

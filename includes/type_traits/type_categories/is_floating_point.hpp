@@ -12,11 +12,11 @@
 
 #pragma once
 
-#ifndef XNS_IS_FLOATING_HEADER
-#define XNS_IS_FLOATING_HEADER
+#ifndef XNS_IS_FLOATING_POINT_HEADER
+#define XNS_IS_FLOATING_POINT_HEADER
 
-#include "is_one_of.hpp"
-#include "remove.hpp"
+#include "type_traits/other/is_one_of.hpp"
+#include "type_traits/type_modifications/remove.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -26,10 +26,10 @@ namespace xns {
 
 	// -- I S  F L O A T I N G  P O I N T -------------------------------------
 
-	/* is floating concept */
-	template <typename T>
-	concept is_floating = xns::is_one_of<xns::remove_cv<T>, float, double, long double>;
+	/* is floating point */
+	template <typename __type>
+	concept is_floating_point = xns::is_one_of<xns::remove_cv<__type>, float, double, long double>;
 
 } // namespace xns
 
-#endif // XNS_IS_FLOATING_HEADER
+#endif // XNS_IS_FLOATING_POINT_HEADER

@@ -12,15 +12,15 @@
 
 #pragma once
 
-#ifndef XNS_IS_TRIVIALLY_DESTRUCTIBLE_HPP
-#define XNS_IS_TRIVIALLY_DESTRUCTIBLE_HPP
+#ifndef XNS_IS_TRIVIALLY_DESTRUCTIBLE_HEADER
+#define XNS_IS_TRIVIALLY_DESTRUCTIBLE_HEADER
 
 // local headers
-#include "config.hpp"
-#include "is_destructible.hpp"
+#include "other/config.hpp"
+#include "type_traits/supported_operations/is_destructible.hpp"
 
 #if not XNS_HAS_BUILTIN(__is_trivially_destructible) and not XNS_HAS_BUILTIN(__has_trivial_destructor)
-#	include <type_traits>
+#	error "compiler does not support __is_trivially_destructible and __has_trivial_destructor"
 #endif
 
 
@@ -42,12 +42,6 @@ namespace xns {
 	/* is trivially destructible concept */
 	template <class T>
 	concept is_trivially_destructible = xns::is_destructible<T> && __has_trivial_destructor(T);
-
-#else
-
-	/* is trivially destructible concept */
-	template <class T>
-	concept is_trivially_destructible = std::is_trivially_destructible_v<T>;
 
 #endif
 

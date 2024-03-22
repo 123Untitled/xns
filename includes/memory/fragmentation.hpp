@@ -1,13 +1,13 @@
 #ifndef XNS_FRAGMENTATION_HPP
 #define XNS_FRAGMENTATION_HPP
 
-#include "vector.hpp"
-#include "terminal.hpp"
-#include "macros.hpp"
-#include "numeric_limits.hpp"
-#include "escape.hpp"
-#include "color.hpp"
-#include "math.hpp"
+#include "containers/vector.hpp"
+#include "terminal/terminal.hpp"
+#include "utility/macros.hpp"
+#include "utility/numeric_limits.hpp"
+#include "terminal/escape.hpp"
+#include "color/color.hpp"
+#include "math/math.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

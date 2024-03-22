@@ -12,11 +12,11 @@
 
 #pragma once
 
-#ifndef XNS_INDEX_OF_HPP
-#define XNS_INDEX_OF_HPP
+#ifndef XNS_INDEX_OF_HEADER
+#define XNS_INDEX_OF_HEADER
 
-#include "is_same.hpp"
-#include "is_one_of.hpp"
+#include "type_traits/relationships_and_property_queries/is_same.hpp"
+#include "type_traits/other/is_one_of.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -39,4 +39,4 @@ namespace xns {
 
 } // namespace xns
 
-#endif // XNS_INDEX_OF_HPP
+#endif // XNS_INDEX_OF_HEADER

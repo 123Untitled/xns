@@ -13,8 +13,7 @@
 #ifndef XNS_EXCEPTIONS_HEADER
 #define XNS_EXCEPTIONS_HEADER
 
-#include "types.hpp"
-
+#include "type_traits/types.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -93,6 +92,6 @@ namespace xns {
 
 	};
 
-}
+} // namespace xns
 
-#endif
+#endif // XNS_EXCEPTIONS_HEADER

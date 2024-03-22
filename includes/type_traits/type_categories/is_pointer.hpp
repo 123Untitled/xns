@@ -1,8 +1,22 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_IS_POINTER_HEADER
 #define XNS_IS_POINTER_HEADER
 
-#include "integral_constant.hpp"
-#include "remove.hpp"
+#include "type_traits/type_trait_constants/integral_constant.hpp"
+#include "type_traits/type_modifications/remove.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -10,33 +24,29 @@
 namespace xns {
 
 
-	// -- D E T A I L ---------------------------------------------------------
+	// -- I S  P O I N T E R --------------------------------------------------
 
-	namespace impl {
+
+	namespace __impl {
 
 		/* is pointer */
-		template <class T>
-		struct is_pointer        : public xns::no  {};
+		template <typename __type>
+		struct is_pointer          : public xns::false_type {};
 
 		/* specialisation */
-		template <class T>
-		struct is_pointer<T*>    : public xns::yes {};
+		template <typename __type>
+		struct is_pointer<__type*> : public xns::true_type {};
 
 		/* helper */
-		template<class T>
-		struct is_pointer_helper : public is_pointer<xns::remove_cv<T>> {};
+		template<typename __type>
+		struct is_pointer_helper   : public __impl::is_pointer<xns::remove_cv<__type>> {};
 
 	}
 
+	/* is pointer */
+	template<typename __type>
+	concept is_pointer = xns::__impl::is_pointer_helper<__type>::value;
 
-	// -- I S  P O I N T E R --------------------------------------------------
+} // namespace xns
 
-	/* is pointer concept */
-	template<class T>
-	concept is_pointer = impl::is_pointer_helper<T>::value;
-
-
-}
-
-
-#endif
+#endif // XNS_IS_POINTER_HEADER

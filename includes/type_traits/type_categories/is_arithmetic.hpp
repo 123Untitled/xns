@@ -1,8 +1,22 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_IS_ARITHMETIC_HEADER
 #define XNS_IS_ARITHMETIC_HEADER
 
-#include "is_integral.hpp"
-#include "is_floating.hpp"
+#include "type_traits/type_categories/is_integral.hpp"
+#include "type_traits/type_categories/is_floating_point.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -14,10 +28,8 @@ namespace xns {
 
 	/* is arithmetic concept */
 	template <class T>
-	concept is_arithmetic = is_integral<T> || is_floating<T>;
+	concept is_arithmetic = xns::is_integral<T> || xns::is_floating_point<T>;
 
+} // namespace xns
 
-}
-
-
-#endif
+#endif // XNS_IS_ARITHMETIC_HEADER

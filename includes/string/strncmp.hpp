@@ -1,10 +1,24 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_STRNCMP_HEADER
 #define XNS_STRNCMP_HEADER
 
 // local headers
-#include "types.hpp"
-#include "is_char.hpp"
-#include "type_compare.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/type_categories/is_char.hpp"
+#include "type_traits/type_transformations/bigger_type.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -21,7 +35,7 @@ namespace xns {
 		static_assert(xns::is_char<A> && xns::is_char<B>,
 			"): STRNCMP: requires character types :(");
 		// get bigger type
-		using bigger = xns::bigger<A, B>;
+		using bigger = xns::bigger_type<A, B>;
 		// loop over characters
 		while (--size
 			&& (*a != static_cast<A>(0))

@@ -1,8 +1,22 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_MOVE_HEADER
 #define XNS_MOVE_HEADER
 
-#include "to_reference.hpp"
-#include "is_const.hpp"
+#include "type_traits/other/to_reference.hpp"
+#include "type_traits/type_properties/is_const.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -21,7 +35,6 @@ namespace xns {
 		return static_cast<xns::to_rvalue<T>>(obj);
 	}
 
-}
+} // namespace xns
 
-
-#endif
+#endif // XNS_MOVE_HEADER

@@ -1,9 +1,23 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_SAFE_ENUM_HEADER
 #define XNS_SAFE_ENUM_HEADER
 
 // local headers
-#include "types.hpp"
-#include "is_same.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/relationships_and_property_queries/is_same.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -123,7 +137,6 @@ namespace xns {
 
 
 
-}
+} // namespace xns
 
-
-#endif
+#endif // XNS_SAFE_ENUM_HEADER

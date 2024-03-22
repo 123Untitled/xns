@@ -2,8 +2,8 @@
 #define XNS_BJORKLUND_HPP
 
 
-#include "vector.hpp"
-#include "fragmentation.hpp"
+#include "containers/vector.hpp"
+#include "memory/fragmentation.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

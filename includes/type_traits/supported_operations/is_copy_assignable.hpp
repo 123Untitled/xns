@@ -1,4 +1,5 @@
 /*****************************************************************************/
+/*                                                                           */
 /*                       :::    ::: ::::    :::  ::::::::                    */
 /*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
 /*                      +:+  +:+  :+:+:+  +:+ +:+                            */
@@ -6,16 +7,17 @@
 /*                    +#+  +#+  +#+  +#+#+#        +#+                       */
 /*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
 /*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
 /*****************************************************************************/
 
 #pragma once
 
-#ifndef XNS_IS_COPY_ASSIGNABLE_HPP
-#define XNS_IS_COPY_ASSIGNABLE_HPP
+#ifndef XNS_IS_COPY_ASSIGNABLE_HEADER
+#define XNS_IS_COPY_ASSIGNABLE_HEADER
 
-#include "is_assignable.hpp"
-#include "add_lvalue_reference.hpp"
-#include "add_const.hpp"
+#include "type_traits/supported_operations/is_assignable.hpp"
+#include "type_traits/type_modifications/add_lvalue_reference.hpp"
+#include "type_traits/type_modifications/add_const.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -37,4 +39,4 @@ namespace xns {
 
 } // namespace xns
 
-#endif // XNS_IS_COPY_ASSIGNABLE_HPP
+#endif // XNS_IS_COPY_ASSIGNABLE_HEADER

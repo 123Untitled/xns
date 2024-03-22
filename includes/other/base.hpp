@@ -15,8 +15,8 @@
 #ifndef XNS_BASE_HEADER
 #define XNS_BASE_HEADER
 
-#include "types.hpp"
-#include "is_one_of.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/other/is_one_of.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

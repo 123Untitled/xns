@@ -1,14 +1,26 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_OUTPUT_HEADER
 #define XNS_OUTPUT_HEADER
 
-// -- imports -----------------------------------------------------------------
-
 // xns headers
-#include "macros.hpp"
-#include "types.hpp"
-#include "string.hpp"
-#include "string_literal.hpp"
-#include "is_floating.hpp"
+#include "utility/macros.hpp"
+#include "type_traits/types.hpp"
+#include "string/string.hpp"
+#include "type_traits/other/string_literal.hpp"
+#include "type_traits/type_categories/is_floating_point.hpp"
 
 // operating system headers
 #include <unistd.h>
@@ -73,7 +85,7 @@ namespace xns {
 			}
 
 			/* write float / double */
-			template <xns::is_floating T>
+			template <xns::is_floating_point T>
 			static void write(const T& number) {
 				std::stringstream ss;
 

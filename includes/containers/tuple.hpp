@@ -23,16 +23,16 @@
 
 // local headers
 //#include "types.hpp"
-#include "move.hpp"
-#include "forward.hpp"
-#include "is_same.hpp"
-#include "identity.hpp"
-#include "is_all_unique.hpp"
-#include "indexed_element.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_operations/forward.hpp"
+#include "type_traits/relationships_and_property_queries/is_same.hpp"
+#include "type_traits/other/identity.hpp"
+#include "type_traits/other/is_all_unique.hpp"
+#include "other/indexed_element.hpp"
 #include "type_at.hpp"
-#include "index_of.hpp"
-#include "integer_sequence.hpp"
-#include "in_place.hpp"
+#include "type_traits/other/index_of.hpp"
+#include "type_traits/sequences/integer_sequence.hpp"
+#include "type_traits/other/in_place.hpp"
 
 // c++ standard library headers
 #include <iostream>

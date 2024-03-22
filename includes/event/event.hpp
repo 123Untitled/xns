@@ -1,20 +1,34 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_EVENT_HEADER
 #define XNS_EVENT_HEADER
 
-#include "macros.hpp"
-#include "move.hpp"
-#include "forward.hpp"
-#include "types.hpp"
-#include "vector.hpp"
-#include "pair.hpp"
-#include "array.hpp"
-#include "function.hpp"
-#include "string.hpp"
-#include "evntype.hpp"
-#include "unique_ptr.hpp"
-#include "stack.hpp"
-#include "debug.hpp"
-#include "callable.hpp"
+#include "utility/macros.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_operations/forward.hpp"
+#include "type_traits/types.hpp"
+#include "containers/vector.hpp"
+#include "containers/pair.hpp"
+#include "containers/array.hpp"
+#include "invoke/function.hpp"
+#include "string/string.hpp"
+#include "event/evntype.hpp"
+#include "memory/unique_ptr.hpp"
+#include "containers/stack.hpp"
+#include "other/debug.hpp"
+#include "invoke/callable.hpp"
 
 
 

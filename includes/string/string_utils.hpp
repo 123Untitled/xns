@@ -1,9 +1,23 @@
-#ifndef XNS_STRING_UTILS_HPP
-#define XNS_STRING_UTILS_HPP
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
 
-#include "is_char.hpp"
-#include "types.hpp"
-#include "array.hpp"
+#pragma once
+
+#ifndef XNS_STRING_UTILS_HEADER
+#define XNS_STRING_UTILS_HEADER
+
+#include "type_traits/type_categories/is_char.hpp"
+#include "type_traits/types.hpp"
+#include "containers/array.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -125,6 +139,6 @@ namespace xns {
 	}
 
 
-}
+} // namespace xns
 
-#endif
+#endif // XNS_STRING_UTILS_HEADER

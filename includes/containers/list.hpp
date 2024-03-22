@@ -15,10 +15,10 @@
 #ifndef XNS_LIST_HEADER
 #define XNS_LIST_HEADER
 
-#include "move.hpp"
-#include "forward.hpp"
-#include "macros.hpp"
-#include "allocator.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_operations/forward.hpp"
+#include "utility/macros.hpp"
+#include "memory/allocator.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

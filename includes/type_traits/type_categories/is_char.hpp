@@ -1,8 +1,22 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_IS_CHAR_HEADER
 #define XNS_IS_CHAR_HEADER
 
-#include "integral_constant.hpp"
-#include "remove.hpp"
+#include "type_traits/type_trait_constants/integral_constant.hpp"
+#include "type_traits/type_modifications/remove.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -13,36 +27,35 @@ namespace xns {
 	// -- I S  C H A R  -------------------------------------------------------
 
 	/* false type */
-	template <class T>
-	struct _is_char_t           : xns::no  {};
+	template <typename>
+	struct _is_char_t           : xns::false_type {};
 
 	/* true type */
 	template <>
-	struct _is_char_t<char>     : xns::yes {};
+	struct _is_char_t<char>     : xns::true_type {};
 
 	/* true type */
 	template <>
-	struct _is_char_t<char8_t>  : xns::yes {};
+	struct _is_char_t<char8_t>  : xns::true_type {};
 
 	/* true type */
 	template <>
-	struct _is_char_t<char16_t> : xns::yes {};
+	struct _is_char_t<char16_t> : xns::true_type {};
 
 	/* true type */
 	template <>
-	struct _is_char_t<char32_t> : xns::yes {};
+	struct _is_char_t<char32_t> : xns::true_type {};
 
 	/* true type */
 	template <>
-	struct _is_char_t<wchar_t>  : xns::yes {};
+	struct _is_char_t<wchar_t>  : xns::true_type {};
 
 
-	/* is char concept */
-	template <class T>
-	concept is_char = _is_char_t<xns::remove_cv<T>>::value;
+	/* is char */
+	template <typename __type>
+	concept is_char = _is_char_t<xns::remove_cv<__type>>::value;
 
 
-}
+} // namespace xns
 
-
-#endif
+#endif // XNS_IS_CHAR_HEADER

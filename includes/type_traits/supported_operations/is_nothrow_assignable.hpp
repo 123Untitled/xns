@@ -1,4 +1,5 @@
 /*****************************************************************************/
+/*                                                                           */
 /*                       :::    ::: ::::    :::  ::::::::                    */
 /*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
 /*                      +:+  +:+  :+:+:+  +:+ +:+                            */
@@ -6,17 +7,18 @@
 /*                    +#+  +#+  +#+  +#+#+#        +#+                       */
 /*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
 /*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
 /*****************************************************************************/
 
 #pragma once
 
-#ifndef IS_NOTHROW_ASSIGNABLE_HPP
-#define IS_NOTHROW_ASSIGNABLE_HPP
+#ifndef IS_NOTHROW_ASSIGNABLE_HEADER
+#define IS_NOTHROW_ASSIGNABLE_HEADER
 
-#include "config.hpp"
+#include "other/config.hpp"
 
 #if not XNS_HAS_BUILTIN(__is_nothrow_assignable)
-#	include <type_traits>
+#	error "compiler does not support __is_nothrow_assignable"
 #endif
 
 
@@ -25,22 +27,12 @@
 namespace xns {
 
 
-#if not XNS_HAS_BUILTIN(__is_nothrow_assignable)
-
-	/* is nothrow assignable */
-	template <typename T, typename A>
-	concept is_nothrow_assignable = std::is_nothrow_assignable_v<T, A>;
-
-#else
-
 	// -- I S  N O T H R O W  A S S I G N A B L E -----------------------------
 
 	/* is nothrow assignable */
-	template <typename T, typename A>
-	concept is_nothrow_assignable = __is_nothrow_assignable(T, A);
-
-#endif
+	template <typename __type, typename __other>
+	concept is_nothrow_assignable = __is_nothrow_assignable(__type, __other);
 
 } // namespace xns
 
-#endif // IS_NOTHROW_ASSIGNABLE_HPP
+#endif // IS_NOTHROW_ASSIGNABLE_HEADER

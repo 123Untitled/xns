@@ -745,7 +745,8 @@ function setup_files {
 	# get source files
 	SRCS=($SRCDIR/**/*.'cpp'(.N))
 	# get all directories hierarchy in incdir
-	INCLUDES=($INCDIR/**/*(/N) $INCDIR)
+	#INCLUDES=($INCDIR/**/*(/N) $INCDIR)
+	INCLUDES=($INCDIR)
 
 	if [[ $MODE == 'test' ]]; then
 		# get all directories hierarchy in incdir

@@ -12,21 +12,21 @@
 
 #pragma once
 
-#ifndef XNS_ALLOCATOR_HPP
-#define XNS_ALLOCATOR_HPP
+#ifndef XNS_ALLOCATOR_HEADER
+#define XNS_ALLOCATOR_HEADER
 
 // local headers
-#include "types.hpp"
-#include "macros.hpp"
-#include "forward.hpp"
-#include "exceptions.hpp"
-#include "move.hpp"
-#include "numeric_limits.hpp"
+#include "type_traits/types.hpp"
+#include "utility/macros.hpp"
+#include "type_traits/type_operations/forward.hpp"
+#include "diagnostics/exceptions.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "utility/numeric_limits.hpp"
 
 #include "type_traits/supported_operations/supported_operations.hpp"
 #include "type_traits/type_properties/type_properties.hpp"
 
-#include "addressof.hpp"
+#include "other/addressof.hpp"
 
 // standard headers
 #include <cstdlib>

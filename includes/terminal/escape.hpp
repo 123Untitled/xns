@@ -1,15 +1,29 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_ESCAPE_HEADER
 #define XNS_ESCAPE_HEADER
 
 
 // local headers
-#include "types.hpp"
-#include "color.hpp"
-#include "output.hpp"
-#include "macros.hpp"
-#include "array.hpp"
-#include "string.hpp"
-#include "numeric_limits.hpp"
+#include "type_traits/types.hpp"
+#include "color/color.hpp"
+#include "terminal/output.hpp"
+#include "utility/macros.hpp"
+#include "containers/array.hpp"
+#include "string/string.hpp"
+#include "utility/numeric_limits.hpp"
 
 // operating system headers
 #include <unistd.h>

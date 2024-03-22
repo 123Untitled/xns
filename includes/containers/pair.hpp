@@ -1,19 +1,34 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_PAIR_HEADER
 #define XNS_PAIR_HEADER
 
 // local headers
-#include "is_nothrow_constructible.hpp"
-#include "is_nothrow_default_constructible.hpp"
-#include "is_nothrow_copy_constructible.hpp"
-#include "is_nothrow_move_constructible.hpp"
-#include "is_nothrow_copy_assignable.hpp"
-#include "is_nothrow_move_assignable.hpp"
-#include "is_nothrow_destructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_constructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_default_constructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_copy_constructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_move_constructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_copy_assignable.hpp"
+#include "type_traits/supported_operations/is_nothrow_move_assignable.hpp"
+#include "type_traits/supported_operations/is_nothrow_destructible.hpp"
 
-#include "types.hpp"
-#include "move.hpp"
-#include "forward.hpp"
-#include "indexed_element.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_operations/forward.hpp"
+
+#include "other/indexed_element.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

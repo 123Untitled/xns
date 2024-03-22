@@ -1,4 +1,5 @@
 /*****************************************************************************/
+/*                                                                           */
 /*                       :::    ::: ::::    :::  ::::::::                    */
 /*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
 /*                      +:+  +:+  :+:+:+  +:+ +:+                            */
@@ -6,16 +7,17 @@
 /*                    +#+  +#+  +#+  +#+#+#        +#+                       */
 /*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
 /*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
 /*****************************************************************************/
 
 #pragma once
 
-#ifndef XNS_IS_NOTHROW_COPY_CONSTRUCTIBLE_HPP
-#define XNS_IS_NOTHROW_COPY_CONSTRUCTIBLE_HPP
+#ifndef XNS_IS_NOTHROW_COPY_CONSTRUCTIBLE_HEADER
+#define XNS_IS_NOTHROW_COPY_CONSTRUCTIBLE_HEADER
 
-#include "add_const.hpp"
-#include "add_lvalue_reference.hpp"
-#include "is_nothrow_constructible.hpp"
+#include "type_traits/type_modifications/add_const.hpp"
+#include "type_traits/type_modifications/add_lvalue_reference.hpp"
+#include "type_traits/supported_operations/is_nothrow_constructible.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

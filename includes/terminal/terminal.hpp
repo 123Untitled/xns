@@ -1,3 +1,17 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_TERMINAL_HEADER
 #define XNS_TERMINAL_HEADER
 
@@ -14,13 +28,13 @@
 #include <fcntl.h>
 
 // xns headers
-#include "types.hpp"
-#include "macros.hpp"
-#include "event.hpp"
-#include "is_unsigned.hpp"
-#include "output.hpp"
+#include "type_traits/types.hpp"
+#include "utility/macros.hpp"
+#include "event/event.hpp"
+#include "type_traits/type_properties/is_unsigned.hpp"
+#include "terminal/output.hpp"
 
-#include "declval.hpp"
+#include "type_traits/type_operations/declval.hpp"
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
@@ -159,8 +173,6 @@ namespace xns {
 
 	};
 
-}
+} // namespace xns
 
-
-#endif
-
+#endif // XNS_TERMINAL_HEADER

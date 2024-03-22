@@ -15,9 +15,9 @@
 #ifndef XNS_IS_ALL_UNIQUE_HEADER
 #define XNS_IS_ALL_UNIQUE_HEADER
 
-#include "integral_constant.hpp"
-#include "is_one_of.hpp"
-#include "is_same.hpp"
+#include "type_traits/type_trait_constants/integral_constant.hpp"
+#include "type_traits/other/is_one_of.hpp"
+#include "type_traits/relationships_and_property_queries/is_same.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -44,7 +44,7 @@ namespace xns {
 
 		/* end of recursion */
 		template <typename T>
-		struct is_all_unique<T> : public xns::yes {};
+		struct is_all_unique<T> : public xns::true_type {};
 
 
 		/* is unique */
@@ -100,6 +100,6 @@ namespace xns {
 	};
 
 
-}
+} // namespace xns
 
-#endif
+#endif // XNS_IS_ALL_UNIQUE_HEADER

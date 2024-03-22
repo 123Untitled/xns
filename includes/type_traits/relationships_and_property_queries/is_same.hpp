@@ -12,12 +12,10 @@
 
 #pragma once
 
-#ifndef XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
-#define XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
+#ifndef XNS_IS_SAME_HEADER
+#define XNS_IS_SAME_HEADER
 
-#include "type_traits/type_modifications/add_lvalue_reference.hpp"
-#include "type_traits/type_modifications/add_rvalue_reference.hpp"
-#include "type_traits/supported_operations/is_nothrow_assignable.hpp"
+#include "type_traits/type_modifications/remove.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -25,19 +23,38 @@
 namespace xns {
 
 
-	// -- I S  N O T H R O W  M O V E  A S S I G N A B L E --------------------
+	// -- I S  S A M E ---------------------------------------------------------
 
-	/* is nothrow move assignable */
-	template <typename T>
-	concept is_nothrow_move_assignable
-		= xns::is_nothrow_assignable<xns::add_lvalue_reference<T>,
-									 xns::add_rvalue_reference<T>>;
+	// -- detail --------------------------------------------------------------
 
-	/* are nothrow move assignable */
+	namespace impl {
+
+
+		template <typename T, typename U>
+		constexpr bool is_same_test       = false;
+
+		template <typename T>
+		constexpr bool is_same_test<T, T> = true;
+
+		template <typename T, typename... U>
+		constexpr bool is_same = (xns::impl::is_same_test<T, U> && ...);
+
+	} // namespace impl
+
+
+	/* is same concept */
 	template <typename... T>
-	concept are_nothrow_move_assignable
-		= (xns::is_nothrow_move_assignable<T> && ...);
+	concept is_same = xns::impl::is_same<T...>;
+
+	/* is not same concept */
+	template <typename... T>
+	concept is_not_same = not xns::impl::is_same<T...>;
+
+	/* is same remove cvr concept */
+	template <typename... T>
+	concept is_same_cvr = xns::impl::is_same<xns::remove_cvr<T>...>;
+
 
 } // namespace xns
 
-#endif // XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
+#endif // XNS_IS_SAME_HEADER

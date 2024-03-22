@@ -10,10 +10,10 @@
 
 #pragma once
 
-#ifndef XNS_IS_MEMBER_POINTER_HPP
-#define XNS_IS_MEMBER_POINTER_HPP
+#ifndef XNS_IS_MEMBER_POINTER_HEADER
+#define XNS_IS_MEMBER_POINTER_HEADER
 
-#include "remove.hpp"
+#include "type_traits/type_modifications/remove.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

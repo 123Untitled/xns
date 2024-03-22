@@ -15,9 +15,9 @@
 #ifndef XNS_INDEXED_ELEMENT_HEADER
 #define XNS_INDEXED_ELEMENT_HEADER
 
-#include "types.hpp"
-#include "type_at.hpp"
-#include "conditional.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/other/type_at.hpp"
+#include "type_traits/type_transformations/conditional.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

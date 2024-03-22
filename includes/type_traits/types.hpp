@@ -1,15 +1,28 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_TYPES_HEADER
 #define XNS_TYPES_HEADER
 
-#include "conditional.hpp"
-#include "is_signed.hpp"
-#include "always_false.hpp"
-#include "macros.hpp"
+#include "type_traits/type_operations/declval.hpp"
+#include "type_traits/type_transformations/conditional.hpp"
+#include "type_traits/type_properties/is_signed.hpp"
+#include "type_traits/other/always_false.hpp"
+#include "utility/macros.hpp"
 
 // include for struct winsize
 #include <sys/ioctl.h>
-// include for declval
-#include "declval.hpp"
 
 
 

@@ -1,12 +1,26 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_MATH_HEADER
 #define XNS_MATH_HEADER
 
-#include "is_arithmetic.hpp"
-#include "is_floating.hpp"
-#include "is_signed.hpp"
-#include "numeric_limits.hpp"
-#include "is_scalar.hpp"
-#include "is_comparable.hpp"
+#include "type_traits/type_categories/is_arithmetic.hpp"
+#include "type_traits/type_categories/is_floating_point.hpp"
+#include "type_traits/type_categories/is_scalar.hpp"
+#include "type_traits/type_properties/is_signed.hpp"
+#include "relationships_and_property_queries/is_comparable.hpp"
+#include "utility/numeric_limits.hpp"
 
 
 
@@ -21,7 +35,7 @@ namespace xns {
 	template <typename T>
 	inline auto remap(T value, T oldmin, T oldmax, T newmin, T newmax) -> T {
 		// assert that T is a floating point type
-		static_assert(xns::is_floating<T>, "): T MUST BE FLOATING POINT :(");
+		static_assert(xns::is_floating_point<T>, "): T MUST BE FLOATING POINT :(");
 		return oldmin == oldmax ? newmin : (((value - oldmin) / (oldmax - oldmin)) * (newmax - newmin)) + newmin;
 	}
 
@@ -46,7 +60,7 @@ namespace xns {
 		static_assert(xns::is_scalar<__type>, "abs: type must be scalar");
 
 		// check T is floating point
-		if constexpr (xns::is_floating<__type>)
+		if constexpr (xns::is_floating_point<__type>)
 			// return absolute value
 			return __vl < 0 ? -__vl : __vl;
 
@@ -102,7 +116,7 @@ namespace xns {
 	template <typename T>
 	constexpr auto ceil(const T& value) noexcept -> T {
 		// assert that T is an floating point type
-		static_assert(xns::is_floating<T>, "): CEIL: T must be a floating point type :(");
+		static_assert(xns::is_floating_point<T>, "): CEIL: T must be a floating point type :(");
 		// check sign
 		return value > 0 ? static_cast<T>(static_cast<xns::umax>(value)) + 1
 						 : static_cast<T>(static_cast<xns::smax>(value));
@@ -114,7 +128,7 @@ namespace xns {
 	template <typename T>
 	constexpr auto floor(const T& value) noexcept -> T {
 		// assert that T is an floating point type
-		static_assert(xns::is_floating<T>, "): FLOOR: T must be a floating point type :(");
+		static_assert(xns::is_floating_point<T>, "): FLOOR: T must be a floating point type :(");
 		// check sign
 		return value > 0 ? static_cast<T>(static_cast<xns::umax>(value))
 						 : static_cast<T>(static_cast<xns::smax>(value)) - 1;

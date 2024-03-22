@@ -1,8 +1,22 @@
-#ifndef XNS_FUNCTION_HPP
-#define XNS_FUNCTION_HPP
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
 
-#include "forward.hpp"
-#include "types.hpp"
+#pragma once
+
+#ifndef XNS_FUNCTION_HEADER
+#define XNS_FUNCTION_HEADER
+
+#include "type_traits/type_operations/forward.hpp"
+#include "type_traits/types.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -175,5 +189,4 @@ namespace xns {
 
 } // namespace xns
 
-#endif // XNS_FUNCTION_HPP
-
+#endif // XNS_FUNCTION_HEADER

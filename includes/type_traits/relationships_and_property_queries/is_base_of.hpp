@@ -12,12 +12,10 @@
 
 #pragma once
 
-#ifndef XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
-#define XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
+#ifndef XNS_IS_BASE_OF_HEADER
+#define XNS_IS_BASE_OF_HEADER
 
-#include "type_traits/type_modifications/add_lvalue_reference.hpp"
-#include "type_traits/type_modifications/add_rvalue_reference.hpp"
-#include "type_traits/supported_operations/is_nothrow_assignable.hpp"
+#include "type_traits/relationships_and_property_queries/is_derived_from.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -25,19 +23,13 @@
 namespace xns {
 
 
-	// -- I S  N O T H R O W  M O V E  A S S I G N A B L E --------------------
+	// -- I S  B A S E  O F ---------------------------------------------------
 
-	/* is nothrow move assignable */
-	template <typename T>
-	concept is_nothrow_move_assignable
-		= xns::is_nothrow_assignable<xns::add_lvalue_reference<T>,
-									 xns::add_rvalue_reference<T>>;
-
-	/* are nothrow move assignable */
-	template <typename... T>
-	concept are_nothrow_move_assignable
-		= (xns::is_nothrow_move_assignable<T> && ...);
+	/* is base of */
+	template <typename __base, typename __derived>
+	concept is_base_of = __impl::is_derived_from<__derived, __base>::value;
 
 } // namespace xns
 
-#endif // XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
+#endif // XNS_IS_DERIVED_FROM_HEADER
+

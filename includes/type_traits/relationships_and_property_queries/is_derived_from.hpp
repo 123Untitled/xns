@@ -12,9 +12,10 @@
 
 #pragma once
 
-#ifndef XNS_TO_REFERENCE_HEADER
-#define XNS_TO_REFERENCE_HEADER
+#ifndef XNS_IS_DERIVED_FROM_HEADER
+#define XNS_IS_DERIVED_FROM_HEADER
 
+#include "type_traits/type_trait_constants/integral_constant.hpp"
 #include "type_traits/type_modifications/remove.hpp"
 
 
@@ -23,19 +24,41 @@
 namespace xns {
 
 
-	// -- T O  L V A L U E  R E F E R E N C E ---------------------------------
+	// -- I S  D E R I V E D  F R O M -----------------------------------------
 
-	/* forward lvalue helper */
-	template <typename T>
-	using to_lvalue = xns::remove_reference<T>&;
+	namespace __impl {
+
+		template <typename __derived, typename __base>
+		struct is_derived_from {
 
 
-	// -- T O  R V A L U E  R E F E R E N C E ---------------------------------
+			private:
 
-	/* forward rvalue helper */
-	template <typename T>
-	using to_rvalue = xns::remove_reference<T>&&;
+				// -- private static methods ----------------------------------
+
+				/* test for derived */
+				static consteval auto __test(__base*) -> xns::true_type;
+
+				/* test for not derived */
+				static consteval auto __test(...)     -> xns::false_type;
+
+
+			public:
+
+				// -- public static constants ---------------------------------
+
+				/* value */
+				static constexpr bool value = decltype(__test(static_cast<__derived*>(nullptr)))::value;
+
+		}; // struct is_derived_from
+
+	} // namespace __impl
+
+
+	/* is derived from */
+	template <typename __derived, typename __base>
+	concept is_derived_from = __impl::is_derived_from<__derived, __base>::value;
 
 } // namespace xns
 
-#endif // XNS_TO_REFERENCE_HEADER
+#endif // XNS_IS_BASE_OF_HEADER

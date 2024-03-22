@@ -1,4 +1,4 @@
-#include "bjorklund.hpp"
+#include "algorithm/bjorklund.hpp"
 
 /* member constructor */
 xns::bjorklund::bjorklund(const size_type step,

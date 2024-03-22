@@ -27,9 +27,9 @@
 #include "is_nothrow_default_constructible.hpp"
 
 /* copy constructible */
-#include "is_copy_constructible.hpp"
-#include "is_trivially_copy_constructible.hpp"
-#include "is_nothrow_copy_constructible.hpp"
+#include "type_traits/supported_operations/is_copy_constructible.hpp"
+#include "type_traits/supported_operations/is_trivially_copy_constructible.hpp"
+#include "type_traits/supported_operations/is_nothrow_copy_constructible.hpp"
 
 /* move constructible */
 #include "is_move_constructible.hpp"

@@ -12,16 +12,16 @@
 
 #pragma once
 
-#ifndef XNS_VECTOR_HPP
-#define XNS_VECTOR_HPP
+#ifndef XNS_VECTOR_HEADER
+#define XNS_VECTOR_HEADER
 
 // local headers
-#include "types.hpp"
-#include "allocator.hpp"
-#include "array.hpp"
-#include "is_comparable.hpp"
-#include "is_trivially_destructible.hpp"
-#include "swap.hpp"
+#include "type_traits/types.hpp"
+#include "memory/allocator.hpp"
+#include "containers/array.hpp"
+#include "type_traits/relationships_and_property_queries/is_comparable.hpp"
+#include "type_traits/supported_operations/is_trivially_destructible.hpp"
+#include "other/swap.hpp"
 
 // c++ standard library headers
 #include <iostream>
@@ -1028,4 +1028,4 @@ namespace xns {
 
 } // namespace xns
 
-#endif // XNS_VECTOR_HPP
+#endif // XNS_VECTOR_HEADER

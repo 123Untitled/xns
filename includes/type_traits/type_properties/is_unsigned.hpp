@@ -1,8 +1,22 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_IS_UNSIGNED_HEADER
 #define XNS_IS_UNSIGNED_HEADER
 
-#include "is_integral.hpp"
-#include "is_arithmetic.hpp"
+#include "type_traits/type_categories/is_integral.hpp"
+#include "type_traits/type_categories/is_arithmetic.hpp"
 
 
 // -- N A M E S P A C E -------------------------------------------------------

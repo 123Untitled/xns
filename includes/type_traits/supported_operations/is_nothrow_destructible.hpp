@@ -1,4 +1,5 @@
 /*****************************************************************************/
+/*                                                                           */
 /*                       :::    ::: ::::    :::  ::::::::                    */
 /*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
 /*                      +:+  +:+  :+:+:+  +:+ +:+                            */
@@ -6,17 +7,18 @@
 /*                    +#+  +#+  +#+  +#+#+#        +#+                       */
 /*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
 /*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
 /*****************************************************************************/
 
 #pragma once
 
-#ifndef XNS_IS_NOTHROW_DESTRUCTIBLE_HPP
-#define XNS_IS_NOTHROW_DESTRUCTIBLE_HPP
+#ifndef XNS_IS_NOTHROW_DESTRUCTIBLE_HEADER
+#define XNS_IS_NOTHROW_DESTRUCTIBLE_HEADER
 
-#include "config.hpp"
+#include "other/config.hpp"
 
 #if not XNS_HAS_BUILTIN(__is_nothrow_destructible)
-#	include <type_traits>
+#	error "compiler does not support __is_nothrow_destructible"
 #endif
 
 
@@ -25,21 +27,11 @@
 namespace xns {
 
 
-#if not XNS_HAS_BUILTIN(__is_nothrow_destructible)
-
-	/* is nothrow destructible */
-	template <typename T>
-	concept is_nothrow_destructible = std::is_nothrow_destructible_v<T>;
-
-#else
-
 	// -- I S  N O T H R O W  D E S T R U C T I B L E ----------------------------
 
 	/* is nothrow destructible */
 	template <typename T>
 	concept is_nothrow_destructible = __is_nothrow_destructible(T);
-
-#endif
 
 	/* are nothrow destructible */
 	template <typename... T>
@@ -47,4 +39,4 @@ namespace xns {
 
 } // namespace xns
 
-#endif // XNS_IS_NOTHROW_DESTRUCTIBLE_HPP
+#endif // XNS_IS_NOTHROW_DESTRUCTIBLE_HEADER

@@ -1,9 +1,23 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_STRING_LITERAL_HEADER
 #define XNS_STRING_LITERAL_HEADER
 
-#include "is_char.hpp"
-#include "is_same.hpp"
-#include "is_comparable.hpp"
+#include "type_traits/type_categories/is_char.hpp"
+#include "type_traits/relationships_and_property_queries/is_same.hpp"
+#include "type_traits/relationships_and_property_queries/is_comparable.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -309,6 +323,6 @@ namespace xns {
 
 
 
-}
+} // namespace xns
 
-#endif
+#endif // XNS_STRING_LITERAL_HEADER

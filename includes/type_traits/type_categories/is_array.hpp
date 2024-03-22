@@ -12,8 +12,8 @@
 
 #pragma once
 
-#ifndef XNS_IS_ARRAY_HPP
-#define XNS_IS_ARRAY_HPP
+#ifndef XNS_IS_ARRAY_HEADER
+#define XNS_IS_ARRAY_HEADER
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

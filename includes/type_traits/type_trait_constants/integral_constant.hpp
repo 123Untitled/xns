@@ -15,7 +15,7 @@
 #ifndef XNS_INTEGRAL_CONSTANT_HEADER
 #define XNS_INTEGRAL_CONSTANT_HEADER
 
-#include "macros.hpp"
+#include "utility/macros.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -71,16 +71,10 @@ namespace xns {
 	// -- T R U E  T Y P E -----------------------------------------------------
 
 	/* true type */
-	using yes = xns::bool_constant<true>;
-
-	/* true type */
 	using true_type = xns::bool_constant<true>;
 
 
 	// -- F A L S E  T Y P E ---------------------------------------------------
-
-	/* false type */
-	using no = xns::bool_constant<false>;
 
 	/* false type */
 	using false_type = xns::bool_constant<false>;

@@ -12,12 +12,11 @@
 
 #pragma once
 
-#ifndef XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
-#define XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
+#ifndef XNS_SMALLER_TYPE_HEADER
+#define XNS_SMALLER_TYPE_HEADER
 
-#include "type_traits/type_modifications/add_lvalue_reference.hpp"
-#include "type_traits/type_modifications/add_rvalue_reference.hpp"
-#include "type_traits/supported_operations/is_nothrow_assignable.hpp"
+// local headers
+#include "type_traits/type_transformations/conditional.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -25,19 +24,12 @@
 namespace xns {
 
 
-	// -- I S  N O T H R O W  M O V E  A S S I G N A B L E --------------------
+	// -- S M A L L E R  T Y P E ----------------------------------------------
 
-	/* is nothrow move assignable */
-	template <typename T>
-	concept is_nothrow_move_assignable
-		= xns::is_nothrow_assignable<xns::add_lvalue_reference<T>,
-									 xns::add_rvalue_reference<T>>;
-
-	/* are nothrow move assignable */
-	template <typename... T>
-	concept are_nothrow_move_assignable
-		= (xns::is_nothrow_move_assignable<T> && ...);
+	/* smaller type */
+	template <typename __first, typename __second>
+	using smaller_type = xns::conditional<(sizeof(__first) < sizeof(__second)), __first, __second>;
 
 } // namespace xns
 
-#endif // XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
+#endif // XNS_SMALLER_TYPE_HEADER

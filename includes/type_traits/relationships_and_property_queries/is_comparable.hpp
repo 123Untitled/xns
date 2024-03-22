@@ -12,12 +12,11 @@
 
 #pragma once
 
-#ifndef XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
-#define XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
+#ifndef XNS_IS_COMPARABLE_HEADER
+#define XNS_IS_COMPARABLE_HEADER
 
-#include "type_traits/type_modifications/add_lvalue_reference.hpp"
-#include "type_traits/type_modifications/add_rvalue_reference.hpp"
-#include "type_traits/supported_operations/is_nothrow_assignable.hpp"
+// local headers
+#include "type_traits/relationships_and_property_queries/is_convertible.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -25,19 +24,19 @@
 namespace xns {
 
 
-	// -- I S  N O T H R O W  M O V E  A S S I G N A B L E --------------------
+	// -- I S  C O M P A R A B L E --------------------------------------------
 
-	/* is nothrow move assignable */
-	template <typename T>
-	concept is_nothrow_move_assignable
-		= xns::is_nothrow_assignable<xns::add_lvalue_reference<T>,
-									 xns::add_rvalue_reference<T>>;
-
-	/* are nothrow move assignable */
-	template <typename... T>
-	concept are_nothrow_move_assignable
-		= (xns::is_nothrow_move_assignable<T> && ...);
+	/* is comparable concept */
+	template <typename A, typename B = A>
+	concept is_comparable = requires (A a, B b) {
+		{ a == b } -> xns::is_convertible<bool>;
+		{ a != b } -> xns::is_convertible<bool>;
+		{ a <  b } -> xns::is_convertible<bool>;
+		{ a >  b } -> xns::is_convertible<bool>;
+		{ a <= b } -> xns::is_convertible<bool>;
+		{ a >= b } -> xns::is_convertible<bool>;
+	};
 
 } // namespace xns
 
-#endif // XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
+#endif // IS_COMPARABLE_HEADER

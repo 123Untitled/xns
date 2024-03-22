@@ -1,17 +1,31 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_ARRAY_HEADER
 #define XNS_ARRAY_HEADER
 
 // local headers
-#include "types.hpp"
-#include "move.hpp"
-#include "common_type.hpp"
-#include "is_integral.hpp"
-#include "is_enum.hpp"
-#include "is_void.hpp"
-#include "forward.hpp"
-#include "is_convertible.hpp"
-#include "swap.hpp"
-#include "safe_enum.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_transformations/common_type.hpp"
+#include "type_traits/type_categories/is_integral.hpp"
+#include "type_traits/type_categories/is_enum.hpp"
+#include "type_traits/type_categories/is_void.hpp"
+#include "type_traits/type_operations/forward.hpp"
+#include "type_traits/relationships_and_property_queries/is_convertible.hpp"
+#include "other/swap.hpp"
+#include "other/safe_enum.hpp"
 
 #include <iostream>
 
@@ -21,15 +35,15 @@
 namespace xns {
 
 
-	template <class T>
-	concept is_index = is_integral <xns::remove_cvr<T>>
-					|| is_enum     <xns::remove_cvr<T>>
-					|| is_safe_enum<xns::remove_cvr<T>>
-					|| is_convertible<T, unsigned char,
-										 unsigned short,
-										 unsigned int,
-										 unsigned long,
-										 unsigned long long>;
+	template <typename __type>
+	concept is_index = xns::is_integral <xns::remove_cvr<__type>>
+					|| xns::is_enum     <xns::remove_cvr<__type>>
+					|| xns::is_safe_enum<xns::remove_cvr<__type>>
+					|| xns::is_convertible<__type, unsigned char>
+					|| xns::is_convertible<__type, unsigned short>
+					|| xns::is_convertible<__type, unsigned int>
+					|| xns::is_convertible<__type, unsigned long>
+					|| xns::is_convertible<__type, unsigned long long>;
 
 
 	// -- A R R A Y -----------------------------------------------------------

@@ -12,12 +12,12 @@
 
 #pragma once
 
-#ifndef XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
-#define XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
+#ifndef XNS_IS_CONVERTIBLE_HEADER
+#define XNS_IS_CONVERTIBLE_HEADER
 
-#include "type_traits/type_modifications/add_lvalue_reference.hpp"
-#include "type_traits/type_modifications/add_rvalue_reference.hpp"
-#include "type_traits/supported_operations/is_nothrow_assignable.hpp"
+// local headers
+#include "type_traits/type_operations/declval.hpp"
+#include "type_traits/relationships_and_property_queries/is_same.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -25,19 +25,23 @@
 namespace xns {
 
 
-	// -- I S  N O T H R O W  M O V E  A S S I G N A B L E --------------------
+	// -- I S  C O N V E R T I B L E ------------------------------------------
 
-	/* is nothrow move assignable */
-	template <typename T>
-	concept is_nothrow_move_assignable
-		= xns::is_nothrow_assignable<xns::add_lvalue_reference<T>,
-									 xns::add_rvalue_reference<T>>;
+	namespace __impl {
 
-	/* are nothrow move assignable */
-	template <typename... T>
-	concept are_nothrow_move_assignable
-		= (xns::is_nothrow_move_assignable<T> && ...);
+
+		/* is convertible */
+		template <typename __from, typename __to>
+		concept is_convertible = requires {
+			requires xns::is_same<__to, decltype(static_cast<__to>(xns::declval<__from>()))>;
+		};
+
+	} // namespace __impl
+
+	/* is convertible */
+	template <typename __from, typename __to>
+	concept is_convertible = __impl::is_convertible<__from, __to>;
 
 } // namespace xns
 
-#endif // XNS_IS_NOTHROW_MOVE_ASSIGNABLE_HEADER
+#endif // IS_CONVERTIBLE_HEADER

@@ -1,9 +1,23 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_SWAP_HEADER
 #define XNS_SWAP_HEADER
 
 // local headers
-#include "is_convertible.hpp"
-#include "move.hpp"
+#include "type_traits/relationships_and_property_queries/is_convertible.hpp"
+#include "type_traits/type_operations/move.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
