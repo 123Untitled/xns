@@ -46,7 +46,7 @@
 
 
 
-#include "char_traits.hpp"
+#include "other/char_traits.hpp"
 
 
 // strncmp

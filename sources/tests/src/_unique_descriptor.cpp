@@ -1,10 +1,7 @@
 #include "unit_tests.hpp"
 #include "system/unique_descriptor.hpp"
 
-#include "getline.hpp"
-
 /* unit test */
-
 auto unit_tests_unique_descriptor(void) -> int {
 	// code here...
 	return 0;
