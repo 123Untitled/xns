@@ -5,12 +5,6 @@
 # get current directory name
 local DIR_NAME=${$(pwd):t}
 
-# check current directory is 'xns'
-if [[ $DIR_NAME != 'xns' ]]; then
-	echo 'please run this script in 'xns' directory.'
-	exit 1
-fi
-
 # check libxns.a exists
 if [[ ! -f 'libxns.a' ]]; then
 	echo 'libxns.a not found.'
