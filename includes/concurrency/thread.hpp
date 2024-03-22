@@ -1,4 +1,5 @@
 /*****************************************************************************/
+/*                                                                           */
 /*                       :::    ::: ::::    :::  ::::::::                    */
 /*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
 /*                      +:+  +:+  :+:+:+  +:+ +:+                            */
@@ -6,6 +7,7 @@
 /*                    +#+  +#+  +#+  +#+#+#        +#+                       */
 /*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
 /*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
 /*****************************************************************************/
 
 #pragma once
@@ -14,12 +16,12 @@
 #define XNS_THREAD_HEADER
 
 // local headers
-#include "utility/macros.hpp"
+#include "config/macros.hpp"
 #include "containers/tuple.hpp"
 #include "utility/apply.hpp"
 
 #include "type_traits/type_categories/is_function.hpp"
-#include "type_traits/other/integer_sequence.hpp"
+#include "type_traits/sequences/integer_sequence.hpp"
 #include "memory/unique_ptr.hpp"
 #include "invoke/invoke.hpp"
 

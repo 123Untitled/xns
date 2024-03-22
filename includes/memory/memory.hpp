@@ -16,12 +16,12 @@
 #define XNS_MEMORY_HEADER
 
 // local headers
-#include "os.hpp"
-#include "types.hpp"
-#include "exceptions.hpp"
-#include "macros.hpp"
-#include "move.hpp"
-#include "forward.hpp"
+#include "config/os.hpp"
+#include "type_traits/types.hpp"
+#include "diagnostics/exceptions.hpp"
+#include "config/macros.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_operations/forward.hpp"
 
 #include "type_traits/supported_operations/supported_operations.hpp"
 

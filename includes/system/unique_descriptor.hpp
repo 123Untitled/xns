@@ -1,13 +1,25 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
 #pragma once
 
 #ifndef XNS_UNIQUE_DESCRIPTOR_HEADER
 #define XNS_UNIQUE_DESCRIPTOR_HEADER
 
 // local headers
-#include "types.hpp"
-#include "allocator.hpp"
-#include "macros.hpp"
-#include "string.hpp"
+#include "type_traits/types.hpp"
+#include "memory/allocator.hpp"
+#include "config/macros.hpp"
+#include "string/string.hpp"
 
 // operating system headers
 #include <fcntl.h>

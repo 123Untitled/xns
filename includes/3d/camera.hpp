@@ -1,7 +1,7 @@
 #ifndef XNS_CAMERA_HEADER
 #define XNS_CAMERA_HEADER
 
-#include "matrix.hpp"
+#include "math/matrix.hpp"
 #include <cmath>
 
 

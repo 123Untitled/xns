@@ -1,10 +1,24 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_SHARED_PTR_HEADER
 #define XNS_SHARED_PTR_HEADER
 
 // local headers
-#include "allocator.hpp"
-#include "inheritance.hpp"
-#include "swap.hpp"
+#include "memory/allocator.hpp"
+#include "type_traits/relationships_and_property_queries/is_derived_from.hpp"
+#include "utility/swap.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

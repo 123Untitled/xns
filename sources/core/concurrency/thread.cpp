@@ -11,7 +11,7 @@
 /*****************************************************************************/
 
 #include "concurrency/thread.hpp"
-#include "other/swap.hpp"
+#include "utility/swap.hpp"
 
 
 // -- public lifecycle --------------------------------------------------------

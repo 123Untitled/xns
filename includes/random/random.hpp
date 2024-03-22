@@ -1,3 +1,17 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_RANDOM_HEADER
 #define XNS_RANDOM_HEADER
 
@@ -5,16 +19,16 @@
 #include <ctime>
 #include <unistd.h>
 
-#include "types.hpp"
-#include "macros.hpp"
-#include "is_integral.hpp"
-#include "is_signed.hpp"
-#include "is_unsigned.hpp"
-#include "make_signed.hpp"
-#include "make_unsigned.hpp"
-#include "numeric_limits.hpp"
+#include "type_traits/types.hpp"
+#include "config/macros.hpp"
+#include "type_traits/type_categories/is_integral.hpp"
+#include "type_traits/type_properties/is_signed.hpp"
+#include "type_traits/type_properties/is_unsigned.hpp"
+#include "type_traits/type_modifications/make_signed.hpp"
+#include "type_traits/type_modifications/make_unsigned.hpp"
+#include "utility/numeric_limits.hpp"
 
-#include "xorshift.hpp"
+#include "random/xorshift.hpp"
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 

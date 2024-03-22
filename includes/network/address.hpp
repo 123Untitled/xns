@@ -1,12 +1,28 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_ADDRESS_HEADER
 #define XNS_ADDRESS_HEADER
 
 // local headers
-#include "macros.hpp"
-#include "types.hpp"
-#include "is_integral.hpp"
-#include "string.hpp"
-#include "is_one_of.hpp"
+#include "config/macros.hpp"
+
+#include "type_traits/types.hpp"
+#include "type_traits/type_categories/is_integral.hpp"
+#include "type_traits/other/is_one_of.hpp"
+
+#include "string/string.hpp"
 
 // operating system headers
 #include <sys/socket.h>
@@ -216,6 +232,6 @@ namespace xns {
 
 
 
-}
+} // namespace xns
 
 #endif // ADDRESS_HEADER

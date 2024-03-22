@@ -1,12 +1,26 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_ASCII_HEADER
 #define XNS_ASCII_HEADER
 
-#include "types.hpp"
-#include "macros.hpp"
-#include "array.hpp"
-#include "string.hpp"
-#include "safe_enum.hpp"
-#include "literal_map.hpp"
+#include "type_traits/types.hpp"
+#include "config/macros.hpp"
+#include "containers/array.hpp"
+#include "string/string.hpp"
+#include "other/safe_enum.hpp"
+#include "containers/literal_map.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

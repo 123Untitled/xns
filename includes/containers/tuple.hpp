@@ -28,11 +28,12 @@
 #include "type_traits/relationships_and_property_queries/is_same.hpp"
 #include "type_traits/other/identity.hpp"
 #include "type_traits/other/is_all_unique.hpp"
-#include "other/indexed_element.hpp"
-#include "type_at.hpp"
+#include "type_traits/other/type_at.hpp"
 #include "type_traits/other/index_of.hpp"
 #include "type_traits/sequences/integer_sequence.hpp"
 #include "type_traits/other/in_place.hpp"
+
+#include "other/indexed_element.hpp"
 
 // c++ standard library headers
 #include <iostream>

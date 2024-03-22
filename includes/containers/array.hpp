@@ -24,7 +24,7 @@
 #include "type_traits/type_categories/is_void.hpp"
 #include "type_traits/type_operations/forward.hpp"
 #include "type_traits/relationships_and_property_queries/is_convertible.hpp"
-#include "other/swap.hpp"
+#include "utility/swap.hpp"
 #include "other/safe_enum.hpp"
 
 #include <iostream>

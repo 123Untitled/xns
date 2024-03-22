@@ -17,12 +17,13 @@
 
 #include <unistd.h>
 
-#include "macros.hpp"
+#include "config/macros.hpp"
 
-#include "escape.hpp"
-#include "types.hpp"
-#include "ascii.hpp"
-#include "output.hpp"
+#include "terminal/escape.hpp"
+#include "terminal/output.hpp"
+
+#include "type_traits/types.hpp"
+#include "other/ascii.hpp"
 
 /* standard includes */
 #include <string>

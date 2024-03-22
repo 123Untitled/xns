@@ -1,9 +1,23 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_FILE_HEADER
 #define XNS_FILE_HEADER
 
 // local headers
-#include "string.hpp"
-#include "unique_descriptor.hpp"
+#include "string/string.hpp"
+#include "system/unique_descriptor.hpp"
 
 // operating system headers
 #include <fcntl.h>

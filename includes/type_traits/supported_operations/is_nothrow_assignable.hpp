@@ -15,7 +15,7 @@
 #ifndef IS_NOTHROW_ASSIGNABLE_HEADER
 #define IS_NOTHROW_ASSIGNABLE_HEADER
 
-#include "other/config.hpp"
+#include "config/config.hpp"
 
 #if not XNS_HAS_BUILTIN(__is_nothrow_assignable)
 #	error "compiler does not support __is_nothrow_assignable"

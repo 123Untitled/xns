@@ -1,4 +1,4 @@
-#include "debug.hpp"
+#include "other/debug.hpp"
 
 //xns::unique_fd xns::debug::initialize(void) noexcept {
 //

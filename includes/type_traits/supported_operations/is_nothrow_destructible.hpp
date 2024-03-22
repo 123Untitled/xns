@@ -15,7 +15,7 @@
 #ifndef XNS_IS_NOTHROW_DESTRUCTIBLE_HEADER
 #define XNS_IS_NOTHROW_DESTRUCTIBLE_HEADER
 
-#include "other/config.hpp"
+#include "config/config.hpp"
 
 #if not XNS_HAS_BUILTIN(__is_nothrow_destructible)
 #	error "compiler does not support __is_nothrow_destructible"

@@ -1,14 +1,26 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
 #pragma once
 
 #ifndef XNS_STACK_HEADER
 #define XNS_STACK_HEADER
 
 // local headers
-#include "types.hpp"
-#include "move.hpp"
-#include "forward.hpp"
-#include "swap.hpp"
-#include "allocator.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_operations/forward.hpp"
+#include "utility/swap.hpp"
+#include "memory/allocator.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

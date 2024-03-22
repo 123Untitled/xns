@@ -16,7 +16,7 @@
 #define XNS_IS_TRIVIALLY_DESTRUCTIBLE_HEADER
 
 // local headers
-#include "other/config.hpp"
+#include "config/config.hpp"
 #include "type_traits/supported_operations/is_destructible.hpp"
 
 #if not XNS_HAS_BUILTIN(__is_trivially_destructible) and not XNS_HAS_BUILTIN(__has_trivial_destructor)

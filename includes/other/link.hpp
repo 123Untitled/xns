@@ -1,10 +1,23 @@
-#ifndef XNS_LINK_HPP
-#define XNS_LINK_HPP
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
+#ifndef XNS_LINK_HEADER
+#define XNS_LINK_HEADER
 
 // local headers
-#include "vector.hpp"
-#include "move.hpp"
-#include "inheritance.hpp"
+#include "containers/vector.hpp"
+#include "type_traits/type_operations/move.hpp"
 
 
 #include <type_traits>
@@ -150,6 +163,6 @@ namespace xns {
 
 	};
 
-}
+} // namespace xns
 
-#endif
+#endif // XNS_LINK_HEADER

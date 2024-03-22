@@ -15,7 +15,7 @@
 #ifndef XNS_IS_TRIVIALLY_ASSIGNABLE_HEADER
 #define XNS_IS_TRIVIALLY_ASSIGNABLE_HEADER
 
-#include "other/config.hpp"
+#include "config/config.hpp"
 
 #if not XNS_HAS_BUILTIN(__is_trivially_assignable)
 #	error "compiler does not support __is_trivially_assignable"

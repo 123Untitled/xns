@@ -1,9 +1,24 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_WEAK_PTR_HEADER
 #define XNS_WEAK_PTR_HEADER
 
-#include "types.hpp"
-#include "allocator.hpp"
-#include "inheritance.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/relationships_and_property_queries/is_derived_from.hpp"
+
+#include "memory/allocator.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

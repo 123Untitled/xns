@@ -12,17 +12,17 @@
 
 #pragma once
 
-#ifndef XNS_MAKE_UNSIGNED_HPP
-#define XNS_MAKE_UNSIGNED_HPP
+#ifndef XNS_MAKE_UNSIGNED_HEADER
+#define XNS_MAKE_UNSIGNED_HEADER
 
-#include "is_bool.hpp"
-#include "is_enum.hpp"
-#include "is_integral.hpp"
-#include "is_const.hpp"
-#include "is_volatile.hpp"
+#include "type_traits/type_categories/is_bool.hpp"
+#include "type_traits/type_categories/is_enum.hpp"
+#include "type_traits/type_categories/is_integral.hpp"
+#include "type_traits/type_properties/is_const.hpp"
+#include "type_traits/type_properties/is_volatile.hpp"
 
-#include "types.hpp"
-#include "conditional.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/type_transformations/conditional.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

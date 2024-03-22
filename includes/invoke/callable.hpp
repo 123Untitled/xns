@@ -2,10 +2,10 @@
 #define XNS_CALLABLE_HEADER
 
 // local headers
-#include "forward.hpp"
-#include "macros.hpp"
-#include "allocator.hpp"
-#include "unique_ptr.hpp"
+#include "type_traits/type_operations/forward.hpp"
+#include "config/macros.hpp"
+#include "memory/allocator.hpp"
+#include "memory/unique_ptr.hpp"
 
 
 // c++ standard library headers

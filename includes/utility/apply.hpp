@@ -1,4 +1,5 @@
 /*****************************************************************************/
+/*                                                                           */
 /*                       :::    ::: ::::    :::  ::::::::                    */
 /*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
 /*                      +:+  +:+  :+:+:+  +:+ +:+                            */
@@ -6,19 +7,20 @@
 /*                    +#+  +#+  +#+  +#+#+#        +#+                       */
 /*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
 /*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
 /*****************************************************************************/
 
 #pragma once
 
-#ifndef XNS_APPLY_HPP
-#define XNS_APPLY_HPP
+#ifndef XNS_APPLY_HEADER
+#define XNS_APPLY_HEADER
 
 // local headers
-#include "is_function.hpp"
-#include "is_member_pointer.hpp"
-#include "tuple.hpp"
-#include "integer_sequence.hpp"
-#include "invoke.hpp"
+#include "type_traits/type_categories/is_function.hpp"
+#include "type_traits/type_categories/is_member_pointer.hpp"
+#include "containers/tuple.hpp"
+#include "type_traits/sequences/integer_sequence.hpp"
+#include "invoke/invoke.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

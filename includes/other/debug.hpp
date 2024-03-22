@@ -2,9 +2,9 @@
 #define XNS_DEBUG_HEADER
 
 // local headers
-#include "types.hpp"
-#include "macros.hpp"
-#include "unique_descriptor.hpp"
+#include "type_traits/types.hpp"
+#include "config/macros.hpp"
+#include "system/unique_descriptor.hpp"
 
 // c++ standard headers
 #include <iostream>

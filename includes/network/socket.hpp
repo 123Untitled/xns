@@ -2,14 +2,16 @@
 #define XNS_UNIQUE_SOCKET_HEADER
 
 // local headers
-#include "macros.hpp"
-#include "vector.hpp"
-#include "unique_descriptor.hpp"
-#include "reference_wrapper.hpp"
-#include "move.hpp"
-#include "link.hpp"
+#include "config/macros.hpp"
 
-#include "is_comparable.hpp"
+#include "containers/vector.hpp"
+#include "containers/reference_wrapper.hpp"
+
+#include "system/unique_descriptor.hpp"
+#include "other/link.hpp"
+
+#include "type_traits/relationships_and_property_queries/is_comparable.hpp"
+#include "type_traits/type_operations/move.hpp"
 
 // operating system headers
 #include <unistd.h>

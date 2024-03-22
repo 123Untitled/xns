@@ -25,16 +25,16 @@
 #include "type_traits/type_properties/is_unsigned.hpp"
 #include "type_traits/type_properties/is_signed.hpp"
 
-#include "other/memcpy.hpp"
-#include "other/memset.hpp"
-#include "other/memmove.hpp"
+#include "memory/memcpy.hpp"
+#include "memory/memset.hpp"
+#include "memory/memmove.hpp"
 
 #include "string/strcmp.hpp"
 #include "string/strncmp.hpp"
 #include "string/string_utils.hpp"
 
 
-#include "other/swap.hpp"
+#include "utility/swap.hpp"
 
 #include "containers/list.hpp"
 #include "containers/tuple.hpp"
@@ -42,7 +42,7 @@
 #include "containers/array.hpp"
 
 #include "memory/allocator.hpp"
-#include "numeric_limits.hpp"
+#include "utility/numeric_limits.hpp"
 
 
 

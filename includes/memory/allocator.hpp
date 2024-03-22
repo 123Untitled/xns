@@ -17,7 +17,7 @@
 
 // local headers
 #include "type_traits/types.hpp"
-#include "utility/macros.hpp"
+#include "config/macros.hpp"
 #include "type_traits/type_operations/forward.hpp"
 #include "diagnostics/exceptions.hpp"
 #include "type_traits/type_operations/move.hpp"
@@ -26,7 +26,7 @@
 #include "type_traits/supported_operations/supported_operations.hpp"
 #include "type_traits/type_properties/type_properties.hpp"
 
-#include "other/addressof.hpp"
+#include "memory/addressof.hpp"
 
 // standard headers
 #include <cstdlib>

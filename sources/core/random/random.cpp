@@ -1,4 +1,4 @@
-#include "random.hpp"
+#include "random/random.hpp"
 
 /* singleton instance */
 xns::random xns::random::_instance = xns::random{};

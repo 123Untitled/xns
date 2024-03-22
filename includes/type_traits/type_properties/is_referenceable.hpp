@@ -15,7 +15,7 @@
 
 #include "type_traits/type_trait_constants/integral_constant.hpp"
 #include "type_traits/relationships_and_property_queries/is_same.hpp"
-#include "utility/macros.hpp"
+#include "config/macros.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

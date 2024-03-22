@@ -20,7 +20,7 @@
 #include "type_traits/types.hpp"
 #include "color/color.hpp"
 #include "terminal/output.hpp"
-#include "utility/macros.hpp"
+#include "config/macros.hpp"
 #include "containers/array.hpp"
 #include "string/string.hpp"
 #include "utility/numeric_limits.hpp"

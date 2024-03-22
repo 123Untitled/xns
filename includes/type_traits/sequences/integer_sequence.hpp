@@ -15,8 +15,8 @@
 #ifndef XNS_INTEGER_SEQUENCE_HEADER
 #define XNS_INTEGER_SEQUENCE_HEADER
 
-#include "is_integral.hpp"
-#include "types.hpp"
+#include "type_traits/type_categories/is_integral.hpp"
+#include "type_traits/types.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

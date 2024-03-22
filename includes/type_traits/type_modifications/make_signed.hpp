@@ -1,15 +1,29 @@
-#ifndef XNS_MAKE_SIGNED_HPP
-#define XNS_MAKE_SIGNED_HPP
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
 
-#include "types.hpp"
+#pragma once
 
-#include "is_bool.hpp"
-#include "is_enum.hpp"
-#include "is_integral.hpp"
-#include "is_const.hpp"
-#include "is_volatile.hpp"
+#ifndef XNS_MAKE_SIGNED_HEADER
+#define XNS_MAKE_SIGNED_HEADER
 
-#include "conditional.hpp"
+#include "type_traits/types.hpp"
+
+#include "type_traits/type_categories/is_bool.hpp"
+#include "type_traits/type_categories/is_enum.hpp"
+#include "type_traits/type_categories/is_integral.hpp"
+#include "type_traits/type_properties/is_const.hpp"
+#include "type_traits/type_properties/is_volatile.hpp"
+
+#include "type_traits/type_transformations/conditional.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -61,4 +75,4 @@ namespace xns {
 
 } // namespace xns
 
-#endif // XNS_MAKE_SIGNED_HPP
+#endif // XNS_MAKE_SIGNED_HEADER

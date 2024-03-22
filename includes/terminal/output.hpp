@@ -16,7 +16,7 @@
 #define XNS_OUTPUT_HEADER
 
 // xns headers
-#include "utility/macros.hpp"
+#include "config/macros.hpp"
 #include "type_traits/types.hpp"
 #include "string/string.hpp"
 #include "type_traits/other/string_literal.hpp"

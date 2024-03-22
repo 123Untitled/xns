@@ -19,7 +19,7 @@
 #include "type_traits/type_categories/is_floating_point.hpp"
 #include "type_traits/type_categories/is_scalar.hpp"
 #include "type_traits/type_properties/is_signed.hpp"
-#include "relationships_and_property_queries/is_comparable.hpp"
+#include "type_traits/relationships_and_property_queries/is_comparable.hpp"
 #include "utility/numeric_limits.hpp"
 
 

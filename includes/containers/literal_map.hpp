@@ -24,11 +24,11 @@
 #include "type_traits/supported_operations/is_nothrow_move_assignable.hpp"
 
 //#include "is_char.hpp"
-#include "is_all_unique.hpp"
-#include "char_sequence.hpp"
-#include "string_literal.hpp"
-#include "forward.hpp"
-#include "move.hpp"
+#include "type_traits/other/is_all_unique.hpp"
+#include "type_traits/sequences/char_sequence.hpp"
+#include "type_traits/other/string_literal.hpp"
+#include "type_traits/type_operations/forward.hpp"
+#include "type_traits/type_operations/move.hpp"
 
 
 

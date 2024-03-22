@@ -15,11 +15,11 @@
 #ifndef XNS_CHAR_SEQUENCE_HEADER
 #define XNS_CHAR_SEQUENCE_HEADER
 
-#include "is_char.hpp"
-#include "types.hpp"
-#include "is_same.hpp"
-#include "identity.hpp"
-#include "string_literal.hpp"
+#include "type_traits/type_categories/is_char.hpp"
+#include "type_traits/types.hpp"
+#include "type_traits/relationships_and_property_queries/is_same.hpp"
+#include "type_traits/other/identity.hpp"
+#include "type_traits/other/string_literal.hpp"
 
 #include <iostream>
 

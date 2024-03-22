@@ -1,12 +1,26 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_ENVIRONMENT_HEADER
 #define XNS_ENVIRONMENT_HEADER
 
-#include "string.hpp"
-#include "unique_ptr.hpp"
-#include "weak_ptr.hpp"
-#include "pair.hpp"
-#include "vector.hpp"
-#include "output.hpp"
+#include "string/string.hpp"
+#include "memory/unique_ptr.hpp"
+#include "memory/weak_ptr.hpp"
+#include "containers/pair.hpp"
+#include "containers/vector.hpp"
+#include "terminal/output.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

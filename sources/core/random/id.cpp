@@ -1,4 +1,4 @@
-#include "id.hpp"
+#include "random/id.hpp"
 
 xns::string xns::id::generate(void) {
 

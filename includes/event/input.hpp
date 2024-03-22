@@ -1,14 +1,28 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_INPUT_HEADER
 #define XNS_INPUT_HEADER
 
 //#include "terminal.hpp"
 
 // xns headers
-#include "types.hpp"
-#include "array.hpp"
-#include "string.hpp"
-#include "escape.hpp"
-#include "output.hpp"
+#include "type_traits/types.hpp"
+#include "containers/array.hpp"
+#include "string/string.hpp"
+#include "terminal/escape.hpp"
+#include "terminal/output.hpp"
 
 
 // operating system headers

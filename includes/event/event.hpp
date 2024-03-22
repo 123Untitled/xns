@@ -15,7 +15,7 @@
 #ifndef XNS_EVENT_HEADER
 #define XNS_EVENT_HEADER
 
-#include "utility/macros.hpp"
+#include "config/macros.hpp"
 #include "type_traits/type_operations/move.hpp"
 #include "type_traits/type_operations/forward.hpp"
 #include "type_traits/types.hpp"

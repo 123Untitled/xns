@@ -1,18 +1,35 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_WORKINP_HEADER
 #define XNS_WORKINP_HEADER
 
 // local headers
-#include "types.hpp"
-#include "macros.hpp"
-#include "forward.hpp"
-#include "is_one_of.hpp"
-#include "conditional.hpp"
-#include "string.hpp"
-#include "safe_enum.hpp"
-#include "vector.hpp"
+#include "type_traits/types.hpp"
+#include "config/macros.hpp"
+#include "type_traits/type_operations/forward.hpp"
+#include "type_traits/other/is_one_of.hpp"
 
-#include "socket.hpp"
-#include "address.hpp"
+#include "type_traits/type_transformations/conditional.hpp"
+
+#include "string/string.hpp"
+#include "containers/vector.hpp"
+
+#include "other/safe_enum.hpp"
+
+#include "network/socket.hpp"
+#include "network/address.hpp"
 
 
 // operating system headers

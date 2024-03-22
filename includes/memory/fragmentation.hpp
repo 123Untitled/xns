@@ -3,7 +3,7 @@
 
 #include "containers/vector.hpp"
 #include "terminal/terminal.hpp"
-#include "utility/macros.hpp"
+#include "config/macros.hpp"
 #include "utility/numeric_limits.hpp"
 #include "terminal/escape.hpp"
 #include "color/color.hpp"

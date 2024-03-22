@@ -1,19 +1,25 @@
 #ifndef XNS_WINDOW_HEADER
 #define XNS_WINDOW_HEADER
 
-#include "color.hpp"
-#include "types.hpp"
-#include "escape.hpp"
-#include "terminal.hpp"
-#include "vector.hpp"
-#include "border.hpp"
-#include "rect.hpp"
-#include "event.hpp"
-#include "unique_ptr.hpp"
-#include "window_traits.hpp"
-#include "debug.hpp"
-#include "shared_ptr.hpp"
-#include "list.hpp"
+#include "color/color.hpp"
+#include "type_traits/types.hpp"
+
+#include "terminal/escape.hpp"
+#include "terminal/terminal.hpp"
+
+#include "containers/vector.hpp"
+#include "containers/list.hpp"
+
+#include "visual/border.hpp"
+#include "visual/rect.hpp"
+
+#include "event/event.hpp"
+
+#include "memory/unique_ptr.hpp"
+#include "memory/shared_ptr.hpp"
+
+#include "visual/window_traits.hpp"
+#include "other/debug.hpp"
 
 #include <iostream>
 

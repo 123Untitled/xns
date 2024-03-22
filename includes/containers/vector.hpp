@@ -21,7 +21,7 @@
 #include "containers/array.hpp"
 #include "type_traits/relationships_and_property_queries/is_comparable.hpp"
 #include "type_traits/supported_operations/is_trivially_destructible.hpp"
-#include "other/swap.hpp"
+#include "utility/swap.hpp"
 
 // c++ standard library headers
 #include <iostream>

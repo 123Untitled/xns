@@ -1,13 +1,13 @@
 #ifndef XNS_BORDER_HEADER
 #define XNS_BORDER_HEADER
 
-#include "array.hpp"
-#include "types.hpp"
-#include "macros.hpp"
-#include "rect.hpp"
-#include "escape.hpp"
-#include "allocator.hpp"
-#include "color.hpp"
+#include "containers/array.hpp"
+#include "type_traits/types.hpp"
+#include "config/macros.hpp"
+#include "visual/rect.hpp"
+#include "terminal/escape.hpp"
+#include "memory/allocator.hpp"
+#include "color/color.hpp"
 
 #include <iostream>
 

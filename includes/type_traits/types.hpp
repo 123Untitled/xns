@@ -19,7 +19,7 @@
 #include "type_traits/type_transformations/conditional.hpp"
 #include "type_traits/type_properties/is_signed.hpp"
 #include "type_traits/other/always_false.hpp"
-#include "utility/macros.hpp"
+#include "config/macros.hpp"
 
 // include for struct winsize
 #include <sys/ioctl.h>

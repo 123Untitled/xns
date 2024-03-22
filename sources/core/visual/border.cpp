@@ -1,5 +1,4 @@
-// path: src/visual/border.hpp
-#include "border.hpp"
+#include "visual/border.hpp"
 
 
 constinit xns::border::symbol xns::border::_symb = {

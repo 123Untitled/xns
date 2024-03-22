@@ -1,10 +1,10 @@
 #ifndef XNS_MATRIX_HEADER
 #define XNS_MATRIX_HEADER
 
-#include "types.hpp"
-#include "array.hpp"
-#include "is_same.hpp"
-#include "is_scalar.hpp"
+#include "type_traits/types.hpp"
+#include "containers/array.hpp"
+#include "type_traits/relationships_and_property_queries/is_same.hpp"
+#include "type_traits/type_categories/is_scalar.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

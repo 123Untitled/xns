@@ -1,9 +1,23 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_ACCESS_HEADER
 #define XNS_ACCESS_HEADER
 
 // xns headers
-#include "environment.hpp"
-#include "string.hpp"
+#include "terminal/environment.hpp"
+#include "string/string.hpp"
 
 // operating system headers
 #include <unistd.h>

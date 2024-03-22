@@ -14,10 +14,11 @@
 #define XNS_INVOKE_HPP
 
 #include <type_traits> // temporary
-#include "forward.hpp"
-#include "is_member_pointer.hpp"
-#include "is_function.hpp"
-#include "inheritance.hpp"
+
+#include "type_traits/type_operations/forward.hpp"
+#include "type_traits/type_categories/is_member_pointer.hpp"
+#include "type_traits/type_categories/is_function.hpp"
+#include "type_traits/relationships_and_property_queries/is_base_of.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

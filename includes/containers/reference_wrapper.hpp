@@ -14,12 +14,12 @@
 #define XNS_REFERENCE_WRAPPER_HEADER
 
 // local headers
-#include "move.hpp"
-#include "is_same.hpp"
-#include "remove.hpp"
-#include "forward.hpp"
-#include "addressof.hpp"
-#include "invoke.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_operations/forward.hpp"
+#include "type_traits/relationships_and_property_queries/is_same.hpp"
+#include "type_traits/type_modifications/remove.hpp"
+#include "memory/addressof.hpp"
+#include "invoke/invoke.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

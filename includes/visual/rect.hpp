@@ -3,9 +3,9 @@
 
 #include <iostream>
 
-#include "types.hpp"
-#include "array.hpp"
-#include "is_arithmetic.hpp"
+#include "type_traits/types.hpp"
+#include "containers/array.hpp"
+#include "type_traits/type_categories/is_arithmetic.hpp"
 
 
 #define PRECT(rect) std::cout << "Rect(" << rect.x() << ", " << rect.y() << ", " << rect.w() << ", " << rect.h() << ")" << std::endl;

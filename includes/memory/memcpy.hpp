@@ -16,7 +16,7 @@
 #define XNS_MEMCPY_HEADER
 
 // local headers
-#include "other/os.hpp"
+#include "config/os.hpp"
 #include "type_traits/types.hpp"
 
 
@@ -32,7 +32,7 @@ namespace xns {
 		// check if types have the same size
 		static_assert(sizeof(__dst) == sizeof(__src), "memcpy: types must have the same size");
 		// call built-in memcpy
-		__memcpy(dst, src, size);
+		__builtin_memcpy(dst, src, size);
 	}
 
 } // namespace xns

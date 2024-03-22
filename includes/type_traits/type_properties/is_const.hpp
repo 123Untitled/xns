@@ -13,7 +13,7 @@
 #ifndef XNS_IS_CONST_HEADER
 #define XNS_IS_CONST_HEADER
 
-#include "utility/macros.hpp"
+#include "config/macros.hpp"
 #include "type_traits/type_modifications/remove.hpp"
 
 

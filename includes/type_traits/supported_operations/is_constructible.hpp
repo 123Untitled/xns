@@ -15,7 +15,7 @@
 #ifndef XNS_IS_CONSTRUCTIBLE_HEADER
 #define XNS_IS_CONSTRUCTIBLE_HEADER
 
-#include "other/config.hpp"
+#include "config/config.hpp"
 
 #if not XNS_HAS_BUILTIN(__is_constructible)
 #	error "compiler does not support __is_constructible"

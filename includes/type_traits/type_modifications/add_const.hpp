@@ -15,7 +15,7 @@
 #ifndef XNS_ADD_CONST_HEADER
 #define XNS_ADD_CONST_HEADER
 
-#include "utility/macros.hpp"
+#include "config/macros.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

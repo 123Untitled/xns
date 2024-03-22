@@ -13,7 +13,7 @@
 #ifndef XNS_IS_EMPTY_HEADER
 #define XNS_IS_EMPTY_HEADER
 
-#include "other/config.hpp"
+#include "config/config.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

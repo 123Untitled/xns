@@ -3,8 +3,8 @@
 
 
 //#include "is_char.hpp"
-#include "config.hpp"
-#include "macros.hpp"
+#include "config/config.hpp"
+#include "config/macros.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

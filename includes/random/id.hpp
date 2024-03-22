@@ -1,11 +1,25 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_ID_HEADER
 #define XNS_ID_HEADER
 
-#include "types.hpp"
-#include "macros.hpp"
-#include "string.hpp"
-#include "array.hpp"
-#include "random.hpp"
+#include "type_traits/types.hpp"
+#include "config/macros.hpp"
+#include "string/string.hpp"
+#include "containers/array.hpp"
+#include "random/random.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
