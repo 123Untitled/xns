@@ -207,7 +207,7 @@ function missing_header {
 				fi
 
 				# remove unit test file
-				git rm -v $FILE_PATH
+				git rm $FILE_PATH
 				# commit unit test file
 				git commit -v -m 'remove unit test for '$TEST
 				# push changes
