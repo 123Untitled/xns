@@ -2,9 +2,9 @@
 #define XNS_POLLER_HEADER
 
 // local headers
-#include "socket.hpp"
-#include "numeric_limits.hpp"
-#include "os.hpp"
+#include "network/socket.hpp"
+#include "utility/numeric_limits.hpp"
+#include "config/os.hpp"
 
 // operating system headers
 #if defined(XNS_LINUX)

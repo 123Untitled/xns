@@ -1,7 +1,7 @@
 #include "unit_tests.hpp"
-#include "poller.hpp"
-#include "socket.hpp"
-#include "network.hpp"
+#include "network/poller.hpp"
+#include "network/socket.hpp"
+#include "network/network.hpp"
 
 
 /* unit test */

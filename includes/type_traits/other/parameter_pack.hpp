@@ -2,10 +2,11 @@
 #define XNS_PARAMETER_PACK_HEADER
 
 #include <type_traits>
-#include "type_at.hpp"
-#include "integer_sequence.hpp"
 
-#include "is_constructible.hpp"
+#include "type_traits/other/type_at.hpp"
+#include "type_traits/sequences/integer_sequence.hpp"
+
+#include "type_traits/supported_operations/is_constructible.hpp"
 
 // not RENAMED !!!
 

@@ -15,7 +15,7 @@
 #ifndef XNS_VECTOR3D_HEADER
 #define XNS_VECTOR3D_HEADER
 
-#include "math.hpp"
+#include "math/math.hpp"
 #include <iostream>
 
 
@@ -32,7 +32,7 @@ namespace xns {
 		// -- assertions ------------------------------------------------------
 
 		/* require floating point type */
-		static_assert(xns::is_floating<T>, "vector3D: T must be a floating point type");
+		static_assert(xns::is_floating_point<T>, "vector3D: T must be a floating point type");
 
 
 		public:

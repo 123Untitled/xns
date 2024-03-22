@@ -12,11 +12,11 @@
 
 #pragma once
 
-#ifndef XNS_STATIC_VECTOR_HPP
-#define XNS_STATIC_VECTOR_HPP
+#ifndef XNS_STATIC_VECTOR_HEADER
+#define XNS_STATIC_VECTOR_HEADER
 
-#include "forward.hpp"
-#include "move.hpp"
+#include "type_traits/type_operations/forward.hpp"
+#include "type_traits/type_operations/move.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -312,4 +312,4 @@ namespace xns {
 
 } // namespace xns
 
-#endif // XNS_STATIC_VECTOR_HPP
+#endif // XNS_STATIC_VECTOR_HEADER

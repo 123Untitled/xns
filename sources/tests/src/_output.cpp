@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "output.hpp"
+#include "terminal/output.hpp"
 
 /* unit test */
 

@@ -2,7 +2,7 @@
 
 //#include "literal_map.hpp"
 
-#include "string_literal.hpp"
+#include "type_traits/other/string_literal.hpp"
 
 
 template <xns::basic_string_literal str>

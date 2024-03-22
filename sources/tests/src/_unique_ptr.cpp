@@ -1,7 +1,7 @@
 #include "unit_tests.hpp"
 
-#include "unique_ptr.hpp"
-#include "vector.hpp"
+#include "memory/unique_ptr.hpp"
+#include "containers/vector.hpp"
 
 template <class T>
 using AutoP = xns::unique_ptr<T>;

@@ -1,9 +1,9 @@
 #ifndef XNS_GETLINE_HEADER
 #define XNS_GETLINE_HEADER
 
-#include "unique_descriptor.hpp"
-#include "string.hpp"
-#include "is_one_of.hpp"
+#include "system/unique_descriptor.hpp"
+#include "string/string.hpp"
+#include "type_traits/other/is_one_of.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

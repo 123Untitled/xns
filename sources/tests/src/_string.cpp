@@ -1,15 +1,23 @@
 #include "unit_tests.hpp"
 
-#include "string.hpp"
-#include "string_literal.hpp"
-#include "output.hpp"
+#include "string/string.hpp"
+#include "type_traits/other/string_literal.hpp"
+#include "terminal/output.hpp"
 
-#include "bit_view.hpp"
-#include "terminal.hpp"
+#include "bit/bit_view.hpp"
+#include "terminal/terminal.hpp"
+
+#include "string/strcmp.hpp"
+#include "string/strncmp.hpp"
+
+#include <string.h>
 #include <limits>
-
 #include <string>
 
+#include "other/benchmark.hpp"
+#include "random/random.hpp"
+
+#include "event/input.hpp"
 
 #define SUCCESS(msg) std::cout << "\x1b[32m" << "success" << "\x1b[0m" << ": " << msg << " > "
 #define ERROR(msg)   std::cout << "\x1b[31m" << "error"   << "\x1b[0m" << ": " << msg << " > "
@@ -246,7 +254,6 @@ auto unit_tests_string(void) -> int {
 }
 
 
-#include <cstring>
 
 void compare(void) {
 
@@ -499,7 +506,6 @@ class sso {
 
 };
 
-#include "input.hpp"
 
 template <typename T>
 void sso_test(const T* msg) {
@@ -542,8 +548,6 @@ void sso_test(const T* msg) {
 
 
 
-#include "benchmark.hpp"
-#include "random.hpp"
 
 
 static auto benchmark(void) {
@@ -574,9 +578,6 @@ static auto benchmark(void) {
 	std::cout << "check_sum: " << check_sum << std::endl;
 }
 
-#include <string.h>
-#include "strcmp.hpp"
-#include "strncmp.hpp"
 
 
 

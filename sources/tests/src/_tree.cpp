@@ -1,21 +1,22 @@
 // local headers
 #include "unit_tests.hpp"
-#include "tree.hpp"
-#include "random.hpp"
-#include "time.hpp"
-#include "numeric_limits.hpp"
-#include "input.hpp"
-#include "escape.hpp"
-#include "memcpy.hpp"
-#include "benchmark.hpp"
-#include "file.hpp"
-#include <algorithm>
+#include "containers/tree.hpp"
+
+#include "random/random.hpp"
+#include "time/time.hpp"
+#include "utility/numeric_limits.hpp"
+#include "event/input.hpp"
+#include "terminal/escape.hpp"
+#include "memory/memcpy.hpp"
+#include "other/benchmark.hpp"
+#include "system/file.hpp"
 
 // boost
 //#include <benchmark/benchmark.h>
 //#include <boost/container/set.hpp>
 
 // standard library
+#include <algorithm>
 #include <set>
 #include <unordered_set>
 #include <iostream>
@@ -328,7 +329,7 @@ auto unit_tests_tree(void) -> int {
 //
 	//BENCHMARK_MAIN();
 
-#include "vector3d.hpp"
+#include "math/vector3d.hpp"
 
 #if defined(XNS_TEST_TREE)
 int main(int argc, char** argv) {

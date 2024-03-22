@@ -1,8 +1,8 @@
 #include "unit_tests.hpp"
-#include "queue.hpp"
-#include "tree.hpp"
-#include "random.hpp"
-#include "time.hpp"
+#include "containers/queue.hpp"
+#include "containers/tree.hpp"
+#include "random/random.hpp"
+#include "time/time.hpp"
 
 /* unit test */
 

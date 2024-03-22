@@ -1,7 +1,7 @@
 #include "unit_tests.hpp"
-#include "window.hpp"
-#include "event.hpp"
-#include "output.hpp"
+#include "visual/window.hpp"
+#include "event/event.hpp"
+#include "terminal/output.hpp"
 
 static void exit(void) { xns::event::stop_loop(); }
 static void render(void) { xns::out::render(); }

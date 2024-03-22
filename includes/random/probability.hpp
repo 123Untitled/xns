@@ -1,9 +1,23 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_PROBABILITY_HEADER
 #define XNS_PROBABILITY_HEADER
 
-#include "types.hpp"
-#include "vector.hpp"
-#include "tuple.hpp"
+#include "type_traits/types.hpp"
+#include "containers/vector.hpp"
+#include "containers/tuple.hpp"
 
 #include <unistd.h>
 

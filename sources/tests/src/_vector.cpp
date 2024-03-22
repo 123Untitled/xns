@@ -1,8 +1,9 @@
-#include "vector.hpp"
+#include "containers/vector.hpp"
 //#include <benchmark/benchmark.h>
-#include "random.hpp"
-#include "time.hpp"
+#include "random/random.hpp"
+#include "time/time.hpp"
 
+#include <vector>
 
 
 static void dichotic_test(void) {
@@ -80,7 +81,6 @@ auto unit_tests_vector(void) -> int {
 }
 
 
-#include <vector>
 
 #if defined(XNS_TEST_VECTOR)
 int main(void) {

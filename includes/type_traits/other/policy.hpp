@@ -1,9 +1,23 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_POLICY_HEADER
 #define XNS_POLICY_HEADER
 
-#include "move.hpp"
-#include "forward.hpp"
-#include "is_same.hpp"
+#include "type_traits/type_operations/move.hpp"
+#include "type_traits/type_operations/forward.hpp"
+#include "type_traits/relationships_and_property_queries/is_same.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
