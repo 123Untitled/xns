@@ -10,6 +10,9 @@ benchmark.json
 
 # release output directory
 xns/
+
+install/
+
 #ignore single header
 xns.hpp
 
