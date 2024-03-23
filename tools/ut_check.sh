@@ -9,7 +9,7 @@ NC='\x1b[0m'
 PROJECT='xns'
 
 INCDIR='includes'
-TSTDIR='sources/tests/src'
+TSTDIR='tests/sources'
 
 
 SSH_REPO='git@github.com:123Untitled/xns.git'
