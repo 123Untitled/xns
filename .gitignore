@@ -1,26 +1,14 @@
-plot.py
-plot.sh
 
-.nvimlog
-
-external/
-
-jomt*/
-benchmark.json
+# -- I G N O R E S ------------------------------------------------------------
 
 # release output directory
 xns/
-
+build/
 install/
-
-#ignore single header
-xns.hpp
+external/
 
 # ignore executable
 exec_*
-
-# ignore build directory
-build/
 
 # ignore .env files
 .env
@@ -37,12 +25,6 @@ build/
 # ignore all .so files recursively
 **/*.so
 
-# ignore .dSYM debug files
-xfunc.dSYM/
-
-# ignore all compile_commands.json files recursively
-**/compile_commands.json
-
 # ignore all .log files recursively
 **/*.log
 
@@ -52,9 +34,18 @@ xfunc.dSYM/
 # ignore all .d files recursively
 **/*.d
 
-# ignore all .cache files recursively
-**/.cache
-
 # ignore all .DS_Store files recursively
 **/.DS_Store
 
+
+# ignore .dSYM debug files
+xfunc.dSYM/
+
+# ignore .cache directory
+.cache
+
+# ignore .nvimlog
+.nvimlog
+
+# ignore compile_commands.json
+compile_commands.json
