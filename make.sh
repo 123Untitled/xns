@@ -52,17 +52,17 @@ check_os
 
 # -- S C R I P T  P A T H  S E T T I N G S ------------------------------------
 
-# get absolute directory of script
-ABSDIR=$(cd ${0%/*}; pwd)
+# get current absolute directory path
+ABSDIR=$(pwd -P)
 
-# get dirname of script
-rootname=${ABSDIR##*/}
+# get script absolute directory path
+SCRIPTDIR=${${0%/*}:a}
 
-# get absolute path of script
-MAKE=$ABSDIR/${0##*/}
+# get script absolute path
+MAKE=${0:a}
 
-# basename of the script without using basename command
-scriptname=${0##*/}
+# script name
+SCRIPTNAME=${0##*/}
 
 
 
@@ -209,7 +209,7 @@ CXXFLAGS+=('-Wno-unused' '-Wno-unused-variable' '-Wno-unused-parameter' '-Wno-un
 CXXFLAGS+=('-Winline')
 
 # type conversion
-#CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
+CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
 
 # shadowing
 CXXFLAGS+=('-Wshadow')
@@ -277,7 +277,7 @@ local BANNER=\
 }
 
 function target_info() {
-	echo $COLOR$scriptname$RESET \
+	echo $COLOR$SCRIPTNAME$RESET \
 		'launching' '['$COLOR${1##*/}$RESET']' 'build'
 }
 
@@ -320,20 +320,22 @@ function required {
 
 function repository {
 
+	# local variables
 	local SSH_REPO='git@github.com:123Untitled/xns.git'
 	local PUB_REPO='https://github.com/123Untitled/xns.git'
 
-	# check if the script is run in a git repository
-	if [ ! -d .git ]; then
-		echo 'please run this script in the' $CO$PROJECT$NC 'repository.\n'
+	# check current directory is same as script directory
+	# and have .git directory
+	if [[ $ABSDIR != $SCRIPTDIR || ! -d '.git' ]]; then
+		echo 'please run this script in the' $COLOR$PROJECT$RESET 'repository.\n'
 		exit 1
 	fi
 
-	# get the git repository name
-	GIT_REPO=$(git config --get remote.origin.url)
+	# get the git remote url
+	local REMOTE=$(git config --get 'remote.origin.url')
 
 	# check if the script is run in the right repository
-	if [[ $GIT_REPO != $SSH_REPO && $GIT_REPO != $PUB_REPO ]]; then
+	if [[ $REMOTE != $SSH_REPO && $REMOTE != $PUB_REPO ]]; then
 		echo 'please run this script in the' $COLOR$PROJECT$RESET 'repository.\n'
 		exit 1
 	fi
@@ -695,7 +697,7 @@ function require_test_file {
 }
 
 function require_prefix {
-	echo 'usage:' $COLOR$scriptname$RESET 'install <prefix>\n'
+	echo 'usage:' $COLOR$SCRIPTNAME$RESET 'install <prefix>\n'
 	exit 1
 }
 
@@ -704,18 +706,29 @@ function setup_install {
 
 	# check for prefix exists
 	if [[ ! -d $PREFIX ]]; then
-		echo 'error:' $COLOR$scriptname$RESET 'invalid prefix directory.\n'
+		echo 'error:' $COLOR$SCRIPTNAME$RESET 'invalid prefix directory.\n'
+		exit 1
+	fi
+
+	# get parent directory
+	local ABSPARENT=${ABSDIR%/*}
+	# get absolute path of prefix
+	local ABSPREFIX=${PREFIX:a}
+
+	# check if prefix is parent directory (because current directory may be project name)
+	if [[ $ABSPARENT == $ABSPREFIX && ${ABSDIR##*/} == $PROJECT ]]; then
+		echo 'error:' $COLOR$SCRIPTNAME$RESET 'install directory conflict with' $PROJECT 'repository.\n'
 		exit 1
 	fi
 
 	# check if prefix requires sudo
 	if [[ ! -w $PREFIX ]]; then
-		echo 'error:' $COLOR$scriptname$RESET 'requires sudo to install.\n'
+		echo 'error:' $COLOR$SCRIPTNAME$RESET 'requires permission to install in' $PREFIX '\n'
 		exit 1
 	fi
 
-	# append prefix to project
-	PREFIX+='/'$PROJECT
+	# append project name to prefix
+	PREFIX=$ABSPREFIX'/'$PROJECT
 }
 
 
@@ -783,7 +796,7 @@ function handle_argument {
 		'release')
 			echo 'MODE=release' > $SETUP
 			if [[ $ARG_COUNT -ne 1 ]]; then
-				echo 'usage:' $COLOR$scriptname$RESET 'release\n'
+				echo 'usage:' $COLOR$SCRIPTNAME$RESET 'release\n'
 				exit 1
 			fi
 			;;
@@ -803,7 +816,7 @@ function handle_argument {
 			fi
 
 			# print usage message
-			echo 'usage:' $COLOR$scriptname$RESET 'install <prefix>\n'
+			echo 'usage:' $COLOR$SCRIPTNAME$RESET 'install <prefix>\n'
 			exit 1
 			;;
 
@@ -865,7 +878,7 @@ function setup_mode {
 			;;
 
 		*)
-			echo 'error:' $COLOR$scriptname$RESET 'invalid mode.\n'
+			echo 'error:' $COLOR$SCRIPTNAME$RESET 'invalid mode.\n'
 			make_silent_clean
 			exit 1
 			;;
@@ -904,7 +917,7 @@ function make_install {
 	local STATIC_TARGET=$PREFIX'/lib/'${STATIC##*/}
 
 	# check if static library is more recent than prefix
-	if [[ ! -f $STATIC_TARGET ]] || [[ $STATIC -nt $STATIC_TARGET ]]; then
+	if [[ ! -f $STATIC_TARGET || $STATIC -nt $STATIC_TARGET ]]; then
 		# cp and check if succeeded
 		if ! cp $STATIC $PREFIX'/lib'; then
 			echo -n $ERROR'[x]'$RESET
@@ -920,10 +933,12 @@ function make_install {
 	# loop over directories
 	for DIR in $SUBINCL; do
 
+		# construct target directory
 		local DIR_TARGET=$PREFIX'/include/'${DIR#$INCDIR'/'}
 
 		# check if directory exists
 		if [[ ! -d $DIR_TARGET ]]; then
+
 			# create directory and check if succeeded
 			if ! mkdir -p $DIR_TARGET; then
 				echo -n $ERROR'[x]'$RESET
@@ -933,17 +948,40 @@ function make_install {
 			fi
 		fi
 
+		# get all headers
+		local HEADERS=($DIR'/'*'.hpp'(.N))
+
+		# loop over headers
+		for HEADER in $HEADERS; do
+
+			# construct target header
+			local HEADER_TARGET=$DIR_TARGET'/'${HEADER##*'/'}
+
+			# check if header is more recent than target
+			if [[ ! -f $HEADER_TARGET || $HEADER -nt $HEADER_TARGET ]]; then
+				# cp and check if succeeded
+				if ! cp $HEADER $DIR_TARGET; then
+					echo -n $ERROR'[x]'$RESET
+				else
+					echo -n $SUCCESS'[✓]'$RESET
+					((++COUNT))
+				fi
+			fi
+
+		done
+
 	done
 
+
+	# resuming
 	if [[ $COUNT -eq 0 ]]; then
 		echo $COLOR'[✓]'$RESET 'nothing to install.'
 	else
 		echo '\n\n' 🫠 $COUNT 'files installed.'
 	fi
 
-
+	# print for first installation
 	if [[ $FIRST -eq 1 ]]; then
-		# check if installation succeeded
 		description $PREFIX
 	fi
 }
