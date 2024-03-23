@@ -103,7 +103,7 @@ namespace xns {
 
 				if constexpr (xns::no_exceptions == false)
 					if (ptr == MAP_FAILED)
-						throw xns::exception(-2, "mmap failed");
+						throw xns::exception("mmap failed", -2);
 
 				return ptr;
 			}
@@ -200,7 +200,7 @@ namespace xns {
 
 				if constexpr (xns::no_exceptions == false)
 					if (ptr == MAP_FAILED)
-						throw xns::exception(-2, "mmap failed");
+						throw xns::exception("mmap failed", -2);
 
 				return ptr;
 			}
@@ -769,7 +769,7 @@ namespace xns {
 
 				#if XNS_EXCEPTIONS
 				if (ch->data() != addr)
-					throw xns::exception(-2, "invalid address");
+					throw xns::exception("invalid address", -1);
 				#endif
 
 				return ch;

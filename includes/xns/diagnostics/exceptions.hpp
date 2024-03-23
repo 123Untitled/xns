@@ -1,4 +1,5 @@
 /*****************************************************************************/
+/*                                                                           */
 /*                       :::    ::: ::::    :::  ::::::::                    */
 /*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
 /*                      +:+  +:+  :+:+:+  +:+ +:+                            */
@@ -6,6 +7,7 @@
 /*                    +#+  +#+  +#+  +#+#+#        +#+                       */
 /*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
 /*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
 /*****************************************************************************/
 
 #pragma once
@@ -35,6 +37,7 @@ namespace xns {
 
 	class exception {
 
+
 		public:
 
 			// -- public types ------------------------------------------------
@@ -42,11 +45,8 @@ namespace xns {
 			/* self type */
 			using self = xns::exception;
 
-			/* error code type */
-			using code = xns::s32;
-
-			/* error message type */
-			using message = const char*;
+			/* code type */
+			using code_type = xns::s32;
 
 
 			// -- constructors ------------------------------------------------
@@ -54,11 +54,16 @@ namespace xns {
 			/* default constructor */
 			exception(void) = delete;
 
-			/* copy constructor */
-			exception(const self& e) = default;
-
 			/* code and message constructor */
-			exception(const code& c, message m) : _code(c), _message(m) {}
+			exception(const char* const message, const code_type code) noexcept
+			: _message{message}, _code{code} {
+			}
+
+			/* copy constructor */
+			exception(const self&) noexcept = default;
+
+			/* move constructor */
+			exception(self&&) noexcept = default;
 
 			/* destructor */
 			virtual ~exception(void) = default;
@@ -67,30 +72,36 @@ namespace xns {
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			self& operator=(const self& e) = default;
+			auto operator=(const self&) noexcept -> self& = default;
+
+			/* move assignment operator */
+			auto operator=(self&&) noexcept -> self& = default;
 
 
 			// -- public methods ----------------------------------------------
 
-			/* get error code */
-			code get_code(void) const { return _code; }
+			/* code */
+			auto code(void) const noexcept -> code_type {
+				return _code;
+			}
 
-			/* get error message */
-			message get_message(void) const { return _message; }
+			/* message */
+			auto message(void) const noexcept -> const char* {
+				return _message;
+			}
 
 
 		private:
 
 			// -- private members ---------------------------------------------
 
-			/* error code */
-			code _code;
+			/* message */
+			const char* _message;
 
-			/* error message */
-			message _message;
+			/* code */
+			code_type _code;
 
-
-	};
+	}; // class exception
 
 } // namespace xns
 

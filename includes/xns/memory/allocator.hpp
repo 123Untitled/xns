@@ -109,7 +109,7 @@ namespace xns {
 				if constexpr (xns::no_exceptions == false)
 					// check failed allocation
 					if (ptr == nullptr)
-						throw xns::exception(-2, "allocator, failed to allocate memory");
+						throw xns::exception("allocator, failed to allocate memory", -2);
 
 				return ptr;
 			}
@@ -126,7 +126,7 @@ namespace xns {
 				if constexpr (xns::no_exceptions == false)
 					// check failed reallocation
 					if (ptr == nullptr)
-						throw xns::exception(-2, "allocator, failed to reallocate memory");
+						throw xns::exception("allocator, failed to reallocate memory", -2);
 
 				return ptr;
 			}
