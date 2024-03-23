@@ -1,51 +1,50 @@
+###############################################################################
+#                                                                             #
+#                        :::    ::: ::::    :::  ::::::::                     #
+#                       :+:    :+: :+:+:   :+: :+:    :+:                     #
+#                       +:+  +:+  :+:+:+  +:+ +:+                             #
+#                       +#++:+   +#+ +:+ +#+ +#++:++#++                       #
+#                     +#+  +#+  +#+  +#+#+#        +#+                        #
+#                   #+#    #+# #+#   #+#+# #+#    #+#                         #
+#                  ###    ### ###    ####  ########                           #
+#                                                                             #
+###############################################################################
 
-# -- I G N O R E S ------------------------------------------------------------
+# -- I G N O R E D  F I L E S -------------------------------------------------
 
-# release output directory
+
+# build directory
 /build
+
+# install directory
 /xns
-/install
-/external
 
-# ignore executable
-/exec_*
+# executables
+/exec*
 
-# ignore .env files
-/.env
-
-# ignore .setup files
+# build setup
 /.setup
 
-# ignore all .a files recursively
-/**/*.a
+# static libraries
+/*.a
 
-# ignore all .dylib files recursively
-/**/*.dylib
+# compile logs
+/build/**/*.log
 
-# ignore all .so files recursively
-/**/*.so
+# object files
+/build/**/*.o
 
-# ignore all .log files recursively
-/**/*.log
+# dependency files
+/build/**/*.d
 
-# ignore all .o files recursively
-/**/*.o
-
-# ignore all .d files recursively
-/**/*.d
-
-# ignore all .DS_Store files recursively
+# desktop service store (macos)
 /**/.DS_Store
 
-
-# ignore .dSYM debug files
-/xfunc.dSYM/
-
-# ignore .cache directory
+# clangd cache
 /.cache
 
-# ignore .nvimlog
+# neovim logs
 /.nvimlog
 
-# ignore compile_commands.json
+# compile commands database
 /compile_commands.json
