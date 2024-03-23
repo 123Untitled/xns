@@ -49,7 +49,7 @@ check_os
 
 
 
-# -- S C R I P T  P A T H  S E T T I N G S ------------------------------------
+# -- P W D  &  S C R I P T  D I R E C T O R Y ---------------------------------
 
 # get current absolute directory path
 ABSDIR=$(pwd -P)
@@ -64,23 +64,22 @@ MAKE=${0:a}
 SCRIPTNAME=${0##*/}
 
 
-
 # -- D I R E C T O R I E S ----------------------------------------------------
 
 # sources directory
-SRCDIR=$ABSDIR'/sources/core'
+SRCDIR=$ABSDIR'/sources'
 
 # includes directory
 INCDIR=$ABSDIR'/includes'
 
 # tests directory
-TSTDIR=$ABSDIR'/sources/tests'
+TSTDIR=$ABSDIR'/tests'
 
 # tests includes directory
-TSTINC=$TSTDIR'/inc'
+TSTINC=$TSTDIR'/includes'
 
 # tests sources directory
-TSTSRC=$TSTDIR'/src'
+TSTSRC=$TSTDIR'/sources'
 
 # build directory
 BLDDIR=$ABSDIR'/build'
@@ -170,7 +169,7 @@ ARFLAGS='-rcs'
 LINKER=$CXX
 
 # standard
-STD=('-std=c++2a')
+STD='-std=c++2a'
 
 # debug
 DEBUG='-g'
@@ -244,7 +243,6 @@ fi
   SUCCESS='\x1b[33m'
 	ERROR='\x1b[31m'
 	RESET='\x1b[0m'
-	ERASE='\x1b[1F\x1b[0J'
 SEPARATOR=''
 
 
@@ -313,14 +311,15 @@ function required {
 }
 
 
+CLONE=''
 
 # -- R E P O S I T O R Y  C H E C K -------------------------------------------
 
 function repository {
 
 	# local variables
-	local SSH_REPO='git@github.com:123Untitled/xns.git'
-	local PUB_REPO='https://github.com/123Untitled/xns.git'
+	local -r SSH_REPO='git@github.com:123Untitled/xns.git'
+	local -r PUB_REPO='https://github.com/123Untitled/xns.git'
 
 	# check current directory is same as script directory
 	# and have .git directory
@@ -332,12 +331,20 @@ function repository {
 	# get the git remote url
 	local REMOTE=$(git config --get 'remote.origin.url')
 
-	# check if the script is run in the right repository
-	if [[ $REMOTE != $SSH_REPO && $REMOTE != $PUB_REPO ]]; then
-		echo 'please run this script in the' $COLOR$PROJECT$RESET 'repository.\n'
-		exit 1
+	# check if the script is run in the ssh repository
+	if [[ $REMOTE == $SSH_REPO ]]; then
+		CLONE='private'
+		return
 	fi
 
+	# check if the script is run in the public repository
+	if [[ $REMOTE == $PUB_REPO ]]; then
+		CLONE='public'
+		return
+	fi
+
+	echo 'please run this script in the' $COLOR$PROJECT$RESET 'repository.\n'
+	exit 1
 }
 
 
@@ -385,6 +392,9 @@ function make_static {
 }
 
 
+function message {
+	echo $1':' $COLOR$SCRIPTNAME$RESET $2'.\n'
+}
 
 
 # -- C O M P I L A T I O N  F U N C T I O N S ---------------------------------
@@ -405,6 +415,7 @@ function check_dependency {
 	done
 	return 1
 }
+
 
 function generate_compile_command {
 	# $1: file
@@ -599,7 +610,7 @@ function compile {
 
 function is_link_required {
 	# get first argument
-	local TARGET=$1
+	local -r TARGET=$1
 	shift
 	# loop over object files
 	for DEPENDENCY in $@; do
@@ -613,8 +624,9 @@ function is_link_required {
 
 function linkage {
 
-	local TARGET=$1
-	local FUNCTOR=$2
+	local -r TARGET=$1
+	local -r FUNCTOR=$2
+
 	# get all object files
 	OBJS=($OBJDIR'/'*'.o'(.N))
 	# handle target
@@ -762,6 +774,12 @@ function setup_files {
 			# append test file
 			SRCS=($TSTSRC'/'**'/_'$TEST'.cpp'(.N))
 
+			# check if test file exists
+			if [[ ${#SRCS[@]} -eq 0 ]]; then
+				message 'error' 'test file not found'
+				exit 1
+			fi
+
 			# search in source directory if there is a source file with the same name
 			# not work because some test files need another source files
 			# goal is to compile only the necessary source files
@@ -796,8 +814,6 @@ function setup_files {
 
 
 
-
-
 function handle_argument {
 
 	if [[ $ARG_COUNT -eq 0 ]]; then
@@ -810,7 +826,7 @@ function handle_argument {
 		'release')
 			echo 'MODE=release' > $SETUP
 			if [[ $ARG_COUNT -ne 1 ]]; then
-				echo 'usage:' $COLOR$SCRIPTNAME$RESET 'release\n'
+				message 'usage' 'release'
 				exit 1
 			fi
 			;;
@@ -830,14 +846,36 @@ function handle_argument {
 			fi
 
 			# print usage message
-			echo 'usage:' $COLOR$SCRIPTNAME$RESET 'install <prefix>\n'
+			message 'usage' 'install <prefix>'
 			exit 1
 			;;
 
 		'test')
+
+			# check clone type
+			if [[ $CLONE == 'public' ]]; then
+				message 'error' \
+					'tests are not available in public repository.'
+				exit 1
+			fi
+
+			# submodule : tests
+			# check if submodules are initialized
+
+			git submodule update --init
+
+
 			make_silent_clean
 			echo 'MODE=test'    > $SETUP
-			(($ARG_COUNT == 2)) && echo 'TEST='$ARGUMENTS[2] >> $SETUP
+
+			# check number of arguments
+			if [[ $ARG_COUNT -eq 2 ]]; then
+				# append test to setup file
+				echo 'TEST='${ARGUMENTS[2]} >> $SETUP
+				return
+			fi
+
+
 			;;
 
 		'rm')
@@ -847,8 +885,7 @@ function handle_argument {
 			;;
 
 		*)
-			echo 'unknown argument:' \
-				$COLOR$ARGUMENTS[1]$RESET'\n'
+			message 'error' 'unknown argument'
 			exit 1
 			;;
 	esac
@@ -892,7 +929,7 @@ function setup_mode {
 			;;
 
 		*)
-			echo 'error:' $COLOR$SCRIPTNAME$RESET 'invalid mode.\n'
+			message 'error' 'invalid mode'
 			make_silent_clean
 			exit 1
 			;;
