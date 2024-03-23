@@ -15,7 +15,6 @@
 # Makefile forever, but not really lol.
 
 
-
 # -- O P E R A T I N G  S Y S T E M -------------------------------------------
 
 # check if operating system is supported
@@ -158,8 +157,8 @@ LOCK=$BLDDIR'/.lock'
 # compiler
 #CXX='/opt/homebrew/Cellar/llvm/17.0.6_1/bin/clang++'
 #CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
-#CXX='clang++'
-CXX='g++'
+CXX='clang++'
+#CXX='g++'
 
 # archiver
 ARCHIVER='ar'
@@ -299,7 +298,6 @@ function required {
 		'file'
 		'uname'
 		'openssl'
-		'fzy'
 	)
 	# append arguments
 	COMMANDS+=($@)
@@ -658,16 +656,26 @@ function database {
 
 function require_build_mode {
 
-	IFS=$'\n'
-	local MODES=('release' 'install' 'test')
-	MODE=$(fzy <<< ${MODES[@]})
-	IFS=$' \t\n'
+	if command -v 'fzy' &> /dev/null; then
 
-	if [[ -z $MODE ]]; then
+		IFS=$'\n'
+		local MODES=('release' 'install' 'test')
+		MODE=$('fzy' <<< ${MODES[@]})
+		IFS=$' \t\n'
+
+		if [[ -z $MODE ]]; then
+			exit 1
+		fi
+
+		echo 'MODE='$MODE > $SETUP
+
+	else
+
+		echo 'usage:' $COLOR$SCRIPTNAME$RESET 'release | install <prefix> | test <name>\n'
+		echo 'hint:' 'install' $COLOR'fzy'$RESET 'to use interactive mode.\n'
+
 		exit 1
 	fi
-
-	echo 'MODE='$MODE > $SETUP
 }
 
 
@@ -759,10 +767,10 @@ function setup_files {
 			# goal is to compile only the necessary source files
 			# will be implemented later...
 			#SRCS+=($SRCDIR'/'**'/'$TEST'.cpp'(.N))
-
-			# get all source files
-			SRCS=($SRCDIR/**/*.'cpp'(.N))
 		fi
+
+		# get all source files
+		SRCS+=($SRCDIR/**/*.'cpp'(.N))
 
 		# append defines
 		DEFINES+=('-DXNS_TEST_'${TEST:u})
@@ -892,66 +900,75 @@ function setup_mode {
 }
 
 
+# -- M A K E  I N S T A L L -- ################################################
+
 function make_install {
+
+	# remove cursor
+	echo -n '\x1b[?25l'
+
+	function __exit {
+		# show cursor
+		echo '\x1b[?25h'
+		exit 1
+	}
 
 	echo $SEPARATOR
 
 	local COUNT='0'
 	local FIRST='0'
 
-	if [[ ! -d $PREFIX ]]; then
-		FIRST='1'
-	fi
+	[[ ! -d $PREFIX ]] && ((++FIRST))
 
-	local PREFIX_DIRS=($PREFIX'/include' $PREFIX'/lib')
+	local -r PFX_INCLUDE=$PREFIX'/include/'$PROJECT
+	local -r PFX_LIBRARY=$PREFIX'/lib'
+	local -r PFX_STATIC=$PFX_LIBRARY'/'${STATIC##*/}
+
+
+	# -- main directories -----------------------------------------------------
 
 	# loop over directories
-	for DIR in $PREFIX_DIRS; do
+	for DIR in $PFX_INCLUDE $PFX_LIBRARY; do
 		# check if directory exists
 		if [[ ! -d $DIR ]]; then
 			# create directory and check if succeeded
-			if ! mkdir -p $DIR; then
-				echo -n $ERROR'[x]'$RESET
-			else
-				echo -n $SUCCESS'[✓]'$RESET
-				((++COUNT))
-			fi
+			mkdir -p $DIR || __exit
+			echo -n $SUCCESS'.'$RESET
+			((++COUNT))
 		fi
 	done
 
 
-	local STATIC_TARGET=$PREFIX'/lib/'${STATIC##*/}
+	# -- library --------------------------------------------------------------
 
 	# check if static library is more recent than prefix
-	if [[ ! -f $STATIC_TARGET || $STATIC -nt $STATIC_TARGET ]]; then
+	if [[ ! -f $PFX_STATIC || $STATIC -nt $PFX_STATIC ]]; then
 		# cp and check if succeeded
-		if ! cp $STATIC $PREFIX'/lib'; then
-			echo -n $ERROR'[x]'$RESET
-		else
-			echo -n $SUCCESS'[✓]'$RESET
-			((++COUNT))
-		fi
+		cp $STATIC $PFX_LIBRARY || __exit
+		echo -n $SUCCESS'.'$RESET
+		((++COUNT))
 	fi
 
 
-	local SUBINCL=($INCDIR'/'**'/'*(/N))
+	# -- includes -------------------------------------------------------------
+
+	# construct xns include directory
+	local -r XNSINC=$INCDIR'/'$PROJECT
+	# get all sub include directories
+	local -r SUBDIRS=($XNSINC'/'**'/'*(/N))
 
 	# loop over directories
-	for DIR in $SUBINCL; do
+	for DIR in $SUBDIRS; do
 
 		# construct target directory
-		local DIR_TARGET=$PREFIX'/include/'${DIR#$INCDIR'/'}
+		local PFX_SUBDIR=$PFX_INCLUDE'/'${DIR#$XNSINC'/'}
 
 		# check if directory exists
-		if [[ ! -d $DIR_TARGET ]]; then
-
+		if [[ ! -d $PFX_SUBDIR ]]; then
 			# create directory and check if succeeded
-			if ! mkdir -p $DIR_TARGET; then
-				echo -n $ERROR'[x]'$RESET
-			else
-				echo -n $SUCCESS'[✓]'$RESET
-				((++COUNT))
-			fi
+			mkdir -p $PFX_SUBDIR || __exit
+			echo -n $SUCCESS'.'$RESET
+			((++COUNT))
 		fi
 
 		# get all headers
@@ -961,17 +978,29 @@ function make_install {
 		for HEADER in $HEADERS; do
 
 			# construct target header
-			local HEADER_TARGET=$DIR_TARGET'/'${HEADER##*'/'}
+			local PFX_HEADER=$PFX_SUBDIR'/'${HEADER##*'/'}
 
 			# check if header is more recent than target
-			if [[ ! -f $HEADER_TARGET || $HEADER -nt $HEADER_TARGET ]]; then
+			if [[ ! -f $PFX_HEADER || $HEADER -nt $PFX_HEADER ]]; then
 				# cp and check if succeeded
-				if ! cp $HEADER $DIR_TARGET; then
-					echo -n $ERROR'[x]'$RESET
-				else
-					echo -n $SUCCESS'[✓]'$RESET
-					((++COUNT))
-				fi
+				cp $HEADER $PFX_SUBDIR || __exit
+				echo -n $SUCCESS'.'$RESET
+				((++COUNT))
+			fi
+
+			# get base name of header
+			local BASE=${HEADER##*'/'}
+			# get relative path of prefix header
+			local REL=${HEADER##*'/xns/'}
+			# construct proxy header path
+			local PROXY=$PFX_INCLUDE'/'$BASE
+
+			# check if proxy header is present
+			if [[ ! -f $PROXY ]]; then
+				# create proxy header and check if succeeded
+				echo '#include "'$REL'"' > $PROXY || __exit
+				echo -n $SUCCESS'.'$RESET
+				((++COUNT))
 			fi
 
 		done
@@ -979,17 +1008,20 @@ function make_install {
 	done
 
 
-	# resuming
+	# -- resuming -------------------------------------------------------------
+
+	# check number of installed files
 	if [[ $COUNT -eq 0 ]]; then
 		echo $COLOR'[✓]'$RESET 'nothing to install.'
 	else
 		echo '\n\n' 🫠 $COUNT 'files installed.'
 	fi
 
-	# print for first installation
-	if [[ $FIRST -eq 1 ]]; then
-		description $PREFIX
-	fi
+	# print description for first installation
+	[[ $FIRST -eq 1 ]] && description $PREFIX
+
+	# show cursor
+	echo -n '\x1b[?25h'
 }
 
 
