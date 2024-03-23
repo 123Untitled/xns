@@ -1428,7 +1428,7 @@ namespace xns {
 			// debug !!!!
 			//constexpr size_type size = 100;
 			constexpr size_type size = xns::limits<U>::digits();
-			std::cout << "size: " << size << std::endl;
+			//std::cout << "size: " << size << std::endl;
 			//static_assert(size > 0, "size must be greater than zero");
 
 			str._str = str.allocate(size);
