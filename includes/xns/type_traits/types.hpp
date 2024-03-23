@@ -20,6 +20,7 @@
 #include "xns/type_traits/type_properties/is_signed.hpp"
 #include "xns/type_traits/other/always_false.hpp"
 #include "xns/config/macros.hpp"
+#include "xns/config/config.hpp"
 
 // include for struct winsize
 #include <sys/ioctl.h>
@@ -56,22 +57,22 @@ namespace xns {
 	// -- C O N S T A N T S ---------------------------------------------------
 
 	// assume unsigned char is 1 byte
-	static_assert(sizeof(unsigned char) == 1, "Assumption failed: sizeof(unsigned char) != 1");
+	static_assert(sizeof(unsigned char) == 1, "assumption failed: sizeof(unsigned char) != 1");
 
-	namespace impl {
+	namespace __impl {
 
 		/* get the number of bits in a byte */
 		consteval auto bits_per_byte(void) noexcept -> decltype(sizeof(0)) {
-			decltype(sizeof(0)) count{0};
-			for (auto byte{static_cast<unsigned char>(1)}; byte != 0; byte <<= 1)
-				++count;
-			return count;
+			decltype(sizeof(0)) __count{0};
+			for (auto __byte{static_cast<unsigned char>(1)}; __byte != 0; __byte <<= 1)
+				++__count;
+			return __count;
 		}
 	}
 
 	enum : decltype(sizeof(0)) {
 		// number of bits in a byte
-		bits_per_byte = xns::impl::bits_per_byte(),
+		bits_per_byte = xns::__impl::bits_per_byte(),
 		// number of bytes in an address
 		bytes_per_address = sizeof(void*),
 	};
@@ -94,135 +95,164 @@ namespace xns {
 
 
 
-	// -- integer selector ----------------------------------------------------
+	// -- S I N T  /  U I N T -------------------------------------------------
 
-	template <decltype(sizeof(0)) bytes>
-	struct integer_selector final {
+	namespace __impl {
 
-		private:
-
-			// -- private types -----------------------------------------------
-
-			/* size type */
-			using _size = decltype(bytes);
+		template <decltype(sizeof(0)) __bits>
+		class __selector final {
 
 
-			// -- private structs ---------------------------------------------
+			private:
 
-			/* compile time error */
-			template <typename T>
-			struct compile_time_error {
-				static_assert(xns::always_false<T>,
-						"This machine does not support this integer type.");
-			};
+				// -- private types -------------------------------------------
 
-			/* implementation */
-			template <typename...>
-			struct impl;
-
-			/* parameter pack specialization */
-			template <typename T, typename... Tp>
-			struct impl<T, Tp...> {
-				using type = xns::conditional<sizeof(T) != bytes,
-											typename impl<Tp...>::type,
-											T>;
-			};
-
-			/* end of recursion specialization */
-			template <typename T>
-			struct impl<T> {
-				using type = xns::conditional<sizeof(T) != bytes,
-											compile_time_error<T>,
-											T>;
-			};
+				/* size type */
+				using __size = decltype(__bits);
 
 
+				// -- private structs -----------------------------------------
 
-		public:
+				/* error */
+				template <typename __type>
+				struct __error final {
+					static_assert(xns::always_false<__type>,
+							"this machine does not support this integer type.");
+				};
 
-			// -- public types ------------------------------------------------
+				/* implementation */
+				template <typename...>
+				struct ___;
 
-			using _signed   = typename impl<signed char,
+				/* parameter pack specialization */
+				template <typename __type, typename... __types> requires (sizeof...(__types) > 0)
+				struct ___<__type, __types...> {
+					using __result = xns::conditional<sizeof(__type) * xns::bits_per_byte != __bits,
+												typename ___<__types...>::__result,
+												__type>;
+				};
+
+				/* end of recursion specialization */
+				template <typename __type>
+				struct ___<__type> {
+					using __result = xns::conditional<sizeof(__type) * xns::bits_per_byte != __bits,
+												__error<__type>,
+												__type>;
+				};
+
+
+
+			public:
+
+				// -- public types --------------------------------------------
+
+				/* signed integer type */
+				using __sint = typename ___<signed char,
 											signed short,
 											signed int,
 											signed long,
-											signed long long>::type;
+											signed long long
+											#ifdef XNS_128BIT_INTEGERS
+											, __int128
+											#endif
+											>::__result;
 
-			using _unsigned = typename impl<unsigned char,
+				/* unsigned integer type */
+				using __uint = typename ___<unsigned char,
 											unsigned short,
 											unsigned int,
 											unsigned long,
-											unsigned long long>::type;
+											unsigned long long
+											#ifdef XNS_128BIT_INTEGERS
+											, unsigned __int128
+											#endif
+											>::__result;
 
-	};
+		}; // class __selector
+
+	} // namespace __impl
 
 
-	/* signed integer types */
-	template <decltype(sizeof(0)) N>
-	using _signed = typename xns::integer_selector<N>::_signed;
+	/* sint type */
+	template <decltype(sizeof(0)) __bits>
+	using sint = typename xns::__impl::__selector<__bits>::__sint;
 
-	/* unsigned integer types */
-	template <decltype(sizeof(0)) N>
-	using _unsigned = typename xns::integer_selector<N>::_unsigned;
+	/* uint type */
+	template <decltype(sizeof(0)) __bits>
+	using uint = typename xns::__impl::__selector<__bits>::__uint;
+
 
 
 	/* arch address types */
-	using addr_t  = xns::_unsigned<xns::bytes_per_address>;
+	using addr_t  = xns::uint<xns::bytes_per_address * xns::bits_per_byte>;
 
 	/* uintptr types */
-	using uptr_t  = xns::_unsigned<xns::bytes_per_address>;
-
-	/* pointer types */
-	using ptr_t   = xns::_unsigned<xns::bytes_per_address>;
+	using uintptr  = addr_t;
 
 
 	/* byte types */
-	using sbyte   = xns::_signed<1>;
-	using ubyte   = xns::_unsigned<1>;
+	using sbyte   = xns::sint<xns::bits_per_byte>;
+	using ubyte   = xns::uint<xns::bits_per_byte>;
 
-	/* lowest integer type */
-	using s8      = xns::_signed<1>;
-	using u8      = xns::_unsigned<1>;
+	/* 8-bit integer types */
+	using s8      = xns::sint<8>;
+	using u8      = xns::uint<8>;
 
-	/* medium integer type */
-	using s16     = xns::_signed<2>;
-	using u16     = xns::_unsigned<2>;
+	/* 16-bit integer types */
+	using s16     = xns::sint<16>;
+	using u16     = xns::uint<16>;
 
-	/* normal integer type */
-	using s32     = xns::_signed<4>;
-	using u32     = xns::_unsigned<4>;
+	/* 32-bit integer types */
+	using s32     = xns::sint<32>;
+	using u32     = xns::uint<32>;
 
-	/* highest integer type */
-	using s64     = xns::_signed<8>;
-	using u64     = xns::_unsigned<8>;
+	/* 64-bit integer types */
+	using s64     = xns::sint<64>;
+	using u64     = xns::uint<64>;
+
+	/* 128-bit integer types */
+	#ifdef XNS_128BIT_INTEGERS
+	using s128    = xns::sint<128>;
+	using u128    = xns::uint<128>;
+	#endif
 
 
-	/* maximum unsigned integer type */
-	using size_t = xns::_unsigned<xns::bytes_per_address>;
+	/* signed size type */
+	using ssize_t = xns::sint<xns::bytes_per_address * xns::bits_per_byte>;
+
+	/* unsigned size type */
+	using size_t = xns::uint<xns::bytes_per_address * xns::bits_per_byte>;
+
+
+	#ifdef XNS_128BIT_INTEGERS
 
 	/* maximum signed integer type */
-	using ssize_t = xns::_signed<xns::bytes_per_address>;
-
+	using smax = xns::sint<128>;
 
 	/* maximum unsigned integer type */
-	using umax = xns::_unsigned<xns::bytes_per_address>;
+	using umax = xns::uint<128>;
+
+	#else
 
 	/* maximum signed integer type */
-	using smax = xns::_signed<xns::bytes_per_address>;
+	using smax = xns::sint<64>;
+
+	/* maximum unsigned integer type */
+	using umax = xns::uint<64>;
+
+	#endif
 
 
-	/* floating point types */
 
-	/* lowest floating point type */
+	/* 32-bit floating point type */
 	using f32 = float;
 
-	/* highest floating point type */
+	/* 64-bit floating point type */
 	using f64 = double;
 
+	static_assert(sizeof(f32) * xns::bits_per_byte == 32, "f32 is not 32 bits.");
+	static_assert(sizeof(f64) * xns::bits_per_byte == 64, "f64 is not 64 bits.");
 
-}
+} // namespace xns
 
-
-#endif
-
-
+#endif // XNS_TYPES_HEADER
