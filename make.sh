@@ -866,6 +866,8 @@ function handle_argument {
 				exit 1
 			fi
 
+			message '\ninfo' 'submodule tests initialized'
+
 			make_silent_clean
 			echo 'MODE=test'    > $SETUP
 
