@@ -1,17 +1,19 @@
 #!/usr/bin/env -S zsh --no-rcs --no-globalrcs
+###############################################################################
+#                                                                             #
+#                        :::    ::: ::::    :::  ::::::::                     #
+#                       :+:    :+: :+:+:   :+: :+:    :+:                     #
+#                       +:+  +:+  :+:+:+  +:+ +:+                             #
+#                       +#++:+   +#+ +:+ +#+ +#++:++#++                       #
+#                     +#+  +#+  +#+  +#+#+#        +#+                        #
+#                   #+#    #+# #+#   #+#+# #+#    #+#                         #
+#                  ###    ### ###    ####  ########                           #
+#                                                                             #
+###############################################################################
 
 # This script is used to compile the project.
 # Makefile forever, but not really lol.
 
-local BANNER=\
-'\n'\
-'      :::    ::: ::::    :::  ::::::::\n'\
-'     :+:    :+: :+:+:   :+: :+:    :+:\n'\
-'     +:+  +:+  :+:+:+  +:+ +:+        \n'\
-'     +#++:+   +#+ +:+ +#+ +#++:++#++  \n'\
-'   +#+  +#+  +#+  +#+#+#        +#+   \n'\
-' #+#    #+# #+#   #+#+# #+#    #+#    \n'\
-'###    ### ###    ####  ########      \n'
 
 
 # -- O P E R A T I N G  S Y S T E M -------------------------------------------
@@ -105,9 +107,6 @@ EXTDIR=$ABSDIR'/external'
 # tool directory
 TOOLDIR=$ABSDIR'/tools'
 
-# install directory
-INSTALLDIR=''
-
 
 # -- T A R G E T S ------------------------------------------------------------
 
@@ -175,16 +174,21 @@ LINKER=$CXX
 STD=('-std=c++2a')
 
 # debug
-DEBUG='-g3'
-
-# optimization
-OPT=''
-
-# release level
-FAST='-O3'
+DEBUG='-g'
 
 # debug level
-SLOW='-O0'
+DLEVEL=('0' '1' '2' '3'
+		'dwarf' 'dwarf+' 'dwarf-2' 'dwarf-3' 'dwarf-4' 'dwarf-5' 'dwarf32' 'dwarf64'
+		'gdb' 'gdb0' 'gdb1' 'gdb2' 'gdb3'
+		'stabs' 'stabs+'
+		'coff' 'xcoff' 'xcoff+'
+)
+
+# optimization
+OPT='-O'
+
+# opt level
+OLEVEL=('fast' 'g' 's' '0' '1' '2' '3')
 
 # compiler flags
 CXXFLAGS=()
@@ -224,10 +228,6 @@ LDFLAGS=()
 LEAKER='valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes'
 
 
-FZF_OPTS=('--algo=v2' '--height=50%' '--no-multi' '--layout=reverse' '--border=rounded' '--scroll-off=50'  '--bind' 'tab:down' \
-		  '--color=border:8,fg:7,bg:0,hl:2,fg+:3,bg+:8,hl+:4,info:5,prompt:6,pointer:6,marker:3,spinner:5,header:1')
-
-
 MAX_JOBS=''
 
 if [[ $OS =~ 'macos' ]]; then
@@ -264,6 +264,15 @@ function initialize_separator {
 # -- B A N N E R --------------------------------------------------------------
 
 function banner() {
+local BANNER=\
+'\n'\
+'      :::    ::: ::::    :::  ::::::::\n'\
+'     :+:    :+: :+:+:   :+: :+:    :+:\n'\
+'     +:+  +:+  :+:+:+  +:+ +:+        \n'\
+'     +#++:+   +#+ +:+ +#+ +#++:++#++  \n'\
+'   +#+  +#+  +#+  +#+#+#        +#+   \n'\
+' #+#    #+# #+#   #+#+# #+#    #+#    \n'\
+'###    ### ###    ####  ########      \n'
 	echo $COLOR$BANNER$RESET
 }
 
@@ -287,14 +296,10 @@ function required {
 		'wc'
 		'git'
 		'cat'
-		'sed'
 		'file'
 		'uname'
-		'vared'
 		'openssl'
-		'fzf'
 		'fzy'
-		'jq'
 	)
 	# append arguments
 	COMMANDS+=($@)
@@ -445,7 +450,6 @@ function handle_compilation {
 	# add compiler log file extension
 	local LOG=$LOGDIR'/'$HASH'.log'
 
-
 	# check if source file is modified
 	if check_dependency $OBJ $DEP; then
 
@@ -456,8 +460,6 @@ function handle_compilation {
 		# compile source file
 		$CXX $STD $OPT $DEBUG $CXXFLAGS $DEFINES $INCLUDES \
 					-MT $OBJ -MMD -MF $DEP -c $FILE -o $OBJ 2> $LOG
-			#-MJ $JSN
-
 
 		# check if compilation failed
 		if [[ $? -ne 0 ]]; then
@@ -468,16 +470,10 @@ function handle_compilation {
 			exit 0
 		fi
 
-
 	fi
-
 	exit 0
 }
 
-
-function compile_release {
-	$CXX $STD $FAST $CXXFLAGS $DEFINES $INCLUDES $FILE -o $OBJ
-}
 
 function handle_errors {
 	# get all log files
@@ -641,26 +637,11 @@ function database {
 		done
 		# erase last comma with bracket
 		CONTENT+=']\n'
-		# format json content with jq
+		# write content to database
 		echo $CONTENT > $DATABASE
-		#jq <<< $CONTENT > $DATABASE
 		# check if compilation database succeeded
 		description $DATABASE
 	fi
-	#if [[ ! -e $DATABASE ]] || is_link_required $DATABASE $JSNS; then
-	#	# start json string
-	#	local CONTENT='['
-	#	# get all json files content
-	#	for JSN in $JSNS; do
-	#		CONTENT+=$(<$JSN)
-	#	done
-	#	# erase last comma with bracket
-	#	CONTENT[-1]=']'
-	#	# format json content with jq
-	#	jq <<< $CONTENT > $DATABASE
-	#	# check if compilation database succeeded
-	#	description $DATABASE
-	#fi
 }
 
 
@@ -670,11 +651,9 @@ function database {
 function require_build_mode {
 
 	IFS=$'\n'
-	local MODES=('release' 'install' 'test' 'debug' 'config' 'help' 'rm' )
+	local MODES=('release' 'install' 'test')
 	MODE=$(fzy <<< ${MODES[@]})
 	IFS=$' \t\n'
-
-	#MODE=$(echo -e 'release\ntest\ninstall' | fzf $FZF_OPTS)
 
 	if [[ -z $MODE ]]; then
 		exit 1
@@ -709,51 +688,47 @@ function require_test_file {
 	echo 'TEST='$TEST >> $SETUP
 }
 
-
-
-
-
-function setup_release {
-	# check arguments
-	case $ARG_COUNT; in
-
-		0)
-			INSTALLDIR=$ABSDIR
-			;;
-		1)
-			INSTALLDIR=$ABSDIR
-			;;
-		2)
-			INSTALLDIR=$ARGUMENTS[2]
-			;;
-		*)
-			echo 'usage:' $COLOR$scriptname$RESET 'release [directory]\n'
-			exit 1
-			;;
-	esac
-
-	[[ ! -d $INSTALLDIR ]] && \
-		(echo 'install directory' $COLOR$INSTALLDIR$RESET 'does not exist.\n'; exit 1)
-
-	INSTALLDIR+='/'$PROJECT
+function require_prefix {
+	echo 'usage:' $COLOR$scriptname$RESET 'install <prefix>\n'
+	exit 1
 }
 
 
+function setup_install {
+
+	# check for prefix exists
+	if [[ ! -d $PREFIX ]]; then
+		echo 'error:' $COLOR$scriptname$RESET 'invalid prefix directory.\n'
+		exit 1
+	fi
+
+	# check if prefix requires sudo
+	if [[ ! -w $PREFIX ]]; then
+		echo 'error:' $COLOR$scriptname$RESET 'requires sudo to install.\n'
+		exit 1
+	fi
+
+	# append prefix to project
+	PREFIX+='/'$PROJECT
+}
 
 
 
 # -- S O U R C E  F I L E S ---------------------------------------------------
 
 function setup_files {
+
 	# get source files
 	SRCS=($SRCDIR/**/*.'cpp'(.N))
+
 	# get all directories hierarchy in incdir
-	#INCLUDES=($INCDIR/**/*(/N) $INCDIR)
 	INCLUDES=($INCDIR)
+
 
 	if [[ $MODE == 'test' ]]; then
 		# get all directories hierarchy in incdir
 		INCLUDES+=($TSTINC/**/*(/N) $TSTINC)
+
 		if [[ $TEST == 'all' ]]; then
 			# get all tests files (pattern matching _*.cpp)
 			SRCS+=($TSTSRC'/'**'/_'*'.cpp'(.N))
@@ -761,11 +736,9 @@ function setup_files {
 			# get all tests files (pattern matching _*.cpp)
 			SRCS+=($TSTSRC'/'**'/_'$TEST'.cpp'(.N))
 		fi
+
 		# append defines
 		DEFINES+=('-DXNS_TEST_'${TEST:u})
-		# set optimization level
-		OPT=$FAST
-		#OPT=$SLOW
 
 		if [[ -d $EXTDIR'/google_benchmark' ]]; then
 			# append includes
@@ -774,14 +747,19 @@ function setup_files {
 			LDFLAGS+=('-L'$EXTDIR'/google_benchmark/lib' '-lbenchmark')
 		fi
 	fi
+
 	# insert -I prefix to each directory
 	INCLUDES=("${INCLUDES[@]/#/-I}")
+
+	# set optimization level
+	if [[ $MODE == 'release' || $MODE == 'install' ]]; then
+		  OPT+=$OLEVEL[7] # -O3
+		DEBUG+=$DLEVEL[1] # -g0
+	else
+		  OPT+=$OLEVEL[2] # -Og
+		DEBUG+=$DLEVEL[4] # -g3
+	fi
 }
-
-
-
-
-
 
 
 
@@ -798,6 +776,29 @@ function handle_argument {
 
 		'release')
 			echo 'MODE=release' > $SETUP
+			if [[ $ARG_COUNT -ne 1 ]]; then
+				echo 'usage:' $COLOR$scriptname$RESET 'release\n'
+				exit 1
+			fi
+			;;
+
+		'install')
+			echo 'MODE=install' > $SETUP
+
+			if [[ $ARG_COUNT -eq 1 ]]; then
+				return
+			fi
+
+			# check number of arguments
+			if [[ $ARG_COUNT -eq 2 ]]; then
+				# append prefix to setup file
+				echo 'PREFIX='${ARGUMENTS[2]} >> $SETUP
+				return
+			fi
+
+			# print usage message
+			echo 'usage:' $COLOR$scriptname$RESET 'install <prefix>\n'
+			exit 1
 			;;
 
 		'test')
@@ -822,14 +823,14 @@ function handle_argument {
 
 }
 
+
 function setup_mode {
 
-	# check for .setup file
+	# create default .setup file if not exists
 	if [[ ! -f $SETUP ]]; then
 		make_silent_clean
 		echo 'MODE=' > $SETUP
 	fi
-
 
 	# load .setup file
 	source $SETUP
@@ -838,11 +839,106 @@ function setup_mode {
 		require_build_mode
 	fi
 
-	if   [[ $MODE == 'test' ]] && [[ -z $TEST ]]; then
-		require_test_file
+	# switch build mode
+	case $MODE in
 
-	elif [[ $MODE == 'release' ]]; then
-		setup_release
+		'release')
+			;;
+
+		'install')
+			if [[ -z $PREFIX ]]; then
+				require_prefix
+			fi
+			setup_install
+			;;
+
+		'test')
+			if [[ -z $TEST ]]; then
+				require_test_file
+			fi
+			;;
+
+		*)
+			echo 'error:' $COLOR$scriptname$RESET 'invalid mode.\n'
+			make_silent_clean
+			exit 1
+			;;
+	esac
+}
+
+
+function make_install {
+
+	echo $SEPARATOR
+
+	local COUNT='0'
+	local FIRST='0'
+
+	if [[ ! -d $PREFIX ]]; then
+		FIRST='1'
+	fi
+
+	local PREFIX_DIRS=($PREFIX'/include' $PREFIX'/lib')
+
+	# loop over directories
+	for DIR in $PREFIX_DIRS; do
+		# check if directory exists
+		if [[ ! -d $DIR ]]; then
+			# create directory and check if succeeded
+			if ! mkdir -p $DIR; then
+				echo -n $ERROR'[x]'$RESET
+			else
+				echo -n $SUCCESS'[✓]'$RESET
+				((++COUNT))
+			fi
+		fi
+	done
+
+
+	local STATIC_TARGET=$PREFIX'/lib/'${STATIC##*/}
+
+	# check if static library is more recent than prefix
+	if [[ ! -f $STATIC_TARGET ]] || [[ $STATIC -nt $STATIC_TARGET ]]; then
+		# cp and check if succeeded
+		if ! cp $STATIC $PREFIX'/lib'; then
+			echo -n $ERROR'[x]'$RESET
+		else
+			echo -n $SUCCESS'[✓]'$RESET
+			((++COUNT))
+		fi
+	fi
+
+
+	local SUBINCL=($INCDIR'/'**'/'*(/N))
+
+	# loop over directories
+	for DIR in $SUBINCL; do
+
+		local DIR_TARGET=$PREFIX'/include/'${DIR#$INCDIR'/'}
+
+		# check if directory exists
+		if [[ ! -d $DIR_TARGET ]]; then
+			# create directory and check if succeeded
+			if ! mkdir -p $DIR_TARGET; then
+				echo -n $ERROR'[x]'$RESET
+			else
+				echo -n $SUCCESS'[✓]'$RESET
+				((++COUNT))
+			fi
+		fi
+
+	done
+
+	if [[ $COUNT -eq 0 ]]; then
+		echo $COLOR'[✓]'$RESET 'nothing to install.'
+	else
+		echo '\n\n' 🫠 $COUNT 'files installed.'
+	fi
+
+
+	if [[ $FIRST -eq 1 ]]; then
+		# check if installation succeeded
+		description $PREFIX
 	fi
 }
 
@@ -858,7 +954,6 @@ function main {
 	initialize_separator
 
 	handle_argument
-
 	setup_mode
 	setup_files
 
@@ -870,14 +965,22 @@ function main {
 			target_info $STATIC
 			compile
 			linkage $STATIC make_static
-			$TOOLDIR'/install_xns.sh'
 			;;
+
+		'install')
+			target_info 'install'
+			compile
+			linkage $STATIC make_static
+			make_install
+			;;
+
 		'test')
 			target_info $TEST
 			compile
 			database
 			linkage $EXECUTABLE make_executable
 			;;
+
 		*)
 			exit 1
 			;;
