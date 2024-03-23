@@ -51,7 +51,7 @@ namespace xns {
 
 	// -- I N T E G E R -------------------------------------------------------
 
-	template <xns::size_t bytes, bool is_signed>
+	template <xns::size_t __bits, bool is_signed>
 	class integer final {
 
 
@@ -67,11 +67,11 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = xns::integer<bytes, is_signed>;
+			using self = xns::integer<__bits, is_signed>;
 
 			/* underlying type */
-			using underlying = xns::conditional<is_signed, xns::_signed<bytes / xns::bits_per_byte>,
-														   xns::_unsigned<bytes / xns::bits_per_byte>>;
+			using underlying = xns::conditional<is_signed, xns::sint<__bits>,
+														   xns::uint<__bits>>;
 
 			enum : underlying {
 				MIN = xns::limits<underlying>::min(),
@@ -124,7 +124,7 @@ namespace xns {
 
 			auto print(void) const noexcept -> void {
 				xns::string str = xns::to_string(_value);
-				std::cout << (is_signed ? "int" : "uint") << bytes << ": " <<
+				std::cout << (is_signed ? "sint" : "uint") << __bits << ": " <<
 					str.data() << std::endl;
 			}
 
@@ -147,14 +147,14 @@ namespace xns {
 
 
 			/* copy assignment operator */
-			template <xns::size_t B, bool S> requires (B != bytes || S != is_signed)
+			template <xns::size_t B, bool S> requires (B != __bits || S != is_signed)
 			inline constexpr auto operator=(const xns::integer<B, S>& other) noexcept -> self& {
 				_value = xns::conversion<underlying>(other._value);
 				return *this;
 			}
 
 			/* move assignment operator */
-			template <xns::size_t B, bool S> requires (B != bytes || S != is_signed)
+			template <xns::size_t B, bool S> requires (B != __bits || S != is_signed)
 			inline constexpr auto operator=(xns::integer<B, S>&& other) noexcept -> self& {
 				return operator=(other);
 			}
@@ -313,6 +313,6 @@ namespace xns {
 
 
 
-}
+} // namespace xns
 
-#endif // INTEGER_HEADER
+#endif // XNS_INTEGER_HEADER
