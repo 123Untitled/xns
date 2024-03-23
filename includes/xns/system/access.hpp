@@ -16,7 +16,7 @@
 #define XNS_ACCESS_HEADER
 
 // xns headers
-#include "xns/terminal/environment.hpp"
+#include "xns/system/environment.hpp"
 #include "xns/string/string.hpp"
 
 // operating system headers

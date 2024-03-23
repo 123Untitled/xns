@@ -1,4 +1,4 @@
-#include "xns/visual/window.hpp"
+#include "xns/terminal/window.hpp"
 
 
 

@@ -1,10 +1,24 @@
-#ifndef XNS_BORDER_HEADER
-#define XNS_BORDER_HEADER
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
+#ifndef XNS_BOX_HEADER
+#define XNS_BOX_HEADER
 
 #include "xns/containers/array.hpp"
 #include "xns/type_traits/types.hpp"
 #include "xns/config/macros.hpp"
-#include "xns/visual/rect.hpp"
+#include "xns/graphic/rect.hpp"
 #include "xns/terminal/escape.hpp"
 #include "xns/memory/allocator.hpp"
 #include "xns/color/color.hpp"
@@ -19,7 +33,7 @@ namespace xns {
 
 	// -- B O R D E R  C L A S S ----------------------------------------------
 
-	class border final {
+	class box final {
 
 		// -- assertions ------------------------------------------------------
 
@@ -33,7 +47,7 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = xns::border;
+			using self = xns::box;
 
 			/* terminal size type */
 			using term_size = xns::term_size;
@@ -48,19 +62,19 @@ namespace xns {
 			// -- public constructors -----------------------------------------
 
 			/* default constructor */
-			border(void) = default;
+			box(void) = default;
 
 			/* size and position constructor */
-			border(const rect_type&);
+			box(const rect_type&);
 
 			/* copy constructor */
-			border(const self&) = default;
+			box(const self&) = default;
 
 			/* move constructor */
-			border(self&&) noexcept = default;
+			box(self&&) noexcept = default;
 
 			/* destructor */
-			~border(void) = default;
+			~box(void) = default;
 
 
 			// -- public assignment operators ---------------------------------
@@ -83,14 +97,14 @@ namespace xns {
 
 			// -- M E T H O D S -----------------------------------------------
 
-			/* draw border */
+			/* draw box */
 			void draw(void);
 
 			/* set size and position */
 			void set(const rect_type&,
 					const xns::hexcolor color = xns::color::GREY_COLOR);
 
-			/* set border color */
+			/* set box color */
 			// INFO: not defined yet
 
 
@@ -117,8 +131,8 @@ namespace xns {
 
 			// -- private members ---------------------------------------------
 
-			/* cached border sequence */
-			string _border;
+			/* cached box sequence */
+			string _box;
 
 
 			// -- S T A T I C  M E M B E R S ----------------------------------
@@ -128,6 +142,6 @@ namespace xns {
 
 	};
 
-}
+} // namespace xns
 
-#endif
+#endif // XNS_BOX_HEADER

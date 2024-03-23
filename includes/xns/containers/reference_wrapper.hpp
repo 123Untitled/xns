@@ -19,7 +19,8 @@
 #include "xns/type_traits/relationships_and_property_queries/is_same.hpp"
 #include "xns/type_traits/type_modifications/remove.hpp"
 #include "xns/memory/addressof.hpp"
-#include "xns/invoke/invoke.hpp"
+
+#include "xns/functional/invoke.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

@@ -20,7 +20,7 @@
 #include "xns/type_traits/type_categories/is_member_pointer.hpp"
 #include "xns/containers/tuple.hpp"
 #include "xns/type_traits/sequences/integer_sequence.hpp"
-#include "xns/invoke/invoke.hpp"
+#include "xns/functional/invoke.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

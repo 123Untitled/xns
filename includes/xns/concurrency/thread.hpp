@@ -23,7 +23,7 @@
 #include "xns/type_traits/type_categories/is_function.hpp"
 #include "xns/type_traits/sequences/integer_sequence.hpp"
 #include "xns/memory/unique_ptr.hpp"
-#include "xns/invoke/invoke.hpp"
+#include "xns/functional/invoke.hpp"
 
 #include <pthread.h>
 

@@ -4,22 +4,20 @@
 #include "xns/color/color.hpp"
 #include "xns/type_traits/types.hpp"
 
+#include "xns/terminal/box.hpp"
 #include "xns/terminal/escape.hpp"
 #include "xns/terminal/terminal.hpp"
+#include "xns/terminal/window_traits.hpp"
+
+#include "xns/graphic/rect.hpp"
 
 #include "xns/containers/vector.hpp"
 #include "xns/containers/list.hpp"
-
-#include "xns/visual/border.hpp"
-#include "xns/visual/rect.hpp"
 
 #include "xns/event/event.hpp"
 
 #include "xns/memory/unique_ptr.hpp"
 #include "xns/memory/shared_ptr.hpp"
-
-#include "xns/visual/window_traits.hpp"
-#include "xns/other/debug.hpp"
 
 #include <iostream>
 

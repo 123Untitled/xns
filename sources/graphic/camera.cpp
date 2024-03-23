@@ -1,4 +1,4 @@
-#include "xns/3d/camera.hpp"
+#include "xns/graphic/camera.hpp"
 
 
 // -- C A M E R A -------------------------------------------------------------

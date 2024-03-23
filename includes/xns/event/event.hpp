@@ -16,19 +16,22 @@
 #define XNS_EVENT_HEADER
 
 #include "xns/config/macros.hpp"
+
 #include "xns/type_traits/type_operations/move.hpp"
 #include "xns/type_traits/type_operations/forward.hpp"
 #include "xns/type_traits/types.hpp"
-#include "xns/containers/vector.hpp"
-#include "xns/containers/pair.hpp"
+
 #include "xns/containers/array.hpp"
-#include "xns/invoke/function.hpp"
+#include "xns/containers/vector.hpp"
+#include "xns/containers/stack.hpp"
+#include "xns/containers/pair.hpp"
+
+#include "xns/functional/function.hpp"
+#include "xns/functional/callable.hpp"
+
 #include "xns/string/string.hpp"
 #include "xns/event/evntype.hpp"
 #include "xns/memory/unique_ptr.hpp"
-#include "xns/containers/stack.hpp"
-#include "xns/other/debug.hpp"
-#include "xns/invoke/callable.hpp"
 
 
 
