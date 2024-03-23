@@ -6,6 +6,9 @@ under development, use at your own risk !
 
 ## install
 ```zsh
+# build static library in-place
+./make.sh release
+# and / or build and install
 ./make.sh install <prefix>
 ```
 
