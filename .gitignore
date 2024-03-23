@@ -2,50 +2,50 @@
 # -- I G N O R E S ------------------------------------------------------------
 
 # release output directory
-xns/
-build/
-install/
-external/
+/build
+/xns
+/install
+/external
 
 # ignore executable
-exec_*
+/exec_*
 
 # ignore .env files
-.env
+/.env
 
 # ignore .setup files
-.setup
+/.setup
 
 # ignore all .a files recursively
-**/*.a
+/**/*.a
 
 # ignore all .dylib files recursively
-**/*.dylib
+/**/*.dylib
 
 # ignore all .so files recursively
-**/*.so
+/**/*.so
 
 # ignore all .log files recursively
-**/*.log
+/**/*.log
 
 # ignore all .o files recursively
-**/*.o
+/**/*.o
 
 # ignore all .d files recursively
-**/*.d
+/**/*.d
 
 # ignore all .DS_Store files recursively
-**/.DS_Store
+/**/.DS_Store
 
 
 # ignore .dSYM debug files
-xfunc.dSYM/
+/xfunc.dSYM/
 
 # ignore .cache directory
-.cache
+/.cache
 
 # ignore .nvimlog
-.nvimlog
+/.nvimlog
 
 # ignore compile_commands.json
-compile_commands.json
+/compile_commands.json
