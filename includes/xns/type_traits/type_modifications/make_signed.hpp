@@ -33,45 +33,53 @@ namespace xns {
 
 	// -- M A K E  S I G N E D ------------------------------------------------
 
-	// -- detail --------------------------------------------------------------
+	namespace __impl {
 
-	namespace impl {
 
-		template <typename T>
-		struct make_signed {
+		template <typename __type>
+		class make_signed final {
+
 
 			// -- assertions --------------------------------------------------
 
-			// check if T is an integral type
-			static_assert(xns::is_integral<T> || xns::is_enum<T>,
+			// check if __type is an integral type
+			static_assert(xns::is_integral<__type> || xns::is_enum<__type>,
 					"make_signed requires an integral type.");
 
-			// check if T is not a bool
-			static_assert(xns::is_bool<T> == false,
+			// check if __type is not a bool
+			static_assert(xns::is_bool<__type> == false,
 					"make_signed does not support bool.");
 
 
-			// -- types -------------------------------------------------------
+			private:
 
-			/* signed type */
-			using signed_type = xns::_signed<sizeof(T)>;
+				// -- private types -------------------------------------------
 
-			/* conditional type */
-			using type = xns::conditional<xns::is_const<T>,
-						 xns::conditional<xns::is_volatile<T>,
-										  const volatile signed_type,
-										  const signed_type>,
-						 xns::conditional<xns::is_volatile<T>,
-										  volatile signed_type,
-										  signed_type>>;
+				/* signed type */
+				using __stype = xns::sint<sizeof(__type) * xns::bits_per_byte>;
+
+
+			public:
+
+				// -- public types --------------------------------------------
+
+				/* conditional type */
+				using type = xns::conditional<xns::is_const<__type>,
+							 xns::conditional<xns::is_volatile<__type>,
+											  const volatile __stype,
+											  const __stype>,
+							 xns::conditional<xns::is_volatile<__type>,
+											  volatile __stype,
+											  __stype>>;
 
 		}; // struct make_signed
 
-	} // namespace impl
+	} // namespace __impl
+
 
 	/* make signed */
-	template <class T>
-	using make_signed = typename impl::make_signed<T>::type;
+	template <typename __type>
+	using make_signed = typename xns::__impl::make_signed<__type>::type;
 
 } // namespace xns
 
