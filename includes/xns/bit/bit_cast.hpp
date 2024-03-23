@@ -18,6 +18,7 @@
 #include "xns/type_traits/types.hpp"
 #include "xns/type_traits/type_categories/is_integral.hpp"
 #include "xns/memory/memcpy.hpp"
+#include "xns/type_traits/type_properties/is_trivially_copyable.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -25,27 +26,31 @@
 namespace xns {
 
 
-
 	// -- B I T  C A S T ------------------------------------------------------
 
-	template <class to, class from>
-	constexpr to bit_cast(const from& src) { // NEEDS TO CHECK IF TYPES ARE TRIVIALLY COPYABLE (else undefined behaviour !)
+	template <typename __to, typename __from>
+	inline constexpr auto bit_cast(const __from& __src) noexcept -> __to {
+
+		// check types are trivially copyable
+		static_assert(xns::are_trivially_copyable<__to, __from>,
+				"bit_cast: types are not trivially copyable");
 
 		// check types are same size
-		static_assert(sizeof(to) == sizeof(from), "): BIT_CAST REQUIRE SAME SIZE TYPES :(");
+		static_assert(sizeof(__to) == sizeof(__from),
+				"bit_cast: size mismatch");
 
 		// create destination object
-		to dst;
+		__to __dst;
 
 		// copy bytes from source to destination
-		xns::memcpy(&dst, &src, sizeof(to));
+		xns::memcpy(&__dst, &__src, sizeof(__to));
 
 		// return destination object
-		return dst;
+		return __dst;
 	}
 
 
-	// -- B Y T E S W A P -----------------------------------------------------
+	// -- B Y T E  S W A P ----------------------------------------------------
 
 	template <class T>
 	constexpr T byte_swap(const T& src) {
