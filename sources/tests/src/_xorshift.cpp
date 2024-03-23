@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "random/xorshift.hpp"
+#include "xns/random/xorshift.hpp"
 
 
 

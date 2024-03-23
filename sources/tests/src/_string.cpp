@@ -1,23 +1,23 @@
 #include "unit_tests.hpp"
 
-#include "string/string.hpp"
-#include "type_traits/other/string_literal.hpp"
-#include "terminal/output.hpp"
+#include "xns/string/string.hpp"
+#include "xns/type_traits/other/string_literal.hpp"
+#include "xns/terminal/output.hpp"
 
-#include "bit/bit_view.hpp"
-#include "terminal/terminal.hpp"
+#include "xns/bit/bit_view.hpp"
+#include "xns/terminal/terminal.hpp"
 
-#include "string/strcmp.hpp"
-#include "string/strncmp.hpp"
+#include "xns/string/strcmp.hpp"
+#include "xns/string/strncmp.hpp"
 
 #include <string.h>
 #include <limits>
 #include <string>
 
-#include "other/benchmark.hpp"
-#include "random/random.hpp"
+#include "xns/other/benchmark.hpp"
+#include "xns/random/random.hpp"
 
-#include "event/input.hpp"
+#include "xns/event/input.hpp"
 
 #define SUCCESS(msg) std::cout << "\x1b[32m" << "success" << "\x1b[0m" << ": " << msg << " > "
 #define ERROR(msg)   std::cout << "\x1b[31m" << "error"   << "\x1b[0m" << ": " << msg << " > "

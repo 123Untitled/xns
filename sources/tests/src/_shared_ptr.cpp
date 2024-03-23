@@ -1,4 +1,4 @@
-#include "memory/shared_ptr.hpp"
+#include "xns/memory/shared_ptr.hpp"
 
 #include <iostream>
 

@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "type_traits/other/compare.hpp"
+#include "xns/type_traits/other/compare.hpp"
 
 /* unit test */
 

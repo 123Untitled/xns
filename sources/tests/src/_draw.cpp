@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "terminal/draw.hpp"
+#include "xns/terminal/draw.hpp"
 
 /* unit test */
 

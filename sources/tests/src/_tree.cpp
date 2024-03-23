@@ -1,15 +1,15 @@
 // local headers
 #include "unit_tests.hpp"
-#include "containers/tree.hpp"
+#include "xns/containers/tree.hpp"
 
-#include "random/random.hpp"
-#include "time/time.hpp"
-#include "utility/numeric_limits.hpp"
-#include "event/input.hpp"
-#include "terminal/escape.hpp"
-#include "memory/memcpy.hpp"
-#include "other/benchmark.hpp"
-#include "system/file.hpp"
+#include "xns/random/random.hpp"
+#include "xns/time/time.hpp"
+#include "xns/utility/numeric_limits.hpp"
+#include "xns/event/input.hpp"
+#include "xns/terminal/escape.hpp"
+#include "xns/memory/memcpy.hpp"
+#include "xns/other/benchmark.hpp"
+#include "xns/system/file.hpp"
 
 // boost
 //#include <benchmark/benchmark.h>
@@ -329,7 +329,7 @@ auto unit_tests_tree(void) -> int {
 //
 	//BENCHMARK_MAIN();
 
-#include "math/vector3d.hpp"
+#include "xns/math/vector3d.hpp"
 
 #if defined(XNS_TEST_TREE)
 int main(int argc, char** argv) {

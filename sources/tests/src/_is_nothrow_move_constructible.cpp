@@ -1,5 +1,5 @@
 //#include "unit_tests.hpp"
-#include "type_traits/supported_operations/is_nothrow_move_constructible.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_move_constructible.hpp"
 
 /* unit test */
 int unit_tests_is_nothrow_move_constructible(void) {

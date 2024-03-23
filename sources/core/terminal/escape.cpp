@@ -1,4 +1,4 @@
-#include "terminal/escape.hpp"
+#include "xns/terminal/escape.hpp"
 
 
 /* move home */

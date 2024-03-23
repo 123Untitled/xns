@@ -1,9 +1,9 @@
 #include "unit_tests.hpp"
-#include "other/hash.hpp"
+#include "xns/other/hash.hpp"
 
-#include "containers/pair.hpp"
-#include "string/string.hpp"
-#include "containers/array.hpp"
+#include "xns/containers/pair.hpp"
+#include "xns/string/string.hpp"
+#include "xns/containers/array.hpp"
 
 /* unit test */
 

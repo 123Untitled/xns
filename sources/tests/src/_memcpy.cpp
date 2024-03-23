@@ -1,7 +1,7 @@
 #include "unit_tests.hpp"
-#include "memory/memcpy.hpp"
-#include "other/benchmark.hpp"
-#include "system/system.hpp"
+#include "xns/memory/memcpy.hpp"
+#include "xns/other/benchmark.hpp"
+#include "xns/system/system.hpp"
 
 #include <vector>
 #include <fcntl.h>

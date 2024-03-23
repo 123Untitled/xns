@@ -1,11 +1,11 @@
 #include "unit_tests.hpp"
-#include "other/hash_set.hpp"
+#include "xns/other/hash_set.hpp"
 
-#include "random/random.hpp"
-#include "other/benchmark.hpp"
-#include "time/time.hpp"
+#include "xns/random/random.hpp"
+#include "xns/other/benchmark.hpp"
+#include "xns/time/time.hpp"
 #include <unordered_set>
-#include "containers/trie.hpp"
+#include "xns/containers/trie.hpp"
 
 
 static xns::size_t check_sum = 0;

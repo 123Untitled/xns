@@ -1,5 +1,5 @@
-#include "concurrency/thread.hpp"
-#include "containers/reference_wrapper.hpp"
+#include "xns/concurrency/thread.hpp"
+#include "xns/containers/reference_wrapper.hpp"
 
 class A {
 

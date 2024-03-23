@@ -1,7 +1,7 @@
-#include "containers/vector.hpp"
+#include "xns/containers/vector.hpp"
 //#include <benchmark/benchmark.h>
-#include "random/random.hpp"
-#include "time/time.hpp"
+#include "xns/random/random.hpp"
+#include "xns/time/time.hpp"
 
 #include <vector>
 

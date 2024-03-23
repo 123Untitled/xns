@@ -1,8 +1,8 @@
 #include "unit_tests.hpp"
 
-//#include "literal_map.hpp"
+//#include "xns/literal_map.hpp"
 
-#include "type_traits/other/string_literal.hpp"
+#include "xns/type_traits/other/string_literal.hpp"
 
 
 template <xns::basic_string_literal str>

@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "color/color.hpp"
+#include "xns/color/color.hpp"
 
 /* unit test */
 

@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "other/safe_enum.hpp"
+#include "xns/other/safe_enum.hpp"
 
 
 struct def {

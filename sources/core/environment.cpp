@@ -1,4 +1,4 @@
-#include "terminal/environment.hpp"
+#include "xns/terminal/environment.hpp"
 
 // environ
 extern constinit char** environ;

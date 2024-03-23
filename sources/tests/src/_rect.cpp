@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "visual/rect.hpp"
+#include "xns/visual/rect.hpp"
 
 /* unit test */
 

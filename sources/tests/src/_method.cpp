@@ -1,4 +1,4 @@
-#include "invoke/method.hpp"
+#include "xns/invoke/method.hpp"
 #include <iostream>
 
 

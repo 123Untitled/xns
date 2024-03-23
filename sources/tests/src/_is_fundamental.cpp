@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "type_traits/type_categories/is_fundamental.hpp"
+#include "xns/type_traits/type_categories/is_fundamental.hpp"
 
 /* unit test */
 

@@ -1,4 +1,4 @@
-#include "visual/border.hpp"
+#include "xns/visual/border.hpp"
 
 
 constinit xns::border::symbol xns::border::_symb = {

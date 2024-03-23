@@ -1,4 +1,4 @@
-#include "network/work_in_progress.hpp"
+#include "xns/network/work_in_progress.hpp"
 
 
 

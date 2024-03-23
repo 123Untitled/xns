@@ -1,5 +1,5 @@
-#include "containers/compressed_pair.hpp"
-#include "containers/pair.hpp"
+#include "xns/containers/compressed_pair.hpp"
+#include "xns/containers/pair.hpp"
 #include <iostream>
 
 //#include <benchmark/benchmark.h>
@@ -14,8 +14,8 @@ struct mypair {
 	int b;
 };
 
-#include "other/benchmark.hpp"
-#include "random/random.hpp"
+#include "xns/other/benchmark.hpp"
+#include "xns/random/random.hpp"
 
 //template <typename T>
 //static auto compressed_pair(benchmark::State& state) -> void {

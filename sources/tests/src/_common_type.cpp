@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "type_traits/type_transformations/common_type.hpp"
+#include "xns/type_traits/type_transformations/common_type.hpp"
 
 /* unit test */
 

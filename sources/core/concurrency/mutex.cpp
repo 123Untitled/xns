@@ -10,7 +10,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-#include "concurrency/mutex.hpp"
+#include "xns/concurrency/mutex.hpp"
 #include <pthread.h>
 
 

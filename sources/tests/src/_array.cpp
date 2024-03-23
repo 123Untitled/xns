@@ -1,7 +1,7 @@
 #include "unit_tests.hpp"
-#include "containers/array.hpp"
-#include "utility/swap.hpp"
-#include "other/benchmark.hpp"
+#include "xns/containers/array.hpp"
+#include "xns/utility/swap.hpp"
+#include "xns/other/benchmark.hpp"
 #include <array>
 
 

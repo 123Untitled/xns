@@ -1,10 +1,10 @@
 #include "unit_tests.hpp"
-#include "math/math.hpp"
+#include "xns/math/math.hpp"
 #include <cmath>
 #include <vector>
-#include "integer/integer.hpp"
-#include "bit/bit_view.hpp"
-#include "integer/integer_arithmetic.hpp"
+#include "xns/integer/integer.hpp"
+#include "xns/bit/bit_view.hpp"
+#include "xns/integer/integer_arithmetic.hpp"
 
 #include <algorithm>
 

@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "type_traits/other/is_all_unique.hpp"
+#include "xns/type_traits/other/is_all_unique.hpp"
 
 /* unit test */
 

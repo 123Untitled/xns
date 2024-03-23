@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "event/event.hpp"
+#include "xns/event/event.hpp"
 
 /* unit test */
 

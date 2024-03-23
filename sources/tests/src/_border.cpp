@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "visual/border.hpp"
+#include "xns/visual/border.hpp"
 
 /* unit test */
 

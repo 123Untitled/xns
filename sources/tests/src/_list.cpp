@@ -1,12 +1,12 @@
 #include "unit_tests.hpp"
-#include "containers/list.hpp"
+#include "xns/containers/list.hpp"
 
 #include <unistd.h>
 //#include <vector>
 #include <list>
 
-#include "other/benchmark.hpp"
-#include "random/random.hpp"
+#include "xns/other/benchmark.hpp"
+#include "xns/random/random.hpp"
 
 
 static xns::size_t NSIZE = 100000;

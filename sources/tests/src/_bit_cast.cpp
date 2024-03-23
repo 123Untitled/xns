@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "bit/bit_cast.hpp"
+#include "xns/bit/bit_cast.hpp"
 
 /* unit test */
 

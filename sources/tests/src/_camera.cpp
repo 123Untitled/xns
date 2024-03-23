@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "3d/camera.hpp"
+#include "xns/3d/camera.hpp"
 
 /* unit test */
 

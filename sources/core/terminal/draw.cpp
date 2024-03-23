@@ -1,4 +1,4 @@
-#include "terminal/draw.hpp"
+#include "xns/terminal/draw.hpp"
 
 void xns::draw::clear_line(const xns::u32 posX, const xns::u32 posY, const xns::u32 size) {
 	/*

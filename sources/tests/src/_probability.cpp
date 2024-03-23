@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "random/probability.hpp"
+#include "xns/random/probability.hpp"
 
 /* unit test */
 

@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "memory/weak_ptr.hpp"
+#include "xns/memory/weak_ptr.hpp"
 
 /* unit test */
 

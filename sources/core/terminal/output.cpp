@@ -1,4 +1,4 @@
-#include "terminal/output.hpp"
+#include "xns/terminal/output.hpp"
 
 /* singleton instance */
 xns::out xns::out::_instance = xns::out{};

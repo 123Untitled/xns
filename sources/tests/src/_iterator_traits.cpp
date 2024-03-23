@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "other/iterator_traits.hpp"
+#include "xns/other/iterator_traits.hpp"
 
 /* unit test */
 

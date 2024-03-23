@@ -3,8 +3,8 @@
 #include <iostream>
 #include <iomanip>
 
-#include "type_traits/relationships_and_property_queries/is_base_of.hpp"
-#include "type_traits/relationships_and_property_queries/is_derived_from.hpp"
+#include "xns/type_traits/relationships_and_property_queries/is_base_of.hpp"
+#include "xns/type_traits/relationships_and_property_queries/is_derived_from.hpp"
 
 // avoid namespace pollution
 using namespace xns;

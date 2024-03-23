@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "type_traits/type_trait_constants/integral_constant.hpp"
+#include "xns/type_traits/type_trait_constants/integral_constant.hpp"
 
 /* unit test */
 

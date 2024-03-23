@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "type_traits/type_categories/is_union.hpp"
+#include "xns/type_traits/type_categories/is_union.hpp"
 
 class test_class {
 	union {

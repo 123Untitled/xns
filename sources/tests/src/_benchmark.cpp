@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "other/benchmark.hpp"
+#include "xns/other/benchmark.hpp"
 
 /* unit test */
 

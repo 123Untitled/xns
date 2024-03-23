@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "type_traits/sequences/char_sequence.hpp"
+#include "xns/type_traits/sequences/char_sequence.hpp"
 
 /* unit test */
 

@@ -1,4 +1,4 @@
-#include "memory/allocator.hpp"
+#include "xns/memory/allocator.hpp"
 
 
 class A {

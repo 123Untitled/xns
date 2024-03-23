@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "bit/endianness.hpp"
+#include "xns/bit/endianness.hpp"
 
 /* unit test */
 

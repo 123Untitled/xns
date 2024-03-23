@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "system/directory.hpp"
+#include "xns/system/directory.hpp"
 
 /* unit test */
 

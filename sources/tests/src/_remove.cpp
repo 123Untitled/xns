@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "type_traits/type_modifications/remove.hpp"
+#include "xns/type_traits/type_modifications/remove.hpp"
 
 /* unit test */
 

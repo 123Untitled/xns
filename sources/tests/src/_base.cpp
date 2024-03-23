@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "other/base.hpp"
+#include "xns/other/base.hpp"
 
 /* unit test */
 

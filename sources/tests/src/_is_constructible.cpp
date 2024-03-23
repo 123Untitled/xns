@@ -1,6 +1,6 @@
 #include "unit_tests.hpp"
-#include "type_traits/supported_operations/is_constructible.hpp"
-#include "type_traits/supported_operations/is_assignable.hpp"
+#include "xns/type_traits/supported_operations/is_constructible.hpp"
+#include "xns/type_traits/supported_operations/is_assignable.hpp"
 
 struct AA {
 	AA(int) { std::cout << "A constructor" << std::endl; }

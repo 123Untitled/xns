@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "math/matrix.hpp"
+#include "xns/math/matrix.hpp"
 
 
 

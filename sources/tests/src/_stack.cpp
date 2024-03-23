@@ -1,6 +1,6 @@
 #include "unit_tests.hpp"
-#include "containers/stack.hpp"
-#include "time/time.hpp"
+#include "xns/containers/stack.hpp"
+#include "xns/time/time.hpp"
 
 /* unit test */
 

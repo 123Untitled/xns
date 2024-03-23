@@ -1,5 +1,5 @@
 #include "unit_tests.hpp"
-#include "math/fixed.hpp"
+#include "xns/math/fixed.hpp"
 
 /* unit test */
 

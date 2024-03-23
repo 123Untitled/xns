@@ -10,8 +10,8 @@
 /*                                                                           */
 /*****************************************************************************/
 
-#include "concurrency/thread.hpp"
-#include "utility/swap.hpp"
+#include "xns/concurrency/thread.hpp"
+#include "xns/utility/swap.hpp"
 
 
 // -- public lifecycle --------------------------------------------------------

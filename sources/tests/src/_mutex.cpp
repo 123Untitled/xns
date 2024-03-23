@@ -1,5 +1,5 @@
-#include "concurrency/mutex.hpp"
-#include "concurrency/guard_lock.hpp"
+#include "xns/concurrency/mutex.hpp"
+#include "xns/concurrency/guard_lock.hpp"
 
 /* unit test */
 int unit_tests_mutex(void) {
