@@ -209,7 +209,7 @@ CXXFLAGS+=('-Wno-unused' '-Wno-unused-variable' '-Wno-unused-parameter' '-Wno-un
 CXXFLAGS+=('-Winline')
 
 # type conversion
-CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
+#CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
 
 # shadowing
 CXXFLAGS+=('-Wshadow')
@@ -737,47 +737,53 @@ function setup_install {
 
 function setup_files {
 
-	# get source files
-	SRCS=($SRCDIR/**/*.'cpp'(.N))
-
-	# get all directories hierarchy in incdir
+	# add main include directory
 	INCLUDES=($INCDIR)
 
 
+	# test mode
 	if [[ $MODE == 'test' ]]; then
-		# get all directories hierarchy in incdir
+
+		# append all test include directories
 		INCLUDES+=($TSTINC/**/*(/N) $TSTINC)
 
 		if [[ $TEST == 'all' ]]; then
-			# get all tests files (pattern matching _*.cpp)
+			# append all test files (pattern matching _*.cpp)
 			SRCS+=($TSTSRC'/'**'/_'*'.cpp'(.N))
 		else
-			# get all tests files (pattern matching _*.cpp)
-			SRCS+=($TSTSRC'/'**'/_'$TEST'.cpp'(.N))
+			# append test file
+			SRCS=($TSTSRC'/'**'/_'$TEST'.cpp'(.N))
+
+			# search in source directory if there is a source file with the same name
+			# not work because some test files need another source files
+			# goal is to compile only the necessary source files
+			# will be implemented later...
+			#SRCS+=($SRCDIR'/'**'/'$TEST'.cpp'(.N))
+
+			# get all source files
+			SRCS=($SRCDIR/**/*.'cpp'(.N))
 		fi
 
 		# append defines
 		DEFINES+=('-DXNS_TEST_'${TEST:u})
 
-		if [[ -d $EXTDIR'/google_benchmark' ]]; then
-			# append includes
-			INCLUDES+=($EXTDIR'/google_benchmark/include')
-			# append linker flags
-			LDFLAGS+=('-L'$EXTDIR'/google_benchmark/lib' '-lbenchmark')
-		fi
+		# set optimization level
+		  OPT+=$OLEVEL[2] # -Og
+		DEBUG+=$DLEVEL[4] # -g3
+
+
+	# release or install
+	else
+		# get all source files
+		SRCS=($SRCDIR/**/*.'cpp'(.N))
+
+		# set optimization level
+		  OPT+=$OLEVEL[7] # -O3
+		DEBUG+=$DLEVEL[1] # -g0
 	fi
 
 	# insert -I prefix to each directory
 	INCLUDES=("${INCLUDES[@]/#/-I}")
-
-	# set optimization level
-	if [[ $MODE == 'release' || $MODE == 'install' ]]; then
-		  OPT+=$OLEVEL[7] # -O3
-		DEBUG+=$DLEVEL[1] # -g0
-	else
-		  OPT+=$OLEVEL[2] # -Og
-		DEBUG+=$DLEVEL[4] # -g3
-	fi
 }
 
 

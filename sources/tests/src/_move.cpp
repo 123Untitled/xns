@@ -3,7 +3,6 @@
 #include <string>
 
 /* unit test */
-
 auto unit_tests_move(void) -> int {
 
 
@@ -25,5 +24,3 @@ int main(void) {
 	return unit_tests_move();
 }
 #endif
-
-
