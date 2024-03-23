@@ -1,12 +1,41 @@
 #include "xns/containers/vector.hpp"
-//#include <benchmark/benchmark.h>
 #include "xns/random/random.hpp"
 #include "xns/time/time.hpp"
 
-#include <vector>
+
+// -- types -------------------------------------------------------------------
+
+template <typename __type>
+using __vec = xns::vector<__type>;
 
 
-static void dichotic_test(void) {
+/* is equal */
+template <typename __type, bool __capacity = true>
+static auto is_equal(const __vec<__type>& __v1,
+					 const __vec<__type>& __v2) noexcept -> bool {
+
+	if (__v1.size() != __v2.size())
+		return false;
+
+	if constexpr (__capacity == true) {
+		if (__v1.capacity() != __v2.capacity())
+			return false; }
+
+	for (auto i = 0; i < __v1.size(); ++i)
+		if (__v1[i] != __v2[i])
+			return false;
+
+	return true;
+}
+
+
+// -- constructors ------------------------------------------------------------
+
+static auto constructors_test(void) -> void {
+}
+
+
+static void dichotomic_test(void) {
 	xns::vector<int> v = xns::make_vector<int>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
 	// initialize seed
@@ -71,10 +100,9 @@ public:
 /* unit test */
 auto unit_tests_vector(void) -> int {
 
-	//simd_test();
+	simd_test();
 
-	//xns::vector<A> v;
-	//xns::malloc();
+	xns::vector<A> v;
 
 
 	return 0;
@@ -87,27 +115,3 @@ int main(void) {
 	return unit_tests_vector();
 }
 #endif
-
-
-
-//template <typename T>
-//static auto _test_(benchmark::State& state) -> void {
-//
-//		T v1;
-//	for (auto _ : state) {
-//		v1.clear();
-//		for (auto i = 0; i < state.range(0); ++i) {
-//			v1.emplace_back(xns::random::integral<int>());
-//			benchmark::DoNotOptimize(v1.size());
-//		}
-//	}
-//}
-//
-//#define START 100
-//#define END 10'000'000
-//#define REPEAT 1
-//
-//BENCHMARK(_test_<std::vector<int>>)  -> Range(START, END) -> Repetitions(REPEAT) -> RangeMultiplier(2) -> Unit(benchmark::kMillisecond);
-//BENCHMARK(_test_<xns::vector<int>>)  -> Range(START, END) -> Repetitions(REPEAT) -> RangeMultiplier(2) -> Unit(benchmark::kMillisecond);
-//
-//BENCHMARK_MAIN();
