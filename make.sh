@@ -357,6 +357,12 @@ function make_clean {
 	DELETED=$(rm -rfv $EXECUTABLE $STATIC $BLDDIR $CACHEDIR $DATABASE $SETUP | wc -l)
 	# print full cleaned message
 	echo $SEPARATOR$COLOR'[x]'$RESET 'full cleaned ('${DELETED##* } 'files)\n';
+
+	# check if local install directory exists
+	if [[ -d $PROJECT ]]; then
+		# remove local install directory
+		rm -rf $PROJECT
+	fi
 }
 
 function make_silent_clean {
