@@ -855,15 +855,16 @@ function handle_argument {
 			# check clone type
 			if [[ $CLONE == 'public' ]]; then
 				message 'error' \
-					'tests are not available in public repository.'
+					'tests are not available in public repository'
 				exit 1
 			fi
 
 			# submodule : tests
-			# check if submodules are initialized
-
-			git submodule update --init
-
+			# initialize submodules
+			if ! git submodule update --init --quiet; then
+				message 'error' 'failed to initialize submodules'
+				exit 1
+			fi
 
 			make_silent_clean
 			echo 'MODE=test'    > $SETUP
