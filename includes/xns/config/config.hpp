@@ -71,5 +71,10 @@
 #endif
 
 
+#if defined(__SIZEOF_INT128__)
+#	define XNS_128BIT_INTEGERS
+#endif
+
+
 
 #endif // CONFIG_HEADER
