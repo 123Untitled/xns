@@ -18,6 +18,8 @@
 #include "xns/type_traits/other/is_one_of.hpp"
 #include "xns/type_traits/type_modifications/remove.hpp"
 
+#include "xns/config/config.hpp"
+
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
@@ -33,7 +35,12 @@ namespace xns {
 		bool, char, short, int, long, long long,
 		char8_t, char32_t, char16_t, wchar_t,
 		signed char, unsigned char, unsigned short,
-		unsigned int, unsigned long, unsigned long long>;
+		unsigned int, unsigned long, unsigned long long
+
+		#ifdef XNS_128BIT_INTEGERS
+		, __int128, unsigned __int128
+		#endif
+		>;
 
 } // namespace xns
 
