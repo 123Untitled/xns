@@ -95,91 +95,152 @@ namespace xns {
 
 
 
-	// -- S I N T  /  U I N T -------------------------------------------------
+	// -- I N T E G E R  S E L E C T O R --------------------------------------
 
-	namespace __impl {
-
-		template <decltype(sizeof(0)) __bits>
-		class __selector final {
+	template <decltype(sizeof(0)) __bits>
+	class integer_selector final {
 
 
-			private:
+		public:
 
-				// -- private types -------------------------------------------
+			// -- public types ------------------------------------------------
 
-				/* size type */
-				using __size = decltype(__bits);
+			/* self type */
+			using self = xns::integer_selector<__bits>;
 
-
-				// -- private structs -----------------------------------------
-
-				/* error */
-				template <typename __type>
-				struct __error final {
-					static_assert(xns::always_false<__type>,
-							"this machine does not support this integer type.");
-				};
-
-				/* implementation */
-				template <typename...>
-				struct ___;
-
-				/* parameter pack specialization */
-				template <typename __type, typename... __types> requires (sizeof...(__types) > 0)
-				struct ___<__type, __types...> {
-					using __result = xns::conditional<sizeof(__type) * xns::bits_per_byte != __bits,
-												typename ___<__types...>::__result,
-												__type>;
-				};
-
-				/* end of recursion specialization */
-				template <typename __type>
-				struct ___<__type> {
-					using __result = xns::conditional<sizeof(__type) * xns::bits_per_byte != __bits,
-												__error<__type>,
-												__type>;
-				};
+			/* size type */
+			using size_type = decltype(__bits);
 
 
+		private:
 
-			public:
+			// -- private structs ---------------------------------------------
 
-				// -- public types --------------------------------------------
+			/* error */
+			template <typename __type>
+			struct __error final {
+				static_assert(xns::always_false<__type>,
+						"this machine does not support this integer type.");
+			};
 
-				/* signed integer type */
-				using __sint = typename ___<signed char,
-											signed short,
-											signed int,
-											signed long,
-											signed long long
-											#ifdef XNS_128BIT_INTEGERS
-											, __int128
-											#endif
-											>::__result;
+			/* implementation */
+			template <typename...>
+			struct ___;
 
-				/* unsigned integer type */
-				using __uint = typename ___<unsigned char,
-											unsigned short,
-											unsigned int,
-											unsigned long,
-											unsigned long long
-											#ifdef XNS_128BIT_INTEGERS
-											, unsigned __int128
-											#endif
-											>::__result;
+			/* parameter pack specialization */
+			template <typename __type, typename... __types> requires (sizeof...(__types) > 0)
+			struct ___<__type, __types...> {
+				using __result = xns::conditional<sizeof(__type) * xns::bits_per_byte != __bits,
+												  typename ___<__types...>::__result,
+												  __type>;
+			};
 
-		}; // class __selector
+			/* end of recursion specialization */
+			template <typename __type>
+			struct ___<__type> {
+				using __result = xns::conditional<sizeof(__type) * xns::bits_per_byte != __bits,
+												  __error<__type>,
+												  __type>;
+			};
 
-	} // namespace __impl
+
+		public:
+
+			// -- public types ------------------------------------------------
+
+			/* signed type */
+			using signed_type =
+				typename ___<signed char, signed short,
+							 signed int,  signed long,
+							 signed long long
+							 #ifdef XNS_128BIT_INTEGERS
+						   , __int128
+							 #endif
+							 >::__result;
+
+			/* unsigned type */
+			using unsigned_type =
+				typename ___<unsigned char, unsigned short,
+							 unsigned int,  unsigned long,
+							 unsigned long long
+							 #ifdef XNS_128BIT_INTEGERS
+						   , unsigned __int128
+							 #endif
+							 >::__result;
+
+	}; // class integer_selector
+
+
+
+
+	template <decltype(sizeof(0)) __bits, typename... __params>
+	class type_selector final {
+
+
+		public:
+
+			// -- public types ------------------------------------------------
+
+			/* self type */
+			using self = xns::type_selector<__bits, __params...>;
+
+
+		private:
+
+			// -- private types -----------------------------------------------
+
+			/* size type */
+			using __size = decltype(__bits);
+
+
+			// -- private structs -----------------------------------------
+
+			/* error */
+			template <typename __type>
+			struct __error final {
+				static_assert(xns::always_false<__type>,
+						"no type with the specified size exists.");
+			};
+
+			/* implementation */
+			template <typename...>
+			struct ___;
+
+			/* parameter pack specialization */
+			template <typename __type, typename... __types> requires (sizeof...(__types) > 0)
+			struct ___<__type, __types...> {
+				using __result = xns::conditional<sizeof(__type) * xns::bits_per_byte != __bits,
+												  typename ___<__types...>::__result,
+												  __type>;
+			};
+
+			/* end of recursion specialization */
+			template <typename __type>
+			struct ___<__type> {
+				using __result = xns::conditional<sizeof(__type) * xns::bits_per_byte != __bits,
+												  __error<__type>,
+												  __type>;
+			};
+
+
+		public:
+
+			// -- public types ------------------------------------------------
+
+			/* type */
+			using type = typename ___<__params...>::__result;
+
+	}; // class type_selector
+
 
 
 	/* sint type */
-	template <decltype(sizeof(0)) __bits>
-	using sint = typename xns::__impl::__selector<__bits>::__sint;
+	template <unsigned __bits>
+	using sint = typename xns::integer_selector<__bits>::signed_type;
 
 	/* uint type */
-	template <decltype(sizeof(0)) __bits>
-	using uint = typename xns::__impl::__selector<__bits>::__uint;
+	template <unsigned __bits>
+	using uint = typename xns::integer_selector<__bits>::unsigned_type;
 
 
 
