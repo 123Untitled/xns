@@ -29,18 +29,20 @@
 #include <sstream>
 
 
-struct flush final {
-	non_instanciable(flush);
-};
-
-struct buffered final {
-	non_instanciable(buffered);
-};
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
+
+
+	struct flush final {
+		non_instanciable(flush);
+	};
+
+	struct buffered final {
+		non_instanciable(buffered);
+	};
 
 
 	// -- O U T  C L A S S ----------------------------------------------------
