@@ -1109,7 +1109,7 @@ function main {
 	esac
 
 	echo $SEPARATOR
-	echo '💫' "[$MODE]" 'All targets are up to date !\n';
+	echo $COLOR'[Ξ]'$RESET 'targets up to date.\n';
 }
 
 # call main function
