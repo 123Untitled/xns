@@ -4,6 +4,9 @@ under development, use at your own risk !
 
 `xnamespace` - a riddle wrapped in a mystery, shrouded in an enigma. It's a C++ library of an intensely personal kind.
 
+## wiki
+[documentation](https://123untitled.github.io/xns_docs/)
+
 ## install
 ```zsh
 # build static library in-place
