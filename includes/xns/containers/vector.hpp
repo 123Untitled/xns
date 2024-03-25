@@ -10,6 +10,14 @@
 /*                                                                           */
 /*****************************************************************************/
 
+/**
+ * @file vector.hpp
+ * @brief This file contains the definition of the vector class.
+ * @author Arthur Blin
+ * @date 2024
+ * @version 0.1
+ **/
+
 #pragma once
 
 #ifndef XNS_VECTOR_HEADER
@@ -42,6 +50,13 @@ namespace xns {
 
 
 	// -- V E C T O R  C L A S S ----------------------------------------------
+
+	/**
+	 * @class vector
+	 * @brief The vector class is a sequence container that encapsulates dynamic arrays.
+	 * @tparam __type The type of the elements.
+	 * @tparam __alloc The type of the allocator.
+	 */
 
 	template <typename __type,
 			  typename __alloc = xns::allocator<__type>>
