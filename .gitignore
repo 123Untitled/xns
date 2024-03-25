@@ -14,7 +14,7 @@
 
 
 # build directory
-/build
+/.build
 
 # install directory
 /xns

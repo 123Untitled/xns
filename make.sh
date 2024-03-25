@@ -82,7 +82,7 @@ TSTINC=$TSTDIR'/includes'
 TSTSRC=$TSTDIR'/sources'
 
 # build directory
-BLDDIR=$ABSDIR'/build'
+BLDDIR=$ABSDIR'/.build'
 
 # object directory
 OBJDIR=$BLDDIR'/object'
