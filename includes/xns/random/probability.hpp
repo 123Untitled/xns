@@ -22,15 +22,15 @@
 #include <unistd.h>
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
-namespace Xf {
+namespace xns {
 
 
-	// -- P R O B A B I L I T Y  C L A S S ------------------------------------
+	// -- P R O B A B I L I T Y -----------------------------------------------
 
-	template <class T>
-	class Probability final {
+	template <typename T>
+	class probability final {
 
 		private:
 
@@ -63,12 +63,11 @@ namespace Xf {
 			// -- P U B L I C  C O N S T R U C T O R S ------------------------
 
 			/* default constructor */
-			Probability(void) {
-				// code here...
+			probability(void) {
 			}
 
 			/* capacity constructor */
-			Probability(const size_type size) {
+			probability(const size_type size) {
 				_data.reserve(size);
 			}
 
@@ -131,11 +130,6 @@ namespace Xf {
 	};
 
 
+} // namespace xns
 
-
-
-
-
-}
-
-#endif
+#endif // XNS_PROBABILITY_HEADER
