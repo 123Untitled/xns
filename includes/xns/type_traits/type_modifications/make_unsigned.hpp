@@ -33,7 +33,7 @@ namespace xns {
 
 	// -- M A K E  U N S I G N E D --------------------------------------------
 
-	namespace __impl {
+	namespace ___impl {
 
 
 		template <typename __type>
@@ -78,8 +78,8 @@ namespace xns {
 
 
 	/* make unsigned */
-	template <typename __type>
-	using make_unsigned = typename xns::__impl::make_unsigned<__type>::type;
+	template <typename ___type>
+	using make_unsigned = typename xns::___impl::make_unsigned<___type>::type;
 
 } // namespace xns
 
