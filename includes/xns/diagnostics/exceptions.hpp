@@ -16,21 +16,15 @@
 #define XNS_EXCEPTIONS_HEADER
 
 #include "xns/type_traits/types.hpp"
+#include "xns/config/config.hpp"
+
+
+#if XNS_HAS_NOEXCEPT == false
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
-
-
-	/* no exceptions */
-	#if defined(__cpp_exceptions) || defined(__EXCEPTIONS)
-	/* exceptions enabled */
-	constexpr bool no_exceptions = false;
-	#else
-	/* exceptions disabled */
-	constexpr bool no_exceptions = true;
-	#endif
 
 
 	// -- E X C E P T I O N ---------------------------------------------------
@@ -52,7 +46,9 @@ namespace xns {
 			// -- constructors ------------------------------------------------
 
 			/* default constructor */
-			exception(void) = delete;
+			exception(void) noexcept
+			: _message{"unknown exception"}, _code{0} {
+			}
 
 			/* code and message constructor */
 			exception(const char* const message, const code_type code) noexcept
@@ -76,6 +72,14 @@ namespace xns {
 
 			/* move assignment operator */
 			auto operator=(self&&) noexcept -> self& = default;
+
+
+			// -- public interface --------------------------------------------
+
+			/* what */
+			virtual auto what(void) const noexcept -> const char* {
+				return _message;
+			}
 
 
 			// -- public methods ----------------------------------------------
@@ -104,5 +108,7 @@ namespace xns {
 	}; // class exception
 
 } // namespace xns
+
+#endif // XNS_HAS_EXCEPTIONS
 
 #endif // XNS_EXCEPTIONS_HEADER

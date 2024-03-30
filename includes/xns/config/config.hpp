@@ -1,4 +1,16 @@
-//#pragma once
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
 
 #ifndef XNS_CONFIG_HEADER
 #define XNS_CONFIG_HEADER
@@ -71,10 +83,56 @@
 #endif
 
 
+// -- integer sizes -----------------------------------------------------------
+
+// check for 128-bit integers
 #if defined(__SIZEOF_INT128__)
 #	define XNS_128BIT_INTEGERS
 #endif
 
+// check for 32-bit / 64-bit integers
+#if defined(__i386__) || defined(__arm__)
+#	define XNS_32BIT_INTEGERS
+#elif defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
+#	define XNS_64BIT_INTEGERS
+#endif
+
+
+
+/* check if exceptions are enabled */
+#if defined(__cpp_exceptions) || defined(__EXCEPTIONS)
+
+	/* exceptions enabled */
+	#define XNS_HAS_NOEXCEPT false
+	#define XNS_NOEXCEPT(__cond) noexcept(__cond)
+	#define __XNS_THROW(__exception) throw __exception
+	#define __XNS_TRY try
+	#define __XNS_CATCH(__exception) catch (__exception)
+
+	namespace xns {
+		/* for template programming */
+		enum : bool {
+			has_noexcept = false
+		};
+	}
+
+#else
+
+	/* exceptions disabled */
+	#define XNS_HAS_NOEXCEPT true
+	#define XNS_NOEXCEPT(__cond) noexcept
+	#define __XNS_THROW(__exception)
+	#define __XNS_TRY
+	#define __XNS_CATCH(__exception)
+
+	namespace xns {
+		/* for template programming */
+		enum : bool {
+			has_noexcept = true
+		};
+	}
+
+#endif
 
 
 #endif // CONFIG_HEADER

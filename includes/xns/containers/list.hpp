@@ -15,8 +15,13 @@
 #ifndef XNS_LIST_HEADER
 #define XNS_LIST_HEADER
 
+#include "xns/type_traits/types.hpp"
+
 #include "xns/type_traits/type_operations/move.hpp"
 #include "xns/type_traits/type_operations/forward.hpp"
+
+#include "xns/type_traits/relationships_and_property_queries/is_nothrow_invocable.hpp"
+
 #include "xns/config/macros.hpp"
 #include "xns/memory/allocator.hpp"
 
@@ -28,7 +33,8 @@ namespace xns {
 
 	// -- L I S T -------------------------------------------------------------
 
-	template <typename T>
+	template <typename ___type,
+			  typename ___alloc = xns::allocator<___type>>
 	class list final {
 
 
@@ -44,30 +50,18 @@ namespace xns {
 			class list_iterator;
 
 
-			// -- private types -----------------------------------------------
-
-			/* node type */
-			using node_type   = node;
-
-			/* node pointer type */
-			using node_ptr    = node_type*;
-
-			/* allocator type */
-			using allocator   = xns::allocator<node>;
-
-
 		public:
 
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self           = xns::list<T>;
+			using self           = xns::list<___type, ___alloc>;
 
 			/* value type */
-			using value_type     = T;
+			using value_type     = ___type;
 
 			/* size type */
-			using size_type      = decltype(sizeof(0));
+			using size_type      = xns::size_t;
 
 			/* reference type */
 			using mut_ref        = value_type&;
@@ -90,57 +84,138 @@ namespace xns {
 			/* const iterator type */
 			using const_iterator = list_iterator<true>;
 
+			/* allocator type */
+			using allocator_type = ___alloc;
+
+
+		private:
+
+			// -- private types -----------------------------------------------
+
+			/* node type */
+			using node_type = node;
+
+			/* node pointer type */
+			using node_ptr  = node_type*;
+
+			/* allocator type */
+			using ___allocator = typename ___alloc::template
+													rebind<node_type>::other;
+
+
+			// -- private members ---------------------------------------------
+
+			/* head */
+			node_ptr _head;
+
+			/* tail */
+			node_ptr _tail;
+
+			/* size */
+			size_type _size;
+
+			/* allocator */
+			//[[no_unique_address]]
+			//___allocator _alloc;
+
+
+		public:
 
 			// -- public constructors -----------------------------------------
 
 			/* default constructor */
-			inline list(void) noexcept
-			: _head{nullptr}, _tail{nullptr}, _size{0} {
+			list(void) noexcept
+			: _head{nullptr}, _tail{nullptr}, _size{0U} {
 			}
 
 			/* copy constructor */
-			list(const self& other)
+			list(const self& other) noexcept(xns::is_nothrow_copy_constructible<value_type>
+										  && xns::is_nothrow_invocable<decltype(___allocator::allocate)>)
 			: _head{nullptr}, _tail{nullptr}, _size{other._size} {
+
 				// declare node pointer
-				node_ptr ptr = other._head;
-				node_ptr prev = nullptr;
+				node_ptr    ptr  = other._head;
+				node_ptr    prev = nullptr;
 				node_type** addr = &_head;
 
+
+				// todo: need to increment size for each node if throw !
+
+
 				// loop over other list
-				while (ptr) {
-					*addr = new_node(ptr->_value, prev);
+				while (ptr != nullptr) {
+
+					// nothrow allocate
+					if constexpr (xns::is_nothrow_invocable<decltype(___allocator::allocate)>) {
+						// allocate
+						*addr = ___allocator::allocate();
+						if (not *addr) {
+							_tail = prev;
+							return;
+						}
+					}
+					else {
+						// try to allocate
+						try { *addr = ___allocator::allocate(); }
+						catch (...) {
+							_tail = prev;
+							throw; }
+					}
+
+					// nothrow copy constructible
+					if constexpr (xns::is_nothrow_copy_constructible<value_type>) {
+						// copy construct
+						___allocator::construct(*addr, ptr->_value);
+					}
+					// throw copy constructible
+					else {
+						// try to construct
+						try { ___allocator::construct(*addr, ptr->_value); }
+						catch (...) {
+							___allocator::deallocate(*addr);
+							// init pointer
+							*addr = nullptr;
+							// set tail
+							_tail = prev;
+							throw; }
+					}
+
+					// todo: need to free node if construct throws !!!
+
 					 prev = *addr;
 					 addr = &(*addr)->_next;
-					  ptr = ptr->_next;
-				} // set tail
+					 ptr  = ptr->_next;
+				}
+				// set tail
 				_tail = prev;
 			}
 
 
 			/* move constructor */
-			inline list(self&& other) noexcept
+			list(self&& other) noexcept
 			: _head{other._head}, _tail{other._tail}, _size{other._size} {
-				other.init();
+				other._init();
 			}
 
 			/* destructor */
-			inline ~list(void) noexcept {
-				free_list();
+			~list(void) noexcept {
+				this->_free();
 			}
 
 
-			// -- public assignment methods -----------------------------------
+			// -- public assignment operators ---------------------------------
 
-			/* copy assignment */ // INFO: not optimized !
-			auto assign(const self& other) -> void {
+			/* copy assignment operator */
+			auto operator=(const self& other) -> self& {
 
 				// check for self assignment
 				if (this == &other)
 					return;
 
 				// deallocate list
-				free_list();
-				init();
+				this->_free();
+
+				_init();
 
 				// get other head
 				node_ptr ptr = other._head;
@@ -150,39 +225,29 @@ namespace xns {
 					back_link(new_node(ptr->_value));
 					// move to next node
 					ptr = ptr->_next; }
+
 				// set list size
 				_size = other._size;
+
+				return *this;
 			}
 
-			/* move assignment */
-			auto assign(self&& other) noexcept -> void {
+			/* move assignment operator */
+			auto operator=(self&& other) noexcept -> self& {
 
 				// check for self assignment
 				if (this == &other)
 					return;
 
 				// deallocate list
-				free_list();
+				this->_free();
+
 				// move other members
-				_head = other._head;
-				_tail = other._tail;
-				_size = other._size;
+				_copy(other);
+
 				// invalidate other
-				other.init();
-			}
+				other._init();
 
-
-			// -- public assignment operators ---------------------------------
-
-			/* copy assignment operator */
-			inline auto operator=(const self& other) -> self& {
-				assign(other);
-				return *this;
-			}
-
-			/* move assignment operator */
-			inline auto operator=(self&& other) noexcept -> self& {
-				assign(xns::move(other));
 				return *this;
 			}
 
@@ -217,6 +282,24 @@ namespace xns {
 			/* const back */
 			inline auto back(void) const noexcept -> const_ref {
 				return _tail->_value;
+			}
+
+
+			// -- public iterator accessors -----------------------------------
+
+			/* begin */
+			inline auto begin(void) noexcept -> iterator {
+				return iterator{_head};
+			}
+
+			/* begin */
+			inline auto begin(void) const noexcept -> const_iterator {
+				return const_iterator{_head};
+			}
+
+			/* end */
+			inline auto end(void) const noexcept -> xns::null {
+				return nullptr;
 			}
 
 
@@ -355,11 +438,8 @@ namespace xns {
 
 
 			/* clear list */
-			void clear(void) noexcept {
-				// deallocate list
-				free_list();
-				// initialize members
-				init();
+			auto clear(void) noexcept -> void {
+				_free(); _init();
 			}
 
 
@@ -381,22 +461,6 @@ namespace xns {
 
 
 
-			// -- public iterator methods -------------------------------------
-
-			/* begin */
-			inline auto begin(void) noexcept -> iterator {
-				return iterator{_head};
-			}
-
-			/* begin */
-			inline auto begin(void) const noexcept -> const_iterator {
-				return const_iterator{_head};
-			}
-
-			/* end */
-			inline auto end(void) const noexcept -> xns::null {
-				return nullptr;
-			}
 
 
 		private:
@@ -406,26 +470,24 @@ namespace xns {
 			/* new node */
 			template <typename... A>
 			inline auto new_node(A&&... args) -> node_ptr {
-				auto ptr = allocator::allocate();
-				allocator::construct(ptr, xns::forward<A>(args)...);
+				auto ptr = ___allocator::allocate();
+				___allocator::construct(ptr, xns::forward<A>(args)...);
 				return ptr;
 			}
 
 			/* delete node */
 			inline void store_node(node_ptr ptr) noexcept {
-				allocator::destroy(ptr);
-				allocator::deallocate(ptr);
+				___allocator::destroy(ptr);
+				___allocator::deallocate(ptr);
 			}
 
 
 			/* link node to front */
 			auto front_link(node_ptr ptr) noexcept -> void {
 				// check if list is empty
-				not _head ?
-					_tail = ptr
+				not _head ? _tail = ptr
 					// list is not empty
-					: _head->_prev = ptr,
-					   ptr->_next = _head;
+					: _head->_prev = ptr, ptr->_next = _head;
 				// in any case, set new head
 				_head = ptr;
 			}
@@ -433,24 +495,28 @@ namespace xns {
 			/* link node to back */
 			auto back_link(node_ptr ptr) noexcept -> void {
 				// check if list is empty
-				not _tail ?
-					_head = ptr
+				not _tail ? _head = ptr
 					// list is not empty
-					: _tail->_next = ptr,
-					   ptr->_prev = _tail;
+					: _tail->_next = ptr, ptr->_prev = _tail;
 				// in any case, set new tail
 				_tail = ptr;
 			}
 
 			/* init */
-			void init(void) noexcept {
-				// initialize members
+			auto _init(void) noexcept -> void {
 				_head = _tail = nullptr;
 				_size = 0;
 			}
 
-			/* free list */
-			inline void free_list(void) noexcept {
+			/* copy */
+			auto _copy(const self& __ot) noexcept -> void {
+				_head = __ot._head;
+				_tail = __ot._tail;
+				_size = __ot._size;
+			}
+
+			/* free */
+			auto _free(void) noexcept -> void {
 				// get head node
 				node_ptr ptr = nullptr;
 				// loop over list
@@ -464,64 +530,46 @@ namespace xns {
 			}
 
 
-			// -- private members ---------------------------------------------
 
-			/* head node */
-			node_ptr _head;
-
-			/* tail node */
-			node_ptr _tail;
-
-			/* list size */
-			size_type _size;
-
-
-	};
+	}; // class list
 
 
 
 
 	// -- N O D E -------------------------------------------------------------
 
-	template <class T>
-	class list<T>::node final {
+	template <typename __type, typename __alloc>
+	class list<__type, __alloc>::node final {
 
 
 		public:
 
 			// -- public lifecycle --------------------------------------------
 
-			/* default constructor */
-			inline node(void) noexcept(xns::is_nothrow_default_constructible<T>)
-			: _next{nullptr}, _prev{nullptr}, _value{} {
-			}
+			/* deleted default constructor */
+			node(void) = delete;
 
 			/* not assignable */
 			XNS_NOT_ASSIGNABLE(node);
 
 			/* value copy constructor (with previous node) */
-			inline node(const_ref value, node_ptr prev) noexcept(xns::is_nothrow_copy_constructible<T>)
+			node(const_ref value, node_ptr prev = nullptr) noexcept(xns::is_nothrow_copy_constructible<__type>)
 			: _next{nullptr}, _prev{prev}, _value{value} {
 			}
 
-			/* value copy constructor */
-			inline node(const_ref value) noexcept(xns::is_nothrow_copy_constructible<T>)
-			: _next{nullptr}, _prev{nullptr}, _value{value} {
-			}
-
 			/* value move constructor */
-			inline node(move_ref value) noexcept(xns::is_nothrow_move_constructible<T>)
+			inline node(move_ref value) noexcept(xns::is_nothrow_move_constructible<__type>)
 			: _next{nullptr}, _prev{nullptr}, _value{xns::move(value)} {
 			}
 
 			/* value forward constructor */
-			template <typename... A> requires (xns::is_constructible<T, A...>)
-			inline node(A&&... args) noexcept(xns::is_nothrow_constructible<T, A...>)
-			: _next{nullptr}, _prev{nullptr}, _value{xns::forward<A>(args)...} {
+			template <typename... __params> requires (xns::is_constructible<__type, __params...>)
+			inline node(__params&&... args) noexcept(xns::is_nothrow_constructible<__type, __params...>)
+			: _next{nullptr}, _prev{nullptr}, _value{xns::forward<__params>(args)...} {
 			}
 
 			/* destructor */
-			inline ~node(void) noexcept = default;
+			~node(void) noexcept = default;
 
 
 			// -- public members ----------------------------------------------
@@ -538,7 +586,7 @@ namespace xns {
 	}; // class node
 
 
-	// -- friend functions ----------------------------------------------------
+	// -- non-member functions ------------------------------------------------
 
 	/* swap */
 	template <typename T>
@@ -563,9 +611,9 @@ namespace xns {
 
 	// -- I T E R A T O R -----------------------------------------------------
 
-	template <typename T>
-	template <bool C>
-	class list<T>::list_iterator final {
+	template <typename __type, typename __alloc>
+	template <bool ___const>
+	class list<__type, __alloc>::list_iterator final {
 
 
 		// -- friends ---------------------------------------------------------
@@ -580,13 +628,13 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self     = xns::list<T>::list_iterator<C>;
+			using self     = xns::list<__type, __alloc>::list_iterator<___const>;
 
 			/* reference type */
-			using cond_ref = typename xns::conditional<C, const_ref, mut_ref>;
+			using cond_ref = typename xns::conditional<___const, const_ref, mut_ref>;
 
 			/* pointer type */
-			using cond_ptr = typename xns::conditional<C, const_ptr, mut_ptr>;
+			using cond_ptr = typename xns::conditional<___const, const_ptr, mut_ptr>;
 
 
 			// -- public constructors -----------------------------------------
@@ -597,26 +645,26 @@ namespace xns {
 			}
 
 			/* node constructor */
-			list_iterator(node_ptr node) noexcept
-			: _node{node} {
+			list_iterator(node_ptr __node) noexcept
+			: _node{__node} {
 			}
 
 			/* copy constructor */
 			list_iterator(const self&) noexcept = default;
 
-			/* copy constructor */
-			list_iterator(const list_iterator<not C>& other) noexcept
-			: _node{other._node} {
-				static_assert(C, "iterator: cannot convert const_iterator to iterator");
-			}
-
 			/* move constructor */
 			list_iterator(self&&) noexcept = default;
 
-			/* move constructor */
-			list_iterator(list_iterator<not C>&& other) noexcept
+			/* copy constructor */
+			list_iterator(const list_iterator<not ___const>& other) noexcept
 			: _node{other._node} {
-				static_assert(C, "iterator: cannot convert const_iterator to iterator");
+				static_assert(___const == true, "iterator: cannot convert const_iterator to iterator");
+			}
+
+			/* move constructor */
+			list_iterator(list_iterator<not ___const>&& other) noexcept
+			: _node{other._node} {
+				static_assert(___const == true, "iterator: cannot convert const_iterator to iterator");
 			}
 
 			/* destructor */
@@ -628,23 +676,22 @@ namespace xns {
 			/* copy assignment operator */
 			auto operator=(const self&) noexcept -> self& = default;
 
-			/* copy assignment operator */
-			auto operator=(const list_iterator<not C>& other) noexcept -> self& {
-				static_assert(C, "iterator: cannot convert const_iterator to iterator");
-				_node = other._node;
-				return *this;
-			}
-
 			/* move assignment operator */
 			auto operator=(self&&) noexcept -> self& = default;
 
-			/* move assignment operator */
-			auto operator=(list_iterator<not C>&& other) noexcept -> self& {
-				static_assert(C, "iterator: cannot convert const_iterator to iterator");
+			/* copy assignment operator */
+			auto operator=(const list_iterator<not ___const>& other) noexcept -> self& {
+				static_assert(___const == true, "iterator: cannot convert const iterator to non-const iterator");
 				_node = other._node;
 				return *this;
 			}
 
+			/* move assignment operator */
+			auto operator=(list_iterator<not ___const>&& other) noexcept -> self& {
+				static_assert(___const == true, "iterator: cannot convert const iterator to non-const iterator");
+				_node = other._node;
+				return *this;
+			}
 
 
 			// -- public accessor operators -----------------------------------
@@ -663,26 +710,26 @@ namespace xns {
 			// -- public arithmetic operators ---------------------------------
 
 			/* pre-incrementation operator */
-			inline auto operator++(void) noexcept -> self& {
+			auto operator++(void) noexcept -> self& {
 				_node = _node->_next;
 				return *this;
 			}
 
 			/* post-incrementation operator */
-			inline auto operator++(int) noexcept -> self {
+			auto operator++(int) noexcept -> self {
 				self tmp{*this};
 				_node = _node->_next;
 				return tmp;
 			}
 
 			/* pre-decrementation operator */
-			inline auto operator--(void) noexcept -> self& {
+			auto operator--(void) noexcept -> self& {
 				_node = _node->_prev;
 				return *this;
 			}
 
 			/* post-decrementation operator */
-			inline auto operator--(int) noexcept -> self {
+			auto operator--(int) noexcept -> self {
 				self tmp{*this};
 				_node = _node->_prev;
 				return tmp;

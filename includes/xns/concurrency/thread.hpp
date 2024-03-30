@@ -17,6 +17,8 @@
 
 // local headers
 #include "xns/config/macros.hpp"
+#include "xns/config/config.hpp"
+
 #include "xns/containers/tuple.hpp"
 #include "xns/utility/apply.hpp"
 
@@ -24,6 +26,7 @@
 #include "xns/type_traits/sequences/integer_sequence.hpp"
 #include "xns/memory/unique_ptr.hpp"
 #include "xns/functional/invoke.hpp"
+
 
 #include <pthread.h>
 
@@ -70,7 +73,7 @@ namespace xns {
 									 nullptr,
 									 thread_proxy<tuple_type>,
 									 unique.get()) != 0) {
-					throw;
+					__XNS_THROW();
 				}
 
 				unique.release();

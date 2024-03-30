@@ -1886,9 +1886,8 @@ namespace xns {
 			}
 
 			/* address as integer */
-			inline auto address(void) const noexcept -> xns::addr_t {
-				// return address
-				return reinterpret_cast<xns::addr_t>(_node);
+			inline auto address(void) const noexcept -> xns::uintptr_t {
+				return reinterpret_cast<xns::uintptr_t>(_node);
 			}
 
 

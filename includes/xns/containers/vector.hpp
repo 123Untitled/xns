@@ -10,20 +10,12 @@
 /*                                                                           */
 /*****************************************************************************/
 
-/**
- * @file vector.hpp
- * @brief This file contains the definition of the vector class.
- * @author Arthur Blin
- * @date 2024
- * @version 0.1
- **/
-
 #pragma once
 
 #ifndef XNS_VECTOR_HEADER
 #define XNS_VECTOR_HEADER
 
-// local headers
+#include "xns/config/config.hpp"
 
 #include "xns/memory/allocator.hpp"
 #include "xns/memory/memcpy.hpp"
@@ -38,7 +30,6 @@
 #include "xns/utility/swap.hpp"
 
 
-// c++ standard library headers
 #include <iostream>
 #include <cstring>
 
@@ -51,13 +42,7 @@ namespace xns {
 
 	// -- V E C T O R  C L A S S ----------------------------------------------
 
-	/**
-	 * @class vector
-	 * @brief The vector class is a sequence container that encapsulates dynamic arrays.
-	 * @tparam __type The type of the elements.
-	 * @tparam __alloc The type of the allocator.
-	 */
-
+	/* vector */
 	template <typename __type,
 			  typename __alloc = xns::allocator<__type>>
 	class vector final {
@@ -70,7 +55,7 @@ namespace xns {
 		//		   && xns::is_nothrow_move_assignable<T>,
 		//			  "vector, requires nothrow move operations.");
 
-		/* requires nothrow destructible */
+		/** requires nothrow destructible type */
 		static_assert(xns::is_nothrow_destructible<__type>,
 					  "vector, requires nothrow destructible type.");
 
@@ -140,8 +125,6 @@ namespace xns {
 		public:
 
 
-
-
 			/*
 			template <class InputIt>
 			constexpr vector(InputIt first, InputIt last, const Allocator& alloc = Allocator());
@@ -151,6 +134,9 @@ namespace xns {
 
 			constexpr vector(vector&& other) noexcept;
 			constexpr vector(vector&& other, const Allocator& alloc);
+
+			constexpr vector( size_type count, const T& value, const Allocator& alloc = Allocator());
+			constexpr explicit vector( size_type count, const Allocator& alloc = Allocator());
 
 			*/
 
@@ -175,10 +161,6 @@ namespace xns {
 					allocator::construct(_data + i, xns::forward<T>(__arr)[i]);
 			}
 
-			/*
-			constexpr vector( size_type count, const T& value, const Allocator& alloc = Allocator());
-			constexpr explicit vector( size_type count, const Allocator& alloc = Allocator());
-			*/
 
 			/* allocation constructor */
 			explicit inline vector(mut_ptr ptr, const size_type size) noexcept
@@ -188,16 +170,14 @@ namespace xns {
 
 
 			/* copy constructor */
-			explicit vector(const self& other) noexcept(xns::is_nothrow_copy_constructible<value_type>)
-			:   _data{other._size > 0 ? allocator::allocate(other._size) : nullptr},
+			#if (!XNS_HAS_NOEXCEPT)
+			vector(const self& other) noexcept(xns::is_nothrow_copy_constructible<value_type>)
+			:     _data{other._size > 0 ? allocator::allocate(other._size) : nullptr},
 			  _capacity{other._size},
 			      _size{_capacity} {
 
 				// trival copy
 				if constexpr (xns::is_trivially_copyable<value_type>) {
-
-					std::cout << "trivial vector copy" << std::endl;
-
 					// copy elements
 					xns::memcpy(_data, other._data, _size * sizeof(value_type));
 				}
@@ -207,9 +187,6 @@ namespace xns {
 
 					// construct for nothrow copy constructible types
 					if constexpr (xns::is_nothrow_copy_constructible<value_type>) {
-
-						std::cout << "nothrow vector copy" << std::endl;
-
 						// copy construct elements
 						for (size_type i = 0; i < _size; ++i)
 							allocator::construct(_data + i, other._data[i]);
@@ -217,10 +194,7 @@ namespace xns {
 
 					else {
 
-						std::cout << "throw vector copy" << std::endl;
-
 						size_type i = 0;
-
 						// try construct
 						try {
 							// copy construct elements
@@ -237,10 +211,8 @@ namespace xns {
 								for (size_type j = 0; j < i; ++j)
 									allocator::destroy(_data + j);
 							}
-
 							// deallocate memory
 							allocator::deallocate(_data);
-
 							// forward exception
 							throw;
 						}
@@ -250,6 +222,40 @@ namespace xns {
 				} // non-trivial copy
 
 			} // copy constructor
+
+			#else
+
+			/* copy constructor */
+			vector(const self& other) noexcept
+			:     _data{other._size > 0 ? allocator::allocate(other._size) : nullptr},
+			  _capacity{other._size},
+			      _size{_capacity} {
+
+				if (_data == nullptr) {
+					_capacity = 0;
+					_size = 0;
+					return;
+				}
+
+				// trival copy
+				if constexpr (xns::is_trivially_copyable<value_type>) {
+					// copy elements
+					xns::memcpy(_data, other._data, _size * sizeof(value_type));
+				}
+
+				else {
+					for (size_type i = 0; i < _size; ++i)
+						allocator::construct(_data + i, other._data[i]);
+				}
+
+			}
+
+			#endif // XNS_HAS_NOEXCEPT
+
+
+
+
+
 
 
 			/* move constructor */
@@ -314,7 +320,8 @@ namespace xns {
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			auto operator=(const self& other) -> self& requires (not xns::is_trivially_copyable<value_type>) {
+			auto operator=(const self& other) noexcept (false /* allocator may throw */)
+									 -> self& requires (not xns::is_trivially_copyable<value_type>) {
 
 				// check for self-assignment
 				if (this == &other)
@@ -353,10 +360,14 @@ namespace xns {
 
 				// return self reference
 				return *this;
-			}
+
+			} // implementation not complete !!!
+
+
 
 			/* copy assignment operator (trivially copyable) */
-			auto operator=(const self& other) -> self& requires (xns::is_trivially_copyable<value_type>) {
+			auto operator=(const self& other) noexcept(false /* allocator may throw */)
+									 -> self& requires (xns::is_trivially_copyable<value_type>) {
 
 				// check for self-assignment
 				if (this == &other)
@@ -364,6 +375,19 @@ namespace xns {
 
 				// destroy elements
 				_clear();
+
+
+				if (_capacity < other._size) {
+
+					if (_data != nullptr)
+						allocator::deallocate(_data);
+
+					_init();
+
+					_data = allocator::allocate(other._size);
+
+					_capacity = other._size;
+				}
 
 				// deallocate memory
 				allocator::deallocate(_data); /* info: no nullptr check */
@@ -382,12 +406,11 @@ namespace xns {
 				_clear();
 
 				// deallocate memory
-				allocator::deallocate(_data); /* info: no nullptr check */
+				if (_data != nullptr)
+					allocator::deallocate(_data);
 
-				// move other members
-				_data   = other._data;
-				_capacity = other._capacity;
-				_size     = other._size;
+				// copy members
+				_copy_members(other);
 
 				// invalidate other
 				other._init();
@@ -402,16 +425,6 @@ namespace xns {
 
 			/* const subscript operator */
 			inline auto operator[](const size_type index) const noexcept -> const_ref {
-				return _data[index];
-			}
-
-			/* at */
-			auto at(const size_type index) noexcept -> mut_ref {
-				return _data[index];
-			}
-
-			/* const at */
-			auto at(const size_type index) const noexcept -> const_ref {
 				return _data[index];
 			}
 
@@ -462,8 +475,6 @@ namespace xns {
 			inline auto data(void) const noexcept -> const_ptr {
 				return _data;
 			}
-
-
 
 
 			// -- public memory management ------------------------------------
@@ -875,6 +886,15 @@ namespace xns {
 					// destroy elements
 					for (size_type i = 0; i < _size; ++i)
 						allocator::destroy(_data + i);
+			}
+
+			/* copy members */
+			auto _copy_members(const self& other) noexcept -> void {
+
+				// copy members
+				_data     = other._data;
+				_capacity = other._capacity;
+				_size     = other._size;
 			}
 
 

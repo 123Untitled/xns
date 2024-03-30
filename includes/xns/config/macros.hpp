@@ -45,6 +45,10 @@ namespace xns {
 	#define XNS_NOT_MOVABLE(_) NON_MOVABLE(_)
 	#define XNS_NOT_ASSIGNABLE(_) NON_ASSIGNABLE(_)
 
+	#define ___xns_not_instantiable(_) NON_INSTANCIABLE(_)
+	#define ___xns_not_copyable(_)     NON_COPYABLE(_)
+	#define ___xns_not_movable(_)      NON_MOVABLE(_)
+	#define ___xns_not_assignable(_)   NON_ASSIGNABLE(_)
 
 
 	#define non_instanciable(obj) NON_INSTANCIABLE(obj)
