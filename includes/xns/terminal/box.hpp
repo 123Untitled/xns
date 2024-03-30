@@ -35,12 +35,6 @@ namespace xns {
 
 	class box final {
 
-		// -- assertions ------------------------------------------------------
-
-		/* check string size vs terminal size */
-		static_assert(sizeof(xns::term_size) <= sizeof(xns::string::size_type),
-					"): TERMINAL SIZE IS BIGGER THAN STRING SIZE");
-
 
 		public:
 
@@ -49,11 +43,11 @@ namespace xns {
 			/* self type */
 			using self = xns::box;
 
-			/* terminal size type */
-			using term_size = xns::term_size;
+			/* size type */
+			using size_type = xns::size_t; // before was term_size
 
 			/* rect type */
-			using rect_type = xns::rect<term_size>;
+			using rect_type = xns::rect<size_type>;
 
 			/* string type */
 			using string = xns::string;
