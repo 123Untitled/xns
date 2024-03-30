@@ -61,7 +61,7 @@ void xns::box::set(const rect_type& rect, const xns::hexcolor color) {
 	// append top left corner
 	_box.append(_symb[CORNER_TL], 3);
 	// append top box
-	for (term_size i = 1; i < w - 1; ++i) {
+	for (size_type i = 1; i < w - 1; ++i) {
 		_box.append(_symb[LINE_H], 3);
 	}
 	// append top right corner
@@ -75,15 +75,15 @@ void xns::box::set(const rect_type& rect, const xns::hexcolor color) {
 	_box.append(_symb[CORNER_BL], 3);
 
 	// append bottom box
-	for (term_size i = 1; i < w - 1; ++i) {
+	for (size_type i = 1; i < w - 1; ++i) {
 		_box.append(_symb[LINE_H], 3);
 	}
 	// append bottom right corner
 	_box.append(_symb[CORNER_BR], 3);
 
-	term_size y_pos = y + h - 1;
+	size_type y_pos = y + h - 1;
 	// append left vertical box
-	for (term_size i = y + 1; i < y_pos; ++i) {
+	for (size_type i = y + 1; i < y_pos; ++i) {
 		// append move position left box
 		//_box.append(Esc::get<Xf::move_position_t>(x, i));
 		_box.append(esc::move_position(x, i));
@@ -91,9 +91,9 @@ void xns::box::set(const rect_type& rect, const xns::hexcolor color) {
 		_box.append(_symb[LINE_V], 3);
 	}
 
-	term_size x_pos = x + w - 1;
+	size_type x_pos = x + w - 1;
 	// append right vertical box
-	for (term_size i = y + 1; i < y_pos; ++i) {
+	for (size_type i = y + 1; i < y_pos; ++i) {
 		// append move position right box
 		//_box.append(Esc::get<Xf::move_position_t>(x_pos, i));
 		_box.append(esc::move_position(x_pos, i));
