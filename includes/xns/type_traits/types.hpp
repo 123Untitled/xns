@@ -22,8 +22,6 @@
 #include "xns/config/macros.hpp"
 #include "xns/config/config.hpp"
 
-// include for struct winsize
-#include <sys/ioctl.h>
 
 
 
@@ -80,9 +78,6 @@ namespace xns {
 
 
 	// -- T Y P E S -------------------------------------------------------------
-
-	/* terminal size type */
-	using term_size = decltype(xns::declval<struct winsize>().ws_row);
 
 	/* null pointer type */
 	using null = decltype(nullptr);
@@ -245,10 +240,21 @@ namespace xns {
 
 
 	/* arch address types */
-	using addr_t  = xns::uint<xns::bytes_per_address * xns::bits_per_byte>;
+	//using addr_t  = xns::uint<xns::bytes_per_address * xns::bits_per_byte>;
 
 	/* uintptr types */
-	using uintptr  = addr_t;
+	using uintptr_t  = xns::uint<xns::bytes_per_address * xns::bits_per_byte>;
+
+
+	/* signed size type */
+	using ssize_t = xns::sint<xns::bytes_per_address * xns::bits_per_byte>;
+
+	/* unsigned size type */
+	using size_t = xns::uint<xns::bytes_per_address * xns::bits_per_byte>;
+
+	/* pointer difference types */
+	using ptrdiff_t = decltype(xns::declval<char*>() - xns::declval<char*>());
+
 
 
 	/* byte types */
@@ -278,30 +284,33 @@ namespace xns {
 	#endif
 
 
-	/* signed size type */
-	using ssize_t = xns::sint<xns::bytes_per_address * xns::bits_per_byte>;
-
-	/* unsigned size type */
-	using size_t = xns::uint<xns::bytes_per_address * xns::bits_per_byte>;
 
 
-	#ifdef XNS_128BIT_INTEGERS
+	#if defined XNS_128BIT_INTEGERS
 
 	/* maximum signed integer type */
-	using smax = xns::sint<128>;
+	using intmax_t = xns::sint<128>;
 
 	/* maximum unsigned integer type */
-	using umax = xns::uint<128>;
+	using uintmax_t = xns::uint<128>;
 
-	#else
+	#elif defined XNS_64BIT_INTEGERS
 
 	/* maximum signed integer type */
-	using smax = xns::sint<64>;
+	using intmax_t = xns::sint<64>;
 
 	/* maximum unsigned integer type */
-	using umax = xns::uint<64>;
+	using uintmax_t = xns::uint<64>;
 
-	#endif
+	#elif defined XNS_32BIT_INTEGERS
+
+	/* maximum signed integer type */
+	using intmax_t = xns::sint<32>;
+
+	/* maximum unsigned integer type */
+	using uintmax_t = xns::uint<32>;
+
+	#endif // XNS_128BIT_INTEGERS
 
 
 
@@ -310,9 +319,6 @@ namespace xns {
 
 	/* 64-bit floating point type */
 	using f64 = double;
-
-	static_assert(sizeof(f32) * xns::bits_per_byte == 32, "f32 is not 32 bits.");
-	static_assert(sizeof(f64) * xns::bits_per_byte == 64, "f64 is not 64 bits.");
 
 } // namespace xns
 
