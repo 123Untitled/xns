@@ -29,11 +29,14 @@
 #include <unistd.h>
 
 
+// include for struct winsize
+#include <sys/ioctl.h>
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
 
+	using term_size = decltype(xns::declval<struct winsize>().ws_col);
 
 	// -- E S C A P E  T Y P E ------------------------------------------------
 

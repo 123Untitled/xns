@@ -45,7 +45,7 @@ namespace xns {
 			using self = fragmentation;
 
 			/* size_type */
-			using size_type = xns::addr_t;
+			using size_type = xns::uintptr_t;
 
 
 

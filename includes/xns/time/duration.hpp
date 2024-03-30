@@ -34,15 +34,15 @@ namespace xns {
 
 	// -- I S  D U R A T I O N ------------------------------------------------
 
-	/* is duration concept */
-	template <class T>
-	concept is_duration = xns::is_same<T, xns::duration<typename T::arithmetic_type,
-														typename T::ratio_type>>;
+	/* is duration */
+	template <typename ___type>
+	concept is_duration = xns::is_same<___type, xns::duration<typename ___type::arithmetic_type,
+															  typename ___type::ratio_type>>;
 
 
-	// -- D U R A T I O N  C L A S S --------------------------------------------
+	// -- D U R A T I O N -----------------------------------------------------
 
-	template <xns::is_arithmetic T, xns::is_ratio R>
+	template <xns::is_arithmetic ___type, xns::is_ratio ___ratio>
 	class duration final {
 
 
@@ -62,49 +62,50 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = xns::duration<T, R>;
+			using self = xns::duration<___type, ___ratio>;
 
 			/* arithmetic type */
-			using arithmetic_type = T;
+			using arithmetic_type = ___type;
 
 			/* ratio type */
-			using ratio_type = R;
+			using ratio_type = ___ratio;
 
 
 			// -- public constructors -----------------------------------------
 
 			/* default constructor */
-			constexpr duration(void)
-			: _ticks{0} {}
+			constexpr duration(void) noexcept
+			: _ticks{static_cast<arithmetic_type>(0)} {
+			}
 
 			/* copy constructor */
-			constexpr duration(const self& other)
-			: _ticks{other._ticks} {}
+			constexpr duration(const self&) noexcept = default;
 
 			/* copy constructor from different duration */
-			template <xns::is_duration U>
-			constexpr duration(const U& other)
+			template <xns::is_duration ___dur>
+			constexpr duration(const ___dur& other) noexcept
 			: _ticks{other._ticks * xns::ratio_conversion_factor<ratio_type,
-														typename U::ratio_type>()} {}
+												typename ___dur::ratio_type>()} {
+
+			}
 			//: duration{duration_cast<self>(other)} {}
 
 			/* move constructor */
-			constexpr duration(self&& other)
-			: _ticks{xns::move(other._ticks)} {}
+			constexpr duration(self&&) noexcept = default;
 
-			/* constructor from arithmetic type */
-			constexpr duration(const arithmetic_type& value)
-			: _ticks{value} {}
+			/* arithmetic constructor */
+			constexpr duration(const arithmetic_type& _vl)
+			: _ticks{_vl} {
+			}
 
 			/* destructor */
-			~duration(void) {}
+			~duration(void) noexcept = default;
 
 
 			// -- public accessors --------------------------------------------
 
 			/* count */
-			constexpr inline arithmetic_type count(void) const {
-				// return ticks
+			inline constexpr auto count(void) const noexcept -> arithmetic_type {
 				return _ticks;
 			}
 
@@ -172,41 +173,41 @@ namespace xns {
 	// -- D U R A T I O N  A L I A S E S --------------------------------------
 
 	/* nanoseconds */
-	using nanoseconds  = xns::duration<xns::umax, xns::ratio<1, 1'000'000'000>>;
+	using nanoseconds  = xns::duration<xns::size_t, xns::ratio<1, 1'000'000'000>>;
 
 	/* microseconds */
-	using microseconds = xns::duration<xns::umax, xns::ratio<1, 1'000'000>>;
+	using microseconds = xns::duration<xns::size_t, xns::ratio<1, 1'000'000>>;
 
 	/* milliseconds */
-	using milliseconds = xns::duration<xns::umax, xns::ratio<1, 1'000>>;
+	using milliseconds = xns::duration<xns::size_t, xns::ratio<1, 1'000>>;
 
 	/* seconds */
-	using seconds      = xns::duration<xns::umax, xns::ratio<1, 1>>;
+	using seconds      = xns::duration<xns::size_t, xns::ratio<1, 1>>;
 
 	/* minutes */
-	using minutes      = xns::duration<xns::umax, xns::ratio<60, 1>>;
+	using minutes      = xns::duration<xns::size_t, xns::ratio<60, 1>>;
 
 	/* hours */
-	using hours        = xns::duration<xns::umax, xns::ratio<3600, 1>>;
+	using hours        = xns::duration<xns::size_t, xns::ratio<3600, 1>>;
 
 	/* days */
-	using days         = xns::duration<xns::umax, xns::ratio<86400, 1>>;
+	using days         = xns::duration<xns::size_t, xns::ratio<86400, 1>>;
 
 	/* weeks */
-	using weeks        = xns::duration<xns::umax, xns::ratio<604800, 1>>;
+	using weeks        = xns::duration<xns::size_t, xns::ratio<604800, 1>>;
 
 	/* months */
-	using months       = xns::duration<xns::umax, xns::ratio<2629746, 1>>;
+	using months       = xns::duration<xns::size_t, xns::ratio<2629746, 1>>;
 
 	/* years */
-	using years        = xns::duration<xns::umax, xns::ratio<31556952, 1>>;
+	using years        = xns::duration<xns::size_t, xns::ratio<31556952, 1>>;
 
 
 	/* bpm */
-	using bpm          = xns::duration<xns::umax, xns::ratio<1, 60>>;
+	using bpm          = xns::duration<xns::size_t, xns::ratio<1, 60>>;
 
 
 
-}
+} // namespace xns
 
-#endif
+#endif // XNS_DURATION_HEADER

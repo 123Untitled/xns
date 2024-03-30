@@ -35,7 +35,7 @@ namespace xns {
 
 	// -- R A T I O  C L A S S ------------------------------------------------
 
-	template <xns::umax N, xns::umax D = 1>
+	template <xns::uintmax_t N, xns::uintmax_t D = 1>
 	class ratio final {
 
 
@@ -187,19 +187,18 @@ namespace xns {
 
 	/* ratio conversion factor */
 	template <xns::is_ratio R1, xns::is_ratio R2>
-	consteval xns::umax ratio_conversion_factor(void) {
-
+	consteval auto ratio_conversion_factor(void) -> xns::uintmax_t {
 
 		if constexpr      (xns::ratio_less<R1, R2>) {
 
-			return static_cast<xns::umax>(R2::num * R1::den) /
-				   static_cast<xns::umax>(R2::den * R1::num);
+			return static_cast<xns::uintmax_t>(R2::num * R1::den) /
+				   static_cast<xns::uintmax_t>(R2::den * R1::num);
 		}
 
 		else if constexpr (xns::ratio_greater<R1, R2>) {
 
-			return static_cast<xns::umax>(R1::num * R2::den) /
-				   static_cast<xns::umax>(R1::den * R2::num);
+			return static_cast<xns::uintmax_t>(R1::num * R2::den) /
+				   static_cast<xns::uintmax_t>(R1::den * R2::num);
 		}
 
 		return 1.0;
@@ -295,15 +294,15 @@ namespace xns {
 
 		// unsigned case
 
-		constexpr bool overflow = (b != 0) && (a > (xns::limits<xns::umax>::max() / b));
+		constexpr bool overflow = (b != 0) && (a > (xns::limits<xns::uintmax_t>::max() / b));
 
 		// check for overflow
 		static_assert(!overflow, "): MULTIPLICATION OVERFLOW :(");
 
 		// return multiplication
-		return static_cast<xns::umax>(
-					static_cast<xns::umax>(a) *
-					static_cast<xns::umax>(b)
+		return static_cast<xns::uintmax_t>(
+					static_cast<xns::uintmax_t>(a) *
+					static_cast<xns::uintmax_t>(b)
 		);
 
 	}
@@ -311,8 +310,8 @@ namespace xns {
 
 	consteval inline auto testmulti(void) {
 
-		constexpr xns::umax a = xns::limits<xns::umax>::max();
-		constexpr xns::smax b = 1;
+		constexpr auto a = xns::limits<xns::uintmax_t>::max();
+		constexpr xns::intmax_t b = 1;
 
 		//xns::integral c{2};
 
