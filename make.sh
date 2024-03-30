@@ -154,9 +154,9 @@ LOCK=$BLDDIR'/.lock'
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-#CXX='/opt/homebrew/Cellar/llvm/17.0.6_1/bin/clang++'
+CXX='/opt/homebrew/Cellar/llvm/17.0.6_1/bin/clang++'
 #CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
-CXX='clang++'
+#CXX='clang++'
 #CXX='g++'
 
 # archiver
@@ -213,7 +213,7 @@ CXXFLAGS+=('-Winline')
 CXXFLAGS+=('-Wshadow')
 
 # exception
-#CXXFLAGS+=('-fexceptions' '-Wexceptions')
+CXXFLAGS+=('-fexceptions' '-Wexceptions')
 
 # defines
 DEFINES=()
