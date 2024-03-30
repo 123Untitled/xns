@@ -1,3 +1,17 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_DECLVAL_HEADER
 #define XNS_DECLVAL_HEADER
 
@@ -6,23 +20,22 @@
 
 namespace xns {
 
-	/* libc++ implementation */
 
 	// -- D E C L V A L -------------------------------------------------------
 
-	namespace impl {
+	namespace ___impl {
 
-		template <typename T, typename R = T&&>
-		auto declval(int) -> R;
+		template <typename ___type>
+		auto declval(int) noexcept -> ___type&&;
 
-		template <typename T>
-		auto declval(long) -> T;
+		template <typename ___type>
+		auto declval(long) noexcept -> ___type;
 	}
 
-	template<typename T>
-	auto declval(void) noexcept -> decltype(impl::declval<T>(0));
+	/* declval */
+	template <typename ___type>
+	auto declval(void) noexcept -> decltype(___impl::declval<___type>(0));
 
+} // namespace xns
 
-}
-
-#endif
+#endif // XNS_DECLVAL_HEADER
