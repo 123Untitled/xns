@@ -23,6 +23,7 @@
 #include "xns/utility/numeric_limits.hpp"
 
 
+#include "xns/math/floor.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -100,39 +101,8 @@ namespace xns {
 	}
 
 
-	// -- C L A M P -----------------------------------------------------------
-
-	template <typename T>
-	inline constexpr auto clamp(const T& value, const T& min, const T& max) -> T {
-		// assert that T and U are comparable types
-		static_assert(xns::is_comparable<T>, "): CLAMP: types must be comparable :(");
-		// return clamped value
-		return value < min ? min : value > max ? max : value;
-	}
 
 
-	// -- C E I L -------------------------------------------------------------
-
-	template <typename T>
-	constexpr auto ceil(const T& value) noexcept -> T {
-		// assert that T is an floating point type
-		static_assert(xns::is_floating_point<T>, "): CEIL: T must be a floating point type :(");
-		// check sign
-		return value > 0 ? static_cast<T>(static_cast<xns::umax>(value)) + 1
-						 : static_cast<T>(static_cast<xns::smax>(value));
-	}
-
-
-	// -- F L O O R -----------------------------------------------------------
-
-	template <typename T>
-	constexpr auto floor(const T& value) noexcept -> T {
-		// assert that T is an floating point type
-		static_assert(xns::is_floating_point<T>, "): FLOOR: T must be a floating point type :(");
-		// check sign
-		return value > 0 ? static_cast<T>(static_cast<xns::umax>(value))
-						 : static_cast<T>(static_cast<xns::smax>(value)) - 1;
-	}
 
 
 	// -- T O  R A D I A N S --------------------------------------------------
@@ -295,14 +265,6 @@ namespace xns {
 			value_type _max;
 
 	};
-
-
-
-
-
-
-
-
 
 }
 
