@@ -120,6 +120,34 @@ namespace xns {
 			static void get_process_info(void);
 
 
+			template <tcflag_t ___flags>
+			static auto oflags(struct termios& attrs) -> void {
+				attrs.c_oflag |= ___flags;
+			}
+
+			template <tcflag_t ___flags>
+			static auto iflags(struct termios& attrs) -> void {
+				attrs.c_iflag |= ___flags;
+			}
+
+			template <tcflag_t ___flags>
+			static auto lflags(struct termios& attrs) -> void {
+				attrs.c_lflag |= ___flags;
+			}
+
+			template <tcflag_t ___flags>
+			static auto cflags(struct termios& attrs) -> void {
+				attrs.c_cflag |= ___flags;
+			}
+
+
+			void test() {
+				struct termios attrs;
+				oflags<ONLCR>(attrs);
+				iflags<ICRNL>(attrs);
+			}
+
+
 		private:
 
 			// -- private lifecycle -------------------------------------------

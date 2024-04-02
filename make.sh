@@ -169,7 +169,7 @@ ARFLAGS='-rcs'
 LINKER=$CXX
 
 # standard
-STD='-std=c++2a'
+STD='-std=c++20'
 
 # debug
 DEBUG='-g'
@@ -286,10 +286,10 @@ function required {
 	# default required programs
 	local COMMANDS=(
 		'mkdir'
-		'wait'
-		'pwd'
+		'wait' # zsh built-in
+		'pwd' # zsh built-in
 		'rm'
-		'cd'
+		'cd' # zsh built-in
 		'wc'
 		'git'
 		'cat'
@@ -458,6 +458,15 @@ function handle_compilation {
 	# openssl hash
 	local HASH=$(openssl md5 <<< $FILE)
 	HASH=${HASH#* }
+	# get basename of file (without extension)
+	local BASE=${${FILE##*/}%%.*}'_'
+
+	local I=''
+	for ((I = 1; I <= ${#BASE}; ++I)); do
+		# assign char at hash position
+		HASH[$I]=${BASE[$I]}
+	done
+
 	# add object file extension
 	local OBJ=$OBJDIR'/'$HASH'.o'
 	# add dependency file extension
@@ -1111,6 +1120,8 @@ function main {
 	echo $SEPARATOR
 	echo $COLOR'[Ξ]'$RESET 'targets up to date.\n';
 }
+
+# '[⚙]'
 
 # call main function
 main; exit 0

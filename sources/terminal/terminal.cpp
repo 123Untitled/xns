@@ -1,3 +1,15 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
 #include "xns/terminal/terminal.hpp"
 
 // TCSANOW
@@ -55,7 +67,7 @@ xns::terminal::~terminal(void) noexcept {
 
 
 /* get terminal settings */
-const struct termios xns::terminal::setup_terminal(void) {
+auto xns::terminal::setup_terminal(void) -> const struct termios {
 
 	// termios structure
 	struct termios origin;
@@ -71,7 +83,7 @@ const struct termios xns::terminal::setup_terminal(void) {
 }
 
 /* setup raw terminal */
-void xns::terminal::setup_raw(void) {
+auto xns::terminal::setup_raw(void) -> void {
 
 	// get flag type
 	using iflag = decltype(_raw.c_iflag);

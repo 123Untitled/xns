@@ -41,6 +41,8 @@
 #include "xns/type_traits/supported_operations/is_nothrow_copy_assignable.hpp"
 #include "xns/type_traits/supported_operations/is_nothrow_move_assignable.hpp"
 
+#include "xns/config/config.hpp"
+
 // operating system headers
 #include <unistd.h>
 #include <sys/mman.h>
@@ -97,15 +99,20 @@ namespace xns {
 			// -- private static methods --------------------------------------
 
 			/* map */
-			static inline auto map(const size_type size = page_size(), void* addr = nullptr) noexcept(xns::no_exceptions) -> void* {
-				// map memory
-				void* ptr = ::mmap(addr, size, M_PROTECTION, M_FLAGS, -1, 0);
+			static inline auto map(const size_type size = page_size(), void* addr = nullptr) noexcept(XNS_HAS_NOEXCEPT) -> void* {
 
-				if constexpr (xns::no_exceptions == false)
+				#if XNS_HAS_NOEXCEPT
+					// map memory
+					return ::mmap(addr, size, M_PROTECTION, M_FLAGS, -1, 0);
+				#else
+					// map memory
+					void* ptr = ::mmap(addr, size, M_PROTECTION, M_FLAGS, -1, 0);
+					// check for errors
 					if (ptr == MAP_FAILED)
 						throw xns::exception("mmap failed", -2);
-
-				return ptr;
+					// return pointer
+					return ptr;
+				#endif
 			}
 
 			/* unmap */
@@ -194,15 +201,19 @@ namespace xns {
 			// -- private static methods --------------------------------------
 
 			/* map */
-			static inline auto map(const size_type size = page_size(), void* addr = nullptr) noexcept(xns::no_exceptions) -> void* {
-				// map memory
-				void* ptr = ::mmap(addr, size, M_PROTECTION, M_FLAGS, -1, 0);
-
-				if constexpr (xns::no_exceptions == false)
+			static inline auto map(const size_type size = page_size(), void* addr = nullptr) noexcept(XNS_HAS_NOEXCEPT) -> void* {
+				#if XNS_HAS_NOEXCEPT
+					// map memory
+					return ::mmap(addr, size, M_PROTECTION, M_FLAGS, -1, 0);
+				#else
+					// map memory
+					void* ptr = ::mmap(addr, size, M_PROTECTION, M_FLAGS, -1, 0);
+					// check for errors
 					if (ptr == MAP_FAILED)
 						throw xns::exception("mmap failed", -2);
-
-				return ptr;
+					// return pointer
+					return ptr;
+				#endif
 			}
 
 			/* unmap */
