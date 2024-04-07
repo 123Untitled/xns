@@ -2,6 +2,18 @@
 
 under development, use at your own risk !
 
+```cpp
+constexpr const char* logo = R"(
+        :::    ::: ::::    :::  ::::::::
+       :+:    :+: :+:+:   :+: :+:    :+:
+       +:+  +:+  :+:+:+  +:+ +:+
+       +#++:+   +#+ +:+ +#+ +#++:++#++
+     +#+  +#+  +#+  +#+#+#        +#+
+   #+#    #+# #+#   #+#+# #+#    #+#
+  ###    ### ###    ####  ########
+");
+```
+
 `xnamespace` - a riddle wrapped in a mystery, shrouded in an enigma. It's a C++ library of an intensely personal kind.
 
 ## wiki
