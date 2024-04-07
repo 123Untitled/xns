@@ -1,4 +1,4 @@
-# xnamespace
+# x-namespace
 
 under development, use at your own risk !
 
