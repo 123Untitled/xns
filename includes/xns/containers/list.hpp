@@ -99,8 +99,7 @@ namespace xns {
 			using node_ptr  = node_type*;
 
 			/* allocator type */
-			using ___allocator = typename ___alloc::template
-													rebind<node_type>::other;
+			using ___allocator = typename ___alloc::template rebind<node_type>;
 
 
 			// -- private members ---------------------------------------------
@@ -130,7 +129,7 @@ namespace xns {
 
 			/* copy constructor */
 			list(const self& other) noexcept(xns::is_nothrow_copy_constructible<value_type>
-										  && xns::is_nothrow_invocable<decltype(___allocator::allocate)>)
+										  && noexcept(___allocator::allocate()))
 			: _head{nullptr}, _tail{nullptr}, _size{other._size} {
 
 				// declare node pointer
@@ -146,7 +145,7 @@ namespace xns {
 				while (ptr != nullptr) {
 
 					// nothrow allocate
-					if constexpr (xns::is_nothrow_invocable<decltype(___allocator::allocate)>) {
+					if constexpr (noexcept(___allocator::allocate())) {
 						// allocate
 						*addr = ___allocator::allocate();
 						if (not *addr) {
@@ -210,7 +209,7 @@ namespace xns {
 
 				// check for self assignment
 				if (this == &other)
-					return;
+					return *this;
 
 				// deallocate list
 				this->_free();
@@ -237,7 +236,7 @@ namespace xns {
 
 				// check for self assignment
 				if (this == &other)
-					return;
+					return *this;
 
 				// deallocate list
 				this->_free();

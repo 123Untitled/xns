@@ -3,8 +3,10 @@
 
 #include "xns/type_traits/types.hpp"
 #include "xns/containers/array.hpp"
+#include "xns/containers/multidimensional_array.hpp"
 #include "xns/type_traits/relationships_and_property_queries/is_same.hpp"
 #include "xns/type_traits/type_categories/is_scalar.hpp"
+#include "xns/type_traits/type_modifications/remove_reference.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -89,7 +91,7 @@ namespace xns {
 
 			/* variadic constructor */
 			template <class... A>
-			constexpr matrix(A&&... args) requires (xns::is_same_cvr<T, A...>)
+			constexpr matrix(A&&... args) requires (xns::are_same<xns::remove_cvref<A>, T> && ...)
 			: _data{xns::forward<A>(args)...} {
 				// check if number of arguments is correct
 				static_assert(sizeof...(args) == R * C,
@@ -120,7 +122,7 @@ namespace xns {
 
 			/* variadic assignment */
 			template <class... A>
-			void assign(A&&... args) requires (xns::is_same<T, A...>) {
+			void assign(A&&... args) requires (xns::are_same<T, A...>) {
 				// check if number of arguments is correct
 				static_assert(sizeof...(args) == R * C,
 					"): NUMBER OF ARGUMENTS MUST BE EQUAL TO MATRIX SIZE :(");

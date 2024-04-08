@@ -18,6 +18,16 @@
 #include "xns/type_traits/type_operations/forward.hpp"
 #include "xns/type_traits/type_operations/move.hpp"
 
+#include "xns/type_traits/type_properties/is_trivially_copyable.hpp"
+#include "xns/type_traits/supported_operations/is_trivially_destructible.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_constructible.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_copy_constructible.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_move_constructible.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_destructible.hpp"
+
+#include "xns/memory/memcpy.hpp"
+
+
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
@@ -26,8 +36,15 @@ namespace xns {
 
 	// -- S T A T I C  V E C T O R --------------------------------------------
 
-	template <typename T, decltype(sizeof(0)) N>
+	template <typename ___type, decltype(sizeof(0)) ___size>
 	class static_vector {
+
+
+		// -- assertions ------------------------------------------------------
+
+		/* assert nothrow destructible */
+		static_assert(xns::is_nothrow_destructible<___type>,
+					"value type must be nothrow destructible");
 
 
 		public:
@@ -35,62 +52,101 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self       = xns::static_vector<T, N>;
+			using self       = xns::static_vector<___type, ___size>;
 
 			/* value type */
-			using value_type = T;
+			using value_type = ___type;
 
 			/* size type */
-			using size_type  = decltype(N);
+			using size_type  = decltype(___size);
 
 			/* mutable reference type */
-			using mut_ref    = T&;
+			using mut_ref    = value_type&;
 
 			/* constant reference type */
-			using const_ref  = const T&;
+			using const_ref  = const value_type&;
 
 			/* mutable pointer type */
-			using mut_ptr    = T*;
+			using mut_ptr    = value_type*;
 
 			/* constant pointer type */
-			using const_ptr  = const T*;
+			using const_ptr  = const value_type*;
 
 
 			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
 			constexpr static_vector(void) noexcept
-			: _data{}, _size{0} {
+			: _data{}, _size{0U} {
 			}
 
 			/* copy constructor */
-			constexpr static_vector(const self& other) noexcept
+			constexpr static_vector(const self& other)
+				noexcept(xns::is_nothrow_copy_constructible<value_type>)
 			: _data{}, _size{other._size} {
 
-				// cast data to pointer type
-				mut_ptr sdata = reinterpret_cast<mut_ptr>(_data);
-				mut_ptr odata = reinterpret_cast<mut_ptr>(other._data);
+				// trivial copy
+				if constexpr (xns::is_trivially_copyable<value_type>) {
+					// call memcpy
+					xns::memcpy(_data, other._data, sizeof(value_type) * _size);
+				}
 
-				// loop over objects
-				for (size_type i = 0; i < _size; ++i)
-					// call copy constructor
-					new(sdata + i) T{odata[i]};
+				// non-trivial copy
+				else {
+
+					// cast data to pointer type
+					auto sdata = reinterpret_cast<mut_ptr>(_data);
+					auto odata = reinterpret_cast<const_ptr>(other._data);
+
+					// nothrow copy constructible
+					if constexpr (xns::is_nothrow_copy_constructible<value_type>) {
+
+						// loop over objects
+						for (size_type i = 0U; i < _size; ++i)
+							// call copy constructor
+							::new((void*)(sdata + i)) value_type{odata[i]};
+
+					}
+
+					// throw copy constructible
+					else {
+
+						size_type i = 0U;
+
+						try {
+							// loop over objects
+							for (; i < _size; ++i)
+								// call copy constructor
+								::new((void*)(sdata + i)) value_type{odata[i]};
+						}
+						catch (...) {
+							// assign size
+							_size = i;
+							// re-throws
+							throw;
+						}
+
+					}
+
+				}
 			}
 
 			/* move constructor */
-			constexpr static_vector(self&& other) noexcept
+			// NOT FINISHED !!!
+			constexpr static_vector(self&& other)
+				noexcept(xns::is_nothrow_move_constructible<value_type>)
 			: _data{}, _size{other._size} {
 
 				// cast data to pointer type
-				mut_ptr sdata = reinterpret_cast<mut_ptr>(_data);
-				mut_ptr odata = reinterpret_cast<mut_ptr>(other._data);
+				auto sdata = reinterpret_cast<mut_ptr>(_data);
+				auto odata = reinterpret_cast<mut_ptr>(other._data);
 
 				// loop over objects
 				for (size_type i = 0; i < _size; ++i) {
 					// call move constructor
-					new(sdata + i) T{xns::move(odata[i])};
+					new(sdata + i) value_type{xns::move(odata[i])};
 					// call destructor
-					odata[i].~T();
+					odata[i].~value_type();
 				}
 
 				// reset other size
@@ -100,41 +156,79 @@ namespace xns {
 			/* destructor */
 			~static_vector(void) noexcept {
 
-				// cast data to pointer type
-				mut_ptr data = reinterpret_cast<mut_ptr>(_data);
+				// not trivially destructible
+				if (not xns::is_trivially_destructible<value_type>) {
 
-				// loop over objects
-				for (size_type i = 0; i < _size; ++i)
-					// call destructor
-					data[i].~T();
+					// loop over objects
+					for (size_type i = 0; i < _size; ++i)
+						// call destructor
+						reinterpret_cast<mut_ptr>(_data)[i].~value_type();
+				}
 			}
 
 
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			constexpr auto operator=(const self& other) noexcept -> self& {
+			constexpr auto operator=(const self& other) noexcept -> self&
+				requires (xns::is_trivially_copyable<value_type>) {
+
+				// no need to check for self-assignment since memcpy is safe
+
+				// call memcpy
+				xns::memcpy(_data, other._data, sizeof(value_type) * _size);
+
+				// set size
+				_size = other._size;
+
+				return *this;
+			}
+
+			/* copy assignment operator */
+			constexpr auto operator=(const self& other)
+				noexcept(xns::is_nothrow_copy_constructible<value_type>) -> self&
+				requires (not xns::is_trivially_copyable<value_type>) {
+
 				// check for self-assignment
 				if (this == &other)
 					return *this;
 
-				// cast data to pointer type
-				mut_ptr sdata = reinterpret_cast<mut_ptr>(_data);
-				mut_ptr odata = reinterpret_cast<mut_ptr>(other._data);
+				// non-trivially destructible
+				if constexpr (not xns::is_trivially_destructible<value_type>) {
+					// destruct objects
+					_non_trivial_destroy();
+				}
 
+				// nothrow copy constructible
+				if constexpr (xns::is_nothrow_copy_constructible<value_type>) {
 
-				// clear current data
-				for (size_type i = 0; i < _size; ++i)
-					// call destructor
-					sdata[i].~T();
+					// loop over objects
+					for (size_type i = 0; i < other._size; ++i)
+						// call copy constructor
+						::new((void*)(reinterpret_cast<mut_ptr>(_data) + i))
+							value_type{reinterpret_cast<const_ptr>(other._data)[i]};
 
-				// loop over objects
-				for (size_type i = 0; i < other._size; ++i)
-					// call copy constructor
-					new(sdata + i) T{odata[i]};
+					// set size
+					_size = other._size;
+				}
+				else {
 
-				// set size
-				_size = other._size;
+					size_type i = 0U;
+
+					try {
+						// loop over objects
+						for (; i < other._size; ++i)
+							// call copy constructor
+							::new((void*)(reinterpret_cast<mut_ptr>(_data) + i))
+								value_type{reinterpret_cast<const_ptr>(other._data)[i]};
+					}
+					catch (...) {
+						// assign size
+						_size = i;
+						// re-throws
+						throw;
+					}
+				}
 
 				// return self reference
 				return *this;
@@ -154,14 +248,14 @@ namespace xns {
 				// clear current data
 				for (size_type i = 0; i < _size; ++i)
 					// call destructor
-					sdata[i].~T();
+					sdata[i].~value_type();
 
 				// loop over objects
 				for (size_type i = 0; i < other._size; ++i) {
 					// call move constructor
-					new(sdata + i) T{xns::move(odata[i])};
+					new(sdata + i) value_type{xns::move(odata[i])};
 					// call destructor
-					odata[i].~T();
+					odata[i].~value_type();
 				}
 
 				// set size
@@ -178,13 +272,13 @@ namespace xns {
 			// -- public subscript operators ----------------------------------
 
 			/* mutable subscript operator */
-			constexpr auto operator[](size_type index) noexcept -> mut_ref {
-				return *(reinterpret_cast<mut_ptr>(_data) + index);
+			constexpr auto operator[](const size_type index) noexcept -> mut_ref {
+				return (reinterpret_cast<mut_ptr>(_data))[index];
 			}
 
 			/* constant subscript operator */
-			constexpr auto operator[](size_type index) const noexcept -> const_ref {
-				return *(reinterpret_cast<const_ptr>(_data) + index);
+			constexpr auto operator[](const size_type index) const noexcept -> const_ref {
+				return (reinterpret_cast<const_ptr>(_data))[index];
 			}
 
 
@@ -197,7 +291,7 @@ namespace xns {
 
 			/* capacity */
 			constexpr auto capacity(void) const noexcept -> size_type {
-				return N;
+				return ___size;
 			}
 
 			/* data */
@@ -214,96 +308,101 @@ namespace xns {
 			// -- public modifiers --------------------------------------------
 
 			/* push back */
-			constexpr auto push_back(const_ref value) noexcept(/* ... */true) -> void {
+			constexpr auto push_back(const_ref value)
+				noexcept(xns::is_nothrow_copy_constructible<value_type>) -> void {
 
 				// check if size is less than capacity
-				if (_size == N)
+				if (_size == ___size)
 					return;
 
-				// cast data to pointer type
-				mut_ptr data = reinterpret_cast<mut_ptr>(_data);
-
 				// call copy constructor
-				new(data + _size) T{value};
+				::new((void*)(reinterpret_cast<mut_ptr>(_data) + _size)) value_type{value};
 
 				// increment size
 				++_size;
 			}
 
 			/* push back (move) */
-			constexpr auto push_back(T&& value) noexcept(/* ... */true) -> void {
+			constexpr auto push_back(value_type&& value)
+				noexcept(xns::is_nothrow_move_constructible<value_type>) -> void {
 
 				// check if size is less than capacity
-				if (_size == N)
+				if (_size == ___size)
 					return;
 
-				// cast data to pointer type
-				mut_ptr data = reinterpret_cast<mut_ptr>(_data);
-
 				// call move constructor
-				new(data + _size) T{xns::move(value)};
+				::new((void*)(reinterpret_cast<mut_ptr>(_data) + _size)) value_type{xns::move(value)};
 
 				// increment size
 				++_size;
 			}
 
 			/* emplace back */
-			template <typename... A>
-			constexpr auto emplace_back(A&&... args) noexcept(/* ... */true) -> void {
+			template <typename... ___params>
+			constexpr auto emplace_back(___params&&... args)
+				noexcept(xns::is_nothrow_constructible<value_type, ___params...>) -> void {
 
 				// check if size is less than capacity
-				if (_size == N)
+				if (_size == ___size)
 					return;
 
-				// cast data to pointer type
-				mut_ptr data = reinterpret_cast<mut_ptr>(_data);
-
 				// call constructor
-				new(data + _size) T{xns::forward<A>(args)...};
+				::new((void*)(reinterpret_cast<mut_ptr>(_data) + _size)) value_type{xns::forward<___params>(args)...};
 
 				// increment size
 				++_size;
 			}
 
 			/* pop back */
-			constexpr auto pop_back(void) noexcept(/* ... */true) -> void {
+			constexpr auto pop_back(void) noexcept -> void {
 
-				// check if size is zero
-				if (_size == 0)
-					return;
+				// trivially destructible
+				if constexpr (xns::is_trivially_destructible<value_type>) {
+					// decrement size
+					_size -= (_size > 0U);
+				}
 
-				// cast data to pointer type
-				mut_ptr data = reinterpret_cast<mut_ptr>(_data);
-
-				// call destructor
-				data[_size - 1].~T();
-
-				// decrement size
-				--_size;
+				// non-trivially destructible
+				else {
+					// check if size is zero
+					if (_size == 0U)
+						return;
+					// call destructor
+					reinterpret_cast<mut_ptr>(_data)[--_size].~value_type();
+				}
 			}
 
 			/* clear */
 			constexpr auto clear(void) noexcept -> void {
 
-				// cast data to pointer type
-				mut_ptr data = reinterpret_cast<mut_ptr>(_data);
-
-				// loop over objects
-				for (size_type i = 0; i < _size; ++i)
-					// call destructor
-					data[i].~T();
-
+				// non-trivially destructible
+				if constexpr (not xns::is_trivially_destructible<value_type>) {
+					// destruct objects
+					_non_trivial_destroy();
+				}
 				// reset size
-				_size = 0;
+				_size = 0U;
 			}
 
 
 		private:
 
+			// -- private methods ---------------------------------------------
+
+			/* non trivial destroy */
+			auto _non_trivial_destroy(void) noexcept -> void {
+
+				// loop over objects
+				for (size_type i = 0; i < _size; ++i)
+					// call destructor
+					reinterpret_cast<mut_ptr>(_data)[i].~value_type();
+			}
+
+
 			// -- private members ---------------------------------------------
 
 			/* data */
-			unsigned char _data[sizeof(T) * N];
+			unsigned char _data[sizeof(value_type) * ___size];
 
 			/* size */
 			size_type _size;

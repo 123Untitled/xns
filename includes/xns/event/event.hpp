@@ -95,7 +95,7 @@ namespace xns {
 			using string = xns::string;
 
 			/* character type */
-			using char_t = typename string::char_t;
+			using char_t = typename string::char_type;
 
 			/* size type */
 			using size_type = typename string::size_type;

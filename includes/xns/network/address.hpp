@@ -101,7 +101,7 @@ namespace xns {
 					static_assert(xns::is_string<S>, "): IP MUST BE STRING :(");
 
 					// check port is 16-bit unsigned integer
-					static_assert(xns::is_unsigned_integral<P> && sizeof(P) == 2,
+					static_assert(xns::is_unsigned<P> && xns::is_integral<P> && sizeof(P) == 2,
 						"): PORT MUST BE 16-BIT UNSIGNED INTEGER :(");
 
 					_addr.sin_family = ipv4::value;

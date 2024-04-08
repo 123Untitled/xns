@@ -96,7 +96,7 @@ namespace xns {
 
 				// require unsigned integral type
 				// supporting at least term_size bits
-				static_assert(xns::is_unsigned_integral<T>
+				static_assert(xns::is_unsigned<T> && xns::is_integral<T>
 						&& sizeof(T) >= sizeof(term_size),
 						"): TERMINAL SIZE TYPE MUST BE UNSIGNED INTEGRAL TYPE :(");
 

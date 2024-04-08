@@ -1,3 +1,17 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_ITERATOR_TRAITS_HEADER
 #define XNS_ITERATOR_TRAITS_HEADER
 
@@ -27,8 +41,8 @@ namespace xns {
 
 
 	/* is iterator tag */
-	template <class T>
-	concept is_iterator_tag = xns::is_one_of<T,
+	template <typename ___type>
+	concept is_iterator_tag = xns::is_one_of<___type,
 							  unidirectional_iterator_tag,
 							  bidirectional_iterator_tag,
 							  random_access_iterator_tag>;

@@ -15,12 +15,11 @@
 #ifndef XNS_ESCAPE_HEADER
 #define XNS_ESCAPE_HEADER
 
+#include "xns/config/macros.hpp"
 
-// local headers
 #include "xns/type_traits/types.hpp"
 #include "xns/color/color.hpp"
 #include "xns/terminal/output.hpp"
-#include "xns/config/macros.hpp"
 #include "xns/containers/array.hpp"
 #include "xns/string/string.hpp"
 #include "xns/utility/numeric_limits.hpp"
@@ -32,37 +31,148 @@
 // include for struct winsize
 #include <sys/ioctl.h>
 
+
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
 
+
+	/* term size type */
 	using term_size = decltype(xns::declval<struct winsize>().ws_col);
 
-	// -- E S C A P E  T Y P E ------------------------------------------------
-
-	struct esctype_def {
-		// integral type
-		using type = xns::u8;
-		// enum type
-		enum enum_type : type {
-			/* move */
-			MOVE_HOME,
-			/* erase */
-			ERASE_SCREEN, ERASE_LINE, ERASE_TO_END, ERASE_FROM_START,
-			/* screen */
-			ENTER_SCREEN, EXIT_SCREEN, SAVE_SCREEN, RESTORE_SCREEN,
-			/* color */
-			RESET_STYLE,
-			/* cursor */
-			SHOW_CURSOR, HIDE_CURSOR, REQUEST_POSITION,
-			/* cursor style */
-			CURSOR_BEAM, CURSOR_UNDERLINE, CURSOR_BLOCK,
-			/* max */
-			MAX
-		};
+	struct move_home {
+		___xns_not_instantiable(move_home);
+		static constexpr xns::array esc {'\x1b' , '[', 'H'};
 	};
 
-	using esctype = xns::safe_enum<esctype_def>;
+	struct erase_screen {
+		___xns_not_instantiable(erase_screen);
+		static constexpr xns::array esc {'\x1b', '[', '2', 'J'};
+	};
+
+	struct erase_line {
+		___xns_not_instantiable(erase_line);
+		static constexpr xns::array esc {'\x1b', '[', '2', 'K'};
+	};
+
+
+
+	template <typename ___type = char>
+	struct move_up {
+
+
+		private:
+
+			enum : unsigned {
+				___digits = xns::limits<___type>::digits(),
+				___size   = ___digits + 3
+			};
+
+
+		public:
+
+			// -- public types ------------------------------------------------
+
+			/* self type */
+			using self = xns::move_up<___type>;
+
+			/* array type */
+			using array = xns::array<___type, ___size>;
+
+
+			// -- public lifecycle --------------------------------------------
+
+			/* default constructor */
+			consteval move_up(void) noexcept
+			: _esc{'\x1b', '[', '0', 'A'} {
+			}
+
+			/* value constructor */
+			constexpr move_up(const ___type ___n)
+			: _esc{_init()} {
+				// here implment itoa...
+			}
+
+			/* copy constructor */
+			constexpr move_up(const self&) noexcept = default;
+
+			/* move constructor */
+			constexpr move_up(self&&) noexcept = default;
+
+
+			// -- public assignment operators ---------------------------------
+
+			/* copy assignment operator */
+			auto operator=(const self&) noexcept -> self& = default;
+
+			/* move assignment operator */
+			auto operator=(self&&) noexcept -> self& = default;
+
+
+			// -- public accessors --------------------------------------------
+
+			/* data */
+			constexpr auto data(void) const noexcept -> const char* {
+				return _esc.data();
+			}
+
+			/* size */
+			constexpr auto size(void) const noexcept -> array::size_type {
+				return _esc.size();
+			}
+
+
+		private:
+
+			static consteval auto _init(void) -> xns::array<char, xns::limits<___type>::digits() + 3> {
+				// move up escape sequence: \x1b[0A
+				constexpr auto ___lm = xns::limits<___type>::digits();
+				xns::array<char, ___lm + 3> ___esc {'\x1b', '['};
+				___esc[2 + ___lm] = 'A';
+				return ___esc;
+			}
+
+
+			// -- private members ---------------------------------------------
+
+			/* escape */
+			xns::array<char, ___size> _esc;
+	};
+
+
+	enum : unsigned {
+		move_home,
+		erase_screen,
+		erase_line,
+		erase_to_end,
+		erase_from_start,
+		enter_screen,
+		exit_screen,
+		save_screen,
+		restore_screen,
+		reset_style,
+		show_cursor,
+		hide_cursor,
+		request_position,
+		cursor_beam,
+		cursor_underline,
+		cursor_block,
+		color_rgb,
+		color_hex,
+		move_position,
+		move_x,
+		move_left,
+		move_right,
+	};
+
+	template <typename... ___escs>
+	class esc final {
+	};
+
+
+	//inline xns::esc<xns::move_up> a{};
+
+
 
 
 
@@ -82,10 +192,7 @@ namespace xns {
 			using view = xns::string_view;
 
 			/* character type */
-			using char_t = typename string::char_t;
-
-			/* array type */
-			using esc_array = xns::array<view, esctype::size()>;
+			using char_t = typename string::char_type;
 
 			/* terminal size */
 			using size_type = xns::size_t;
@@ -96,64 +203,96 @@ namespace xns {
 			// -- public lifecycle --------------------------------------------
 
 			/* non-instantiable class */
-			NON_INSTANCIABLE(escape);
-
+			___xns_not_instantiable(escape);
 
 
 			// -- public static methods ---------------------------------------
 
 			/* move home */
-			static const view& move_home(void);
-
+			static auto move_home(void) noexcept -> const char(&)[] {
+				static constexpr char ___esc[] = "\x1b[H";
+				return ___esc;
+			}
 
 			/* erase screen */
-			static const view& erase_screen(void);
+			static auto erase_screen(void) noexcept ->  const char(&)[] {
+				static constexpr char ___esc[] = "\x1b[2J";
+				return ___esc;
+			}
 
 			/* erase line */
-			static const view& erase_line(void);
+			static auto erase_line(void) noexcept -> const char(&)[] {
+				static constexpr char ___esc[] = "\x1b[2K";
+				return ___esc;
+			}
 
 			/* erase to end of line */
-			static const view& erase_to_end(void);
+			static auto erase_to_end(void) noexcept -> const char(&)[] {
+				static constexpr char ___esc[] = "\x1b[0K";
+				return ___esc;
+			}
 
 			/* erase from start of line */
-			static const view& erase_from_start(void);
-
+			static consteval auto erase_from_start(void) noexcept -> xns::string_view {
+				return "\x1b[1K";
+			}
 
 			/* enter screen */
-			static const view& enter_screen(void);
+			static consteval auto enter_screen(void) noexcept -> xns::string_view {
+				return "\x1b[?1049h";
+			}
 
 			/* exit screen */
-			static const view& exit_screen(void);
+			static consteval auto exit_screen(void) noexcept -> xns::string_view {
+				return "\x1b[?1049l";
+			}
 
 			/* save screen */
-			static const view& save_screen(void);
+			static consteval auto save_screen(void) noexcept -> xns::string_view {
+				return "\x1b[?47h";
+			}
 
 			/* restore screen */
-			static const view& restore_screen(void);
-
+			static consteval auto restore_screen(void) noexcept -> xns::string_view {
+				return "\x1b[?47l";
+			}
 
 			/* reset style */
-			static const view& reset_style(void);
+			static consteval auto reset_style(void) noexcept -> xns::string_view {
+				return "\x1b[0m";
+			}
 
 
 			/* show cursor */
-			static const view& show_cursor(void);
+			static consteval auto show_cursor(void) noexcept -> xns::string_view {
+				return "\x1b[?25h";
+			}
 
 			/* hide cursor */
-			static const view& hide_cursor(void);
+			static consteval auto hide_cursor(void) noexcept -> xns::string_view {
+				return "\x1b[?25l";
+			}
 
 			/* request position */
-			static const view& request_position(void);
+			static constexpr auto request_position(void) noexcept -> xns::string_view {
+				return "\x1b[6n";
+			}
 
 
 			/* cursor beam */
-			static const view& cursor_beam(void);
+			static consteval auto cursor_beam(void) noexcept -> xns::string_view {
+				return "\x1b[5 q";
+			}
 
 			/* cursor underline */
-			static const view& cursor_underline(void);
+			static consteval auto cursor_underline(void) noexcept -> xns::string_view {
+				return "\x1b[3 q";
+			}
 
 			/* cursor block */
-			static const view& cursor_block(void);
+			static consteval auto cursor_block(void) noexcept -> xns::string_view {
+				return "\x1b[1 q";
+			}
 
 
 
@@ -201,51 +340,6 @@ namespace xns {
 
 
 		private:
-
-			// -- private static members --------------------------------------
-
-			/* escape sequences */
-			static constexpr esc_array _escapes {
-
-				/* move home */
-				"\x1b[H",
-
-				/* erase screen */
-				"\x1b[2J",
-				/* erase line */
-				"\x1b[2K",
-				/* erase to end of line */
-				"\x1b[0K",
-				/* erase from start of line */
-				"\x1b[1K",
-
-				/* enter screen */
-				"\x1b[?1049h",
-				/* exit screen */
-				"\x1b[?1049l",
-				/* save screen */
-				"\x1b[?47h",
-				/* restore screen */
-				"\x1b[?47l",
-
-				/* reset style */
-				"\x1b[0m",
-
-				/* show cursor */
-				"\x1b[?25h",
-				/* hide cursor */
-				"\x1b[?25l",
-				/* request position */
-				"\x1b[6n",
-
-				/* cursor beam */
-				"\x1b[5 q",
-				/* cursor underline */
-				"\x1b[3 q",
-				/* cursor block */
-				"\x1b[1 q"
-
-			};
 
 
 

@@ -260,15 +260,16 @@ namespace xns {
 			template <class T>
 			auto as(void) noexcept {
 
-				using address_type = xns::remove_cvrp<T>;
+				//using address_type = xns::remove_cvrp<T>;
+				//
+				//// require sockaddr type
+				//static_assert(xns::is_one_of<address_type,
+				//		sockaddr, sockaddr_in, sockaddr_in6, sockaddr_un>,
+				//		"): INVALID SOCKADDR TYPE :(");
+				//
+				//return reinterpret_cast<address_type*>(&_addr);
 
-				// require sockaddr type
-				static_assert(xns::is_one_of<address_type,
-						sockaddr, sockaddr_in, sockaddr_in6, sockaddr_un>,
-						"): INVALID SOCKADDR TYPE :(");
-
-				return reinterpret_cast<address_type*>(&_addr);
-
+				return nullptr;
 			}
 
 			sockaddr* as_sockaddr(void) noexcept {

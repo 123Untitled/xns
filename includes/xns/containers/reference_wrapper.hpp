@@ -17,7 +17,7 @@
 #include "xns/type_traits/type_operations/move.hpp"
 #include "xns/type_traits/type_operations/forward.hpp"
 #include "xns/type_traits/relationships_and_property_queries/is_same.hpp"
-#include "xns/type_traits/type_modifications/remove.hpp"
+#include "xns/type_traits/type_transformations/remove_cvref.hpp"
 #include "xns/memory/addressof.hpp"
 
 #include "xns/functional/invoke.hpp"
@@ -57,7 +57,7 @@ namespace xns {
 			reference_wrapper(void) = delete;
 
 			/* lvalue reference constructor */
-			template <typename U> requires xns::is_not_same<xns::remove_cvr<U>, self> 
+			template <typename U> requires xns::is_not_same<xns::remove_cvref<U>, self> 
 			inline constexpr reference_wrapper(U&& ref) noexcept
 			: _ptr{xns::addressof(ref)} {
 				// check if U is not a rvalue reference

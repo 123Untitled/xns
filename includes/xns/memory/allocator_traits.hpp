@@ -24,6 +24,7 @@
 #include "xns/type_traits/type_properties/have_member_types.hpp"
 
 #include "xns/type_traits/type_transformations/lazy_conditional.hpp"
+#include "xns/type_traits/type_transformations/remove_cvref.hpp"
 
 #include "xns/utility/numeric_limits.hpp"
 
@@ -406,7 +407,7 @@ namespace xns {
 			 * @param p pointer
 			 * @param args arguments
 			*/
-			template <typename... ___params> requires (sizeof...(___params) > 1 || xns::is_not_same<value_type, xns::remove_cvr<___params>...>)
+			template <typename... ___params> requires (sizeof...(___params) > 1 || xns::are_not_same<value_type, xns::remove_cvref<___params>...>)
 			static constexpr auto construct(allocator_type& ___a, pointer ___p, ___params&&... ___args)
 				noexcept(noexcept(___a.construct(___p, xns::forward<___params>(___args)...))) -> void {
 				static_assert(xns::is_constructible<value_type, ___params...>,

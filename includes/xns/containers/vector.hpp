@@ -149,9 +149,9 @@ namespace xns {
 			}
 
 			/* array constructor */
-			template <typename T> requires (xns::extent<xns::remove_cvr<T>> != 0)
+			template <typename T> requires (xns::extent<xns::remove_cvref<T>> != 0)
 			explicit constexpr vector(T&& __arr) noexcept(true /* check for noexcept copy/move construct */)
-			: _data{nullptr}, _capacity{xns::extent<xns::remove_cvr<T>>}, _size{_capacity} {
+			: _data{nullptr}, _capacity{xns::extent<xns::remove_cvref<T>>}, _size{_capacity} {
 
 				// allocate memory
 				_data = allocator::allocate(_capacity);
@@ -643,7 +643,7 @@ namespace xns {
 
 
 			/* insert */
-			template <typename U> requires (xns::is_same<value_type, xns::remove_cvr<U>>)
+			template <typename U> requires (xns::is_same<value_type, xns::remove_cvref<U>>)
 			auto insert(size_type pos, U&& value) -> void {
 
 				// call emplace if pos is equal to size

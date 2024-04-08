@@ -23,6 +23,8 @@
 #include "xns/type_traits/type_operations/move.hpp"
 #include "xns/type_traits/type_operations/forward.hpp"
 
+#include "xns/type_traits/type_transformations/remove_cvref.hpp"
+
 #include "xns/utility/numeric_limits.hpp"
 
 #include "xns/type_traits/type_properties/is_trivially_copyable.hpp"
@@ -109,7 +111,7 @@ namespace xns {
 			// -- public static methods ---------------------------------------
 
 			/* allocate */
-			static inline auto allocate(const size_type size = 1) noexcept(xns::has_noexcept) -> mut_ptr {
+			static auto allocate(const size_type size = 1) noexcept(xns::has_noexcept) -> mut_ptr {
 
 				#if (XNS_HAS_NOEXCEPT)
 					return static_cast<mut_ptr>(::malloc(size * sizeof(type)));
@@ -127,7 +129,7 @@ namespace xns {
 			}
 
 
-			static inline auto allocate(const size_type size, const void*hint)
+			static auto allocate(const size_type size, const void*hint)
 				noexcept(true)
 				//noexcept(false)
 				-> mut_ptr {
@@ -135,7 +137,7 @@ namespace xns {
 			}
 
 			/* realloc */
-			static inline auto realloc(mut_ptr addrs, const size_type size = 1) noexcept(xns::has_noexcept) -> mut_ptr {
+			static auto realloc(mut_ptr addrs, const size_type size = 1) noexcept(xns::has_noexcept) -> mut_ptr {
 
 				// check type is trivially copyable
 				static_assert(xns::is_trivially_copyable<value_type>, "allocator, type is not trivially copyable");
@@ -156,38 +158,42 @@ namespace xns {
 			}
 
 			/* deallocate */
-			static inline auto deallocate(mut_ptr pointer) noexcept -> void {
+			static auto deallocate(mut_ptr pointer) noexcept -> void {
 				::free(pointer);
 			}
 
+			/* max size */
+			static auto max_size(void) noexcept -> size_type {
+				return size_type(~0) / sizeof(value_type);
+			}
 
 
 			// -- public construct methods ------------------------------------
 
 			/* default construct */
-			static inline auto construct(mut_ptr addrs) noexcept(xns::is_nothrow_default_constructible<value_type>) -> void {
+			static auto construct(mut_ptr addrs) noexcept(xns::is_nothrow_default_constructible<value_type>) -> void {
 				// assert type is default constructible
 				//static_assert(xns::is_default_constructible<value_type>, "allocator, type is not default constructible");
 				::new(self::voidify(*addrs)) value_type{};
 			}
 
 			/* copy construct */
-			static inline auto construct(mut_ptr addrs, const_ref value) noexcept(xns::is_nothrow_copy_constructible<value_type>) -> void {
+			static auto construct(mut_ptr addrs, const_ref value) noexcept(xns::is_nothrow_copy_constructible<value_type>) -> void {
 				// assert type is copy constructible
 				//static_assert(xns::is_copy_constructible<value_type>, "allocator, type is not copy constructible");
 				::new(self::voidify(*addrs)) value_type{value};
 			}
 
 			/* move construct */
-			static inline auto construct(mut_ptr addrs, move_ref value) noexcept(xns::is_nothrow_move_constructible<value_type>) -> void {
+			static auto construct(mut_ptr addrs, move_ref value) noexcept(xns::is_nothrow_move_constructible<value_type>) -> void {
 				// assert type is move constructible
 				//static_assert(xns::is_move_constructible<value_type>, "allocator, type is not move constructible");
 				::new(self::voidify(*addrs)) value_type{xns::move(value)};
 			}
 
 			/* forward construct */
-			template <typename... A> requires (sizeof...(A) > 1 || xns::is_not_same<value_type, xns::remove_cvr<A>...>)
-			static inline auto construct(mut_ptr addrs, A&&... args) noexcept(xns::is_nothrow_constructible<value_type, A...>) -> void {
+			template <typename... A> requires (sizeof...(A) > 1 || xns::are_not_same<value_type, xns::remove_cvref<A>...>)
+			static auto construct(mut_ptr addrs, A&&... args) noexcept(xns::is_nothrow_constructible<value_type, A...>) -> void {
 				// assert type is constructible
 				//static_assert(xns::is_constructible<value_type, A...>, "allocator, type is not constructible with given arguments");
 				::new(self::voidify(*addrs)) value_type(xns::forward<A>(args)...);
@@ -197,7 +203,7 @@ namespace xns {
 			// -- public destroy methods --------------------------------------
 
 			/* destroy */
-			static inline auto destroy(mut_ptr addrs) noexcept(xns::is_nothrow_destructible<value_type>) -> void {
+			static auto destroy(mut_ptr addrs) noexcept(xns::is_nothrow_destructible<value_type>) -> void {
 				// check type is trivially destructible
 				if constexpr (xns::is_trivially_destructible<value_type> == false) {
 					// check type is destructible
@@ -211,14 +217,14 @@ namespace xns {
 			// -- public assign methods ---------------------------------------
 
 			/* copy assign */
-			static inline auto assign(mut_ref dst, const_ref src) noexcept(xns::is_nothrow_copy_assignable<value_type>) -> void {
+			static auto assign(mut_ref dst, const_ref src) noexcept(xns::is_nothrow_copy_assignable<value_type>) -> void {
 				// assert type is copy assignable
 				static_assert(xns::is_copy_assignable<value_type>, "allocator, type is not copy assignable");
 				dst = src;
 			}
 
 			/* move assign */
-			static inline auto assign(mut_ref dst, move_ref src) noexcept(xns::is_nothrow_move_assignable<value_type>) -> void {
+			static auto assign(mut_ref dst, move_ref src) noexcept(xns::is_nothrow_move_assignable<value_type>) -> void {
 				// assert type is move assignable
 				static_assert(xns::is_move_assignable<value_type>, "allocator, type is not move assignable");
 				dst = xns::move(src);
@@ -231,7 +237,7 @@ namespace xns {
 
 			/* voidify */
 			template <typename U>
-			static inline constexpr auto voidify(U& value) noexcept -> void* {
+			static constexpr auto voidify(U& value) noexcept -> void* {
 				return const_cast<void*>(static_cast<const volatile void*>(xns::addressof(value)));
 			}
 

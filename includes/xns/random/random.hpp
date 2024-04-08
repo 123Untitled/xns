@@ -28,6 +28,8 @@
 #include "xns/type_traits/type_modifications/make_unsigned.hpp"
 #include "xns/utility/numeric_limits.hpp"
 
+#include "xns/type_traits/type_transformations/remove_cvref.hpp"
+
 #include "xns/random/xorshift.hpp"
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -58,10 +60,10 @@ namespace xns {
 
 			/* random integer */
 			template <typename T>
-			static auto integral(void) -> xns::remove_cvr<T> {
+			static auto integral(void) -> xns::remove_cvref<T> {
 
 				// remove const and reference
-				using type = xns::remove_cvr<T>;
+				using type = xns::remove_cvref<T>;
 
 				// check for integral type
 				static_assert(xns::is_integral<type>,
