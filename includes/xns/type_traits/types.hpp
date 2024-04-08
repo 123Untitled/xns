@@ -57,7 +57,7 @@ namespace xns {
 	// assume unsigned char is 1 byte
 	static_assert(sizeof(unsigned char) == 1, "assumption failed: sizeof(unsigned char) != 1");
 
-	namespace __impl {
+	namespace ___impl {
 
 		/* get the number of bits in a byte */
 		consteval auto bits_per_byte(void) noexcept -> decltype(sizeof(0)) {
@@ -70,7 +70,7 @@ namespace xns {
 
 	enum : decltype(sizeof(0)) {
 		// number of bits in a byte
-		bits_per_byte = xns::__impl::bits_per_byte(),
+		bits_per_byte = xns::___impl::bits_per_byte(),
 		// number of bytes in an address
 		bytes_per_address = sizeof(void*),
 	};
@@ -148,9 +148,6 @@ namespace xns {
 				typename ___<signed char, signed short,
 							 signed int,  signed long,
 							 signed long long
-							 #ifdef XNS_128BIT_INTEGERS
-						   , __int128
-							 #endif
 							 >::__result;
 
 			/* unsigned type */
@@ -158,9 +155,6 @@ namespace xns {
 				typename ___<unsigned char, unsigned short,
 							 unsigned int,  unsigned long,
 							 unsigned long long
-							 #ifdef XNS_128BIT_INTEGERS
-						   , unsigned __int128
-							 #endif
 							 >::__result;
 
 	}; // class integer_selector
@@ -277,24 +271,10 @@ namespace xns {
 	using s64     = xns::sint<64>;
 	using u64     = xns::uint<64>;
 
-	/* 128-bit integer types */
-	#ifdef XNS_128BIT_INTEGERS
-	using s128    = xns::sint<128>;
-	using u128    = xns::uint<128>;
-	#endif
 
 
 
-
-	#if defined XNS_128BIT_INTEGERS
-
-	/* maximum signed integer type */
-	using intmax_t = xns::sint<128>;
-
-	/* maximum unsigned integer type */
-	using uintmax_t = xns::uint<128>;
-
-	#elif defined XNS_64BIT_INTEGERS
+	#if defined XNS_64BIT_INTEGERS
 
 	/* maximum signed integer type */
 	using intmax_t = xns::sint<64>;
@@ -310,7 +290,7 @@ namespace xns {
 	/* maximum unsigned integer type */
 	using uintmax_t = xns::uint<32>;
 
-	#endif // XNS_128BIT_INTEGERS
+	#endif // XNS_64BIT_INTEGERS
 
 
 
