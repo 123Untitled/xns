@@ -15,10 +15,6 @@
 #ifndef XNS_CONFIG_HEADER
 #define XNS_CONFIG_HEADER
 
-#ifndef __has_builtin
-#define __has_builtin(__x) 0
-#endif
-
 
 #ifndef XNS_CPP_VERSION
 #	if __cplusplus <= 201103L
@@ -132,6 +128,17 @@
 		};
 	}
 
+#endif
+
+
+// check for clang
+#if defined(__clang__)
+#	define XNS_CLANG
+#endif
+
+// check for gcc
+#if defined(__GNUC__)
+#	define XNS_GCC
 #endif
 
 
