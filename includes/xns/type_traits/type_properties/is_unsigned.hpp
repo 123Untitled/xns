@@ -15,39 +15,62 @@
 #ifndef XNS_IS_UNSIGNED_HEADER
 #define XNS_IS_UNSIGNED_HEADER
 
+#include "xns/config/macros.hpp"
 #include "xns/type_traits/type_categories/is_integral.hpp"
 #include "xns/type_traits/type_categories/is_arithmetic.hpp"
 
 
-// -- N A M E S P A C E -------------------------------------------------------
+// -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
 
 
 	// -- I S  U N S I G N E D ------------------------------------------------
 
+	namespace ___impl {
+
+
+		/* integral specialization */
+		template <typename ___type, bool = xns::is_integral<___type>>
+		struct ___is_unsigned_impl : public xns::bool_constant<(___type(-1) > ___type(0))> {
+			___xns_not_instantiable(___is_unsigned_impl);
+		};
+
+		/* floating point specialization */
+		template <typename ___type>
+		struct ___is_unsigned_impl<___type, false> : public xns::false_type {
+			___xns_not_instantiable(___is_unsigned_impl);
+		};
+
+		/* arithmetic specialization */
+		template <typename ___type, bool = xns::is_arithmetic<___type>>
+		struct ___is_unsigned_arithmetic : public ___is_unsigned_impl<___type> {
+			___xns_not_instantiable(___is_unsigned_arithmetic);
+		};
+
+		/* non arithmetic specialization */
+		template <typename ___type>
+		struct ___is_unsigned_arithmetic<___type, false> : public xns::false_type {
+			___xns_not_instantiable(___is_unsigned_arithmetic);
+		};
+
+		/* is unsigned */
+		template <typename ___type>
+		struct ___is_unsigned final : public ___is_unsigned_arithmetic<___type> {
+			___xns_not_instantiable(___is_unsigned);
+		};
+
+	} // namespace ___impl
+
+
 	/* is unsigned */
-	template <class T>
-	concept is_unsigned = requires {
-		// check if T is arithmetic
-		requires xns::is_arithmetic<T>;
-		// check if T is unsigned
-		requires T(-1) > T(0);
-	};
-
-
-	// -- I S  U N S I G N E D  I N T E G R A L -------------------------------
+	template <typename ___type>
+	concept is_unsigned = xns::___impl::___is_unsigned<___type>::value;
 
 	/* is unsigned integral */
-	template <class T>
-	concept is_unsigned_integral = requires {
-		// check if T is integral
-		requires xns::is_integral<T>;
-		// check if T is unsigned
-		requires T(-1) > T(0);
-	};
+	template <typename ___type>
+	concept is_unsigned_integral = xns::is_unsigned<___type> && xns::is_integral<___type>;
 
+} // namespace xns
 
-}
-
-#endif
+#endif // XNS_IS_UNSIGNED_HEADER
