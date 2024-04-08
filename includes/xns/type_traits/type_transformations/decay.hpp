@@ -19,8 +19,8 @@
 #include "xns/type_traits/type_modifications/remove_extent.hpp"
 #include "xns/type_traits/type_categories/is_array.hpp"
 #include "xns/type_traits/type_categories/is_function.hpp"
-#include "xns/type_traits/type_modifications/remove.hpp"
 #include "xns/type_traits/type_transformations/conditional.hpp"
+#include "xns/type_traits/type_modifications/remove_cv.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

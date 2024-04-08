@@ -3,7 +3,6 @@
 
 //#include <type_traits>
 
-#include "xns/type_traits/type_modifications/remove.hpp"
 #include "xns/type_traits/relationships_and_property_queries/is_same.hpp"
 
 #include <type_traits>
@@ -18,22 +17,22 @@ namespace xns {
 
 	namespace __impl {
 
-		/* common type */
-		template <typename T, typename... R>
-		struct common_type {
-			// remove reference of T
-			using type = xns::remove_cvr<T>;
-			// check if all types are the same
-			static_assert((xns::is_same<type, xns::remove_cvr<R>> && ...),
-						  "): ALL TYPES MUST BE THE SAME :(");
-		};
-
-		/* common type (specialization for one type) */
-		template <class T>
-		struct common_type<T> final {
-			// remove reference of T
-			using type = xns::remove_reference<T>;
-		};
+		///* common type */
+		//template <typename T, typename... R>
+		//struct common_type {
+		//	// remove reference of T
+		//	using type = xns::remove_cvr<T>;
+		//	// check if all types are the same
+		//	static_assert((xns::is_same<type, xns::remove_cvr<R>> && ...),
+		//				  "): ALL TYPES MUST BE THE SAME :(");
+		//};
+		//
+		///* common type (specialization for one type) */
+		//template <class T>
+		//struct common_type<T> final {
+		//	// remove reference of T
+		//	using type = xns::remove_reference<T>;
+		//};
 
 	}
 
