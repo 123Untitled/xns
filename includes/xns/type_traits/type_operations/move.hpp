@@ -27,12 +27,10 @@ namespace xns {
 	// -- M O V E -------------------------------------------------------------
 
 	/* move */
-	template <typename T>
-	inline constexpr auto move(T&& obj) noexcept -> xns::to_rvalue<T> {
-		// assert that T is not const (not following the standard)
-		static_assert(not xns::is_const<T>, "): MOVE: cannot move const object :(");
+	template <typename ___type>
+	constexpr auto move(___type&& obj) noexcept -> xns::to_rvalue<___type> {
 		// remove reference from T and return as rvalue reference
-		return static_cast<xns::to_rvalue<T>>(obj);
+		return static_cast<xns::to_rvalue<___type>>(obj);
 	}
 
 } // namespace xns
