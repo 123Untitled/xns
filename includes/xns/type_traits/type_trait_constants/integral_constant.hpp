@@ -26,29 +26,29 @@ namespace xns {
 	// -- I N T E G R A L  C O N S T A N T ------------------------------------
 
 	/* integral constant */
-	template <typename T, T V>
+	template <typename ___type, ___type ___vl>
 	struct integral_constant {
 
 
 		// -- types -----------------------------------------------------------
 
 		/* self type */
-		using self = xns::integral_constant<T, V>;
+		using self = xns::integral_constant<___type, ___vl>;
 
 		/* value type */
-		using value_type = T;
+		using value_type = ___type;
 
 
 		// -- static members --------------------------------------------------
 
 		/* value */
-		static constexpr value_type value{V};
+		static constexpr value_type value = ___vl;
 
 
 		// -- conversion operators --------------------------------------------
 
 		/* value_type conversion operator */
-		inline consteval operator value_type() const noexcept {
+		consteval operator value_type() const noexcept {
 			return value;
 		}
 
@@ -56,7 +56,7 @@ namespace xns {
 		// -- function call operator ------------------------------------------
 
 		/* function call operator */
-		inline consteval auto operator()() const noexcept -> value_type {
+		consteval auto operator()() const noexcept -> value_type {
 			return value;
 		}
 
@@ -64,17 +64,11 @@ namespace xns {
 
 
 	/* bool constant */
-	template <bool B>
-	using bool_constant = xns::integral_constant<bool, B>;
-
-
-	// -- T R U E  T Y P E -----------------------------------------------------
+	template <bool ___vl>
+	using bool_constant = xns::integral_constant<bool, ___vl>;
 
 	/* true type */
 	using true_type = xns::bool_constant<true>;
-
-
-	// -- F A L S E  T Y P E ---------------------------------------------------
 
 	/* false type */
 	using false_type = xns::bool_constant<false>;
