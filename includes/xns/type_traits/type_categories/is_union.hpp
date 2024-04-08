@@ -1,3 +1,17 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                       :::    ::: ::::    :::  ::::::::                    */
+/*                      :+:    :+: :+:+:   :+: :+:    :+:                    */
+/*                      +:+  +:+  :+:+:+  +:+ +:+                            */
+/*                      +#++:+   +#+ +:+ +#+ +#++:++#++                      */
+/*                    +#+  +#+  +#+  +#+#+#        +#+                       */
+/*                  #+#    #+# #+#   #+#+# #+#    #+#                        */
+/*                 ###    ### ###    ####  ########                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#pragma once
+
 #ifndef XNS_IS_UNION_HEADER
 #define XNS_IS_UNION_HEADER
 
@@ -12,8 +26,8 @@ namespace xns {
 	#if __has_builtin(__is_union)
 
 		/* is union */
-		template <typename T>
-		concept is_union = __is_union(T);
+		template <typename ___type>
+		concept is_union = __is_union(___type);
 
 	#else
 
@@ -21,6 +35,6 @@ namespace xns {
 
 	#endif
 
-}
+} // namespace xns
 
-#endif
+#endif // XNS_IS_UNION_HEADER
