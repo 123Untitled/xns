@@ -27,8 +27,8 @@ namespace xns {
 	// -- I S  A R I T H M E T I C --------------------------------------------
 
 	/* is arithmetic concept */
-	template <class T>
-	concept is_arithmetic = xns::is_integral<T> || xns::is_floating_point<T>;
+	template <typename ___type>
+	concept is_arithmetic = (xns::is_integral<___type> || xns::is_floating_point<___type>);
 
 } // namespace xns
 

@@ -16,7 +16,7 @@
 #define XNS_IS_INTEGRAL_HEADER
 
 #include "xns/type_traits/other/is_one_of.hpp"
-#include "xns/type_traits/type_modifications/remove.hpp"
+#include "xns/type_traits/type_modifications/remove_cv.hpp"
 
 #include "xns/config/config.hpp"
 
@@ -36,11 +36,7 @@ namespace xns {
 		char8_t, char32_t, char16_t, wchar_t,
 		signed char, unsigned char, unsigned short,
 		unsigned int, unsigned long, unsigned long long
-
-		#ifdef XNS_128BIT_INTEGERS
-		, __int128, unsigned __int128
-		#endif
-		>;
+			>;
 
 } // namespace xns
 

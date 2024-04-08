@@ -26,23 +26,24 @@ namespace xns {
 
 	// -- I S  C L A S S ------------------------------------------------------
 
+	namespace ___impl {
 
-	namespace __impl {
 
 		/* test for class */
-		template <typename __type>
-		constexpr auto test(int __type::*) -> xns::bool_constant<xns::is_union<__type> == false>;
+		template <typename ___type>
+		constexpr auto ___is_class_test(int ___type::*) -> xns::bool_constant<xns::is_union<___type> == false>;
 
 		/* test for non-class */
-		template <typename __type>
-		constexpr auto test(...) -> xns::false_type;
+		template <typename ___type>
+		constexpr auto ___is_class_test(...) -> xns::false_type;
 
-	}
+	} // namespace ___impl
 
-	/* is_class */
-	template <typename __type>
-	concept is_class = decltype(xns::__impl::test<__type>(nullptr))::value;
 
-}
+	/* is class */
+	template <typename ___type>
+	concept is_class = decltype(xns::___impl::___is_class_test<___type>(nullptr))::value;
 
-#endif
+} // namespace xns
+
+#endif // XNS_IS_CLASS_HEADER

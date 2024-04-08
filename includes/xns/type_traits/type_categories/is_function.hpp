@@ -17,6 +17,7 @@
 
 #include "xns/type_traits/other/is_one_of.hpp"
 #include "xns/type_traits/type_trait_constants/integral_constant.hpp"
+#include "xns/type_traits/type_modifications/remove_cv.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------

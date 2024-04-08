@@ -13,7 +13,7 @@
 #ifndef XNS_IS_MEMBER_POINTER_HEADER
 #define XNS_IS_MEMBER_POINTER_HEADER
 
-#include "xns/type_traits/type_modifications/remove.hpp"
+#include "xns/type_traits/type_modifications/remove_cv.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -44,4 +44,4 @@ namespace xns {
 
 } // namespace xns
 
-#endif // XNS_IS_MEMBER_POINTER_HPP
+#endif // XNS_IS_MEMBER_POINTER_HEADER
