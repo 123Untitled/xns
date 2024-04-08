@@ -18,7 +18,7 @@
 #include "xns/type_traits/type_categories/is_char.hpp"
 #include "xns/type_traits/types.hpp"
 #include "xns/type_traits/relationships_and_property_queries/is_same.hpp"
-#include "xns/type_traits/other/identity.hpp"
+#include "xns/type_traits/type_transformations/type_identity.hpp"
 #include "xns/type_traits/other/string_literal.hpp"
 
 #include <iostream>
