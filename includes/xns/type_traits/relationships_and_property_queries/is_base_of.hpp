@@ -26,8 +26,8 @@ namespace xns {
 	// -- I S  B A S E  O F ---------------------------------------------------
 
 	/* is base of */
-	template <typename __base, typename __derived>
-	concept is_base_of = __impl::is_derived_from<__derived, __base>::value;
+	template <typename ___base, typename ___derived>
+	concept is_base_of = xns::___impl::___is_derived_from<___derived, ___base>::value;
 
 } // namespace xns
 

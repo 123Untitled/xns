@@ -15,7 +15,7 @@
 #ifndef XNS_TO_REFERENCE_HEADER
 #define XNS_TO_REFERENCE_HEADER
 
-#include "xns/type_traits/type_modifications/remove.hpp"
+#include "xns/type_traits/type_modifications/remove_reference.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
