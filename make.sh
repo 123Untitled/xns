@@ -150,12 +150,15 @@ COMPILED=$BLDDIR'/.compiled'
 # lock file (mutex)
 LOCK=$BLDDIR'/.lock'
 
+# repository visibility
+CLONE=''
+
 
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-CXX='/opt/homebrew/Cellar/llvm/17.0.6_1/bin/clang++'
-#CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
+#CXX=('/opt/homebrew/Cellar/llvm/'*'/bin/clang++'(N))
+CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
 #CXX='clang++'
 #CXX='g++'
 
@@ -204,7 +207,7 @@ CXXFLAGS+=('-Wpedantic' '-Weffc++')
 CXXFLAGS+=('-Wno-unused' '-Wno-unused-variable' '-Wno-unused-parameter' '-Wno-unused-result')
 
 # optimization
-CXXFLAGS+=('-Winline')
+#CXXFLAGS+=('-Winline')
 
 # type conversion
 #CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
@@ -214,6 +217,35 @@ CXXFLAGS+=('-Wshadow')
 
 # exception
 CXXFLAGS+=('-fexceptions' '-Wexceptions')
+
+# runtime type information
+CXXFLAGS+=('-fno-rtti')
+
+# thread static
+#CXXFLAGS+=('-fno-threadsafe-statics')
+
+
+# diagnostics
+#CXXFLAGS+=('fdiagnostics-absolute-paths')
+
+#-fdiagnostics-absolute-paths                                                   -- print absolute paths in diagnostics
+#-fdiagnostics-color                                                            -- colorize diagnostics
+#-fdiagnostics-fixit-info                                                       -- supply fixit into with diagnostic messages
+#-fdiagnostics-format                                                           -- diagnostics format
+#-fdiagnostics-generate-patch                                                   -- print fix-it hints to stderr in unified diff format
+#-fdiagnostics-hotness-threshold                                                -- prevent optimization remarks from being output if they do not meet threshold
+#-fdiagnostics-parseable-fixits                                                 -- print fixit hints in machine-readable form
+#-fdiagnostics-parseable-fixits                                                 -- print fixits in a machine parseable form
+#-fdiagnostics-print-source-range-info                                          -- print source range spans in numeric form
+#-fdiagnostics-show-caret                                                       -- show the source line with a caret indicating the column
+#-fdiagnostics-show-category                                                    -- diagnostics show category
+#-fdiagnostics-show-hotness                                                     -- enable profile hotness information in diagnostic line
+#-fdiagnostics-show-location                                                    -- how often to emit source location at the beginning of line-wrapped diagnostics
+#-fdiagnostics-show-note-include-stack                                          -- display include stacks for diagnostic notes
+#-fdiagnostics-show-option                                                      -- amend appropriate diagnostic messages with the command line option that controls them
+#-fdiagnostics-show-option                                                      -- enable -Woption information in diagnostic line
+#-fdiagnostics-show-template-tree
+
 
 # defines
 DEFINES=()
@@ -311,7 +343,6 @@ function required {
 }
 
 
-CLONE=''
 
 # -- R E P O S I T O R Y  C H E C K -------------------------------------------
 
@@ -577,8 +608,8 @@ function compile {
 					# wait all pids
 					wait
 					echo '\n'$SEPARATOR
-					#cat $LOGDIR/*.log
-					handle_errors
+					cat $LOGDIR/*.log
+					#handle_errors
 					exit 1
 				fi
 			done
@@ -586,6 +617,7 @@ function compile {
 			PIDS=()
 		fi
 	done
+
 
 	# loop over pids
 	for PID in $PIDS; do
@@ -595,8 +627,8 @@ function compile {
 		if [[ $? -ne 0 ]]; then
 			wait
 			echo '\n'$SEPARATOR
-			#cat $LOGDIR/*.log
-			handle_errors
+			cat $LOGDIR/*.log
+			#handle_errors
 			exit 1
 		fi
 	done
