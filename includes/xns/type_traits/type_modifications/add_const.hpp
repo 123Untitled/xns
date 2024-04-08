@@ -25,29 +25,22 @@ namespace xns {
 
 	// -- A D D  C O N S T ----------------------------------------------------
 
-	// -- detail --------------------------------------------------------------
+	namespace ___impl {
 
-	namespace impl {
 
 		/* add const */
-		template <typename T>
-		struct add_const          final {
-			using type = const T;
-			XNS_NOT_INSTANTIABLE(add_const);
+		template <typename ___type>
+		struct ___add_const final {
+			using type = const ___type;
+			___xns_not_instantiable(___add_const);
 		};
 
-		/* specialisation for const T */
-		template <typename T>
-		struct add_const<const T> final {
-			using type = const T;
-			XNS_NOT_INSTANTIABLE(add_const);
-		};
+	} // namespace ___impl
 
-	} // namespace impl
 
 	/* add const */
-	template <class T>
-	using add_const = typename impl::add_const<T>::type;
+	template <typename ___type>
+	using add_const = typename xns::___impl::___add_const<___type>::type;
 
 } // namespace xns
 

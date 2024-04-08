@@ -16,6 +16,7 @@
 #define XNS_ADD_RVALUE_REFERENCE_HEADER
 
 #include "xns/type_traits/type_properties/is_referenceable.hpp"
+#include "xns/config/macros.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -25,52 +26,34 @@ namespace xns {
 
 	// -- A D D  R V A L U E  R E F E R E N C E -------------------------------
 
+	namespace ___impl {
 
-	namespace impl {
-
-		// -- forward declarations --------------------------------------------
 
 		/* add rvalue reference */
 		template <typename, bool>
-		struct add_rvalue_reference;
+		struct ___add_rvalue_reference;
 
-		/* add rvalue reference false specialisation */
-		template <typename T>
-		struct add_rvalue_reference<T, false> final {
-
-			// -- types -------------------------------------------------------
-
-			/* type */
-			using type = T;
-
-			// -- lifecycle ---------------------------------------------------
-
-			/* not instantiable */
-			XNS_NOT_INSTANTIABLE(add_rvalue_reference);
-
+		/* false specialisation */
+		template <typename ___type>
+		struct ___add_rvalue_reference<___type, false> final {
+			using type = ___type;
+			___xns_not_instantiable(___add_rvalue_reference);
 		};
 
-		/* add rvalue reference true specialisation */
-		template <typename T>
-		struct add_rvalue_reference<T, true> final {
-
-			// -- types -------------------------------------------------------
-
-			/* type */
-			using type = T&&;
-
-			// -- lifecycle ---------------------------------------------------
-
-			/* not instantiable */
-			XNS_NOT_INSTANTIABLE(add_rvalue_reference);
-
+		/* true specialisation */
+		template <typename ___type>
+		struct ___add_rvalue_reference<___type, true> final {
+			using type = ___type&&;
+			___xns_not_instantiable(___add_rvalue_reference);
 		};
 
-	} // namespace impl
+	} // namespace ___impl
+
 
 	/* add rvalue reference */
-	template <typename T>
-	using add_rvalue_reference = typename impl::add_rvalue_reference<T, xns::is_referenceable<T>>::type;
+	template <typename ___type>
+	using add_rvalue_reference = typename xns::___impl::___add_rvalue_reference<___type,
+																				xns::is_referenceable<___type>>::type;
 
 } // namespace xns
 
