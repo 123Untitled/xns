@@ -16,10 +16,27 @@ SSH_REPO='git@github.com:123Untitled/xns.git'
 PUB_REPO='https://github.com/123Untitled/xns.git'
 
 
+# -- C H E C K  R E Q U I R E M E N T S ---------------------------------------
+
+local -r -a REQUIRED=(
+	'git'
+	'fzy'
+)
+
+# loop over all required commands
+for COMMAND in $REQUIRED; do
+	# check if the command is installed
+	if ! command -v $COMMAND &> /dev/null; then
+		echo $COMMAND 'is required to run this script.'
+		exit 1
+	fi
+done
+
+
 # -- C H E C K  W O R K I N G  D I R E C T O R Y ------------------------------
 
 # check if the script is run in a git repository
-if [ ! -d .git ]; then
+if [[ ! -d .git ]]; then
 	echo 'please run this script in the' $CO$PROJECT$NC 'repository.'
 	exit 1
 fi
@@ -47,17 +64,19 @@ fi
 # -- C H E C K  D I R E C T O R I E S -----------------------------------------
 
 # check if the include directory exists
-if [ ! -d $INCDIR ]; then
+if [[ ! -d $INCDIR ]]; then
 	echo 'the' $CO$INCDIR$NC 'directory does not exist.'
 	exit 1
 fi
 
 
 # check if the unit test directory exists
-if [ ! -d $TSTDIR ]; then
+if [[ ! -d $TSTDIR ]]; then
 	echo 'the' $CO$TSTDIR$NC 'directory does not exist.'
 	exit 1
 fi
+
+
 
 
 # -- I N I T I A L I Z A T I O N ----------------------------------------------
@@ -100,45 +119,52 @@ done
 
 
 
-function model {
+function ___model {
 
-	# check if there is one argument
-	if [ $# -ne 1 ]; then
+	# check if there is two arguments
+	if [[ $# -ne 2 ]]; then
+		echo 'usage: ___model <path> <basename>'
 		exit 1
 	fi
 
 	# unit test file model
-	local MODEL=\
-'#include "unit_tests.hpp"\n'\
-'#include "'$1'.hpp"\n\n'\
-'/* unit test */\n'\
-'int unit_tests_'$1'(void) {\n'\
-'\treturn 0;\n'\
-'}\n\n'\
-'#if defined(XNS_TEST_'${1:u}')\n'\
-'int main(void) {\n'\
-'\treturn unit_tests_'$1'();\n'\
-'}\n'\
-'#endif\n'
+	local -r -a MODEL=(
+			'#include "'$1'"\n\n'
+			'/* unit test */\n'
+			'static int ___'$2'(void) {\n'
+			'\treturn 0;\n'
+			'}\n\n'
+			'static int ___'$2'(int ac, char** av) {\n'
+			'\treturn 0;\n'
+			'}\n\n'
+			'#if defined(XNS_TEST_'${2:u}')\n'
+			'int main(int ac, char** av) {\n'
+			'\treturn (ac > 1)\n'
+			'\t\t? ___'$2'(ac - 1, av + 1)\n'
+			'\t\t: ___'$2'();\n'
+			'}\n'
+			'#endif'
+	)
 
 	echo $MODEL
 }
 
 
-function prompt {
+
+function ___prompt {
 	echo -n '[y/n] ? '
 
 	while true; do
 		# read one character
 		read -k 1 -s INPUT
 		# echo
-		if   [[ $INPUT =~ '[yY]' ]]; then
+		if   [[ $INPUT =~ '[yY]' || $INPUT == $'\n' ]]; then
 			echo 'yes.'
 			return 0
-		elif [[ $INPUT =~ '[nN]' ]]; then
+		elif [[ $INPUT =~ '[nN]' || $INPUT == $'\e' ]]; then
 			echo 'no.'
 			return 1
-		elif [[ $INPUT =~ '[qQ]' ]]; then
+		elif [[ $INPUT =~ '[qQaA]' ]]; then
 			echo 'abort.'
 			exit 0
 		fi
@@ -147,42 +173,59 @@ function prompt {
 }
 
 
-
-
 function missing_test {
+
+	local CHOICES=()
 
 	# loop over all header files
 	for HEADER in $HEADERS; do
-
 		# check if the associated unit file exist
 		if [[ ! -v UTABLE[$HEADER] ]]; then
-
-			# print message
-			echo -n $CE'_'$HEADER'.cpp'$NC 'does not exist, generating it ? '
-
-			if prompt; then
-
-				# get the unit test file path
-				local FILE_PATH=$TSTDIR'/_'$HEADER'.cpp'
-
-				# check if the unit test file already exists
-				if [ -f $FILE_PATH ]; then
-					exit 1
-				fi
-
-				# generate unit test file
-				model $HEADER > $FILE_PATH
-
-				# add unit test file to git
-				git add -v $FILE_PATH
-				# commit unit test file
-				git commit -v -m "add unit test for $HEADER"
-				# push changes
-				git push -v
-			fi
-
+			CHOICES+=($HEADER)
 		fi
 	done
+
+	# send choices to fzy
+	IFS=$'\n'
+	local -r SELECT=$(fzy <<< $CHOICES)
+	IFS=$' \t\n'
+
+	if [[ -z $SELECT ]]; then
+		exit 0
+	fi
+
+	echo -n $CE$SELECT$NC 'does not have a unit test file, generating it ? '
+
+	___prompt || exit 0
+
+	# get the unit test file path
+	local TEST_PATH=$TSTDIR'/_'$SELECT'.cpp'
+
+	# check if the unit test file already exists
+	if [[ -f $TEST_PATH ]]; then
+		echo $CO'error'$NC 'unit test file already exists.'
+		exit 1
+	fi
+
+	# search full path of the header file
+	local INCLUDE_PATH=($INCDIR'/'**'/'$SELECT'.hpp'(.N))
+
+
+	# remove 'includes/' prefix
+	INCLUDE_PATH=${INCLUDE_PATH#includes/}
+
+	# generate unit test file
+	___model $INCLUDE_PATH $SELECT > $TEST_PATH
+
+	# check if the unit test file was generated
+	if [ ! -f $TEST_PATH ]; then
+		echo $CO'error'$NC 'generating unit test file.'
+		exit 1
+	fi
+
+	echo $CE'_'$SELECT'.hpp'$NC 'unit test file generated.'
+
+	exit 0
 }
 
 
@@ -196,7 +239,7 @@ function missing_header {
 			# print message
 			echo -n $CO'_'$TEST'.cpp'$NC 'is not associated to a header file, delete it ? '
 
-			if prompt; then
+			if ___prompt; then
 
 				# get the unit test file path
 				local FILE_PATH=$TSTDIR'/_'$TEST'.cpp'
@@ -217,8 +260,14 @@ function missing_header {
 		fi
 
 	done
-
 }
 
-missing_header
-missing_test
+local -r SELECT=$(echo 'generate test\ndelete test' | fzy)
+
+if   [[ $SELECT == 'generate test' ]]; then
+	missing_test
+elif [[ $SELECT == 'delete test' ]]; then
+	missing_header
+fi
+
+exit 0
