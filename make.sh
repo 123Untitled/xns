@@ -713,7 +713,7 @@ function require_build_mode {
 
 		IFS=$'\n'
 		local MODES=('release' 'install' 'test')
-		MODE=$('fzy' <<< ${MODES[@]})
+		MODE=$('fzy' '--prompt=> ' <<< ${MODES[@]})
 		IFS=$' \t\n'
 
 		if [[ -z $MODE ]]; then
