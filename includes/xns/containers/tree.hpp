@@ -403,7 +403,7 @@ namespace xns {
 					}
 				}
 
-				xns::allocator<value_type>::deallocate(vec);
+				xns::allocator<value_type>::deallocate2(vec);
 			}
 
 
@@ -745,7 +745,7 @@ namespace xns {
 			template <typename... A>
 			inline auto make_node(node_ptr parent, A&&... args) -> node_ptr {
 				// allocate and construct node
-				node_ptr node = allocator::allocate();
+				node_ptr node = allocator::allocate2();
 				allocator::construct(node, parent, xns::forward<A>(args)...);
 				// increment size
 				++_size;
@@ -919,7 +919,7 @@ namespace xns {
 					// destroy node
 					allocator::destroy(node);
 					// deallocate node
-					allocator::deallocate(node);
+					allocator::deallocate2(node);
 				}
 			}
 

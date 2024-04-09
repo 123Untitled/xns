@@ -62,7 +62,7 @@ namespace xns {
 			/* method reference constructor */
 			template <typename C>
 			explicit callable(method_prototype<C> method, reference<C> instance)
-			: _base{xns::allocator<method_impl<C>>::allocate()} {
+			: _base{xns::allocator<method_impl<C>>::allocate2()} {
 				// construct
 				xns::allocator<method_impl<C>>::construct(_base, method, instance);
 			}
@@ -70,7 +70,7 @@ namespace xns {
 			/* method pointer constructor */
 			template <typename C>
 			explicit callable(method_prototype<C> method, pointer<C> instance)
-			: _base{xns::allocator<method_impl<C>>::allocate()} {
+			: _base{xns::allocator<method_impl<C>>::allocate2()} {
 				// construct
 				xns::allocator<method_impl<C>>::construct(
 					static_cast<method_impl<C>*>(_base), method, instance);
@@ -78,7 +78,7 @@ namespace xns {
 
 			/* function pointer constructor */
 			explicit callable(function_prototype function)
-			: _base{xns::allocator<function_impl>::allocate()} {
+			: _base{xns::allocator<function_impl>::allocate2()} {
 				// construct
 				xns::allocator<function_impl>::construct(
 					static_cast<function_impl*>(_base), function);
@@ -103,7 +103,7 @@ namespace xns {
 				// destroy base
 				xns::allocator<base>::destroy(_base);
 				// deallocate memory
-				xns::allocator<base>::deallocate(_base);
+				xns::allocator<base>::deallocate2(_base);
 			}
 
 
@@ -118,7 +118,7 @@ namespace xns {
 						// destroy base
 						xns::allocator<base>::destroy(_base);
 						// deallocate memory
-						xns::allocator<base>::deallocate(_base);
+						xns::allocator<base>::deallocate2(_base);
 					}
 					// copy base
 					_base = other._base ? other._base->clone() : nullptr;
@@ -135,7 +135,7 @@ namespace xns {
 						// destroy base
 						xns::allocator<base>::destroy(_base);
 						// deallocate memory
-						xns::allocator<base>::deallocate(_base);
+						xns::allocator<base>::deallocate2(_base);
 					}
 					// move base pointer
 					_base = other._base;
@@ -152,7 +152,7 @@ namespace xns {
 					// destroy base
 					xns::allocator<base>::destroy(_base);
 					// deallocate memory
-					xns::allocator<base>::deallocate(_base);
+					xns::allocator<base>::deallocate2(_base);
 				}
 				// invalidate base pointer
 				_base = nullptr;
@@ -319,7 +319,7 @@ namespace xns {
 				/* clone function */
 				base* clone(void) const override {
 					// allocate memory
-					function_impl* copy = xns::allocator<function_impl>::allocate();
+					function_impl* copy = xns::allocator<function_impl>::allocate2();
 					// construct copy
 					xns::allocator<function_impl>::construct(copy, _function);
 					// return copy

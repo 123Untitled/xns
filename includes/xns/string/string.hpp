@@ -450,7 +450,7 @@ namespace xns {
 				// check for self-assignment
 				if (this != &other) {
 					// deallocate memory
-					if (_str) { allocator::deallocate(_str); }
+					if (_str) { allocator::deallocate2(_str); }
 					// move members
 					_str      = other._str;
 					_capacity = other._capacity;
@@ -1277,19 +1277,19 @@ namespace xns {
 			/* allocate */
 			static auto allocate(const size_type request) -> mut_ptr {
 				// add one for null character
-				return allocator::allocate(request + 1U);
+				return allocator::allocate2(request + 1U);
 			}
 
 			/* deallocate */
 			auto deallocate(void) noexcept -> void {
 				// check if memory is allocated
-				if (_str) { allocator::deallocate(_str); }
+				if (_str) { allocator::deallocate2(_str); }
 			}
 
 			/* realloc */
 			auto reallocate(const size_type request) -> void {
 				// reallocate memory
-				_str = allocator::realloc(_str, request + 1U);
+				_str = allocator::realloc2(_str, request + 1U);
 				// update capacity
 				_capacity = request;
 			}

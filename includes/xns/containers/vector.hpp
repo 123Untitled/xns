@@ -154,7 +154,7 @@ namespace xns {
 			: _data{nullptr}, _capacity{xns::extent<xns::remove_cvref<T>>}, _size{_capacity} {
 
 				// allocate memory
-				_data = allocator::allocate(_capacity);
+				_data = allocator::allocate2(_capacity);
 
 				// copy elements
 				for (size_type i = 0; i < _size; ++i)
@@ -172,7 +172,7 @@ namespace xns {
 			/* copy constructor */
 			#if (!XNS_HAS_NOEXCEPT)
 			vector(const self& other) noexcept(xns::is_nothrow_copy_constructible<value_type>)
-			:     _data{other._size > 0 ? allocator::allocate(other._size) : nullptr},
+			:     _data{other._size > 0 ? allocator::allocate2(other._size) : nullptr},
 			  _capacity{other._size},
 			      _size{_capacity} {
 
@@ -212,7 +212,7 @@ namespace xns {
 									allocator::destroy(_data + j);
 							}
 							// deallocate memory
-							allocator::deallocate(_data);
+							allocator::deallocate2(_data);
 							// forward exception
 							throw;
 						}
@@ -227,7 +227,7 @@ namespace xns {
 
 			/* copy constructor */
 			vector(const self& other) noexcept
-			:     _data{other._size > 0 ? allocator::allocate(other._size) : nullptr},
+			:     _data{other._size > 0 ? allocator::allocate2(other._size) : nullptr},
 			  _capacity{other._size},
 			      _size{_capacity} {
 
@@ -276,7 +276,7 @@ namespace xns {
 				_clear();
 
 				// deallocate memory
-				allocator::deallocate(_data);
+				allocator::deallocate2(_data);
 			}
 
 
@@ -380,17 +380,17 @@ namespace xns {
 				if (_capacity < other._size) {
 
 					if (_data != nullptr)
-						allocator::deallocate(_data);
+						allocator::deallocate2(_data);
 
 					_init();
 
-					_data = allocator::allocate(other._size);
+					_data = allocator::allocate2(other._size);
 
 					_capacity = other._size;
 				}
 
 				// deallocate memory
-				allocator::deallocate(_data); /* info: no nullptr check */
+				allocator::deallocate2(_data); /* info: no nullptr check */
 
 				return *this;
 			}
@@ -407,7 +407,7 @@ namespace xns {
 
 				// deallocate memory
 				if (_data != nullptr)
-					allocator::deallocate(_data);
+					allocator::deallocate2(_data);
 
 				// copy members
 				_copy_members(other);
@@ -853,7 +853,7 @@ namespace xns {
 			auto _reserve(const size_type capacity) -> void requires (not xns::is_trivially_copyable<value_type>) {
 
 				// allocate memory
-				mut_ptr tmp = allocator::allocate(capacity);
+				mut_ptr tmp = allocator::allocate2(capacity);
 
 				// reconstruct elements
 				for (size_type i = 0; i < _size; ++i) {
@@ -862,7 +862,7 @@ namespace xns {
 				}
 
 				// deallocate memory
-				allocator::deallocate(_data); /* info: no nullptr check */
+				allocator::deallocate2(_data); /* info: no nullptr check */
 
 				// update members
 				_capacity = capacity;
@@ -873,7 +873,7 @@ namespace xns {
 			auto _reserve(const size_type capacity) -> void requires (xns::is_trivially_copyable<value_type> == true) {
 
 				// reallocate memory
-				  _data = allocator::realloc(_data, capacity);
+				  _data = allocator::realloc2(_data, capacity);
 				_capacity = capacity;
 			}
 

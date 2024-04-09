@@ -85,7 +85,7 @@ auto xns::bjorklund::generate_impl(void) -> xns::vector<size_type> {
 	auto sub_pulse = bursts.size();
 
 	// node allocation
-	_front = allocator::allocate(_step);
+	_front = allocator::allocate2(_step);
 
 	for (size_type i = 0; i < sub_pulse; ++i)
 		allocator::construct(_front + i, 1U);
@@ -130,7 +130,7 @@ auto xns::bjorklund::generate_impl(void) -> xns::vector<size_type> {
 	} f += b;
 
 
-	auto seq = xns::vector<size_type>::allocator::allocate(_step);
+	auto seq = xns::vector<size_type>::allocator::allocate2(_step);
 	auto ptr = seq;
 	// retrieve sequence to fill vector
 	for (i = 0; i < f; ++i) {
@@ -140,7 +140,7 @@ auto xns::bjorklund::generate_impl(void) -> xns::vector<size_type> {
 	}
 
 	// deallocate nodes
-	allocator::deallocate(_front);
+	allocator::deallocate2(_front);
 
 	return xns::vector<size_type>{seq, _step};
 
