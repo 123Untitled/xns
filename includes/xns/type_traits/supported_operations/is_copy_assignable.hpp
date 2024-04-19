@@ -28,14 +28,14 @@ namespace xns {
 	// -- I S  C O P Y  A S S I G N A B L E -----------------------------------
 
 	/* is copy assignable */
-	template <typename T>
+	template <typename ___type>
 	concept is_copy_assignable
-		= xns::is_assignable<xns::add_lvalue_reference<T>,
-							 xns::add_lvalue_reference<xns::add_const<T>>>;
+		= xns::is_assignable<xns::add_lvalue_reference<___type>,
+							 xns::add_lvalue_reference<xns::add_const<___type>>>;
 
 	/* are copy assignable */
-	template <typename... T>
-	concept are_copy_assignable = (xns::is_copy_assignable<T> && ...);
+	template <typename... ___types>
+	concept are_copy_assignable = (xns::is_copy_assignable<___types> && ...);
 
 } // namespace xns
 

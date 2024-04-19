@@ -12,10 +12,10 @@
 
 #pragma once
 
-#ifndef XNS_IS_NOTHROW_DEFAULT_CONSTRUCTIBLE_HEADER
-#define XNS_IS_NOTHROW_DEFAULT_CONSTRUCTIBLE_HEADER
+#ifndef XNS_IS_CONSTANT_EVALUATED_HEADER
+#define XNS_IS_CONSTANT_EVALUATED_HEADER
 
-#include "xns/type_traits/supported_operations/is_nothrow_constructible.hpp"
+#include "xns/config/config.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -23,18 +23,19 @@
 namespace xns {
 
 
-	// -- I S  N O T H R O W  D E F A U L T  C O N S T R U C T I B L E --------
+	// -- I S  C O N S T A N T  E V A L U A T E D -----------------------------
 
-	/* is nothrow default constructible */
-	template <typename ___type>
-	concept is_nothrow_default_constructible
-		= xns::is_nothrow_constructible<___type>;
+#if ___xns_has_builtin(__builtin_is_constant_evaluated)
 
-	/* are nothrow default constructible */
-	template <typename... ___types>
-	concept are_nothrow_default_constructible
-		= (xns::is_nothrow_default_constructible<___types> && ...);
+	/* is constant evaluated */
+	constexpr auto is_constant_evaluated(void) noexcept -> bool {
+		return __builtin_is_constant_evaluated();
+	}
+
+#else
+#	error "compiler does not support __builtin_is_constant_evaluated"
+#endif
 
 } // namespace xns
 
-#endif // XNS_IS_NOTHROW_DEFAULT_CONSTRUCTIBLE_HEADER
+#endif // XNS_IS_CONSTANT_EVALUATED_HEADER

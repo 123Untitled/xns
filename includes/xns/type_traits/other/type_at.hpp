@@ -1,6 +1,8 @@
 #ifndef XNS_TYPE_AT_HEADER
 #define XNS_TYPE_AT_HEADER
 
+#include "xns/config/macros.hpp"
+
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
@@ -9,20 +11,22 @@ namespace xns {
 
 	// -- T Y P E  A T --------------------------------------------------------
 
-	namespace impl {
+	namespace ___impl {
 
 
-		template <decltype(sizeof(0)) I, typename... A>
-		class type_at final {
+		template <unsigned ___idx, typename... ___params>
+		class ___type_at final {
 
 
 			// -- assertions --------------------------------------------------
 
 			/* check if pack is not empty */
-			static_assert(sizeof...(A) > 0, "[xns::type_at] Parameter pack is empty.");
+			static_assert(sizeof...(___params) > 0,
+					"type_at: parameter pack is empty.");
 
 			/* check if index is valid */
-			static_assert(I < sizeof...(A), "[xns::type_at] Index is out of range.");
+			static_assert(___idx < sizeof...(___params),
+					"type_at: index is out of range.");
 
 
 			private:
@@ -30,19 +34,21 @@ namespace xns {
 				// -- private implementation ----------------------------------
 
 				/* forward declaration */
-				template <decltype(I) N, typename... T>
-				struct impl;
+				template <unsigned, typename...>
+				struct ___;
 
-				/* specialization for N == IDX */
-				template <decltype(I) N, typename U, typename... T> requires (N == I)
-				struct impl<N, U, T...> {
-					using type = U;
+				/* specialization for ___n == ___idx */
+				template <unsigned ___n, typename ___type, typename... ___types> requires (___n == ___idx)
+				struct ___<___n, ___type, ___types...> final {
+					using type = ___type;
+					___xns_not_instantiable(___);
 				};
 
-				/* specialization for N < IDX */
-				template <decltype(I) N, typename U, typename... T> requires (N < I)
-				struct impl<N, U, T...> {
-					using type = typename impl<N + 1, T...>::type;
+				/* specialization for ___n < ___idx */
+				template <unsigned ___n, typename ___type, typename... ___types> requires (___n < ___idx)
+				struct ___<___n, ___type, ___types...> final {
+					using type = typename ___<___n + 1U, ___types...>::type;
+					___xns_not_instantiable(___);
 				};
 
 
@@ -51,19 +57,23 @@ namespace xns {
 				// -- public types --------------------------------------------
 
 				/* type indexed by IDX */
-				using type = typename impl<0, A...>::type;
-
-		};
-
-	}
-
-	/* type at type */
-	template <decltype(sizeof(0)) I, class... A>
-	using type_at = typename impl::type_at<I, A...>::type;
-
-}
+				using type = typename ___<0U, ___params...>::type;
 
 
+				// -- public lifecycle ----------------------------------------
+
+				/* non-instantiable class */
+				___xns_not_instantiable(___type_at);
+
+		}; // class ___type_at
+
+	} // namespace ___impl
 
 
-#endif
+	/* type at */
+	template <unsigned ___idx, typename... ___params>
+	using type_at = typename xns::___impl::___type_at<___idx, ___params...>::type;
+
+} // namespace xns
+
+#endif // XNS_TYPE_AT_HEADER

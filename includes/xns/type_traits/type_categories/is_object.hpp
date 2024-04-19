@@ -12,10 +12,13 @@
 
 #pragma once
 
-#ifndef XNS_IS_NOTHROW_DEFAULT_CONSTRUCTIBLE_HEADER
-#define XNS_IS_NOTHROW_DEFAULT_CONSTRUCTIBLE_HEADER
+#ifndef XNS_IS_OBJECT_HEADER
+#define XNS_IS_OBJECT_HEADER
 
-#include "xns/type_traits/supported_operations/is_nothrow_constructible.hpp"
+#include "xns/type_traits/type_categories/is_scalar.hpp"
+#include "xns/type_traits/type_categories/is_array.hpp"
+#include "xns/type_traits/type_categories/is_union.hpp"
+#include "xns/type_traits/type_categories/is_class.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -23,18 +26,17 @@
 namespace xns {
 
 
-	// -- I S  N O T H R O W  D E F A U L T  C O N S T R U C T I B L E --------
+	// -- I S  O B J E C T ----------------------------------------------------
 
-	/* is nothrow default constructible */
+	/* is object */
 	template <typename ___type>
-	concept is_nothrow_default_constructible
-		= xns::is_nothrow_constructible<___type>;
+	concept is_object = (xns::is_scalar<___type> || xns::is_array<___type>
+					  || xns::is_union<___type>  || xns::is_class<___type>);
 
-	/* are nothrow default constructible */
-	template <typename... ___types>
-	concept are_nothrow_default_constructible
-		= (xns::is_nothrow_default_constructible<___types> && ...);
+	/* are object */
+	template <typename... ___type>
+	concept are_object = (xns::is_object<___type> && ...);
 
 } // namespace xns
 
-#endif // XNS_IS_NOTHROW_DEFAULT_CONSTRUCTIBLE_HEADER
+#endif // XNS_IS_OBJECT_HEADER

@@ -27,15 +27,19 @@ namespace xns {
 	// -- I S  C O M P A R A B L E --------------------------------------------
 
 	/* is comparable concept */
-	template <typename A, typename B = A>
-	concept is_comparable = requires (A a, B b) {
-		{ a == b } -> xns::is_convertible<bool>;
-		{ a != b } -> xns::is_convertible<bool>;
-		{ a <  b } -> xns::is_convertible<bool>;
-		{ a >  b } -> xns::is_convertible<bool>;
-		{ a <= b } -> xns::is_convertible<bool>;
-		{ a >= b } -> xns::is_convertible<bool>;
+	template <typename ___lhs, typename ___rhs = ___lhs>
+	concept is_comparable = requires (___lhs ___l, ___rhs ___r) {
+		{ ___l == ___r } -> xns::is_convertible<bool>;
+		{ ___l != ___r } -> xns::is_convertible<bool>;
+		{ ___l <  ___r } -> xns::is_convertible<bool>;
+		{ ___l >  ___r } -> xns::is_convertible<bool>;
+		{ ___l <= ___r } -> xns::is_convertible<bool>;
+		{ ___l >= ___r } -> xns::is_convertible<bool>;
 	};
+
+	/* are comparable */
+	template <typename ___type, typename... ___types>
+	concept are_comparable = (xns::is_comparable<___type, ___types> && ...);
 
 } // namespace xns
 
