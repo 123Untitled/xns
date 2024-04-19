@@ -16,42 +16,61 @@
 #define XNS_CONFIG_HEADER
 
 
-#ifndef XNS_CPP_VERSION
-#	if __cplusplus <= 201103L
-#		define XNS_CPP_VERSION 11
+// -- check for c++ language --------------------------------------------------
+
+#ifdef __cplusplus
+
+
+// -- cxx version -------------------------------------------------------------
+
+/* cxx version */
+#ifndef ___xns_cxx_version
+
+#	if   __cplusplus <= 199711L
+#		define ___xns_cxx_version 98
+
+#	elif __cplusplus <= 201103L
+#		define ___xns_cxx_version 11
+
 #	elif __cplusplus <= 201402L
-#		define XNS_CPP_VERSION 14
+#		define ___xns_cxx_version 14
+
 #	elif __cplusplus <= 201703L
-#		define XNS_CPP_VERSION 17
+#		define ___xns_cxx_version 17
+
 #	elif __cplusplus <= 202002L
-#		define XNS_CPP_VERSION 20
+#		define ___xns_cxx_version 20
+
 #	elif __cplusplus <= 202302L
-#		define XNS_CPP_VERSION 23
+#		define ___xns_cxx_version 23
+
 #	else
-#		define _LIBCPP_STD_VER 26
+#		define ___xns_cxx_version 26
 #	endif
-#endif // XNS_CPP_VERSION
+#endif // ___xns_cxx_version
 
-// check if __always_inline__
-#if not defined(XNS_FORCE_INLINE)
-	#if (defined(__GNUC__) && __GNUC__ >= 4) || defined(__clang__)
-		#define XNS_FORCE_INLINE __attribute__((__always_inline__))
-	#elif defined(_MSC_VER)
-		#define XNS_FORCE_INLINE __forceinline
-	#else
-		#define XNS_FORCE_INLINE inline
-	#endif
-#endif
 
-// check for 'has_builtin'
-#if not defined(XNS_HAS_BUILTIN)
-#	if not defined(__has_builtin)
+
+// -- has builtin -------------------------------------------------------------
+
+#ifndef XNS_HAS_BUILTIN
+#	ifndef __has_builtin
 #		define XNS_HAS_BUILTIN(x) 0
 #	else
 #		define XNS_HAS_BUILTIN(x) __has_builtin(x)
 #	endif
 #endif
 
+#ifndef ___xns_has_builtin
+#	ifndef __has_builtin
+#		define ___xns_has_builtin(x) 0
+#	else
+#		define ___xns_has_builtin(x) __has_builtin(x)
+#	endif
+#endif
+
+
+// -- endian ------------------------------------------------------------------
 
 #ifdef __LITTLE_ENDIAN__
 #	if __LITTLE_ENDIAN__
@@ -79,6 +98,7 @@
 #endif
 
 
+
 // -- integer sizes -----------------------------------------------------------
 
 // check for 128-bit integers
@@ -95,15 +115,23 @@
 
 
 
+// -- exceptions --------------------------------------------------------------
+
 /* check if exceptions are enabled */
 #if defined(__cpp_exceptions) || defined(__EXCEPTIONS)
 
 	/* exceptions enabled */
 	#define XNS_HAS_NOEXCEPT false
+	#define XNS_HAS_EXCEPTIONS true
 	#define XNS_NOEXCEPT(__cond) noexcept(__cond)
+
 	#define __XNS_THROW(__exception) throw __exception
 	#define __XNS_TRY try
 	#define __XNS_CATCH(__exception) catch (__exception)
+
+#	define ___xns_throw(___e) throw ___e
+#	define ___xns_try try
+#	define ___xns_catch(___e) catch (___e)
 
 	namespace xns {
 		/* for template programming */
@@ -112,14 +140,21 @@
 		};
 	}
 
+	#define ___xns_noexcept(___expr) noexcept(___expr)
+
 #else
 
 	/* exceptions disabled */
 	#define XNS_HAS_NOEXCEPT true
+	#define XNS_HAS_EXCEPTIONS false
 	#define XNS_NOEXCEPT(__cond) noexcept
 	#define __XNS_THROW(__exception)
 	#define __XNS_TRY
 	#define __XNS_CATCH(__exception)
+
+#	define ___xns_throw()
+#	define ___xns_try
+#	define ___xns_catch()
 
 	namespace xns {
 		/* for template programming */
@@ -128,8 +163,12 @@
 		};
 	}
 
+	#define ___xns_noexcept() noexcept(true)
+
 #endif
 
+
+// -- compiler ----------------------------------------------------------------
 
 // check for clang
 #if defined(__clang__)
@@ -142,4 +181,25 @@
 #endif
 
 
-#endif // CONFIG_HEADER
+// -- if consteval ------------------------------------------------------------
+
+
+
+
+
+
+// check for cxx version
+#if ___xns_cxx_version >= 23
+#	define ___xns_if_consteval if consteval
+#else
+#	if ___xns_has_builtin(__builtin_is_constant_evaluated)
+#		define ___xns_if_consteval if (__builtin_is_constant_evaluated())
+#	else
+#		error "compiler does not support __builtin_is_constant_evaluated"
+#	endif
+#endif
+
+
+#endif // __cplusplus
+
+#endif // XNS_CONFIG_HEADER
