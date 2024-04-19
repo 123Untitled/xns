@@ -15,76 +15,44 @@
 #ifndef XNS_ACCESS_HEADER
 #define XNS_ACCESS_HEADER
 
-// xns headers
-#include "xns/system/environment.hpp"
-#include "xns/string/string.hpp"
-
-// operating system headers
-#include <unistd.h>
-
-
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
 
 
+	// -- forward declarations ------------------------------------------------
+
+	/* basic string */
+	template <typename ___char>
+	class basic_string;
+
+	/* string */
+	using string = xns::basic_string<char>;
+
+
 	// -- A C C E S S ---------------------------------------------------------
 
-	class access final {
+	namespace access {
 
 
-		public:
+		/* x ok */
+		static auto x_ok(const xns::string&) noexcept -> bool;
 
-			// -- public static methods ---------------------------------------
+		/* r ok */
+		static auto r_ok(const xns::string&) noexcept -> bool;
 
-			/* check execution access */
-			static bool x_ok(const xns::string&) noexcept;
+		/* w ok */
+		static auto w_ok(const xns::string&) noexcept -> bool;
 
-			/* check read access */
-			static bool r_ok(const xns::string&) noexcept;
+		/* f ok */
+		static auto f_ok(const xns::string&) noexcept -> bool;
 
-			/* check write access */
-			static bool w_ok(const xns::string&) noexcept;
+		/* sys x ok */
+		static auto sys_x_ok(xns::string&) -> bool;
 
-			/* check existence */
-			static bool f_ok(const xns::string&) noexcept;
+	} // namespace access
 
+} // namespace xns
 
-			/* get execution access */
-			static bool sys_x_ok(xns::string&);
-
-
-			// -- public constructors -----------------------------------------
-
-			/* default constructor */
-			access(void) noexcept;
-
-			/* copy constructor */
-			access(const access&) noexcept;
-
-			/* move constructor */
-			access(access&&) noexcept;
-
-			/* destructor */
-			~access(void) noexcept;
-
-
-			// -- public assignment operators ---------------------------------
-
-			/* copy assignment operator */
-			access& operator=(const access&) noexcept;
-
-			/* move assignment operator */
-			access& operator=(access&&) noexcept;
-
-
-		private:
-
-			// -- private members ---------------------------------------------
-
-	};
-
-}
-
-#endif
+#endif // XNS_ACCESS_HEADER

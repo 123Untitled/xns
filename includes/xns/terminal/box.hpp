@@ -31,17 +31,21 @@
 namespace xns {
 
 
-	// -- B O R D E R  C L A S S ----------------------------------------------
+	// -- B O X ---------------------------------------------------------------
 
 	class box final {
+
+		private:
+
+			// -- private types -----------------------------------------------
+
+			/* self type */
+			using ___self = xns::box;
 
 
 		public:
 
 			// -- public types ------------------------------------------------
-
-			/* self type */
-			using self = xns::box;
 
 			/* size type */
 			using size_type = xns::size_t; // before was term_size
@@ -58,14 +62,14 @@ namespace xns {
 			/* default constructor */
 			box(void) = default;
 
-			/* size and position constructor */
+			/* rect constructor */
 			box(const rect_type&);
 
 			/* copy constructor */
-			box(const self&) = default;
+			box(const ___self&) = default;
 
 			/* move constructor */
-			box(self&&) noexcept = default;
+			box(___self&&) noexcept = default;
 
 			/* destructor */
 			~box(void) = default;
@@ -74,27 +78,18 @@ namespace xns {
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			auto operator=(const self&) -> self&;
+			auto operator=(const ___self&) -> self&;
 
 			/* move assignment operator */
-			auto operator=(self&&) noexcept -> self&;
+			auto operator=(___self&&) noexcept -> self&;
 
 
-			// -- public boolean operators ------------------------------------
+			// -- public methods ----------------------------------------------
 
-			/* bool operator */
-			explicit operator bool(void) const;
-
-			/* not operator */
-			bool operator!(void) const;
-
-
-			// -- M E T H O D S -----------------------------------------------
-
-			/* draw box */
+			/* draw */
 			void draw(void);
 
-			/* set size and position */
+			/* set */
 			void set(const rect_type&,
 					const xns::hexcolor color = xns::color::GREY_COLOR);
 
@@ -129,12 +124,19 @@ namespace xns {
 			string _box;
 
 
-			// -- S T A T I C  M E M B E R S ----------------------------------
+			// -- private static members --------------------------------------
 
 			/* symbol array */
-			static constinit symbol _symb;
+			static constexpr symbol _symb {
+				"\xe2\x94\x80",
+				"\xe2\x94\x82",
+				"\xe2\x95\xad",
+				"\xe2\x95\xae",
+				"\xe2\x95\xb0",
+				"\xe2\x95\xaf"
+			};
 
-	};
+	}; // class box
 
 } // namespace xns
 

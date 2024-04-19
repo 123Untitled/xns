@@ -94,7 +94,6 @@ namespace xns {
 			/* environment variables */
 			vector_type _env;
 
-
 	};
 
 
