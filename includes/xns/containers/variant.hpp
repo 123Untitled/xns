@@ -23,7 +23,7 @@
 #include "xns/type_traits/other/is_all_unique.hpp"
 #include "xns/type_traits/type_properties/is_const.hpp"
 
-#include "xns/memory/allocator.hpp"
+#include "xns/memory/lifecycle.hpp"
 #include "xns/containers/aligned_storage.hpp"
 
 #include "xns/other/indexed_element.hpp"
@@ -69,6 +69,10 @@ namespace xns {
 			using self = xns::variant<A...>;
 
 
+		private:
+
+
+
 			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
@@ -80,7 +84,7 @@ namespace xns {
 			explicit constexpr variant(const T& value) requires xns::is_one_of<T, A...>
 			: _storage{}, _index{xns::index_of<T, A...>()} {
 				// call allocator constructor
-				xns::allocator<T>::construct(
+				xns::lifecycle<T>::construct(
 					xns::ptr<T>(_storage), value
 				);
 			}
@@ -90,7 +94,7 @@ namespace xns {
 			explicit constexpr variant(T&& value) requires xns::is_one_of<T, A...>
 			: _storage{}, _index{xns::index_of<T, A...>()} {
 				// call allocator constructor
-				xns::allocator<T>::construct(
+				xns::lifecycle<T>::construct(
 					xns::ptr<T>(_storage), xns::move(value)
 				);
 			}
@@ -100,7 +104,7 @@ namespace xns {
 			constexpr variant(xns::in_place_type<T>, U&&... args)
 			: _storage{}, _index{xns::index_of<T, A...>()} {
 				// call allocator constructor
-				xns::allocator<T>::construct(
+				xns::lifecycle<T>::construct(
 					xns::ptr<T>(_storage), xns::forward<U>(args)...
 				);
 			}
@@ -112,7 +116,7 @@ namespace xns {
 				// get type at index
 				using T = xns::type_at<I, A...>;
 				// call allocator constructor
-				xns::allocator<T>::construct(
+				xns::lifecycle<T>::construct(
 					xns::ptr<T>(_storage), xns::forward<U>(args)...
 				);
 			}
@@ -189,7 +193,7 @@ namespace xns {
 				_index = xns::index_of<T, A...>();
 
 				// call allocator emplace constructor
-				xns::allocator<T>::construct(
+				xns::lifecycle<T>::construct(
 					xns::ptr<T>(_storage), xns::forward<U>(args)...
 				);
 			}
@@ -254,7 +258,7 @@ namespace xns {
 			template <typename T>
 			static inline constexpr auto copy_construct(storage& dst, const storage& src) -> void {
 				// call allocator copy constructor
-				xns::allocator<T>::construct(
+				xns::lifecycle<T>::construct(
 					xns::ptr<T>(dst), xns::ref<T>(src)
 				);
 			}
@@ -263,7 +267,7 @@ namespace xns {
 			template <typename T>
 			static inline constexpr auto move_construct(storage& dst, storage& src) noexcept -> void {
 				// call allocator move constructor
-				xns::allocator<T>::construct(
+				xns::lifecycle<T>::construct(
 					xns::ptr<T>(dst), xns::move(xns::ref<T>(src))
 				);
 			}
@@ -272,7 +276,7 @@ namespace xns {
 			template <typename T>
 			static inline constexpr auto copy_assign(storage& dst, const storage& src) -> void {
 				// call allocator copy assignment
-				xns::allocator<T>::assign(
+				xns::lifecycle<T>::assign(
 					xns::ref<T>(dst), xns::ref<T>(src)
 				);
 			}
@@ -281,7 +285,7 @@ namespace xns {
 			template <typename T>
 			static inline constexpr auto move_assign(storage& dst, storage& src) noexcept -> void {
 				// call allocator move assignment
-				xns::allocator<T>::assign(
+				xns::lifecycle<T>::assign(
 					xns::ref<T>(dst), xns::move(xns::ref<T>(src))
 				);
 			}
@@ -290,7 +294,7 @@ namespace xns {
 			template <typename T>
 			static inline constexpr auto destructor(storage& obj) noexcept -> void {
 				// call allocator destructor
-				xns::allocator<T>::destroy(
+				xns::lifecycle<T>::destroy(
 					xns::ptr<T>(obj)
 				);
 			}

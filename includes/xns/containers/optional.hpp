@@ -26,6 +26,7 @@
 #include "xns/type_traits/supported_operations/is_trivially_destructible.hpp"
 
 #include "xns/memory/allocator.hpp"
+#include "xns/memory/lifecycle.hpp"
 
 // c++ standard headers library
 #include <iostream>
@@ -78,6 +79,8 @@ namespace xns {
 			using const_move_ref = const type&&;
 
 
+			using ___lifecycle = xns::lifecycle<type>;
+
 			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
@@ -92,7 +95,7 @@ namespace xns {
 			explicit inline constexpr optional(const_ref value)
 			: _storage{}, _active{ACTIVE} {
 				// construct value by copy
-				allocator::construct(
+				___lifecycle::construct(
 					xns::ptr<type>(_storage), value
 				);
 			}
@@ -101,7 +104,7 @@ namespace xns {
 			explicit inline constexpr optional(move_ref value) noexcept
 			: _storage{}, _active{ACTIVE} {
 				// construct value by move
-				allocator::construct(
+				___lifecycle::construct(
 					xns::ptr<type>(_storage), xns::move(value)
 				);
 			}
@@ -111,7 +114,7 @@ namespace xns {
 			inline constexpr optional(A&&... args)
 			: _storage{}, _active{ACTIVE} {
 				// construct value in place
-				allocator::construct(
+				___lifecycle::construct(
 					xns::ptr<type>(_storage), xns::forward<A>(args)...
 				);
 			}
@@ -123,7 +126,7 @@ namespace xns {
 				switch (_active) {
 					case ACTIVE:
 						// construct value by copy
-						allocator::construct(
+						___lifecycle::construct(
 							xns::ptr<type>(_storage), xns::ref<type>(other._storage)
 						);
 					default: break;
@@ -138,7 +141,7 @@ namespace xns {
 				switch (_active) {
 					case ACTIVE:
 						// construct value by move
-						allocator::construct(
+						___lifecycle::construct(
 							xns::ptr<type>(_storage), xns::move(xns::ref<type>(other._storage))
 						);
 					default: break;
@@ -151,7 +154,7 @@ namespace xns {
 				switch (_active) {
 					case ACTIVE:
 						// destroy value
-						allocator::destroy(
+						___lifecycle::destroy(
 							xns::ptr<type>(_storage)
 						);
 					default: break;
