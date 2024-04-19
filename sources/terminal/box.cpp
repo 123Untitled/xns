@@ -1,36 +1,14 @@
 #include "xns/terminal/box.hpp"
 
 
-constinit xns::box::symbol xns::box::_symb = {
-	"\xe2\x94\x80",
-	"\xe2\x94\x82",
-	"\xe2\x95\xad",
-	"\xe2\x95\xae",
-	"\xe2\x95\xb0",
-	"\xe2\x95\xaf"
-};
-
-
-/* size and position constructor */
+/* rect constructor */
 xns::box::box(const rect_type& rect)
 : _box{} {
 	// call set method
 	set(rect);
 }
 
-/* bool operator */
-xns::box::operator bool(void) const {
-	// check if box is empty
-	return !_box.empty();
-}
-
-/* bool not operator */
-bool xns::box::operator!(void) const {
-	// check if box is empty
-	return _box.empty();
-}
-
-/* draw box */
+/* draw */
 void xns::box::draw(void) {
 	// check if box is empty
 	if (_box.empty()) { return; }
@@ -38,7 +16,7 @@ void xns::box::draw(void) {
 	xns::out::write(_box);
 }
 
-
+/* set */
 void xns::box::set(const rect_type& rect, const xns::hexcolor color) {
 	// avoid namespace pollution
 	using esc = xns::escape;
@@ -103,5 +81,4 @@ void xns::box::set(const rect_type& rect, const xns::hexcolor color) {
 
 	_box.append(esc::reset_style());
 }
-
 
