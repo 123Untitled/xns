@@ -15,15 +15,20 @@
 #ifndef XNS_QUEUE_HEADER
 #define XNS_QUEUE_HEADER
 
-// local headers
-#include "xns/type_traits/types.hpp"
-#include "xns/memory/allocator.hpp"
-#include "xns/memory/memory.hpp"
-#include "xns/type_traits/type_operations/move.hpp"
+#include "xns/type_traits/relationships_and_property_queries/is_same.hpp"
 #include "xns/type_traits/type_operations/forward.hpp"
+#include "xns/utility/swap.hpp"
 
-// c++ standard library headers
-#include <iostream>
+#include <deque>
+
+#include "xns/type_traits/supported_operations/is_nothrow_default_constructible.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_copy_constructible.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_move_constructible.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_copy_assignable.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_move_assignable.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_destructible.hpp"
+
+#include "xns/containers/list.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -33,8 +38,16 @@ namespace xns {
 
 	// -- Q U E U E -----------------------------------------------------------
 
-	template <typename T>
+	template <typename ___type,
+			  typename ___container = std::deque<___type>>
 	class queue final {
+
+
+		// -- assertions ------------------------------------------------------
+
+		/* check ___type is same as container value type */
+		static_assert(xns::is_same<___type, typename ___container::value_type>,
+					  "queue: type must be the same as container value type");
 
 
 		public:
@@ -42,329 +55,133 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self            = xns::queue<T>;
+			using self            = xns::queue<___type, ___container>;
+
+			/* container type */
+			using container_type  = ___container;
 
 			/* value type */
-			using value_type      = T;
-
-			/* reference type */
-			using mut_ref       = value_type&;
-
-			/* move reference type */
-			using move_ref  = value_type&&;
-
-			/* const reference type */
-			using const_ref = const value_type&;
-
-			/* pointer type */
-			using mut_ptr = value_type*;
-
-			/* const pointer type */
-			using const_ptr   = const value_type*;
+			using value_type      = typename container_type::value_type;
 
 			/* size type */
-			using size_type       = xns::size_t;
+			using size_type       = typename container_type::size_type;
+
+			/* reference type */
+			using reference       = typename container_type::reference;
+
+			/* const reference type */
+			using const_reference = typename container_type::const_reference;
 
 
-		private:
-
-			// -- forwared declarations ---------------------------------------
-
-			/* internal_node class */
-			class internal_node;
-
-
-			// -- private types -----------------------------------------------
-
-			/* node type */
-			using node_type       = self::internal_node;
-
-			/* allocator type */
-			using allocator       = xns::allocator<node_type>;
-
-			/* node pointer type */
-			using node_ptr    = node_type*;
-
-
-			// -- private members ---------------------------------------------
-
-			/* head pointer */
-			node_ptr _head;
-
-			/* tail pointer */
-			node_ptr _tail;
-
-			/* size */
-			size_type _size;
-
-
-		public:
-
-			// -- public constructors -----------------------------------------
+			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			inline queue(void) noexcept
-			: _head{nullptr}, _tail{nullptr}, _size{0} {}
+			queue(void) noexcept(xns::is_nothrow_default_constructible<container_type>)
+			: _container{} {
+			}
 
 			/* copy constructor */
-			queue(const self& other)
-			: _head{nullptr}, _tail{nullptr}, _size{0} {
-				// declare node
-				node_ptr node = other._head;
-				// loop over other queue
-				while (node != nullptr) {
-					// enqueue copy of value
-					enqueue(node->_value);
-					// move to next node
-					node = node->_next;
-				}
-				// update size only at the end (optimization)
-			}
+			queue(const self&) noexcept(xns::is_nothrow_copy_constructible<container_type>) = default;
 
 			/* move constructor */
-			inline queue(self&& other) noexcept
-			: _head{other._head}, _tail{other._tail}, _size{other._size} {
-				// invalidate other
-				other.init();
-			}
+			queue(self&&) noexcept(xns::is_nothrow_move_constructible<container_type>) = default;
 
 			/* destructor */
-			inline ~queue(void) noexcept {
-				// deallocate queue
-				free_queue();
-			}
+			~queue(void) noexcept(xns::is_nothrow_destructible<container_type>) = default;
 
 
-			// -- public assignment -------------------------------------------
-
-			/* copy assignment */
-			auto assign(const self& other) -> void {
-				// check for self assignment
-				if (this != &other) {
-					// deallocate queue
-					free_queue();
-					init();
-					// get other head
-					node_ptr node = other._head;
-					// loop over other queue
-					while (node != nullptr) {
-						// enqueue value by copy
-						enqueue(node->_value);
-						// move to next node
-						node = node->_next;
-					}
-				}
-			}
-
-			/* move assignment */
-			auto assign(self&& other) noexcept -> void {
-				// check for self assignment
-				if (this != &other) {
-					// deallocate queue
-					free_queue();
-					// move other members
-					_head = other._head;
-					_tail = other._tail;
-					_size = other._size;
-					// invalidate other
-					other.init();
-				}
-			}
-
-
-			// -- assignment operators ----------------------------------------
+			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			inline auto operator=(const self& other) -> self& {
-				// call copy assignment
-				assign(other);
-				// return self reference
-				return *this;
-			}
+			auto operator=(const self&) noexcept(xns::is_nothrow_copy_assignable<container_type>) -> self& = default;
 
 			/* move assignment operator */
-			inline auto operator=(self&& other) noexcept -> self& {
-				// call move assignment
-				assign(xns::move(other));
-				// return self reference
-				return *this;
-			}
+			auto operator=(self&&) noexcept(xns::is_nothrow_move_assignable<container_type>) -> self& = default;
 
 
 			// -- public accessors --------------------------------------------
 
-			/* get size */
-			inline auto size(void) const noexcept -> size_type {
-				// return size
-				return _size;
+			/* next */
+			auto next(void) noexcept(
+					noexcept(___container{}.front())
+				) -> reference {
+				return _container.front();
 			}
 
-			/* is empty */
-			inline auto empty(void) const noexcept -> bool {
-				// return empty
-				return _size == 0;
+			/* const next */
+			auto next(void) const noexcept(
+					noexcept(___container{}.front())
+				) -> const_reference {
+				return _container.front();
 			}
 
-			/* get first enqueued element */
-			inline auto next(void) noexcept -> mut_ref {
-				// return front
-				return _head->_value;
+			/* empty */
+			auto empty(void) const noexcept(
+					noexcept(___container{}.empty())
+				) -> bool {
+				return _container.empty();
 			}
 
-			/* get first enqueued const element */
-			inline auto next(void) const noexcept -> const_ref {
-				// return front
-				return _head->_value;
+			/* size */
+			auto size(void) const noexcept(
+					noexcept(___container{}.size())
+				) -> size_type {
+				return _container.size();
 			}
 
 
 			// -- public modifiers --------------------------------------------
 
 			/* enqueue */
-			template <typename U>
-			auto enqueue(U&& value) -> void {
-				// assert that T is convertible from U
-				//static_assert(xns::is_same<xns::remove_cvr<U>, value_type>, // TODO: replace with is_convertible ?
-				//		"): QUEUE: U MUST BE SAME AS T :(");
-				// allocate node
-				node_ptr node = allocator::allocate();
-				allocator::construct(node, xns::forward<U>(value));
-				// link node
-				link(node);
+			template <typename ___tp>
+			auto enqueue(___tp&& ___vl) noexcept(
+					noexcept(___container{}.push_back(xns::forward<___tp>(___vl)))
+				) -> void {
+				_container.push_back(xns::forward<___tp>(___vl));
 			}
 
 			/* emplace */
-			template <class... A>
-			auto emplace(A&&... args) -> void {
-				// assert that T is constructible from A
-				static_assert(xns::is_constructible<value_type, A...>,
-						"): QUEUE: T MUST BE CONSTRUCTIBLE FROM A... :(");
-				// allocate node
-				node_ptr node = allocator::allocate();
-				allocator::construct(node, xns::forward<A>(args)...);
-				// link node
-				link(node);
+			template <typename... ___params>
+			auto emplace(___params&&... ___args) noexcept(
+					noexcept(___container{}.emplace_back(xns::forward<___params>(___args)...))
+				) -> void {
+				_container.emplace_back(xns::forward<___params>(___args)...);
 			}
 
 			/* dequeue */
-			void dequeue(void) noexcept {
-				// check for non-empty queue
-				if (_head != nullptr) {
-					// get first enqueued node
-					node_ptr node = _head;
-					// unlink node
-					_head = _head->_next;
-					// destroy node
-					allocator::destroy(node);
-					// deallocate node
-					allocator::deallocate(node);
-					// decrement size
-					--_size;
-				}
+			auto dequeue(void) noexcept(
+					noexcept(___container{}.pop_front())
+				) -> void {
+				_container.pop_front();
 			}
 
-			/* clear queue */
-			inline auto clear(void) noexcept -> void {
-				// deallocate queue
-				free_queue();
-				// initialize members
-				init();
+			/* swap */
+			auto swap(self& ___ot) noexcept(
+					noexcept(xns::swap(___container{}, ___ot._container))
+				) -> void {
+				xns::swap(_container, ___ot._container);
 			}
 
 
 		private:
 
-			// -- private modifiers -------------------------------------------
+			// -- private members --------------------------------------------
 
-			/* link node */
-			inline void link(node_ptr node) noexcept {
-				// check head
-				_head != nullptr ?
-					// link to tail
-					_tail->_next = node
-					// else link to head
-					: _head = node;
-				// update tail
-				_tail = node;
-				// update size
-				++_size;
-			}
+			/* container */
+			container_type _container;
 
-			/* init members */
-			inline auto init(void) noexcept -> void {
-				// initialize members
-				_head = _tail = nullptr;
-				_size = 0;
-			}
-
-			/* free queue */
-			auto free_queue(void) noexcept -> void {
-				// get head node
-				node_ptr node = _head;
-				// loop over queue
-				while (node) {
-					// get next node
-					node_ptr next = node->_next;
-					// destroy node
-					allocator::destroy(node);
-					// deallocate node
-					allocator::deallocate(node);
-					// set node to next
-					node = next;
-				}
-			}
-
-	};
+	}; // class queue
 
 
-	// -- N O D E  C L A S S --------------------------------------------------
+	// -- non-member functions ------------------------------------------------
 
-	template <class T>
-	class xns::queue<T>::internal_node final {
+	/* swap */
+	template <typename ___type, typename ___container>
+	auto swap(xns::queue<___type, ___container>& ___lhs,
+			  xns::queue<___type, ___container>& ___rhs) noexcept(noexcept(___lhs.swap(___rhs))) -> void {
+		___lhs.swap(___rhs);
+	}
 
-		public:
+} // namespace xns
 
-			// -- public lifecycle --------------------------------------------
-
-			/* default constructor */
-			inline internal_node(void) noexcept
-			: _next{nullptr} {}
-
-			/* not assignable */
-			XNS_NOT_ASSIGNABLE(internal_node);
-
-			/* value copy constructor */
-			inline explicit internal_node(const_ref value)
-			: _value{value}, _next{nullptr} {}
-
-			/* value move constructor */
-			inline explicit internal_node(move_ref value) noexcept
-			: _value{xns::move(value)}, _next{nullptr} {}
-
-			/* value emplace constructor */
-			template <typename... A>
-			inline explicit internal_node(A&&... args)
-			: _value{xns::forward<A>(args)...}, _next{nullptr} {}
-
-			/* destructor */
-			inline ~internal_node(void) noexcept = default;
-
-
-			// -- public members ----------------------------------------------
-
-			/* value */
-			value_type _value;
-
-			/* next */
-			node_ptr _next;
-
-	};
-
-
-
-
-
-
-}
-
-#endif
+#endif // XNS_QUEUE_HEADER
