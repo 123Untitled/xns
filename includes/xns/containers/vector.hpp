@@ -18,20 +18,36 @@
 #include "xns/config/config.hpp"
 
 #include "xns/memory/allocator.hpp"
-#include "xns/memory/memcpy.hpp"
+#include "xns/memory/allocator_traits.hpp"
+#include "xns/memory/lifecycle.hpp"
 
-#include "xns/containers/array.hpp"
+#include "xns/memory/memcpy.hpp"
+#include "xns/memory/memset.hpp"
+#include "xns/memory/memmove.hpp"
+
+#include "xns/iterator/distance.hpp"
 
 #include "xns/type_traits/types.hpp"
 #include "xns/type_traits/relationships_and_property_queries/is_comparable.hpp"
-#include "xns/type_traits/relationships_and_property_queries/extent.hpp"
+
 #include "xns/type_traits/supported_operations/is_trivially_destructible.hpp"
+#include "xns/type_traits/supported_operations/is_trivially_default_constructible.hpp"
+#include "xns/type_traits/supported_operations/is_trivially_move_constructible.hpp"
+
+#include "xns/type_traits/supported_operations/is_nothrow_copy_assignable.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_default_constructible.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_moveable.hpp"
+
+#include "xns/type_traits/other/type_at.hpp"
 
 #include "xns/utility/swap.hpp"
 
 
 #include <iostream>
-#include <cstring>
+#include <unistd.h>
+
+
+#include "xns/containers/container_traits.hpp"
 
 
 
@@ -40,24 +56,28 @@
 namespace xns {
 
 
-	// -- V E C T O R  C L A S S ----------------------------------------------
+
+	// -- V E C T O R ---------------------------------------------------------
 
 	/* vector */
-	template <typename __type,
-			  typename __alloc = xns::allocator<__type>>
+	template <typename ___type,
+			  typename ___alloc = xns::allocator<___type>>
 	class vector final {
 
 
 		// -- assertions ------------------------------------------------------
 
-		/* requires nothrow move operations */
-		//static_assert(xns::is_nothrow_move_constructible<T>
-		//		   && xns::is_nothrow_move_assignable<T>,
-		//			  "vector, requires nothrow move operations.");
+		/* requires nothrow move semantic */
+		static_assert(xns::is_nothrow_moveable<___type>,
+					  "vector requires nothrow move semantic.");
 
-		/** requires nothrow destructible type */
-		static_assert(xns::is_nothrow_destructible<__type>,
-					  "vector, requires nothrow destructible type.");
+		/* requires nothrow move semantic allocator */
+		static_assert(xns::is_nothrow_moveable<___alloc>,
+					  "vector requires nothrow move semantic allocator.");
+
+		/* requires nothrow destructible type */
+		static_assert(xns::is_nothrow_destructible<___type>,
+					  "vector requires nothrow destructible type.");
 
 
 		private:
@@ -65,458 +85,684 @@ namespace xns {
 			// -- forward declarations ----------------------------------------
 
 			/* iterator */
-			template <bool>
-			class vector_iterator;
+			template <bool, bool>
+			class ___iterator;
+
+
+			// -- private types -----------------------------------------------
+
+			/* self type */
+			using ___self                = xns::vector<___type, ___alloc>;
+
+			/* allocator traits type */
+			using ___alloc_traits        = xns::allocator_traits<___alloc>;
+
+			/* lifecycle type */
+			using ___lifecycle           = xns::lifecycle<___type>;
+
+
+			// -- debug -------------------------------------------------------
+
+#ifdef XNS_TEST_VECTOR
+
+			/* debug */
+			template <unsigned ___sz>
+			static constexpr auto _(const char (&___msg)[___sz]) -> void {
+				::write(STDOUT_FILENO, "\x1b[31mvector: \x1b[0m", 17);
+				::write(STDOUT_FILENO, ___msg, ___sz);
+				::write(STDOUT_FILENO, "\n", 1);
+			}
+#else
+#	define _(msg)
+#endif
 
 
 		public:
 
-
 			// -- public types ------------------------------------------------
 
-			/* self type */
-			using self           = xns::vector<__type, __alloc>;
-
 			/* value type */
-			using value_type     = __type;
+			using value_type             = ___type;
 
 			/* allocator type */
-			using allocator      = __alloc;
+			using allocator_type         = ___alloc;
 
 			/* size type */
-			using size_type      = xns::size_t;
+			using size_type              = unsigned long long;
 
-			/* mutable reference type */
-			using mut_ref        = value_type&;
+			/* difference type */
+			using difference_type        = long long;
+
+			/* reference type */
+			using reference              = value_type&;
 
 			/* const reference type */
-			using const_ref      = const value_type&;
+			using const_reference        = const value_type&;
 
-			/* move reference type */
-			using move_ref       = value_type&&;
-
-			/* mutable pointer type */
-			using mut_ptr        = allocator::mut_ptr;
+			/* pointer type */
+			using pointer                = ___alloc_traits::pointer;
 
 			/* const pointer type */
-			using const_ptr      = allocator::const_ptr;
+			using const_pointer          = ___alloc_traits::const_pointer;
 
 			/* iterator type */
-			using iterator       = vector_iterator<false>;
+			using iterator               = ___iterator<false, false>;
 
 			/* const iterator type */
-			using const_iterator = vector_iterator<true>;
+			using const_iterator         = ___iterator<true, false>;
+
+			/* reverse iterator */
+			using reverse_iterator       = ___iterator<false, true>;
+
+			/* const reverse iterator */
+			using const_reverse_iterator = ___iterator<true, true>;
 
 
 		private:
 
+			// -- private enums -----------------------------------------------
+
+			/* noexcept */
+			enum : bool {
+				___noexcept_allocate = noexcept(___alloc_traits::allocate(xns::declval<___alloc&>(), 0U)),
+				___throw_copy        = !xns::is_nothrow_copy_constructible<value_type>,
+				___trivial_destruct  = xns::is_trivially_destructible<value_type>,
+				___trivial_copy      = xns::is_trivially_copyable<value_type>,
+				___requires_destruct = !xns::is_trivially_destructible<value_type>
+			};
+
+			/* is allocator */
+			template <typename ___tp>
+			using ___is_allocator = xns::bool_constant<xns::same_as<xns::remove_cvref<___tp>, allocator_type>>;
+
+			/* is value type */
+			template <typename ___tp>
+			using ___is_value_type = xns::bool_constant<xns::same_as<xns::remove_cvref<___tp>, value_type>>;
+
+
 			// -- private members ---------------------------------------------
 
+			/* allocator */
+			[[no_unique_address]]
+			allocator_type _allocator;
+
 			/* data */
-			mut_ptr _data;
+			pointer _data;
 
-			/* capacity */
-			size_type _capacity;
+			/* end */
+			pointer _end;
 
-			/* size */
-			size_type _size;
+			/* end capacity */
+			pointer _cap;
+
+
+			// -- private classes ---------------------------------------------
+
+			class ___destroy final {
+
+				public:
+
+					// -- public lifecycle ------------------------------------
+
+					/* vector constructor */
+					constexpr ___destroy(___self& ___v) noexcept
+					: _vector{___v}, _complete{false} {
+					}
+
+					/* non-assignable class */
+					___xns_not_assignable(___destroy);
+
+					/* destructor */
+					~___destroy(void) noexcept {
+						if (not _complete) {
+							_vector._clear();
+							_vector._unsafe_deallocate();
+						}
+					}
+
+
+					// -- public modifiers ------------------------------------
+
+					/* complete */
+					constexpr auto complete(void) noexcept -> void {
+						_complete = true;
+					}
+
+
+				private:
+
+					// -- private members -------------------------------------
+
+					/* vector */
+					___self& _vector;
+
+					/* complete */
+					bool _complete;
+
+			}; // class ___destroy
 
 
 		public:
 
 
-			/*
-			template <class InputIt>
-			constexpr vector(InputIt first, InputIt last, const Allocator& alloc = Allocator());
+			// -- debug -------------------------------------------------------
 
-			constexpr vector(const vector& other);
-			constexpr vector(const vector& other, const Allocator& alloc);
-
-			constexpr vector(vector&& other) noexcept;
-			constexpr vector(vector&& other, const Allocator& alloc);
-
-			constexpr vector( size_type count, const T& value, const Allocator& alloc = Allocator());
-			constexpr explicit vector( size_type count, const Allocator& alloc = Allocator());
-
-			*/
+			auto print(void) const -> void {
+				std::cout << "    size: " << size()     << "\r\n";
+				std::cout << "capacity: " << capacity() << "\r\n";
+				for (const auto& x : *this) {
+					std::cout << x << " "; }
+				std::cout << "\r\n";
+			}
 
 
 			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			constexpr vector(void) noexcept(true /* allocator default construct */)
-			: _data{nullptr}, _capacity{0}, _size{0} {
+			constexpr vector(void)
+				// noexcept specification
+				noexcept(xns::is_nothrow_default_constructible<allocator_type>)
+			// initializer
+			: _allocator{}, _data{nullptr}, _end{nullptr}, _cap{nullptr} {
+				_("default constructor");
 			}
 
-			/* array constructor */
-			template <typename T> requires (xns::extent<xns::remove_cvref<T>> != 0)
-			explicit constexpr vector(T&& __arr) noexcept(true /* check for noexcept copy/move construct */)
-			: _data{nullptr}, _capacity{xns::extent<xns::remove_cvref<T>>}, _size{_capacity} {
-
-				// allocate memory
-				_data = allocator::allocate2(_capacity);
-
-				// copy elements
-				for (size_type i = 0; i < _size; ++i)
-					allocator::construct(_data + i, xns::forward<T>(__arr)[i]);
+			/* allocator constructor */
+			template <typename ___tp> requires ___is_allocator<___tp>::value
+			constexpr explicit vector(___tp&& ___a)
+				// noexcept specification
+				noexcept(xns::is_nothrow_constructible<allocator_type, ___tp&&>)
+			// initializer
+			: _allocator{xns::forward<___tp>(___a)}, _data{nullptr}, _end{nullptr}, _cap{nullptr} {
+				_("allocator constructor");
 			}
 
+			/* fill emplace constructor */
+			template <typename... ___params>
+			constexpr vector(const size_type ___sz, const ___params&... ___args)
+				// noexcept specification
+				noexcept(false)
+			// initializer
+			: _allocator{}, _data{_allocate(___sz)}, _end{_data}, _cap{_data + ___sz} {
 
-			/* allocation constructor */
-			explicit inline vector(mut_ptr ptr, const size_type size) noexcept
-			: _data{ptr}, _capacity{ptr ? size : 0}, _size{_capacity} {}
-			// WARNING: this constructor is dangerous, use with caution
-			// need to use same allocator as the one used to allocate ptr
+				_("emplace constructor");
+				// fill construct elements
+				_fill_construct(___args...);
+			}
 
+			/* fill emplace constructor with allocator */
+			template <typename ___tp, typename... ___params> requires ___is_allocator<___tp>::value
+			constexpr vector(___tp&& ___a, const size_type ___sz, const ___params&... ___args)
+				// noexcept specification
+				noexcept(false)
+			// initializer
+			: _allocator{xns::forward<___tp>(___a)}, _data{_allocate(___sz)}, _end{_data}, _cap{_data + ___sz} {
 
-			/* copy constructor */
-			#if (!XNS_HAS_NOEXCEPT)
-			vector(const self& other) noexcept(xns::is_nothrow_copy_constructible<value_type>)
-			:     _data{other._size > 0 ? allocator::allocate2(other._size) : nullptr},
-			  _capacity{other._size},
-			      _size{_capacity} {
-
-				// trival copy
-				if constexpr (xns::is_trivially_copyable<value_type>) {
-					// copy elements
-					xns::memcpy(_data, other._data, _size * sizeof(value_type));
-				}
-
-				// non-trivial copy
-				else {
-
-					// construct for nothrow copy constructible types
-					if constexpr (xns::is_nothrow_copy_constructible<value_type>) {
-						// copy construct elements
-						for (size_type i = 0; i < _size; ++i)
-							allocator::construct(_data + i, other._data[i]);
-					}
-
-					else {
-
-						size_type i = 0;
-						// try construct
-						try {
-							// copy construct elements
-							while (i < _size) {
-								allocator::construct(_data + i, other._data[i]);
-								++i; }
-						}
-						// clean up on exception
-						catch (...) {
-
-							// destroy only non-trivially destructible types
-							if constexpr (not xns::is_trivially_destructible<value_type>) {
-								// destroy elements
-								for (size_type j = 0; j < i; ++j)
-									allocator::destroy(_data + j);
-							}
-							// deallocate memory
-							allocator::deallocate2(_data);
-							// forward exception
-							throw;
-						}
-
-					} // throw copy
-
-				} // non-trivial copy
-
-			} // copy constructor
-
-			#else
+				_("emplace constructor with allocator");
+				// fill construct elements
+				_fill_construct(___args...);
+			}
 
 			/* copy constructor */
-			vector(const self& other) noexcept
-			:     _data{other._size > 0 ? allocator::allocate2(other._size) : nullptr},
-			  _capacity{other._size},
-			      _size{_capacity} {
+			constexpr vector(const ___self& ___ot) noexcept (false)
+			// initializer
+			: _allocator{___ot._allocator}, _data{nullptr}, _end{nullptr}, _cap{nullptr} {
 
-				if (_data == nullptr) {
-					_capacity = 0;
-					_size = 0;
-					return;
+				_("copy constructor");
+
+				const auto ___sz = ___ot.size();
+
+				_data = _end  = _allocate(___sz);
+				_cap  = _data + ___sz;
+
+				if constexpr (___trivial_copy) {
+					xns::memcpy(_data, ___ot._data, ___sz);
 				}
 
-				// trival copy
-				if constexpr (xns::is_trivially_copyable<value_type>) {
-					// copy elements
-					xns::memcpy(_data, other._data, _size * sizeof(value_type));
+				else if constexpr (not ___throw_copy) {
+					for (auto ___it = ___ot._data; ___it < ___ot._end; ++___it) {
+						___lifecycle::construct(_end, *___it);
+						++_end; }
 				}
 
 				else {
-					for (size_type i = 0; i < _size; ++i)
-						allocator::construct(_data + i, other._data[i]);
+					// create destroy guard
+					___destroy ___d{*this};
+					for (auto ___it = ___ot._data; ___it < ___ot._end; ++___it) {
+						___lifecycle::construct(_end, *___it);
+						++_end; }
+					// complete
+					___d.complete();
 				}
 
 			}
-
-			#endif // XNS_HAS_NOEXCEPT
-
-
-
-
-
-
 
 			/* move constructor */
-			inline vector(self&& other) noexcept
-			: _data{other._data}, _capacity{other._capacity}, _size{other._size} {
-
+			constexpr vector(___self&& ___ot) noexcept
+			// initializer
+			: _allocator{xns::move(___ot._allocator)}, _data{___ot._data}, _end{___ot._end}, _cap{___ot._cap} {
+				_("move constructor");
 				// invalidate other
-				other._init();
+				___ot._init();
 			}
 
-			/* destructor */
-			~vector(void) noexcept {
+			/* container constructor */
+			template <xns::is_container ___container>
+			constexpr vector(const ___container& ___c) noexcept(false)
+			// initializer
+			: _allocator{}, _data{nullptr}, _end{nullptr}, _cap{nullptr} {
 
-				if (_data == nullptr)
-					return;
+				_("container constructor");
 
-				// destroy elements
-				_clear();
+				const auto ___sz = xns::size(___c);
 
-				// deallocate memory
-				allocator::deallocate2(_data);
-			}
+				_data = _end  = _allocate(___sz);
+				_cap  = _data + ___sz;
 
+				//if constexpr (___trivial_copy) {
+				// here check if container is contiguous
+				//
+				//	xns::memcpy(_data, ___container_traits::data(___c), ___sz);
+				//}
 
-			// -- public iterators --------------------------------------------
+				if constexpr (not ___throw_copy) {
+					const auto end = xns::end(___c);
+					for (auto ___it = xns::begin(___c); ___it != end; ++___it) {
+						___lifecycle::construct(_end, *___it);
+						++_end; }
+				}
 
-			/* begin */
-			inline auto begin(void) noexcept -> iterator {
-				return self::iterator{_data};
-			}
-
-			/* const begin */
-			inline auto begin(void) const noexcept -> const_iterator {
-				return self::const_iterator{_data};
-			}
-
-			/* end */
-			inline auto end(void) noexcept -> iterator {
-				return self::iterator{_data + _size};
-			}
-
-			/* const end */
-			inline auto end(void) const noexcept -> const_iterator {
-				return self::const_iterator{_data + _size};
-			}
-
-
-			// -- D E B U G ---------------------------------------------------
-
-			auto print(void) const -> void {
-				std::cout << "\nsize: " << _size << std::endl;
-				std::cout << "capacity: " << _capacity << std::endl;
-				for (const auto& x : *this) {
-					std::cout << x << " ";
+				else {
+					// create destroy guard
+					___destroy ___d{*this};
+					const auto end = xns::end(___c);
+					for (auto ___it = xns::begin(___c); ___it != end; ++___it) {
+						___lifecycle::construct(_end, *___it);
+						++_end; }
+					// complete
+					___d.complete();
 				}
 			}
 
 
-			// important need to setup member like _capacity before operation may throw !
+			/* iterator constructor */
+			//template <typename ___it> requires (not xns::is_integral<___it>)
+			//constexpr vector(___it first, ___it last) noexcept(false)
+			//// initializer
+			//: _allocator{}, _data{nullptr}, _end{nullptr}, _cap{nullptr} {
+			//	
+			//	_("iterator constructor");
+
+				//// get distance
+				//const auto ___dist = xns::distance(first, last);
+				//
+				//// check distance
+				//if (___dist <= 0) {
+				//	_("iterator constructor, distance <= 0");
+				//	return;
+				//}
+				//
+				//// allocate memory
+				//_data = _allocate(___dist);
+				//_end  = _data;
+				//_cap  = _data + ___dist;
+				//
+				//// check for contiguous iterator
+				//if constexpr (xns::random_access_iterator<typename xns::iterator_traits<___it>::iterator_category>
+				//		   && xns::is_trivially_copyable<value_type>) {
+				//	// copy elements
+				//	xns::memcpy(_data, first, ___dist);
+				//	_("iterator constructor, contiguous iterator, trivially copyable");
+				//}
+				//else if constexpr (xns::is_nothrow_copy_constructible<value_type>) {
+				//
+				//	// copy elements
+				//	for (; first != last; ++first, ++_end)
+				//		___lifecycle::construct(_end, *first);
+				//}
+				//else {
+				//
+				//	// create destroy guard
+				//	___destroy ___d{*this};
+				//
+				//	// copy elements
+				//	for (; first != last; ++first, ++_end)
+				//		___lifecycle::construct(_end, *first);
+				//
+				//	// complete
+				//	___d.complete();
+				//}
+			//}
+
+			/* iterator constructor */
+			//template <typename ___it>
+			//constexpr vector(___it first, ___it last, const allocator_type& ___a = allocator_type{}) {
+			//}
+
+
+			///* allocation constructor WILL BE REMOVED ! */
+			//explicit vector(pointer ptr, const size_type size) noexcept
+			//: _allocator{}, _data{ptr}, _capacity{ptr ? size : 0}, _size{_capacity} {
+			//}
+			//// WARNING: this constructor is dangerous, use with caution
+			//// need to use same allocator as the one used to allocate ptr
+
+
+			/* destructor */
+			constexpr ~vector(void) noexcept {
+				// destroy elements
+				_clear();
+				// deallocate memory
+				_deallocate();
+			}
+
+
+		private:
+
+			/* fill construct */
+			constexpr auto _fill_construct(const_reference ___vl) noexcept(xns::is_nothrow_copy_constructible<value_type>) -> void {
+
+				// trivially copyable
+				if constexpr (xns::is_trivially_copyable<value_type>) {
+					xns::memset(_data, ___vl, _cap - _data);
+				}
+				else if constexpr (xns::is_nothrow_copy_constructible<value_type>) {
+					// construct elements
+					for (; _end < _cap; ++_end)
+						___lifecycle::construct(_end, ___vl);
+				}
+				else {
+					// create destroy guard
+					___destroy ___d{*this};
+					// construct elements
+					for (; _end < _cap; ++_end)
+						___lifecycle::construct(_end, ___vl);
+					// complete
+					___d.complete();
+				}
+			}
+
+
+			/* fill construct */
+			template <typename... ___params>
+			constexpr auto _fill_construct(const ___params&... ___args)
+				// noexcept specification
+				noexcept(xns::is_nothrow_constructible<value_type, const ___params&...>) -> void {
+
+				if constexpr (xns::is_nothrow_constructible<value_type, const ___params&...>) {
+					// construct elements
+					for (; _end < _cap; ++_end)
+						___lifecycle::construct(_end, ___args...);
+				}
+				else {
+					// create destroy guard
+					___destroy ___d{*this};
+					// construct elements
+					for (; _end < _cap; ++_end)
+						___lifecycle::construct(_end, ___args...);
+					// complete
+					___d.complete();
+				}
+			}
+
+
+		public:
 
 
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			auto operator=(const self& other) noexcept (false /* allocator may throw */)
-									 -> self& requires (not xns::is_trivially_copyable<value_type>) {
+			constexpr auto operator=(const ___self& ___ot) -> ___self&
+				// requirements
+				requires (xns::is_nothrow_copy_constructible<value_type>) {
 
-				// check for self-assignment
-				if (this == &other)
+				// check self assignment
+				if (this == &___ot)
 					return *this;
 
-				// destroy elements
-				_clear();
+				{
+					const auto ___sz = ___ot.size();
 
-				// allocate / reallocate memory
-				if (_capacity < other._size)
-					_data = allocator::reallocate(_data, other._size);
+					// check sufficient capacity
+					if (___sz > capacity()) {
+						pointer ___tmp = _allocate(___sz);
+						_clear();
+						_update_members(___tmp, ___tmp, ___tmp + ___sz);
+					}
+					else {
+						_clear();
+						_end = _data;
+					}
 
-				// reset members
-				_data   = nullptr;
-				_size     = 0;
-				_capacity = 0;
-
-				// reserve other size
-				reserve(other._size);
-
-
-				// copy construct elements
-				for (size_type i = 0; i < other._size; ++i) {
-
-					allocator::construct(_data + i, other._data[i]);
-
-					if constexpr (not xns::is_nothrow_copy_constructible<value_type>)
-						/* info: increment size after each construct
-						   if throw, size reflects the number of valid elements */
-						++_size;
 				}
 
-				if constexpr (xns::is_nothrow_copy_constructible<value_type>)
-					// update size
-					_size = other._size;
-
-				// return self reference
-				return *this;
-
-			} // implementation not complete !!!
-
-
-
-			/* copy assignment operator (trivially copyable) */
-			auto operator=(const self& other) noexcept(false /* allocator may throw */)
-									 -> self& requires (xns::is_trivially_copyable<value_type>) {
-
-				// check for self-assignment
-				if (this == &other)
-					return *this;
-
-				// destroy elements
-				_clear();
-
-
-				if (_capacity < other._size) {
-
-					if (_data != nullptr)
-						allocator::deallocate2(_data);
-
-					_init();
-
-					_data = allocator::allocate2(other._size);
-
-					_capacity = other._size;
-				}
-
-				// deallocate memory
-				allocator::deallocate2(_data); /* info: no nullptr check */
+				for (pointer ___ptr = ___ot._data; ___ptr < ___ot._end; ++___ptr, ++_end)
+					___lifecycle::construct(_end, *___ptr);
 
 				return *this;
 			}
 
 			/* move assignment operator */
-			auto operator=(self&& other) noexcept -> self& {
+			constexpr auto operator=(___self&& ___ot) noexcept -> ___self& {
 
-				// check for self-assignment
-				if (this == &other)
+				// check self assignment
+				if (this == &___ot)
 					return *this;
 
 				// destroy elements
 				_clear();
-
+				
 				// deallocate memory
-				if (_data != nullptr)
-					allocator::deallocate2(_data);
+				_deallocate();
 
 				// copy members
-				_copy_members(other);
+				_copy_members(___ot);
 
 				// invalidate other
-				other._init();
+				___ot._init();
 
 				return *this;
 			}
 
-			/* subscript operator */
-			inline auto operator[](const size_type index) noexcept -> mut_ref {
-				return _data[index];
+
+
+			// -- public iterators --------------------------------------------
+
+			/* begin */
+			constexpr auto begin(void) noexcept -> iterator {
+				return iterator{_data};
 			}
 
-			/* const subscript operator */
-			inline auto operator[](const size_type index) const noexcept -> const_ref {
-				return _data[index];
+			/* const begin */
+			constexpr auto begin(void) const noexcept -> const_iterator {
+				return const_iterator{_data};
+			}
+
+			/* cbegin */
+			constexpr auto cbegin(void) const noexcept -> const_iterator {
+				return const_iterator{_data};
+			}
+
+			/* end */
+			constexpr auto end(void) noexcept -> iterator {
+				return iterator{_end};
+			}
+
+			/* const end */
+			constexpr auto end(void) const noexcept -> const_iterator {
+				return const_iterator{_end};
+			}
+
+			/* cend */
+			constexpr auto cend(void) const noexcept -> const_iterator {
+				return const_iterator{_end};
+			}
+
+			/* rbegin */
+			constexpr auto rbegin(void) noexcept -> reverse_iterator {
+				return reverse_iterator{_end - 1};
+			}
+
+			/* const rbegin */
+			constexpr auto rbegin(void) const noexcept -> const_reverse_iterator {
+				return const_reverse_iterator{_end - 1};
+			}
+
+			/* crbegin */
+			constexpr auto crbegin(void) const noexcept -> const_reverse_iterator {
+				return const_reverse_iterator{_end - 1};
+			}
+
+			/* rend */
+			constexpr auto rend(void) noexcept -> reverse_iterator {
+				return reverse_iterator{_data - 1};
+			}
+
+			/* const rend */
+			constexpr auto rend(void) const noexcept -> const_reverse_iterator {
+				return const_reverse_iterator{_data - 1};
+			}
+
+			/* crend */
+			constexpr auto crend(void) const noexcept -> const_reverse_iterator {
+				return const_reverse_iterator{_data - 1};
 			}
 
 
 			// -- public accessors --------------------------------------------
 
 			/* empty */
-			inline auto empty(void) const noexcept -> bool {
-				return _size == 0;
+			inline constexpr auto empty(void) const noexcept -> bool {
+				return _data == _end;
 			}
 
 			/* size */
-			inline auto size(void) const noexcept -> size_type {
-				return _size;
+			inline constexpr auto size(void) const noexcept -> size_type {
+				return static_cast<size_type>(_end - _data);
+			}
+
+			/* max size */
+			constexpr auto max_size(void) const noexcept -> size_type {
+
+				const auto ___max  = ___alloc_traits::max_size(_allocator);
+				const auto ___diff = static_cast<size_type>(xns::limits<difference_type>::max());
+
+				return (___max < ___diff) ? ___max : ___diff;
 			}
 
 			/* capacity */
-			inline auto capacity(void) const noexcept -> size_type {
-				return _capacity;
+			inline constexpr auto capacity(void) const noexcept -> size_type {
+				return static_cast<size_type>(_cap - _data);
 			}
 
 			/* front */
-			inline auto front(void) noexcept -> mut_ref {
+			inline constexpr auto front(void) noexcept -> reference {
 				return *_data;
 			}
 
 			/* const front */
-			inline auto front(void) const noexcept -> const_ref {
+			inline constexpr auto front(void) const noexcept -> const_reference {
 				return *_data;
 			}
 
 			/* back */
-			inline auto back(void) noexcept -> mut_ref {
-				return _data[_size - 1];
+			inline constexpr auto back(void) noexcept -> reference {
+				return *(_end - 1);
 			}
 
 			/* const back */
-			inline auto back(void) const noexcept -> const_ref {
-				return _data[_size - 1];
+			inline constexpr auto back(void) const noexcept -> const_reference {
+				return *(_end - 1);
 			}
 
 			/* data */
-			inline auto data(void) noexcept -> mut_ptr {
+			inline constexpr auto data(void) noexcept -> pointer {
 				return _data;
 			}
 
 			/* const data */
-			inline auto data(void) const noexcept -> const_ptr {
+			inline constexpr auto data(void) const noexcept -> const_pointer {
 				return _data;
+			}
+
+			/* subscript operator */
+			inline constexpr auto operator[](const size_type ___idx) noexcept -> reference {
+				return _data[___idx];
+			}
+
+			/* const subscript operator */
+			inline constexpr auto operator[](const size_type ___idx) const noexcept -> const_reference {
+				return _data[___idx];
+			}
+
+			/* get allocator */
+			inline constexpr auto get_allocator(void) const noexcept -> allocator_type {
+				return _allocator;
 			}
 
 
 			// -- public memory management ------------------------------------
 
+
+			/* shrink to fit */
+			constexpr auto shrink_to_fit(void)
+				// noexcept specification
+				noexcept(false) -> void {
+
+				// check if capacity is equal to size
+				if (_end == _cap)
+					return;
+
+				// call shrink implementation
+				_shrink();
+			}
+
 			/* reserve */
-			inline auto reserve(const size_type capacity) -> void {
+			constexpr auto reserve(const size_type ___cap)
+				noexcept(___noexcept_allocate) -> void {
 
 				// check capacity
-				if (capacity <= _capacity) 
+				if (___cap <= capacity())
 					return;
 
 				// call reserve implementation
-				_reserve(capacity);
+				_reserve(___cap);
 			}
 
 
 			/* resize */
-			auto resize(const size_type size) -> void {
+			auto resize(const size_type ___sz) -> void {
+				//static_assert(xns::always_false<value_type>, "resize not implemented");
 
 				// superior size
-				if (size > _size) {
+				if (___sz > size()) {
 
 					// check capacity
-					if (size > _capacity)
-						reserve(size);
+					if (___sz > capacity()) {
 
-					// construct default elements
-					for (size_type i = _size; i < size; ++i)
-						allocator::construct(_data + i);
+						if constexpr (___noexcept_allocate) {
+							if (!_reserve(_try_expand(___sz)))
+								return; }
+						else _reserve(_try_expand(___sz));
+					}
+
 				}
 
 				// inferior size
-				else
+				else {
+
 					// destroy only non-trivially destructible types
-					if constexpr (not xns::is_trivially_destructible<value_type>)
+					if constexpr (___requires_destruct) {
+						;
+					}
 
 						// destroy excess elements (if not equal size)
-						for (size_type i = size; i < _size; ++i)
-							allocator::destroy(_data + i);
+						//for (size_type i = ___sz; i < _size; ++i)
+						//	___lifecycle::destroy(_data + i);
+				}
 
 				// update size
-				_size = size;
+				//_size = ___sz;
 			}
 
 
@@ -524,215 +770,644 @@ namespace xns {
 			// -- public modifiers --------------------------------------------
 
 			/* clear */
-			auto clear(void) noexcept(xns::is_nothrow_destructible<value_type>) -> void {
+			constexpr auto clear(void) noexcept -> void {
 
 				// destroy elements
 				_clear();
 
-				// update size
-				_size = 0;
+				// reset end
+				_end = _data;
 			}
 
 
-			/* emplace */
-			template <typename... A>
-			auto emplace(const size_type pos, A&&... args) -> void {
 
-				/* info: if construct throws, elements are not moved back.
-						 so construct new element before and call insert */
+			/* push back */
+			template <typename ___tp> requires ___is_value_type<___tp>::value
+			constexpr auto push_back(___tp&& ___vl)
+				// noexcept specification
+				noexcept(false) -> void {
 
-				if constexpr (not xns::is_nothrow_constructible<value_type, A...>) {
-					insert(pos, value_type{xns::forward<A>(args)...});
+				// expand if no available space
+				if (!(_end < _cap))
+					_reserve(_expand());
+
+				// construct new element by copy / move
+				___lifecycle::construct(_end, xns::forward<___tp>(___vl));
+
+				// increment end
+				++_end;
+			}
+
+
+			/* emplace back */
+			template <typename... ___params>
+			constexpr auto emplace_back(___params&&... ___args)
+				// noexcept specification
+				noexcept(false) -> void {
+
+				// expand if no available space
+				if (!(_end < _cap))
+					_reserve(_expand());
+
+				// construct new element in place
+				___lifecycle::construct(_end, xns::forward<___params>(___args)...);
+
+				// increment end
+				++_end;
+			}
+
+			/* pop back */
+			constexpr auto pop_back(void) noexcept -> void {
+
+				// non-trivially destructible
+				if constexpr (___requires_destruct)
+					___lifecycle::destroy(--_end);
+				else
+					--_end;
+			}
+
+			/* swap */
+			constexpr auto swap(___self& ___ot) noexcept {
+				// swap allocators
+				xns::swap(_allocator, ___ot._allocator);
+				// swap members
+				xns::swap(_data, ___ot._data);
+				xns::swap(_cap,  ___ot._cap);
+				xns::swap(_end,  ___ot._end);
+			}
+
+
+		private:
+
+			// -- private methods ---------------------------------------------
+
+			/* init */
+			constexpr auto _init(void) noexcept -> void {
+				_data = _end  = _cap = nullptr;
+			}
+
+			/* copy members */
+			constexpr auto _copy_members(const ___self& ___ot) noexcept -> void {
+				_data = ___ot._data;
+				_end  = ___ot._end;
+				_cap  = ___ot._cap;
+			}
+
+			/* allocate */
+			constexpr auto _allocate(const size_type ___sz) noexcept(false) -> pointer
+				// requirements
+				requires (___noexcept_allocate == false) {
+				return ___alloc_traits::allocate(_allocator, ___sz);
+			}
+
+			/* allocate (noexcept) */
+			constexpr auto _allocate(const size_type ___sz) noexcept(false) -> pointer
+				// requirements
+				requires (___noexcept_allocate == true) {
+
+				pointer ___ptr = ___alloc_traits::allocate(_allocator, ___sz);
+
+				if (___ptr == nullptr)
+					throw xns::exception("vector, allocation failed", -2);
+				return ___ptr;
+			}
+
+			/* deallocate */
+			constexpr auto _deallocate(void) noexcept -> void {
+				// deallocate memory
+				if (_data == nullptr)
+					return;
+				___alloc_traits::deallocate(_allocator, _data, _cap - _data);
+			}
+
+			/* unsafe deallocate */
+			constexpr auto _unsafe_deallocate(void) noexcept -> void {
+				// deallocate memory
+				___alloc_traits::deallocate(_allocator, _data, _cap - _data);
+			}
+
+			/* available capacity */
+			constexpr auto _available_capacity(void) const noexcept -> size_type {
+				return _cap - _end;
+			}
+
+			/* expand */
+			constexpr auto _expand(void) const noexcept -> size_type {
+
+				const auto ___max = max_size();
+				const auto ___cap = capacity();
+
+				if (___cap >= ___max)
+					return ___max;
+				else
+					return ___cap ? ___cap << 1U : 1U;
+			}
+
+			/* try expand */
+			constexpr auto _try_expand(const size_type ___sz) const noexcept -> size_type {
+				const auto ___exp = _expand();
+				return ___exp < ___sz ? ___sz : ___exp;
+			}
+
+
+			/* destroy */
+			static constexpr auto _destroy(pointer ___ptr, const size_type ___sz) noexcept -> void {
+
+				// destroy only non-trivially destructible types
+				if constexpr (not ___trivial_destruct)
+					// destroy elements
+					for (size_type i = 0; i < ___sz; ++i)
+						___lifecycle::destroy(___ptr + i);
+			}
+
+
+			/* clear */
+			constexpr auto _clear(void) noexcept -> void {
+
+				// destroy only non-trivially destructible types
+				if constexpr (___requires_destruct)
+					// destroy elements
+					for (pointer ___ptr = _data; ___ptr < _end; ++___ptr)
+						___lifecycle::destroy(___ptr);
+			}
+
+			/* update members */
+			constexpr auto _update_members(pointer ___ptr,
+										   pointer ___end,
+										   pointer ___cap) noexcept -> void {
+				_data = ___ptr;
+				_end  = ___end;
+				_cap  = ___cap;
+			}
+
+			/* shrink */
+			constexpr auto _shrink(void) noexcept(false) -> void
+				// requirements
+				requires (xns::is_trivially_copyable<value_type>) {
+
+				// get size
+				const auto ___sz = size();
+
+				// reallocate memory
+				const pointer ___tmp = _allocate(___sz);
+
+				// trivially copyable
+				xns::memcpy(___tmp, _data, ___sz);
+
+				// clean up
+				this->~vector();
+
+				// compute end
+				const pointer ___end = ___tmp + ___sz;
+
+				// update data
+				_update_members(___tmp, ___end, ___end);
+			}
+
+			/* shrink */
+			constexpr auto _shrink(void) noexcept(false) -> void
+				// requirements
+				requires (not xns::is_trivially_copyable<value_type>) {
+
+				// reallocate memory
+				const pointer ___tmp = _allocate(size());
+
+				pointer ___ptr = _data;
+				pointer ___end = ___tmp;
+
+				// move construct elements
+				for (; ___ptr < _end; ++___ptr, ++___end)
+					___lifecycle::construct(___end, xns::move(*___ptr));
+
+				// clean up
+				this->~vector();
+
+				// update data
+				_update_members(___tmp, ___end, ___end);
+
+			}
+
+			/* reserve */
+			constexpr auto _reserve(const size_type ___cap) noexcept(false) -> void
+				// requirements
+				requires (xns::is_trivially_copyable<value_type>) {
+
+				// reallocate memory
+				const pointer ___tmp = _allocate(___cap);
+
+				// get size
+				const auto ___sz = size();
+
+				// trivially copyable
+				xns::memcpy(___tmp, _data, ___sz);
+
+				// clean up
+				this->~vector();
+
+				// update data
+				_update_members(___tmp, ___tmp + ___sz, ___tmp + ___cap);
+			}
+
+			/* reserve */
+			constexpr auto _reserve(const size_type ___cap) noexcept(false) -> void
+				// requirements
+				requires (not xns::is_trivially_copyable<value_type>) {
+
+				// reallocate memory
+				const pointer ___tmp = _allocate(___cap);
+
+				pointer ___ptr = _data;
+				pointer ___end = ___tmp;
+
+				// move construct elements
+				for (; ___ptr < _end; ++___ptr, ++___end)
+					___lifecycle::construct(___end, xns::move(*___ptr));
+
+				// clean up
+				this->~vector();
+
+				// update data
+				_update_members(___tmp, ___end, ___tmp + ___cap);
+
+			}
+
+
+		// -- friends ---------------------------------------------------------
+
+		/* filter as friend */
+		template <typename ___tp, typename ___al, typename... ___pa>
+		friend auto filter(xns::vector<___tp, ___al>&, const ___pa&...) noexcept -> void;
+
+	}; // class vector
+
+
+	// -- I T E R A T O R -----------------------------------------------------
+
+	template <typename ___type, typename ___alloc>
+	template <bool ___const, bool ___reverse>
+	class vector<___type, ___alloc>::___iterator {
+
+
+		// -- friends ---------------------------------------------------------
+
+		/* other iterator as friend */
+		template <bool, bool>
+		friend class ___iterator;
+
+		/* vector as friend */
+		template <typename, typename>
+		friend class xns::vector;
+
+
+		private:
+
+			// -- private types -----------------------------------------------
+
+			/* self type */
+			using ___self = ___iterator<___const, ___reverse>;
+
+			/* vector type */
+			using ___vector = xns::vector<___type, ___alloc>;
+
+
+		public:
+
+			// -- public types ------------------------------------------------
+
+			/* pointer type */
+			using pointer           = xns::conditional<___const, ___vector::const_pointer,
+																 ___vector::pointer>;
+			/* iterator type */
+			using iterator_type     = pointer;
+
+			/* value type */
+			using value_type        = ___vector::value_type;
+
+			/* difference type */
+			using difference_type   = ___vector::difference_type;
+
+			/* reference type */
+			using reference         = xns::conditional<___const, ___vector::const_reference,
+																 ___vector::reference>;
+			/* iterator category */
+			using iterator_category = xns::random_access_iterator_tag;
+
+
+		private:
+
+			// -- private members ---------------------------------------------
+
+			/* pointer */
+			pointer _iter;
+
+
+		private:
+
+			// -- private lifecycle -------------------------------------------
+
+			/* pointer constructor */
+			constexpr explicit ___iterator(const pointer ___it) noexcept
+			: _iter{___it} {
+			}
+
+
+		public:
+
+			// -- public lifecycle --------------------------------------------
+
+			/* default constructor */
+			constexpr ___iterator(void) noexcept
+			: _iter{nullptr} {
+			}
+
+			/* copy constructor */
+			constexpr ___iterator(const ___self&) noexcept = default;
+
+			/* copy constructor */
+			constexpr ___iterator(const ___iterator<!___const, ___reverse>& other) noexcept
+			: _iter{other._iter} {
+				static_assert(___const,
+						"non-const iterator cannot be constructed from const iterator"); 
+			}
+
+			/* move constructor */
+			constexpr ___iterator(___self&&) noexcept = default;
+
+			/* destructor */
+			~___iterator(void) noexcept = default;
+
+
+			// -- public assignment operators ---------------------------------
+
+			/* copy assignment operator */
+			constexpr auto operator=(const ___self&) noexcept -> ___self& = default;
+
+			/* copy assignment operator */
+			constexpr auto operator=(const ___iterator<!___const, ___reverse>& other) noexcept -> ___self& {
+				static_assert(___const,
+						"non-const iterator cannot be assigned from const iterator");
+				_iter = other._iter;
+				return *this;
+			}
+
+			/* move assignment operator */
+			constexpr auto operator=(___self&&) noexcept -> ___self& = default;
+
+			/* move assignment operator */
+			template <bool ___rev>
+			constexpr auto operator=(___iterator<!___const, ___rev>&& other) noexcept -> ___self& {
+				static_assert(___const,
+						"non-const iterator cannot be assigned from const iterator");
+				_iter = other._iter;
+				return *this;
+			}
+
+
+			// -- public accessors --------------------------------------------
+
+			/* operator* */
+			constexpr auto operator*(void) const noexcept -> reference {
+				return *_iter;
+			}
+
+			/* operator-> */
+			constexpr auto operator->(void) const noexcept -> pointer {
+				return _iter;
+			}
+
+			/* operator[] */
+			constexpr auto operator[](const difference_type __n) const noexcept -> reference
+				requires (not ___reverse) {
+				return _iter[__n];
+			}
+
+			/* operator[] (reverse) */
+			constexpr auto operator[](const difference_type __n) const noexcept -> reference
+				requires ___reverse {
+				return _iter[-__n];
+			}
+
+			/* base */
+			constexpr auto base(void) const noexcept -> iterator_type {
+				return _iter;
+			}
+
+
+			// -- public arithmetic operators ---------------------------------
+
+			/* operator++ */
+			constexpr auto operator++(void) noexcept -> ___self&
+				requires (not ___reverse) {
+				++_iter;
+				return *this;
+			}
+
+			/* operator++ (reverse) */
+			constexpr auto operator++(void) noexcept -> ___self&
+				requires ___reverse {
+				--_iter;
+				return *this;
+			}
+
+			/* operator++ */
+			constexpr auto operator++(int) noexcept -> ___self
+				requires (not ___reverse) {
+				___self tmp{*this};
+				++_iter;
+				return tmp;
+			}
+
+			/* operator++ (reverse) */
+			constexpr auto operator++(int) noexcept -> ___self
+				requires ___reverse {
+				___self tmp{*this};
+				--_iter;
+				return tmp;
+			}
+
+			/* operator-- */
+			constexpr auto operator--(void) noexcept -> ___self&
+				requires (not ___reverse) {
+				--_iter;
+				return *this;
+			}
+
+			/* operator-- (reverse) */
+			constexpr auto operator--(void) noexcept -> ___self&
+				requires ___reverse {
+				++_iter;
+				return *this;
+			}
+
+			/* operator-- */
+			constexpr auto operator--(int) noexcept -> ___self
+				requires (not ___reverse) {
+				___self tmp{*this};
+				--_iter;
+				return tmp;
+			}
+
+			/* operator-- (reverse) */
+			constexpr auto operator--(int) noexcept -> ___self
+				requires ___reverse {
+				___self tmp{*this};
+				++_iter;
+				return tmp;
+			}
+
+			/* operator+ */
+			constexpr auto operator+(const difference_type __n) const noexcept -> ___self
+				requires (not ___reverse) {
+				___self tmp{_iter + __n};
+				return tmp;
+			}
+
+			/* operator+ (reverse) */
+			constexpr auto operator+(const difference_type __n) const noexcept -> ___self
+				requires ___reverse {
+				___self tmp{_iter - __n};
+				return tmp;
+			}
+
+			/* operator+= */
+			constexpr auto operator+=(const difference_type __n) noexcept -> ___self&
+				requires (not ___reverse) {
+				_iter += __n;
+				return *this;
+			}
+
+			/* operator+= (reverse) */
+			constexpr auto operator+=(const difference_type __n) noexcept -> ___self&
+				requires ___reverse {
+				_iter -= __n;
+				return *this;
+			}
+
+			/* operator- */
+			constexpr auto operator-(const difference_type __n) const noexcept -> ___self
+				requires (not ___reverse) {
+				___self tmp{_iter - __n};
+				return tmp;
+			}
+
+			/* operator- (reverse) */
+			constexpr auto operator-(const difference_type __n) const noexcept -> ___self
+				requires ___reverse {
+				___self tmp{_iter + __n};
+				return tmp;
+			}
+
+			/* operator-= */
+			constexpr auto operator-=(const difference_type __n) noexcept -> ___self&
+				requires (not ___reverse) {
+				_iter -= __n;
+				return *this;
+			}
+
+			/* operator-= (reverse) */
+			constexpr auto operator-=(const difference_type __n) noexcept -> ___self&
+				requires ___reverse {
+				_iter += __n;
+				return *this;
+			}
+
+
+			// -- public comparison operators ---------------------------------
+
+			/* equality operator */
+			template <bool ___c, bool ___r>
+			constexpr auto operator==(const ___iterator<___c, ___r>& __rhs) const noexcept -> bool {
+				return _iter == __rhs._iter;
+			}
+
+			/* inequality operator */
+			template <bool ___c, bool ___r>
+			constexpr auto operator!=(const ___iterator<___c, ___r>& __rhs) const noexcept -> bool {
+				return _iter != __rhs._iter;
+			}
+
+			/* less than operator */
+			template <bool ___c, bool ___r>
+			constexpr auto operator<(const ___iterator<___c, ___r>& __rhs) const noexcept -> bool {
+				return _iter < __rhs._iter;
+			}
+
+			/* greater than operator */
+			template <bool ___c, bool ___r>
+			constexpr auto operator>(const ___iterator<___c, ___r>& __rhs) const noexcept -> bool {
+				return _iter > __rhs._iter;
+			}
+
+			/* less than or equal operator */
+			template <bool ___c, bool ___r>
+			constexpr auto operator<=(const ___iterator<___c, ___r>& __rhs) const noexcept -> bool {
+				return _iter <= __rhs._iter;
+			}
+
+			/* greater than or equal operator */
+			template <bool ___c, bool ___r>
+			constexpr auto operator>=(const ___iterator<___c, ___r>& __rhs) const noexcept -> bool {
+				return _iter >= __rhs._iter;
+			}
+
+
+
+
+	}; // class ___iterator
+
+
+
+
+
+
+
+			/* remove all elements that match the given value */
+			template <typename ___type, typename ___alloc, typename... ___params>
+			auto filter(xns::vector<___type, ___alloc>& ___v, const ___params&... ___vls) noexcept -> void {
+
+				if constexpr (sizeof...(___params) == 0) {
 					return;
 				}
 				else {
 
-					// call emplace if pos is equal to size
-					if (pos == _size)
-						return emplace_back(xns::forward<A>(args)...);
+					using ___vector = xns::vector<___type, ___alloc>;
+					using ___lifecycle = typename ___vector::___lifecycle;
 
-					// return if position is out of range
-					if (pos > _size)
-						return;
+					static_assert(xns::are_comparable<___type, ___params...>,
+						"types are not comparable in filter");
 
-					// expand if no available space
-					if (_available_capacity() == 0)
-						_reserve(_expand());
+					typename ___vector::pointer ___z = ___v._data;
+					typename ___vector::pointer ___x = ___v._data;
 
+					// loop over vector
+					for (; ___x < ___v._end; ++___x) {
 
-					if constexpr (xns::is_trivially_copyable<value_type>)
-						::memmove(_data + pos + 1,           // destination
-								  _data + pos,               // source
-								   (_size - pos) * sizeof(value_type)); // size
-
-					else
-						if constexpr (xns::is_nothrow_move_constructible<value_type>
-								   && xns::is_nothrow_destructible<value_type>) {
-
-							// move construct last element
-							allocator::construct(_data + _size, xns::move(_data[_size - 1]));
-
-							/* info: it is better for performance
-									 to destroy and move construct than move assign */
-
-							// move elements
-							for (size_type i = _size - 1; i > pos; --i) {
-								allocator::destroy(_data + i);
-								allocator::construct(_data + i, xns::move(_data[i - 1]));
-							}
+						if (((*___x != ___vls) && ...)) {
+							// if no match, maybe move, check shift
+							if (___z != ___x) {
+								// move element
+								*___z = xns::move(*___x);
+							} // increment z
+							++___z;
 						}
-						else
-							static_assert(xns::always_false<value_type>, "vector, emplace not supports throw move operations");
-
-					// construct new element in place
-					allocator::construct(_data + pos,
-							xns::forward<A>(args)...);
-
-					// update size
-					++_size;
-				}
-			}
-
-			/* emplace back */
-			template <typename... A>
-			auto emplace_back(A&&... args) -> void {
-
-				// expand if no available space
-				if (_available_capacity() == 0)
-					_reserve(_expand());
-
-				// construct new element
-				allocator::construct(_data + _size,
-					  xns::forward<A>(args)...);
-
-				// update size
-				++_size;
-			}
-
-			/* push back */
-			template <typename U>
-			auto push_back(U&& value) -> void {
-
-				// expand if no available space
-				if (_available_capacity() == 0)
-					_reserve(_expand());
-
-				// construct new element
-				allocator::construct(_data + _size,
-					  xns::forward<U>(value));
-
-				// update size
-				++_size;
-			}
-
-			/* pop back */
-			inline auto pop_back(void) noexcept -> void {
-
-				// return if size is zero
-				if (_size == 0)
-					return;
-
-				// destroy only non-trivially destructible types
-				if constexpr (not xns::is_trivially_destructible<value_type>)
-					allocator::destroy(_data + --_size);
-				else
-					--_size;
-			}
-
-
-
-
-			/* insert */
-			template <typename U> requires (xns::is_same<value_type, xns::remove_cvref<U>>)
-			auto insert(size_type pos, U&& value) -> void {
-
-				// call emplace if pos is equal to size
-				if (pos == _size)
-					return push_back(xns::forward<U>(value));
-
-				// return if position is out of range
-				if (pos > _size)
-					return;
-
-				// check capacity
-				if (_available_capacity() == 0)
-					reserve(_expand());
-
-				// move elements
-				for (size_type x = _size; x > pos; --x) {
-					// move element
-					_data[x] = xns::move(_data[x - 1]);
-				}
-
-				// increment size
-				++_size;
-
-				allocator::destroy(_data + pos);
-				// copy or move value (need to check if U is nothrow copy constructible or nothrow move constructible) !!!
-				allocator::construct(_data + pos, xns::forward<U>(value));
-				
-				//_data[pos] = xns::forward<U>(value);
-			}
-
-
-			/* erase */
-			inline auto erase(const iterator& pos) noexcept -> void {
-				// check position
-				if (pos._ptr < _data) { return; }
-				// compute position (pointers subtraction gives a signed type (ptrdiff_t))
-				erase(static_cast<size_type>(pos._ptr - _data));
-			}
-
-			/* erase */
-			auto erase(const size_type pos) noexcept -> void {
-				// check position
-				if (pos >= _size) { return; }
-				// move elements
-				for (size_type x = pos; x < (_size - 1); ++x) {
-					// move element
-					_data[x] = xns::move(_data[x + 1]);
-				} // decrement size
-				--_size;
-				// destroy last element
-				allocator::destroy(_data + _size);
-			}
-
-
-
-
-
-
-			/* swap */
-			auto swap(self& other) noexcept -> void {
-				// swap members
-				xns::swap(_data,   other._data);
-				xns::swap(_capacity, other._capacity);
-				xns::swap(_size,     other._size);
-			}
-
-
-			/* filter */ //requires is_comparable<U, value>
-			/* remove all elements that match the given value */
-			template <class... A>
-			auto filter(const A&... compare) -> void {
-				// z is the index of the next element to move
-				size_type z = 0;
-				// loop over vector
-				for (size_type x = 0; x < _size; ++x) {
-					// loop over arguments to compare
-					if (((_data[x] != compare) && ...)) {
-						// if no match, maybe move, check shift
-						if (z != x) {
-							// move element
-							_data[z] = xns::move(_data[x]);
-						} // increment z
-						++z;
 					}
-				} // finaly, destroy elements and decrement size
-				while (z < _size) { allocator::destroy(_data + --_size); }
+					___v._end = ___z;
+					// destroy elements
+					for (; ___x < ___v._end; ++___x) {
+						___lifecycle::destroy(___x);
+					}
+				}
 			}
+
+} // namespace xns
+
+#endif // XNS_VECTOR_HEADER
+
+/*
+			*/
 
 			/* move elements to the back of the vector if exists, else push back */
+/*
 			auto to_back(const value_type& value) -> void {
 				// loop over vector
 				for (size_type x = 0; x < _size; ++x) {
@@ -751,8 +1426,10 @@ namespace xns {
 				} // push back
 				push_back(value);
 			}
+			*/
 
 			/* dichotomic search */
+/*
 			template <typename U>
 			auto dichotomic_search(const U& value) noexcept -> iterator
 				requires (xns::is_comparable<U, value_type>) {
@@ -779,14 +1456,16 @@ namespace xns {
 					// check value is lower
 					else if (value < _data[middle]) { upper = middle - 1; }
 					// else value is equal
-					else    { return self::iterator(_data + middle);            }
+					else    { return ___self::iterator(_data + middle);            }
 				} // not found
-				return self::iterator(_data + _size);
+				return ___self::iterator(_data + _size);
 
 			}
+			*/
 
 			/* dichotomic insert */
-			auto dichotomic_insert(const_ref value) -> void
+/*
+			auto dichotomic_insert(const_reference value) -> void
 				requires (xns::is_comparable<value_type>) {
 
 				// check if U is comparable to value_type
@@ -822,299 +1501,4 @@ namespace xns {
 
 				insert(lower, value);
 			}
-
-
-
-
-
-		private:
-
-			// -- private methods ---------------------------------------------
-
-			/* init */
-			inline auto _init(void) noexcept -> void {
-				_data   = nullptr;
-				_capacity = 0;
-				_size     = 0;
-			}
-
-			/* available capacity */
-			inline auto _available_capacity(void) const noexcept -> size_type {
-				// return available memory
-				return _capacity - _size;
-			}
-
-			/* expand */
-			inline auto _expand(void) const noexcept -> size_type {
-				return _capacity ? _capacity << 1 : 1;
-			}
-
-			/* _reserve */
-			auto _reserve(const size_type capacity) -> void requires (not xns::is_trivially_copyable<value_type>) {
-
-				// allocate memory
-				mut_ptr tmp = allocator::allocate2(capacity);
-
-				// reconstruct elements
-				for (size_type i = 0; i < _size; ++i) {
-					allocator::construct(tmp + i, xns::move(_data[i]));
-					allocator::destroy(_data + i);
-				}
-
-				// deallocate memory
-				allocator::deallocate2(_data); /* info: no nullptr check */
-
-				// update members
-				_capacity = capacity;
-				  _data = tmp;
-			}
-
-			/* _reserve (trivially copyable) */
-			auto _reserve(const size_type capacity) -> void requires (xns::is_trivially_copyable<value_type> == true) {
-
-				// reallocate memory
-				  _data = allocator::realloc2(_data, capacity);
-				_capacity = capacity;
-			}
-
-			/* clear */
-			auto _clear(void) noexcept -> void {
-
-				// destroy only non-trivially destructible types
-				if constexpr (not xns::is_trivially_destructible<value_type>)
-
-					// destroy elements
-					for (size_type i = 0; i < _size; ++i)
-						allocator::destroy(_data + i);
-			}
-
-			/* copy members */
-			auto _copy_members(const self& other) noexcept -> void {
-
-				// copy members
-				_data     = other._data;
-				_capacity = other._capacity;
-				_size     = other._size;
-			}
-
-
-	}; // class vector
-
-
-	// -- V E C T O R  I T E R A T O R ----------------------------------------
-
-	template <typename T, typename __alloc> template <bool C>
-	class vector<T, __alloc>::vector_iterator final {
-
-
-		// -- friends ---------------------------------------------------------
-
-		/* other iterator as friend */
-		template <bool D>
-		friend class vector_iterator;
-
-		/* vector as friend */
-		friend class vector<T, __alloc>;
-
-
-		private:
-
-			// -- private constants -------------------------------------------
-
-			/* iterator is const */
-			static constexpr bool _const = C;
-
-
-		public:
-
-			// -- public types ------------------------------------------------
-
-			/* list type */
-			using vector_type = xns::vector<T, __alloc>;
-
-			/* value type */
-			using value_type = typename vector_type::value_type;
-
-			/* self type */
-			using self = vector_type::vector_iterator<C>;
-
-			/* reference type */
-			using cond_ref = typename xns::conditional<C, vector_type::const_ref,
-														  vector_type::mut_ref>;
-
-			/* pointer type */
-			using cond_ptr   = typename xns::conditional<C, vector_type::const_ptr,
-															vector_type::mut_ptr>;
-
-
-			// -- public lifecycle --------------------------------------------
-
-			/* default constructor */
-			inline vector_iterator(void) noexcept
-			: _ptr{nullptr} {}
-
-			/* pointer constructor */
-			inline vector_iterator(cond_ptr ptr) noexcept
-			: _ptr{ptr} {}
-
-			/* copy constructor (non-const) */
-			inline vector_iterator(const vector_type::iterator& other) noexcept
-			: _ptr{other._ptr} {}
-
-			/* copy constructor (const) */
-			inline vector_iterator(const vector_type::const_iterator& other) noexcept
-			: _ptr{other._ptr} {
-				// assert invalid conversion
-				static_assert(_const,
-						"): CANNOT CONVERT CONST TO NON-CONST VECTOR ITERATOR :(");
-			}
-
-			/* move constructor (non-const) */
-			inline vector_iterator(vector_type::iterator&& other) noexcept
-			: vector_iterator{other._ptr} {}
-
-			/* move constructor (const) */
-			inline vector_iterator(vector_type::const_iterator&& other) noexcept
-			: vector_iterator{other._ptr} {}
-
-			/* destructor */
-			~vector_iterator(void) noexcept = default;
-
-
-			// -- public assignment operators ---------------------------------
-
-			/* copy assignment operator (non-const) */
-			inline auto operator=(const vector_type::iterator& other) noexcept -> self& {
-				// copy pointer
-				_ptr = other._ptr;
-				// return self reference
-				return *this;
-			}
-
-			/* copy assignment operator (const) */
-			inline auto operator=(const vector_type::const_iterator& other) noexcept -> self& {
-				// assert invalid conversion
-				static_assert(_const, "iterator, cannot convert const to non-const vector iterator.");
-				// copy pointer
-				_ptr = other._ptr;
-				// return self reference
-				return *this;
-			}
-
-			/* move assignment operator */
-			inline auto operator=(vector_type::iterator&& other) noexcept -> self& {
-				return operator=(other);
-			}
-
-			/* move assignment operator (const) */
-			inline auto operator=(vector_type::const_iterator&& other) noexcept -> self& {
-				return operator=(other);
-			}
-
-
-			// -- public accessor operators -----------------------------------
-
-			/* dereference operator */
-			inline auto operator*(void) const noexcept -> cond_ref {
-				return *_ptr;
-			}
-
-			/* arrow operator */
-			inline auto operator->(void) const noexcept -> cond_ptr {
-				return _ptr;
-			}
-
-
-			// -- public increment operators ----------------------------------
-
-			/* pre-increment operator */
-			inline auto operator++(void) noexcept -> self& {
-				// increment pointer
-				++_ptr;
-				// return self reference
-				return *this;
-			}
-
-			/* post-increment operator */
-			inline auto operator++(int) noexcept -> self {
-				// copy self
-				self tmp{*this};
-				// increment pointer
-				++_ptr;
-				// return copy
-				return tmp;
-			}
-
-
-			// -- public decrement operators ----------------------------------
-
-			/* pre-decrement operator */
-			inline auto operator--(void) noexcept -> self& {
-				// decrement pointer
-				--_ptr;
-				// return self reference
-				return *this;
-			}
-
-			/* post-decrement operator */
-			inline auto operator--(int) noexcept -> self {
-				// copy self
-				self tmp{*this};
-				// decrement pointer
-				--_ptr;
-				// return copy
-				return tmp;
-			}
-
-
-			// -- public comparison operators ---------------------------------
-
-			/* equality operator */
-			template <bool D>
-			inline auto operator==(const vector_iterator<D>& other) const noexcept -> bool {
-				// return pointer equality
-				return _ptr == other._ptr;
-			}
-
-			/* inequality operator */
-			template <bool D>
-			inline auto operator!=(const vector_iterator<D>& other) const noexcept -> bool {
-				return _ptr != other._ptr;
-			}
-
-			/* null equality operator */
-			inline auto operator==(xns::null) const noexcept -> bool {
-				return _ptr == nullptr;
-			}
-
-			/* null inequality operator */
-			inline auto operator!=(xns::null) const noexcept -> bool {
-				return _ptr != nullptr;
-			}
-
-
-			// -- public boolean operators ------------------------------------
-
-			/* boolean operator */
-			inline explicit operator bool(void) const noexcept {
-				return _ptr != nullptr;
-			}
-
-			/* not operator */
-			inline auto operator!(void) const noexcept -> bool {
-				return _ptr == nullptr;
-			}
-
-
-		private:
-
-			// -- private members ---------------------------------------------
-
-			/* pointer */
-			cond_ptr _ptr;
-
-	}; // vector_iterator
-
-} // namespace xns
-
-#endif // XNS_VECTOR_HEADER
+			*/
