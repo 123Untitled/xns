@@ -877,13 +877,13 @@ namespace xns {
 				// deallocate memory
 				if (_data == nullptr)
 					return;
-				___alloc_traits::deallocate(_allocator, _data, _cap - _data);
+				___alloc_traits::deallocate(_allocator, _data, static_cast<size_type>(_cap - _data));
 			}
 
 			/* unsafe deallocate */
 			constexpr auto _unsafe_deallocate(void) noexcept -> void {
 				// deallocate memory
-				___alloc_traits::deallocate(_allocator, _data, _cap - _data);
+				___alloc_traits::deallocate(_allocator, _data, static_cast<size_type>(_cap - _data));
 			}
 
 			/* available capacity */

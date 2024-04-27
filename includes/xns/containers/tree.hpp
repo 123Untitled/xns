@@ -1936,7 +1936,7 @@ namespace xns {
 			};
 
 			/* multipliers */
-			enum : xns::size_t {
+			enum : xns::s64 {
 				Y_OFFSET = 3U,
 				X_OFFSET = 3U
 			};

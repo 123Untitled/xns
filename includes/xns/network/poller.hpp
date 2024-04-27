@@ -142,12 +142,24 @@ namespace xns {
 					_kevents.reserve(DEFAULT_BUFF_SIZE);
 				}
 
+				/* add socket */
 				auto add_socket(network::socket& socket) noexcept -> void {
 
-					struct kevent event{};
-
-					// setup event
-					EV_SET(&event, socket.get(), EVFILT_READ, EV_ADD, 0, 0, &socket);
+					// make kevent struct
+					const struct kevent event{
+						/* identifier for this event */
+						.ident  = static_cast<uintptr_t>(socket.get()),
+						/* filter for event */
+						.filter = EVFILT_READ,
+						/* general flags */
+						.flags  = EV_ADD,
+						/* filter-specific flags */
+						.fflags = 0,
+						/* filter-specific data */
+						.data   = 0,
+						/* opaque user data identifier */
+						.udata  = &socket
+					};
 
 					// add event
 					if (::kevent(_kqueue.get(), &event, 1, nullptr, 0, nullptr) == -1) {
@@ -158,9 +170,22 @@ namespace xns {
 
 				auto remove_socket(network::socket& socket) noexcept -> void {
 
-					struct kevent event{};
-					// setup event
-					EV_SET(&event, socket.get(), EVFILT_READ, EV_DELETE, 0, 0, nullptr);
+					// make kevent struct
+					struct kevent event{
+						/* identifier for this event */
+						.ident  = static_cast<uintptr_t>(socket.get()),
+						/* filter for event */
+						.filter = EVFILT_READ,
+						/* general flags */
+						.flags  = EV_DELETE,
+						/* filter-specific flags */
+						.fflags = 0,
+						/* filter-specific data */
+						.data   = 0,
+						/* opaque user data identifier */
+						.udata  = nullptr
+					};
+
 					// add event
 					if (kevent(_kqueue.get(), &event, 1, nullptr, 0, nullptr) == -1) {
 						std::cout << "error: " << std::strerror(errno) << std::endl;

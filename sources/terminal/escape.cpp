@@ -150,30 +150,27 @@ bool xns::escape::request_position(size_type& x, size_type& y) {
 
 	size_type* num     = &y;
 	bool       bracket = false;
-	xns::ubyte     c       = 0;
-
-	constexpr xns::ubyte base = 10;
-	constexpr xns::ubyte zero = 48;
+	xns::ubyte c       = 0;
 
 	const auto& esc = xns::escape::request_position();
 
 	::write(STDOUT_FILENO, esc.data(), esc.size());
 	x = y = 0;
 	// iterate while input available
-	while (0 < read(STDIN_FILENO, &c, 1) && c != 'R') {
+	while (0 < ::read(STDIN_FILENO, &c, 1) && c != 'R') {
 		// check bracket sequence
 		if (bracket) {
 			// convert character to integer
-			if ((c ^ 48) < base) {
+			if ((c ^ 48) < 10U) {
 
-				term_size digit = c - zero;
+				term_size digit = c - '0';
 
 				// check overflow
-				term_size tmp = (xns::limits<term_size>::max() - digit) / base;
+				term_size tmp = static_cast<term_size>((xns::limits<term_size>::max() - digit) / static_cast<term_size>(10U));
 
 				if (*num > tmp) return false;
 
-				*num = (*num * base) + digit;
+				*num = (*num * 10U) + digit;
 
 			}
 			// check separator character
@@ -221,13 +218,13 @@ xns::escape::string xns::escape::move_position(size_type x, size_type y) {
 	escape[ite] = 'H';
 	// integer to ascii X pos
 	while (x) {
-		escape[--ite] = ((x % 10) ^ 48);
+		escape[--ite] = static_cast<char>((x % 10) ^ 48);
 		x /= 10;
 	} // separator char
 	escape[--ite] = ';';
 	// integer to ascii Y pos
 	while (y) {
-		escape[--ite] = ((y % 10) ^ 48);
+		escape[--ite] = static_cast<char>((y % 10) ^ 48);
 		y /= 10;
 	} // ctrl char
 	escape[--ite] = '[';
@@ -258,7 +255,7 @@ xns::escape::string xns::escape::_move_direction(size_type cells, const char_t d
 
 	// integer to ascii X pos
 	while (cells) {
-		buffer[--i] = ((cells % 10) ^ 48);
+		buffer[--i] = static_cast<char>((cells % 10) ^ 48);
 		cells /= 10;
 	}
 
@@ -297,7 +294,7 @@ const xns::escape::string& xns::escape::move_x(size_type x) {
 
 	// integer to ascii X pos
 	while (x) {
-		buffer[--i] = ((x % 10) ^ 48);
+		buffer[--i] = static_cast<char>((x % 10) ^ 48);
 		x /= 10;
 	}
 

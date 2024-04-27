@@ -58,7 +58,7 @@ namespace xns {
 
 	/* realloc */
 	template <typename ___type>
-	inline auto realloc(___type* ___ptr, const xns::size_t ___sz) noexcept -> void* {
+	inline auto realloc(___type* ___ptr, const xns::size_t ___sz) noexcept -> ___type* {
 
 		static_assert(xns::is_trivially_copyable<___type>,
 				"realloc requires trivially copyable type");

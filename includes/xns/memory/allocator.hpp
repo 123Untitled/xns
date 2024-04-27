@@ -90,7 +90,6 @@ namespace xns {
 
 			/* allocate */
 			auto allocate(const size_type ___sz = 1) noexcept(false) -> pointer {
-
 				// allocate memory
 				const pointer ___ptr = xns::malloc<value_type>(___sz);
 
@@ -101,22 +100,23 @@ namespace xns {
 				return ___ptr;
 			}
 
+
 			/* allocate hint */
 			auto allocate(const size_type ___sz, const void*) noexcept(false) -> pointer {
 				return allocate(___sz);
 			}
 
-			/* realloc */
-			auto realloc(const pointer addrs, const size_type size = 1) noexcept(false) -> pointer {
+			/* reallocate */
+			auto reallocate(const pointer ___addr, const size_type ___sz) noexcept(false) -> pointer {
 
 				// reallocate memory
-				const pointer ptr = xns::realloc<value_type>(addrs, size);
+				pointer ___p = xns::realloc<value_type>(___addr, ___sz);
 
 				// check failed reallocation
-				if (ptr == nullptr)
+				if (___p == nullptr)
 					throw xns::exception("allocator, failed to reallocate memory", -2);
 
-				return ptr;
+				return ___p;
 			}
 
 			/* deallocate */
@@ -128,6 +128,8 @@ namespace xns {
 			auto deallocate(const pointer ___addrs, const size_type) noexcept -> void {
 				xns::free<value_type>(___addrs);
 			}
+
+
 
 	}; // class allocator
 

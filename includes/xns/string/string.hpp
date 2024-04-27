@@ -15,7 +15,7 @@
 
 // global includes
 #include <iostream>
-#include <iomanip>
+//#include <iomanip>
 #include <unistd.h>
 
 // local includes
@@ -147,6 +147,15 @@ namespace xns {
 				"basic_string: requires a character type");
 
 
+		private:
+
+
+			// -- private types -----------------------------------------------
+
+			/* self type */
+			using ___self         = xns::basic_string<___char>;
+
+
 		public:
 
 			// -- public types ------------------------------------------------
@@ -192,11 +201,8 @@ namespace xns {
 
 
 
-
 			/* comparison type */
 			using signed_type = xns::s64;
-			/* allocator type */
-			//using allocator = xns::allocator<value_type>;
 
 
 		private:
@@ -302,106 +308,129 @@ namespace xns {
 
 			// -- public assignments ------------------------------------------
 
-			/* string view assignment */
-			auto assign(const view_type& view) -> void {
-				assign(view.data(), view.size());
+			/* character assign */
+			constexpr auto assign(const value_type ___ch) -> void {
+
+				// check if capacity is sufficient
+				if (_capacity < 1U)
+					_reallocate(1U);
+
+				// copy string
+				*_data = ___ch;
+
+				// set nullchar
+				_null_terminator(1U);
 			}
 
-			/* null-terminated string assignment */
-			auto assign(const_pointer str) -> void {
-				assign(str, xns::strlen(str));
-			}
+			/* buffer assign */
+			constexpr auto assign(const_pointer ___ptr, const size_type ___sz) -> void {
 
-			/* buffer assignment */
-			auto assign(const_pointer str, const size_type size) -> void {
 				// check if size or pointer is null
-				if (not size || not str) { clear(); return; }
-				// check if capacity is sufficient
-				if (_capacity < size) {
-					// resize the string
-					reallocate(size);
-				} // copy string
-				traits_type::copy(_data, str, size);
-				// set nullchar
-				_null_terminator(size);
-			}
-
-			/* fill assignment */
-			auto assign(const value_type character, const size_type size) -> void {
-				// check if size is zero
-				if (not size) { clear(); return; }
-				// check if capacity is sufficient
-				if (_capacity < size) {
-					// resize the string
-					reallocate(size);
-				} // fill string
-				traits_type::fill(_data, size, character);
-				// set nullchar
-				_null_terminator(size);
-			}
-
-
-			/* copy assignment */
-			auto assign(const self& other) -> void {
-				// check for self-assignment
-				if (this == &other) { return; }
-				// check for other size
-				if (other.empty()) { clear(); return; }
-				// check if capacity is sufficient
-				if (_capacity < other._size) {
-					// reallocate memory
-					reallocate(other._size);
-				} // copy string
-				traits_type::copy(_data, other._data, other._size);
-				// set nullchar
-				_null_terminator(other._size);
-			}
-
-			/* move assignment */
-			auto assign(self&& other) noexcept -> void {
-				// check for self-assignment
-				if (this == &other)
+				if (not ___sz || not ___ptr) {
+					clear();
 					return;
-				// deallocate memory
-				if (_data)
-					___alloc_traits::deallocate(_allocator, _data, _capacity);
+				}
 
-				_copy_members(other);
-				other._init();
+				// check if capacity is sufficient
+				if (_capacity < ___sz)
+					_reallocate(___sz);
+
+				// copy string
+				traits_type::copy(_data, ___ptr, ___sz);
+
+				// set nullchar
+				_null_terminator(___sz);
 			}
 
+			/* fill assign */
+			constexpr auto assign(const value_type ___ch, const size_type ___sz) -> void {
+
+				// check if size is zero
+				if (not ___sz) {
+					clear();
+					return;
+				}
+
+				// check if capacity is sufficient
+				if (_capacity < ___sz)
+					_reallocate(___sz);
+
+				// fill string
+				traits_type::fill(_data, ___sz, ___ch);
+
+				// set nullchar
+				_null_terminator(___sz);
+			}
+
+			/* copy assign */
+			constexpr auto assign(const ___self& ___ot) -> void {
+
+				// check for self-assignment
+				if (this == &___ot) 
+					return;
+
+				// call buffer assignment
+				assign(___ot._data, ___ot._size);
+			}
+
+			/* move assign */
+			constexpr auto assign(___self&& ___ot) noexcept -> void {
+
+				// check for self-assignment
+				if (this == &___ot)
+					return;
+
+				// deallocate memory
+				_deallocate();
+
+				// take ownership
+				_copy_members(___ot);
+
+				// invalidate other
+				___ot._init();
+			}
+
+			/* string view assign */
+			constexpr auto assign(const view_type& ___vw) -> void {
+				assign(___vw.data(), ___vw.size());
+			}
+
+			/* null-terminated string assign */
+			constexpr auto assign(const_pointer ___ptr) -> void {
+				assign(___ptr, traits_type::length(___ptr));
+			}
 
 
 
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			auto operator=(const self& other) -> self& {
-				assign(other);
+			constexpr auto operator=(const ___self& ___ot) -> ___self& {
+				assign(___ot._data, ___ot._size);
 				return *this;
 			}
 
 			/* move assignment operator */
-			auto operator=(self&& other) noexcept -> self& {
-				assign(xns::move(other));
+			constexpr auto operator=(___self&& ___ot) noexcept -> ___self& {
+				assign(static_cast<___self&&>(___ot));
 				return *this;
 			}
 
-			/* string view assignment operator */
-			auto operator=(const view_type& view) -> self& {
-				assign(view);
+			/* view assignment operator */
+			constexpr auto operator=(const view_type& ___vw) -> ___self& {
+				assign(___vw.data(), ___vw.size());
 				return *this;
 			}
 
 			/* null-terminated string assignment operator */
-			auto operator=(const_pointer str) -> self& {
-				assign(str, traits_type::length(str));
+			constexpr auto operator=(const_pointer ___ptr) -> ___self& {
+				assign(___ptr, traits_type::length(___ptr));
 				return *this;
 			}
 
 			/* character assignment operator */
-			auto operator=(const value_type character) -> self& {
-				assign(character, 1);
+			constexpr auto operator=(const value_type ___ch) -> ___self& {
+				assign(___ch);
 				return *this;
 			}
 
@@ -409,7 +438,6 @@ namespace xns {
 
 			// -- public comparison operators ---------------------------------
 
-			// -- C O M P A R I S O N -----------------------------------------
 
 			// WARNING: constructor not allow empty string
 			// so comparison with empty string is not equal...
@@ -484,22 +512,32 @@ namespace xns {
 			// -- public iterators --------------------------------------------
 
 			/* begin */
-			auto begin(void) noexcept -> iterator {
+			constexpr auto begin(void) noexcept -> iterator {
 				return iterator{_data};
 			}
 
-			/* end */
-			auto end(void) noexcept -> iterator {
-				return iterator{_data + _size};
-			}
-
 			/* const begin */
-			auto begin(void) const noexcept -> const_iterator {
+			constexpr auto begin(void) const noexcept -> const_iterator {
 				return const_iterator{_data};
 			}
 
+			/* cbegin */
+			constexpr auto cbegin(void) const noexcept -> const_iterator {
+				return const_iterator{_data};
+			}
+
+			/* end */
+			constexpr auto end(void) noexcept -> iterator {
+				return iterator{_data + _size};
+			}
+
 			/* const end */
-			auto end(void) const noexcept -> const_iterator {
+			constexpr auto end(void) const noexcept -> const_iterator {
+				return const_iterator{_data + _size};
+			}
+
+			/* cend */
+			constexpr auto cend(void) const noexcept -> const_iterator {
 				return const_iterator{_data + _size};
 			}
 
@@ -507,12 +545,12 @@ namespace xns {
 			// -- public subscript operators ----------------------------------
 
 			/* subscript operator */
-			auto operator[](const size_type ___idx) noexcept -> reference {
+			constexpr auto operator[](const size_type ___idx) noexcept -> reference {
 				return _data[___idx];
 			}
 
 			/* const subscript operator */
-			auto operator[](const size_type ___idx) const noexcept -> const_reference {
+			constexpr auto operator[](const size_type ___idx) const noexcept -> const_reference {
 				return _data[___idx];
 			}
 
@@ -520,58 +558,55 @@ namespace xns {
 			// -- public accessors --------------------------------------------
 
 			/* empty */
-			auto empty(void) const noexcept -> bool {
+			constexpr auto empty(void) const noexcept -> bool {
 				return _size == 0;
 			}
 
 			/* length */
-			auto length(void) const noexcept -> size_type {
+			constexpr auto length(void) const noexcept -> size_type {
 				return _size;
 			}
 
 			/* size */
-			auto size(void) const noexcept -> size_type {
+			constexpr auto size(void) const noexcept -> size_type {
 				return _size;
 			}
 
 			/* capacity */
-			auto capacity(void) const noexcept -> size_type {
+			constexpr auto capacity(void) const noexcept -> size_type {
 				return _capacity;
 			}
 
 			/* front */
-			auto front(void) noexcept -> reference {
+			constexpr auto front(void) noexcept -> reference {
 				return _data[0];
 			}
 
 			/* const front */
-			auto front(void) const noexcept -> const_reference {
+			constexpr auto front(void) const noexcept -> const_reference {
 				return _data[0];
 			}
 
 			/* back */
-			auto back(void) noexcept -> reference {
+			constexpr auto back(void) noexcept -> reference {
 				return _data[_size - 1];
 			}
 
 			/* const back */
-			auto back(void) const noexcept -> const_reference {
+			constexpr auto back(void) const noexcept -> const_reference {
 				return _data[_size - 1];
 			}
 
 			/* data */
-			auto data(void) noexcept -> pointer {
+			constexpr auto data(void) noexcept -> pointer {
 				return _data;
 			}
 
 			/* const data */
-			auto data(void) const noexcept -> const_pointer {
+			constexpr auto data(void) const noexcept -> const_pointer {
 				return _data;
 			}
 
-
-			// INFO: in reserve(), does user need to know that nullchar is not included in available space?
-			// answer: no, user should not know that nullchar is not included in available space
 
 
 			/* get subview */
@@ -614,25 +649,103 @@ namespace xns {
 				xns::swap(_capacity, other._capacity);
 			}
 
+
+
+			// INFO: in reserve(), does user need to know that nullchar is not included in available space?
+			// answer: no, user should not know that nullchar is not included in available space
+
+
 			/* reserve */
-			auto reserve(const size_type request) -> void {
+			auto reserve(const size_type ___cp) -> void {
+
 				// check if size is greater than capacity
-				if (request > _capacity) {
-					// reallocate memory
-					reallocate(request);
-				}
+				if (___cp > _capacity)
+					_reallocate(___cp);
 			}
 
+
 			/* resize */
-			void resize(const size_type request) {
+			void resize(const size_type ___sz) {
+
 				// check if size is greater than capacity
-				if (request > _capacity) {
-					reallocate(request);
-				}
-				if (_data) {
-					// set nullchar
-					_null_terminator(request);
-				}
+				if (___sz > _capacity)
+					_reallocate(___sz);
+
+				// set nullchar
+				if (_data)
+					_null_terminator(___sz);
+			}
+
+
+
+
+
+			/* append character */
+			auto append(const value_type ___ch) -> self& {
+
+				// check if there is enough space
+				if (not available())
+					_reallocate(expand());
+
+				// append character
+				_data[_size] = ___ch;
+
+				// set nullchar
+				_null_terminator(_size + 1);
+
+				return *this;
+			}
+
+
+			/* fill append */
+			auto append(const value_type ___ch, const size_type ___cn) -> self& {
+				// check if there is enough space
+				if (___cn > available())
+					_reallocate(try_expand(_size + ___cn));
+
+				// copy characters
+				xns::memset(_data + _size, ___ch, ___cn);
+
+				// set nullchar
+				_null_terminator(_size + ___cn);
+
+				return *this;
+			}
+
+			/* buffer append */ // WARNING: need to check nullptr
+			auto append(const_pointer ___ptr, const size_type ___sz) -> self& {
+
+				// check if size or pointer is null
+				if (not ___sz || not ___ptr)
+					return *this;
+
+				// check if there is enough space
+				if (___sz > available())
+					_reallocate(try_expand(_size + ___sz));
+
+				// copy string
+				xns::memcpy(_data + _size, ___ptr, ___sz);
+
+				// set nullchar
+				_null_terminator(_size + ___sz);
+
+				return *this;
+			}
+
+			/* string append */
+			auto append(const self& ___ot) -> self& {
+				return append(___ot._data, ___ot._size);
+			}
+
+			/* string view append */
+			auto append(const view_type& view) -> self& {
+				return append(view.data(), view.size());
+			}
+
+
+			/* null-terminated string append */
+			auto append(const_pointer str) -> self& {
+				return append(str, xns::strlen(str));
 			}
 
 
@@ -641,7 +754,7 @@ namespace xns {
 
 			/* multiple string append */
 			template <typename... ___params>
-			auto append(___params&&... ___strs) -> self& {
+			auto append_multi(___params&&... ___strs) -> self& {
 
 				if constexpr (sizeof...(___strs) > 0) {
 
@@ -650,7 +763,7 @@ namespace xns {
 
 					// check if there is enough space
 					if (___sz > available())
-						reallocate(try_expand(_size + ___sz));
+						_reallocate(try_expand(_size + ___sz));
 
 					// offset
 					size_type ___of = _size;
@@ -679,7 +792,7 @@ namespace xns {
 				// check if there is enough space
 				if (count > available()) {
 					// resize the string
-					reallocate(try_expand(required));
+					_reallocate(try_expand(required));
 				}
 
 				size_type range = _size - index;
@@ -720,7 +833,7 @@ namespace xns {
 				// check if there is enough space
 				if (size > available()) {
 					// resize the string
-					reallocate(try_expand(required));
+					_reallocate(try_expand(required));
 				}
 				// compute offset
 				const auto offset = _data + index;
@@ -849,17 +962,22 @@ namespace xns {
 			/* deallocate */
 			auto _deallocate(void) noexcept -> void {
 
-				/* ptr always valid, except if fno-exceptions
+				// ptr always valid, except if fno-exceptions
 				if (_data == nullptr)
 					return;
-				*/
+
+				___alloc_traits::deallocate(_allocator, _data, _capacity + 1U);
+			}
+
+			/* unsafe deallocate */
+			auto _unsafe_deallocate(void) noexcept -> void {
 				___alloc_traits::deallocate(_allocator, _data, _capacity + 1U);
 			}
 
 			/* realloc */
-			auto reallocate(const size_type request) -> void {
+			auto _reallocate(const size_type request) -> void {
 				// reallocate memory
-				//_data = xns::allocator<value_type>::realloc2(_data, request + 1U);
+				_data = _allocator.reallocate(_data, request + 1U);
 				// update capacity
 				_capacity = request;
 			}
@@ -979,7 +1097,7 @@ namespace xns {
 				do {
 					U rem = value % base;
 					//_data[x] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
-					str._data[x] = (value % 10) + '0';
+					str._data[x] = static_cast<value_type>((value % 10) + '0');
 					++x;
 				} while ((value /= base));
 
@@ -1018,7 +1136,7 @@ namespace xns {
 
 			// loop through number
 			do {
-				str._data[x] = (number % 10) + '0';
+				str._data[x] = static_cast<value_type>((number % 10) + '0');
 				number /= 10;
 				++x;
 			} while (number);
@@ -1627,21 +1745,21 @@ namespace xns {
 			}
 			// check for 2-byte
 			else if (cp < 0x800) {
-				result.append(static_cast<char>(0xC0 | (cp >> 6)),
-							  static_cast<char>(0x80 | (cp & 0x3F)));
+				result.append_multi(static_cast<char>(0xC0 | (cp >> 6)),
+									static_cast<char>(0x80 | (cp & 0x3F)));
 			}
 			// check for 3-byte
 			else if (cp < 0x10000) {
-				result.append(static_cast<char>(0xE0 |  (cp >> 12)),
-							  static_cast<char>(0x80 | ((cp >> 6) & 0x3F)),
-							  static_cast<char>(0x80 |  (cp & 0x3F)));
+				result.append_multi(static_cast<char>(0xE0 |  (cp >> 12)),
+									static_cast<char>(0x80 | ((cp >> 6) & 0x3F)),
+									static_cast<char>(0x80 |  (cp & 0x3F)));
 			}
 			// check for 4-byte
 			else {
-				result.append(static_cast<char>(0xF0 |  (cp >> 18)),
-							  static_cast<char>(0x80 | ((cp >> 12) & 0x3F)),
-							  static_cast<char>(0x80 | ((cp >> 6)  & 0x3F)),
-							  static_cast<char>(0x80 |  (cp & 0x3F)));
+				result.append_multi(static_cast<char>(0xF0 |  (cp >> 18)),
+									static_cast<char>(0x80 | ((cp >> 12) & 0x3F)),
+									static_cast<char>(0x80 | ((cp >> 6)  & 0x3F)),
+									static_cast<char>(0x80 |  (cp & 0x3F)));
 			}
 		}
 		return result;
