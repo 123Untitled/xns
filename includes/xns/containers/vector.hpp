@@ -782,8 +782,7 @@ namespace xns {
 
 
 			/* push back */
-			template <typename ___tp> requires ___is_value_type<___tp>::value
-			constexpr auto push_back(___tp&& ___vl)
+			constexpr auto push_back(const_reference ___vl)
 				// noexcept specification
 				noexcept(false) -> void {
 
@@ -791,8 +790,24 @@ namespace xns {
 				if (!(_end < _cap))
 					_reserve(_expand());
 
-				// construct new element by copy / move
-				___lifecycle::construct(_end, xns::forward<___tp>(___vl));
+				// construct new element by copy
+				___lifecycle::construct(_end, ___vl);
+
+				// increment end
+				++_end;
+			}
+
+			/* push back */
+			constexpr auto push_back(value_type&& ___vl)
+				// noexcept specification
+				noexcept(false) -> void {
+
+				// expand if no available space
+				if (!(_end < _cap))
+					_reserve(_expand());
+
+				// construct new element by move
+				___lifecycle::construct(_end, xns::move(___vl));
 
 				// increment end
 				++_end;
