@@ -68,6 +68,9 @@ namespace xns {
 			/* allocator type */
 			using allocator = xns::allocator<node>;
 
+			/* lifecycle type */
+			using ___lifecycle = xns::lifecycle<node>;
+
 			/* node pointer */
 			using node_ptr = node*;
 

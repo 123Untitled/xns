@@ -85,14 +85,15 @@ auto xns::bjorklund::generate_impl(void) -> xns::vector<size_type> {
 	auto sub_pulse = bursts.size();
 
 	// node allocation
-	_front = allocator::allocate2(_step);
+	allocator a{};
+	_front = xns::allocator_traits<allocator>::allocate(a, _step);
 
 	for (size_type i = 0; i < sub_pulse; ++i)
-		allocator::construct(_front + i, 1U);
+		___lifecycle::construct(_front + i, 1U);
 	for (size_type i = sub_pulse; i < sub_step; ++i)
-		allocator::construct(_front + i);
+		___lifecycle::construct(_front + i);
 	for (size_type i = sub_step; i < _step; ++i)
-		allocator::construct(_front + i, 1U);
+		___lifecycle::construct(_front + i, 1U);
 
 	size_type i = 0;
 	size_type j = sub_step;
@@ -130,31 +131,18 @@ auto xns::bjorklund::generate_impl(void) -> xns::vector<size_type> {
 	} f += b;
 
 
-	auto seq = xns::vector<size_type>::allocator::allocate2(_step);
-	auto ptr = seq;
+	xns::vector<size_type> seq;
+	seq.reserve(_step);
+
 	// retrieve sequence to fill vector
-	for (i = 0; i < f; ++i) {
+	for (i = 0U; i < f; ++i) {
 		// loop over subsequence
-		for (auto sub = _front + i; sub; sub = sub->_up, ++ptr)
-			*ptr = sub->_data;
+		for (auto sub = _front + i; sub; sub = sub->_up)
+			seq.push_back(sub->_data);
 	}
 
 	// deallocate nodes
-	allocator::deallocate2(_front);
+	xns::allocator_traits<allocator>::deallocate(a, _front, _step);
 
-	return xns::vector<size_type>{seq, _step};
-
-
-
-	//xns::vector<void*> addrs[2];
-	//addrs[0].reserve(_step);
-	//for (size_type i = 0; i < _step; ++i)
-	//	addrs[0].push_back(_front + i);
-	//addrs[1].push_back(sub);
-	//xns::fragmentation::display(addrs[0]);
-	//xns::fragmentation::display(addrs[1]);
-
-
+	return seq;
 }
-
-
