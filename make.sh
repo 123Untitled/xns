@@ -157,8 +157,8 @@ CLONE=''
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-CXX=('/opt/homebrew/Cellar/llvm/'*'/bin/clang++'(N))
-#CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
+#CXX=('/opt/homebrew/Cellar/llvm/'*'/bin/clang++'(N))
+CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
 #CXX='clang++'
 #CXX='g++'
 
@@ -210,7 +210,7 @@ CXXFLAGS+=('-Wno-unused' '-Wno-unused-variable' '-Wno-unused-parameter' '-Wno-un
 #CXXFLAGS+=('-Winline')
 
 # type conversion
-#CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
+CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing')
 
 # shadowing
 CXXFLAGS+=('-Wshadow')
