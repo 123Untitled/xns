@@ -192,7 +192,7 @@ namespace xns {
 			using view = xns::string_view;
 
 			/* character type */
-			using char_t = typename string::char_type;
+			using char_t = typename string::value_type;
 
 			/* terminal size */
 			using size_type = xns::size_t;

@@ -40,6 +40,12 @@
 #include "xns/type_traits/supported_operations/is_trivially_destructible.hpp"
 #include "xns/type_traits/supported_operations/is_nothrow_destructible.hpp"
 
+#include "xns/type_traits/supported_operations/is_nothrow_default_constructible.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_copy_constructible.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_move_constructible.hpp"
+#include "xns/type_traits/supported_operations/is_nothrow_constructible.hpp"
+
+
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
@@ -59,11 +65,15 @@ namespace xns {
 		static_assert(requires { typename ___alloc::value_type; },
 				"allocator_traits, allocator must have a value_type member type");
 
-		/* required */
+		/* requires allocate and deallocate */
 		static_assert(requires {
 			___alloc{}.allocate(0);
 			___alloc{}.deallocate(nullptr);
 			}, "allocator_traits, type does not meet allocator requirements");
+
+		/* requires nothrow deallocate */
+		static_assert(noexcept(___alloc{}.deallocate(nullptr)),
+					  "list: allocator must be nothrow deallocate");
 
 
 		private:
@@ -117,7 +127,7 @@ namespace xns {
 
 			/* ___is_always_equal */
 			template <typename ___a>
-			using ___is_always_equal 
+			using ___is_always_equal
 			= typename ___a::is_always_equal;
 
 			/* ___rebind */
@@ -255,14 +265,18 @@ namespace xns {
 			 * @param a allocator
 			 * @return size
 			*/
-			static constexpr auto max_size(const allocator_type& ___a) noexcept -> size_type {
-				// check if the allocator has a max_size member function
-				if constexpr (requires { ___a.max_size(); })
+			static constexpr auto max_size(const allocator_type& ___a)
+				noexcept(noexcept(___a.max_size())) -> size_type
+				requires (requires { ___a.max_size(); }) {
 					return ___a.max_size();
-				// otherwise, implement max_size using limits
-				else
+			}
+
+			static constexpr auto max_size(const allocator_type& ___a)
+				noexcept -> size_type requires (!requires { ___a.max_size(); }) {
 					return ___max_size;
 			}
+
+
 
 
 			// allocate
@@ -323,110 +337,37 @@ namespace xns {
 				___a.deallocate(___p, ___n);
 			}
 
-
-
-	// deallocate (public static member function)
-	// deallocates storage using the allocator
-
-
-			// destroy
+			// select on container copy construction
 			/**
-			 * @fn destroy
-			 * @brief destructs an object stored in the allocated storage
+			 * @fn select_on_container_copy_construction
+			 * @brief obtains the allocator to use after copying a standard container
 			 * @param a allocator
-			 * @param p pointer
-			*/
-			static constexpr void destroy(allocator_type& ___a, pointer ___p)
-				noexcept(xns::is_nothrow_destructible<value_type>) {
+			 * @return allocator
+			 */
+			//[[nodiscard]] static constexpr auto select_on_container_copy_construction(const allocator_type& ___a)
+			//	noexcept(noexcept(___a.select_on_container_copy_construction()))
+			//	-> allocator_type requires (requires { ___a.select_on_container_copy_construction(); }) {
+			//	return ___a.select_on_container_copy_construction();
+			//}
 
-				// check if type is trivially destructible
-				if constexpr (xns::is_trivially_destructible<value_type>)
-					return;
-				else {
-					// check type is destructible
-					static_assert(xns::is_destructible<value_type>,
-							"allocator_traits, type is not destructible");
-					// check if the allocator has a destroy member function
-					if constexpr (requires { ___a.destroy(___p); })
-						___a.destroy(___p);
-					// otherwise, implement destroy using the destructor
-					else
-						___p->~value_type();
-				}
-			}
-
-			// default construct
+			// select on container copy construction
 			/**
-			 * @fn construct
-			 * @brief constructs an object in the allocated storage
+			 * @fn select_on_container_copy_construction
+			 * @brief obtains the allocator to use after copying a standard container
 			 * @param a allocator
-			 * @param p pointer
-			*/
-			static constexpr auto construct(allocator_type& ___a, pointer ___p)
-				noexcept(noexcept(___a.construct(___p))) -> void {
-				static_assert(xns::is_default_constructible<value_type>,
-						"allocator_traits, type is not default constructible");
-				___a.construct(___p);
-			}
+			 * @return allocator
+			 */
+			//static constexpr auto select_on_container_copy_construction(const allocator_type& ___a)
+			//	noexcept(xns::is_nothrow_copy_constructible<allocator_type>) // does exception may throw here or in parent function?
+			//	-> const allocator_type& requires (!requires { ___a.select_on_container_copy_construction(); }) {
+			//		return ___a;
+			//}
 
-			// copy construct
-			/**
-			 * @fn construct
-			 * @brief constructs an object in the allocated storage
-			 * @param a allocator
-			 * @param p pointer
-			 * @param value value
-			*/
-			static constexpr auto construct(allocator_type& ___a, pointer ___p, const value_type& ___value)
-				noexcept(noexcept(___a.construct(___p, ___value))) -> void {
-				static_assert(xns::is_copy_constructible<value_type>,
-						"allocator_traits, type is not copy constructible");
-				___a.construct(___p, ___value);
-			}
+			// allocate_at_least (public static member function)
+			// allocates storage at least as large as the requested size via an allocator
 
-			// move construct
-			/**
-			 * @fn construct
-			 * @brief constructs an object in the allocated storage
-			 * @param a allocator
-			 * @param p pointer
-			 * @param value value
-			*/
-			static constexpr auto construct(allocator_type& ___a, pointer ___p, value_type&& ___value)
-				noexcept(noexcept(___a.construct(___p, xns::move(___value)))) -> void {
-				static_assert(xns::is_move_constructible<value_type>,
-						"allocator_traits, type is not move constructible");
-				___a.construct(___p, xns::move(___value));
-			}
-
-			// forward construct
-			/**
-			 * @fn construct
-			 * @brief constructs an object in the allocated storage
-			 * @param a allocator
-			 * @param p pointer
-			 * @param args arguments
-			*/
-			template <typename... ___params> requires (sizeof...(___params) > 1 || xns::are_not_same<value_type, xns::remove_cvref<___params>...>)
-			static constexpr auto construct(allocator_type& ___a, pointer ___p, ___params&&... ___args)
-				noexcept(noexcept(___a.construct(___p, xns::forward<___params>(___args)...))) -> void {
-				static_assert(xns::is_constructible<value_type, ___params...>,
-						"allocator_traits, type is not constructible with given arguments");
-				___a.construct(___p, xns::forward<___params>(___args)...);
-			}
-
-
-
-
-
-
-	// allocate_at_least (public static member function)
-	// allocates storage at least as large as the requested size via an allocator
-
-
-
-	// select_on_container_copy_construction [static] (public static member function)
-	// obtains the allocator to use after copying a standard container
+			// select_on_container_copy_construction [static] (public static member function)
+			// obtains the allocator to use after copying a standard container
 
 
 	}; // class allocator_traits

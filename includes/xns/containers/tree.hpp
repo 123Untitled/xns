@@ -23,15 +23,17 @@
 #include "xns/type_traits/types.hpp"
 
 #include "xns/terminal/output.hpp"
-#include "xns/terminal/escape.hpp"
-#include "xns/terminal/terminal.hpp"
 
 #include "xns/memory/fragmentation.hpp"
 
 #include "xns/type_traits/type_transformations/conditional.hpp"
 #include "xns/type_traits/relationships_and_property_queries/is_comparable.hpp"
 
+#include "xns/memory/allocator_traits.hpp"
 
+
+#include <vector>
+#include <queue>
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -41,51 +43,51 @@ namespace xns {
 
 	// -- T R E E -------------------------------------------------------------
 
-	template <typename T>
+	template <typename ___type,
+			  typename ___alloc = xns::allocator<___type>>
 	class tree {
 
 
 		// -- assertions ------------------------------------------------------
 
-		/* assert T is comparable */
-		static_assert(xns::is_comparable<T>, "tree: template type must be comparable");
+		/* assert ___type is comparable */
+		static_assert(xns::is_comparable<___type>,
+				"tree: template type must be comparable");
 
 
 		// -- friends ---------------------------------------------------------
 
 		/* swap as friend */
-		template <typename U>
-		friend auto swap(xns::tree<U>&, xns::tree<U>&) noexcept -> void;
+		template <typename ___tp>
+		friend auto swap(xns::tree<___tp>&, xns::tree<___tp>&) noexcept -> void;
 
 
 		private:
 
-			/* forward declaration */
+			// -- forward declarations ----------------------------------------
+
+			/* printer */
 			class printer;
 
-			/* print as friend */
+			/* printer as friend */
 			friend class printer;
+
+			/* ___node */
+			class ___node;
 
 
 		public:
 
-			/* forward declaration */
-			class internal_node;
-
-
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self        = xns::tree<T>;
+			using self        = xns::tree<___type, ___alloc>;
 
 			/* value type */
-			using value_type  = T;
+			using value_type  = ___type;
 
 			/* node type */
-			using node_type   = self::internal_node;
-
-			/* allocator type */
-			using allocator   = xns::allocator<node_type>;
+			using node_type   = ___node;
 
 			/* node pointer */
 			using node_ptr    = node_type*;
@@ -105,15 +107,29 @@ namespace xns {
 			/* const pointer type */
 			using const_ptr   = const value_type*;
 
-
 			/* size type */
 			using size_type   = xns::size_t;
 
 			/* signed type */
 			using signed_type = xns::s64;
 
+			/* allocator type */
+			using allocator_type = ___alloc;
+
 
 		private:
+
+			// -- private types -----------------------------------------------
+
+			/* node allocator type */
+			using ___allocator = xns::allocator_traits<___alloc>::template rebind_alloc<node_type>;
+
+			/* allocator traits type */
+			using ___alloc_traits = xns::allocator_traits<___allocator>;
+
+			/* lifecycle type */
+			using ___lifecycle = xns::lifecycle<node_type>;
+
 
 
 			/* traversal type */
@@ -201,7 +217,8 @@ namespace xns {
 
 			/* default constructor */
 			tree(void) noexcept
-			: _root{nullptr}, _lower{nullptr}, _upper{nullptr}, _size{0} {}
+			: _root{nullptr}, _lower{nullptr}, _upper{nullptr}, _size{0U} {
+			}
 
 
 			/* copy constructor */
@@ -300,7 +317,7 @@ namespace xns {
 			template <typename K, typename F>
 			auto apply_if_exists(K&& value, F&& func) noexcept -> int {
 				// assert K is comparable to T
-				static_assert(xns::is_comparable<K, T>,
+				static_assert(xns::is_comparable<K, ___type>,
 					"): TREE: K must be comparable to T :(");
 				// get root node
 				node_ptr node = _root;
@@ -339,7 +356,10 @@ namespace xns {
 			/* defragment (slow operation) */
 			auto defragment(void) -> void {
 
-				mut_ptr vec = xns::allocator<value_type>::allocate(_size);
+				xns::allocator<value_type> a;
+
+				mut_ptr vec = xns::allocator_traits<xns::allocator<value_type>>::allocate(a, _size);
+				//mut_ptr vec = xns::allocator<value_type>::allocate(_size);
 
 				auto ptr = vec;
 
@@ -403,16 +423,19 @@ namespace xns {
 					}
 				}
 
-				xns::allocator<value_type>::deallocate2(vec);
+				xns::allocator_traits<xns::allocator<value_type>>::deallocate(a, vec);
+				//xns::allocator<value_type>::deallocate2(vec);
 			}
 
 
 			auto fragmentation(void) const -> void {
-				xns::vector<void*> vec;
+
+				std::vector<void*> vec;
 				vec.reserve(_size);
-				for (auto it = begin(); it != nullptr; ++it) {
+
+				for (auto it = begin(); it != nullptr; ++it)
 					vec.push_back(it._node);
-				}
+
 				xns::fragmentation::display(vec);
 			}
 
@@ -423,7 +446,7 @@ namespace xns {
 			template <typename U>
 			auto insert(U&& value) -> void {
 				// assert T is constructible from U
-				static_assert(xns::is_constructible<T, U>,
+				static_assert(xns::is_constructible<___type, U>,
 					"): TREE: BAD INSERT TYPE :(");
 
 				return    _root == nullptr ? insert_root(xns::forward<U>(value))  :
@@ -437,7 +460,7 @@ namespace xns {
 			auto emplace(A&&... args) -> void {
 
 				// assert T is constructible from A
-				static_assert(xns::is_constructible<T, A...>,
+				static_assert(xns::is_constructible<___type, A...>,
 					"): TREE: BAD INSERT TYPE :(");
 
 			}
@@ -598,7 +621,7 @@ namespace xns {
 			auto erase(const K& value) noexcept -> void {
 
 				// assert K is comparable to T
-				static_assert(xns::is_comparable<K, T>,
+				static_assert(xns::is_comparable<K, ___type>,
 						"tree: K must be comparable to T");
 
 				// get root address
@@ -745,8 +768,9 @@ namespace xns {
 			template <typename... A>
 			inline auto make_node(node_ptr parent, A&&... args) -> node_ptr {
 				// allocate and construct node
-				node_ptr node = allocator::allocate2();
-				allocator::construct(node, parent, xns::forward<A>(args)...);
+				___allocator a{};
+				node_ptr node = ___alloc_traits::allocate(a);
+				___lifecycle::construct(node, parent, xns::forward<A>(args)...);
 				// increment size
 				++_size;
 				return node;
@@ -917,9 +941,11 @@ namespace xns {
 					// increment iterator
 					++it;
 					// destroy node
-					allocator::destroy(node);
+					___lifecycle::destroy(node);
+					___allocator a{};
 					// deallocate node
-					allocator::deallocate2(node);
+					___alloc_traits::deallocate(a, node);
+					//allocator::deallocate2(node);
 				}
 			}
 
@@ -1244,7 +1270,6 @@ namespace xns {
 				return nullptr;
 			}
 
-
 	}; // class tree
 
 
@@ -1277,13 +1302,14 @@ namespace xns {
 
 	// -- N O D E -------------------------------------------------------------
 
-	template <typename T>
-	class xns::tree<T>::internal_node final {
+	template <typename ___type, typename ___alloc>
+	class xns::tree<___type, ___alloc>::___node final {
+
 
 		// -- friends ---------------------------------------------------------
 
 		/* tree as friend */
-		template <typename>
+		template <typename, typename>
 		friend class tree;
 
 
@@ -1292,7 +1318,7 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self = xns::tree<T>::internal_node;
+			using self = xns::tree<___type, ___alloc>::___node;
 
 
 		private:
@@ -1314,19 +1340,19 @@ namespace xns {
 			// -- public lifecycle --------------------------------------------
 
 			/* deleted default constructor */
-			internal_node(void) = delete;
+			___node(void) = delete;
 
 			/* not assignable class */
-			XNS_NOT_ASSIGNABLE(internal_node);
+			___xns_not_assignable(___node);
 
 			/* varidic constructor */
 			template <class... A>
-			inline internal_node(node_ptr parent, A&&... args)
+			___node(node_ptr parent, A&&... args)
 			: _value{xns::forward<A>(args)...}, _left{nullptr}, _right{nullptr}, _parent{parent}, _depth{1} {
 			}
 
 			/* destructor */
-			~internal_node(void) noexcept = default;
+			~___node(void) noexcept = default;
 
 
 
@@ -1334,157 +1360,137 @@ namespace xns {
 
 			// -- accessors ---------------------------------------------------
 
-			/* has left child */
-			inline auto has_left(void) const noexcept -> bool {
-				// return if node has left child
+			/* has left */
+			auto has_left(void) const noexcept -> bool {
 				return _left != nullptr;
 			}
 
-			/* has right child */
-			inline auto has_right(void) const noexcept -> bool {
-				// return if node has right child
+			/* has right */
+			auto has_right(void) const noexcept -> bool {
 				return _right != nullptr;
 			}
 
-			/* has children */
-			inline auto has_child(void) const noexcept -> bool {
-				// return if node has children
+			/* has child */
+			auto has_child(void) const noexcept -> bool {
 				return has_left() || has_right();
+				//return _left != nullptr || _right != nullptr;
 			}
 
 			/* has parent */
-			inline auto has_parent(void) const noexcept -> bool {
-				// return if node has parent
+			auto has_parent(void) const noexcept -> bool {
 				return _parent != nullptr;
 			}
 
-			/* is left child */
-			inline auto is_left(void) const noexcept -> bool {
-				// return if node is left child
+			/* is left */
+			auto is_left(void) const noexcept -> bool {
 				return _parent != nullptr && _parent->_left == this;
 			}
 
-			/* is right child */
-			inline auto is_right(void) const noexcept -> bool {
-				// return if node is right child
+			/* is right */
+			auto is_right(void) const noexcept -> bool {
 				return _parent != nullptr && _parent->_right == this;
 			}
 
 			/* is root */
-			inline auto is_root(void) const noexcept -> bool {
-				// return if node has no parent
+			auto is_root(void) const noexcept -> bool {
 				return _parent == nullptr;
 			}
 
 			/* is disconnected */
-			inline auto is_disconnected(void) const noexcept -> bool {
-				// return if node is disconnected
+			auto is_disconnected(void) const noexcept -> bool {
 				return _parent == nullptr
-						&& _left == nullptr
-						&& _right == nullptr;
+					  && _left == nullptr
+					 && _right == nullptr;
 			}
 
 			/* is leaf */
-			inline auto is_leaf(void) const noexcept -> bool {
-				// return if node has no children
-				return has_child() == false;
+			auto is_leaf(void) const noexcept -> bool {
+				return !has_child();
+				//return _left == nullptr && _right == nullptr;
 			}
 
 			/* is unary */
-			inline auto is_unary(void) const noexcept -> bool {
-				// return if only one child is null
+			auto is_unary(void) const noexcept -> bool {
 				return has_left() != has_right();
+				//return (_left != nullptr) != (_right != nullptr);
 			}
 
 			/* is binary */
-			inline auto is_binary(void) const noexcept -> bool {
-				// return if node has two children
+			auto is_binary(void) const noexcept -> bool {
 				return has_left() && has_right();
+				//return _left != nullptr && _right != nullptr;
 			}
 
+
 			/* is endpoint */
-			inline auto is_endpoint(void) const noexcept -> bool {
-				// return if node is in extremity
+			auto is_endpoint(void) const noexcept -> bool {
 				return is_leaf() || is_unary();
 			}
 
 
 			/* get value */
-			inline auto value(void) noexcept -> mut_ref {
-				// return value
+			auto value(void) noexcept -> mut_ref {
 				return _value;
 			}
 
 			/* get const value */
-			inline auto value(void) const noexcept -> const_ref {
-				// return value
+			auto value(void) const noexcept -> const_ref {
 				return _value;
 			}
 
 			/* get left child */
-			inline auto left(void) noexcept -> node_ptr {
-				// return left
+			auto left(void) noexcept -> node_ptr {
 				return _left;
 			}
 
 			/* get right child */
-			inline auto right(void) noexcept -> node_ptr {
-				// return right
+			auto right(void) noexcept -> node_ptr {
 				return _right;
 			}
 
 			/* get left address */
-			inline auto left_addr(void) noexcept -> node_ptr* {
-				// return left address
+			auto left_addr(void) noexcept -> node_ptr* {
 				return &_left;
 			}
 
 			/* get right address */
-			inline auto right_addr(void) noexcept -> node_ptr* {
-				// return right address
+			auto right_addr(void) noexcept -> node_ptr* {
 				return &_right;
 			}
 
 
 			/* get parent */
-			inline auto parent(void) noexcept -> node_ptr {
-				// return parent
+			auto parent(void) noexcept -> node_ptr {
 				return _parent;
 			}
 
 			/* get depth */
-			inline auto depth(void) const noexcept -> signed_type {
-				// return depth
+			auto depth(void) const noexcept -> signed_type {
 				return _depth;
 			}
 
 
 			/* get left depth */
-			inline auto left_depth(void) const noexcept -> signed_type {
-				// return left depth
+			auto left_depth(void) const noexcept -> signed_type {
 				return _left ? _left->_depth : 0;
 			}
 
 			/* get right depth */
-			inline auto right_depth(void) const noexcept -> signed_type {
-				// return right depth
+			auto right_depth(void) const noexcept -> signed_type {
 				return _right ? _right->_depth : 0;
 			}
 
 			/* get balance factor */
-			inline auto balance_factor(void) const noexcept -> signed_type {
-				// return balance factor
+			auto balance_factor(void) const noexcept -> signed_type {
 				return left_depth() - right_depth();
 			}
 
 			/* update depth */
-			inline auto update_depth(void) noexcept -> void {
-				// get max depth
+			auto update_depth(void) noexcept -> void {
 				_depth = xns::max(left_depth(), right_depth()) + 1;
 			}
 
 
-			// -- setters -----------------------------------------------------
 
 			/* copy value */
 			inline auto value(const_ref value) -> void {
@@ -1512,25 +1518,26 @@ namespace xns {
 					node->_parent = this;
 			}
 
-	};
+	}; // class ___node
 
 
 
 
 	// -- I T E R A T O R -----------------------------------------------------
 
-	template <typename T> template <bool C, typename xns::tree<T>::traversal_type O>
-	class xns::tree<T>::iterator final {
+	template <typename ___type, typename ___alloc>
+	template <bool C, typename xns::tree<___type, ___alloc>::traversal_type O>
+	class xns::tree<___type, ___alloc>::iterator final {
 
 
 		// -- friends ---------------------------------------------------------
 
 		/* tree as friend */
-		friend class xns::tree<T>;
+		friend class xns::tree<___type, ___alloc>;
 
 		/* self type as friend */
-		template <bool, xns::tree<T>::traversal_type>
-		friend class xns::tree<T>::iterator;
+		template <bool, xns::tree<___type, ___alloc>::traversal_type>
+		friend class xns::tree<___type, ___alloc>::iterator;
 
 
 		public:
@@ -1538,7 +1545,7 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self            = xns::tree<T>::iterator<C, O>;
+			using self            = xns::tree<___type, ___alloc>::iterator<C, O>;
 
 			/* pointer type */
 			using conditional_ptr = xns::conditional<C, const_ptr, mut_ptr>;
@@ -1555,29 +1562,29 @@ namespace xns {
 			// -- constructors ------------------------------------------------
 
 			/* default constructor */
-			inline iterator(void) noexcept
+			iterator(void) noexcept
 			: _node{nullptr}, _container{} {}
 
 			/* const copy constructor */
-			inline iterator(const xns::tree<T>::iterator<true, O>& other)
+			iterator(const xns::tree<___type, ___alloc>::iterator<true, O>& other)
 			: _node{other._node}, _container{other._container} {
 				// assert invalid conversion
 				static_assert(C, "): tree::iterator: can't copy CONST iterator to NON-CONST :(");
 			}
 
 			/* non-const copy constructor */
-			inline iterator(const xns::tree<T>::iterator<false, O>& other)
+			iterator(const xns::tree<___type, ___alloc>::iterator<false, O>& other)
 			: _node{other._node}, _container{other._container} {}
 
 			/* const move constructor */
-			inline iterator(xns::tree<T>::iterator<true, O>&& other) noexcept
+			iterator(xns::tree<___type, ___alloc>::iterator<true, O>&& other) noexcept
 			: _node{other._node}, _container{xns::move(other._container)} {
 				// assert invalid conversion
 				static_assert(C, "): tree::iterator: can't move CONST iterator to NON-CONST :(");
 			}
 
 			/* non-const move constructor */
-			inline iterator(xns::tree<T>::iterator<false, O>&& other) noexcept
+			iterator(xns::tree<___type, ___alloc>::iterator<false, O>&& other) noexcept
 			: _node{other._node}, _container{xns::move(other._container)} {}
 
 
@@ -1906,18 +1913,19 @@ namespace xns {
 
 	// -- P R I N T -----------------------------------------------------------
 
-	template <typename T>
-	class xns::tree<T>::printer final {
+	template <typename ___type, typename ___alloc>
+	class xns::tree<___type, ___alloc>::printer final {
+
 
 		private:
 
 			// -- private constants -------------------------------------------
 
 			/* unicode box enum */
-			enum : xns::u8 { HL, VL, TL, TR, BL, BR, BB, MAX };
+			enum : unsigned { HL, VL, TL, TR, BL, BR, BB, MAX };
 
 			/* unicode box array */
-			static constexpr const xns::array<char32_t, MAX> _branch = {
+			static constexpr const xns::array<char32_t, MAX> _branch{
 				U'\u2500', // HL
 				U'\u2502', // VL
 				U'\u256D', // TL
@@ -1927,10 +1935,10 @@ namespace xns {
 				U'\u2534'  // BB
 			};
 
-			// multipliers
+			/* multipliers */
 			enum : xns::size_t {
-				Y_OFFSET = 3,
-				X_OFFSET = 3
+				Y_OFFSET = 3U,
+				X_OFFSET = 3U
 			};
 
 
@@ -1939,7 +1947,7 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* tree type */
-			using tree_type = xns::tree<T>;
+			using tree_type = xns::tree<___type, ___alloc>;
 
 
 			// -- public lifecycle --------------------------------------------
@@ -1948,22 +1956,25 @@ namespace xns {
 			printer(void) = delete;
 
 			/* tree constructor */
-			inline printer(xns::tree<T>& tree) noexcept
-			: _tree{tree}, _nodes{}, _matrix{} {}
+			printer(tree_type& tree) noexcept
+			: _tree{tree}, _nodes{}, _matrix{} {
+			}
 
 			/* non-assignable class */
-			NON_ASSIGNABLE(printer);
+			___xns_not_assignable(printer);
 
 			/* destructor */
-			inline ~printer(void) noexcept = default;
+			~printer(void) noexcept = default;
 
 
 			// -- public methods ----------------------------------------------
 
 			/* display tree */
 			void display(void) {
+
 				// check root
-				if (_tree._root == nullptr) { return; }
+				if (_tree._root == nullptr)
+					return;
 
 				_nodes.reserve(_tree.size());
 
@@ -1973,7 +1984,7 @@ namespace xns {
 
 				xns::size_t levels = 0;
 
-				xns::queue<xns::tuple<node_ptr, node_info*>> queue;
+				std::queue<std::tuple<node_ptr, node_info*>> queue;
 
 				_nodes.emplace_back();
 
@@ -1982,17 +1993,19 @@ namespace xns {
 
 				while (not queue.empty()) {
 
-					auto tuple = queue.next();
-					queue.dequeue();
+					auto tuple = queue.front();
+					//auto tuple = queue.next();
+					queue.pop();
+					//queue.dequeue();
 
-					auto node = xns::get<node_ptr>(tuple);
-					auto info = xns::get<node_info*>(tuple);
+					auto node = std::get<node_ptr>(tuple);
+					auto info = std::get<node_info*>(tuple);
 
-					if constexpr (xns::is_same<T, xns::string>) {
+					if constexpr (xns::is_same<___type, std::string>) {
 						info->value = node->_value;
 					}
 					else {
-						info->value = xns::to_string(node->_value);
+						info->value = std::to_string(node->_value);
 					}
 					info->depth = node->_depth;
 
@@ -2007,7 +2020,7 @@ namespace xns {
 											info->level + 1, // level
 											pos, // position
 											0, // depth
-											xns::string{});
+											std::string{});
 
 						queue.emplace(node->_left, &_nodes.back());
 						info->left = &_nodes.back();
@@ -2022,14 +2035,12 @@ namespace xns {
 											info->level + 1, // level
 											pos, // position
 											0, // depth
-											xns::string{});
+											std::string{});
 
 						queue.emplace(node->_right, &_nodes.back());
 						info->right = &_nodes.back();
 
 					}
-
-
 
 					if      (info->pos < p_min) { p_min = info->pos; }
 					else if (info->pos > p_max) { p_max = info->pos; }
@@ -2038,11 +2049,10 @@ namespace xns {
 				}
 
 
-
 				p_min *= -1;
 				// compute width
 				xns::size_t width = static_cast<xns::u64>(p_max)
-									+ static_cast<xns::u64>(p_min);
+								  + static_cast<xns::u64>(p_min);
 
 
 				// compute positions
@@ -2063,7 +2073,7 @@ namespace xns {
 
 				// fill matrix with spaces
 				for (size_type y = 0; y < levels; ++y) {
-					_matrix.emplace_back(U' ', width);
+					_matrix.emplace_back(width, U' ');
 				}
 
 
@@ -2085,17 +2095,18 @@ namespace xns {
 					// check if left
 					if (node.left != nullptr) {
 
+
 						size_type lx = static_cast<size_type>(node.left->pos);
 						size_type ly = node.left->level;
 
 						// draw horizontal line
-						for (size_type i = lx + 1; i < x + 1; ++i) {
+						for (size_type i = lx + 1; i < x + 1; ++i)
 							_matrix[y + 1][i] = _branch[HL];
-						}
+
 						// draw vertical line
-						for (size_type i = y + 2; i < ly; ++i) {
+						for (size_type i = y + 2; i < ly; ++i)
 							_matrix[i][lx] = _branch[VL];
-						}
+
 						// draw left corner
 						_matrix[y + 1][lx] = _branch[TL];
 					}
@@ -2103,17 +2114,18 @@ namespace xns {
 
 					if (node.right != nullptr) {
 
+
 						size_type rx = static_cast<size_type>(node.right->pos);
 						size_type ry = node.right->level;
 
 						// draw horizontal line
-						for (size_type i = x + 1; i < rx; ++i) {
+						for (size_type i = x + 1; i < rx; ++i)
 							_matrix[y + 1][i] = _branch[HL];
-						}
+
 						// draw vertical line
-						for (size_type i = y + 2; i < ry; ++i) {
+						for (size_type i = y + 2; i < ry; ++i)
 							_matrix[i][rx] = _branch[VL];
-						}
+
 						// draw right corner
 						_matrix[y + 1][rx] = _branch[TR];
 					}
@@ -2121,15 +2133,14 @@ namespace xns {
 
 					if (node.left != nullptr || node.right != nullptr) {
 
-						if (node.left != nullptr && node.right != nullptr) {
+						if (node.left != nullptr && node.right != nullptr)
 							_matrix[y + 1][x] = _branch[BB];
-						}
-						else if (node.left != nullptr) {
+
+						else if (node.left != nullptr)
 							_matrix[y + 1][x] = _branch[BR];
-						}
-						else if (node.right != nullptr) {
+
+						else if (node.right != nullptr)
 							_matrix[y + 1][x] = _branch[BL];
-						}
 					}
 
 					auto& value = node.value;
@@ -2144,14 +2155,12 @@ namespace xns {
 					size_type offset = size / 2;
 
 					if (x > offset) {
-						for (size_type i = 0; i < size; ++i) {
+						for (size_type i = 0; i < size; ++i)
 							_matrix[y][x - offset + i] = static_cast<char32_t>(value[i]);
-						}
 					}
 					else {
-						for (size_type i = 0; i < size; ++i) {
+						for (size_type i = 0; i < size; ++i)
 							_matrix[y][i] = static_cast<char32_t>(value[i]);
-						}
 					}
 				}
 			}
@@ -2159,12 +2168,13 @@ namespace xns {
 
 
 			/* render */
-			inline auto render(void) -> void {
+			auto render(void) -> void {
 				// print matrix
-				for (const xns::u32string& line : _matrix) {
-					xns::print(line, '\n');
+				for (const std::u32string& line : _matrix) {
+					std::cout << xns::stdchar32_to(line) << std::endl;
+					//xns::print(line, '\n');
 				} // render
-				xns::out::render();
+				//xns::out::render();
 			}
 
 
@@ -2177,32 +2187,46 @@ namespace xns {
 			/* node info */
 			struct node_info final {
 
-				// -- public lifecycle ------------------------------------
+
+				// -- lifecycle -----------------------------------------------
 
 				/* default constructor */
 				node_info(void) noexcept
-				: parent{nullptr}, left{nullptr}, right{nullptr}, level{0}, pos{0}, depth{0}, value{} {}
+				: parent{nullptr},
+					left{nullptr},
+				   right{nullptr},
+				   level{0},
+					 pos{0},
+				   depth{0},
+				   value{} {
+				}
 
 				/* members constructor */
-				node_info(node_info* pa, node_info* le, node_info* ri, xns::size_t lev, xns::s64 po, xns::s64 de, xns::string va)
-				: parent{pa}, left{le}, right{ri}, level{lev}, pos{po}, depth{de}, value{va} {}
+				node_info(node_info*   pa, node_info* le, node_info* ri,
+						  xns::size_t lev, xns::s64   po, xns::s64   de, std::string va) noexcept
+				: parent{pa},
+					left{le},
+				   right{ri},
+				   level{lev},
+				     pos{po},
+				   depth{de},
+				   value{va} {
+				}
+
+				/* non-copyable struct */
+				___xns_not_copyable(node_info);
 
 				/* move constructor */
 				node_info(node_info&&) noexcept = default;
 
-				/* non-copyable struct */
-				NON_COPYABLE(node_info);
+				/* move assignment operator */
+				auto operator=(node_info&&) noexcept -> node_info& = default;
 
 				/* destructor */
 				~node_info(void) noexcept = default;
 
 
-				//auto operator=(const node_info& other) -> node_info& = delete;
-
-				auto operator=(node_info&& other) noexcept -> node_info& = default;
-
-
-				// -- public members --------------------------------------
+				// -- public members ------------------------------------------
 
 				node_info* parent;
 				node_info* left;
@@ -2211,7 +2235,7 @@ namespace xns {
 				xns::size_t level;
 				xns::s64 pos;
 				xns::s64 depth;
-				xns::string value;
+				std::string value;
 
 			};
 
@@ -2219,15 +2243,15 @@ namespace xns {
 			// -- private members ---------------------------------------------
 
 			/* tree reference */
-			xns::tree<T>& _tree;
+			tree_type& _tree;
 
 			/* nodes */
-			xns::vector<node_info> _nodes;
+			std::vector<node_info> _nodes;
 
 			/* matrix */
-			xns::vector<xns::u32string> _matrix;
+			std::vector<std::u32string> _matrix;
 
-	};
+	}; // class printer
 
 
 
@@ -2257,9 +2281,4 @@ namespace xns {
 
 }
 
-
-#endif
-
-
-
-
+#endif // XNS_TREE_HEADER

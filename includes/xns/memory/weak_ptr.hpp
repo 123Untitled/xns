@@ -17,6 +17,7 @@
 
 #include "xns/type_traits/types.hpp"
 #include "xns/type_traits/relationships_and_property_queries/is_derived_from.hpp"
+#include "xns/type_traits/type_operations/move.hpp"
 
 #include "xns/memory/allocator.hpp"
 

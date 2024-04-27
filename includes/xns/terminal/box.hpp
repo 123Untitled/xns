@@ -78,10 +78,10 @@ namespace xns {
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			auto operator=(const ___self&) -> self&;
+			auto operator=(const ___self&) -> ___self&;
 
 			/* move assignment operator */
-			auto operator=(___self&&) noexcept -> self&;
+			auto operator=(___self&&) noexcept -> ___self&;
 
 
 			// -- public methods ----------------------------------------------

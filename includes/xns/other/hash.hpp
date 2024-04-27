@@ -24,7 +24,7 @@ namespace xns {
 
 		if constexpr (xns::is_string<T>) {
 			for (xns::string::size_type i = 0; i < value.size(); ++i) {
-				hash ^= static_cast<xns::make_unsigned<typename T::char_type>>(value[i]);
+				hash ^= static_cast<xns::make_unsigned<typename T::value_type>>(value[i]);
 				hash *= PRIME;
 			}
 		}

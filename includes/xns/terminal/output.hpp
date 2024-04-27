@@ -49,23 +49,35 @@ namespace xns {
 
 	class out final {
 
+
 		private:
 
-			// -- P R I V A T E  C O N S T R U C T O R S ----------------------
+			// -- private types -----------------------------------------------
+
+			/* self type */
+			using ___self = xns::out;
+
+
+			// -- private lifecycle -------------------------------------------
 
 			/* default constructor */
 			out(void);
 
 			/* non-assignable class */
-			non_assignable(out);
+			___xns_not_assignable(out);
+
+			/* destructor */
+			~out(void) noexcept = default;
+
+
+			// -- private static methods --------------------------------------
+
+			/* shared */
+			static auto shared(void) -> ___self&;
 
 
 		public:
 
-			// -- P U B L I C  D E S T R U C T O R S --------------------------
-
-			/* destructor */
-			~out(void);
 
 
 			// -- P U B L I C  S T A T I C  M E T H O D S ---------------------
@@ -83,7 +95,7 @@ namespace xns {
 			template <xns::is_char T>
 			static void write(const T& ch) {
 				// append character to buffer
-				_instance._buffer.append(ch);
+				___self::shared()._buffer.append(ch);
 			}
 
 			/* write float / double */
@@ -92,7 +104,7 @@ namespace xns {
 				std::stringstream ss;
 
 				ss << number;
-				_instance._buffer.append(ss.str().c_str(), ss.str().size());
+				___self::shared()._buffer.append(ss.str().c_str(), ss.str().size());
 
 			}
 
@@ -114,15 +126,17 @@ namespace xns {
 
 				constexpr int fd = (L == "stdout") ? STDOUT_FILENO : STDERR_FILENO;
 
+				auto& ___out = ___self::shared();
+
 				// do nothing if buffer is empty
-				if (_instance._buffer.empty()) { return; }
+				if (___out._buffer.empty()) { return; }
 
 				// write buffer to file descriptor
-				static_cast<void>(::write(fd, _instance._buffer.data(),
-								  _instance._buffer.size()));
+				static_cast<void>(::write(fd, ___out._buffer.data(),
+								  ___out._buffer.size()));
 
 				// clear buffer
-				_instance._buffer.clear();
+				___out._buffer.clear();
 			}
 
 			/*
@@ -175,13 +189,6 @@ namespace xns {
 			/* buffers */
 			xns::string _buffer;
 
-
-			// -- P R I V A T E  S T A T I C  M E M B E R S -------------------
-
-			/* instance */
-			static out _instance;
-
-
 	};
 
 
@@ -197,7 +204,7 @@ namespace xns {
 		// write each argument
 		(out::write(args), ...);
 		// get out instance
-		auto& out = out::_instance;
+		auto& out = out::shared();
 		// append new line
 		out._buffer.append('\n');
 	}
@@ -207,7 +214,7 @@ namespace xns {
 		// write each argument
 		(out::write(args), ...);
 		// get out instance
-		auto& out = out::_instance;
+		auto& out = out::shared();
 		// append new line
 		out._buffer.append('\n');
 

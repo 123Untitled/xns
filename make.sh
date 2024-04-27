@@ -157,8 +157,8 @@ CLONE=''
 # -- C O M P I L E R  S E T T I N G S -----------------------------------------
 
 # compiler
-#CXX=('/opt/homebrew/Cellar/llvm/'*'/bin/clang++'(N))
-CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
+CXX=('/opt/homebrew/Cellar/llvm/'*'/bin/clang++'(N))
+#CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
 #CXX='clang++'
 #CXX='g++'
 
@@ -172,7 +172,7 @@ ARFLAGS='-rcs'
 LINKER=$CXX
 
 # standard
-STD='-std=c++20'
+STD='-std=c++23'
 
 # debug
 DEBUG='-g'
@@ -835,8 +835,11 @@ function setup_files {
 		DEFINES+=('-DXNS_TEST_'${TEST:u})
 
 		# set optimization level
-		  OPT+=$OLEVEL[2] # -Og
-		DEBUG+=$DLEVEL[4] # -g3
+		OPT+='0'
+		DEBUG+='0'
+		  #OPT+=$OLEVEL[2] # -Og
+		  #OPT+=$OLEVEL[7] # -O3
+		#DEBUG+=$DLEVEL[4] # -g3
 
 
 	# release or install

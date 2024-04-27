@@ -20,6 +20,8 @@
 #include "xns/type_traits/types.hpp"
 
 #include "xns/memory/allocator.hpp"
+#include "xns/memory/lifecycle.hpp"
+#include "xns/memory/allocator_traits.hpp"
 #include "xns/memory/memory.hpp"
 
 
@@ -302,10 +304,16 @@ namespace xns {
 				// check pointer validity
 				if (_data == nullptr)
 					return;
+
+				allocator a;
+
+				xns::lifecycle<type>::destroy(_data);
+				xns::allocator_traits<allocator>::deallocate(a, _data);
+
 				// destroy object
-				allocator::destroy(_data);
-				// deallocate memory
-				allocator::deallocate(_data);
+				//allocator::destroy(_data);
+				//// deallocate memory
+				//allocator::deallocate(_data);
 			}
 
 
@@ -325,10 +333,15 @@ namespace xns {
 	auto make_unique(A&&... args) -> xns::unique_ptr<T> {
 		// instantiate unique pointer
 		unique_ptr<T> ptr;
+
+		xns::allocator<T> a;
+
 		// allocate memory
-		ptr._data = unique_ptr<T>::allocator::allocate();
+		ptr._data = xns::allocator_traits<xns::allocator<T>>::allocate(a, 1);
+
+		xns::lifecycle<T>::construct(ptr._data, xns::forward<A>(args)...);
+
 		// construct object by forwarding arguments
-		unique_ptr<T>::allocator::construct(ptr._data, xns::forward<A>(args)...);
 		// return unique pointer
 		return ptr;
 	}

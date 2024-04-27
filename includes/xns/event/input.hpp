@@ -52,7 +52,7 @@ namespace xns {
 			using signed_type = typename string::signed_type;
 
 			/* character type */
-			using char_t = typename string::char_type;
+			using char_t = typename string::value_type;
 
 			/* size type */
 			using size_type = typename string::size_type;

@@ -12,13 +12,13 @@
 
 #pragma once
 
-#ifndef XNS_MEMMOVE_HEADER
-#define XNS_MEMMOVE_HEADER
+#ifndef XNS_MEMCHR_HEADER
+#define XNS_MEMCHR_HEADER
 
 #include "xns/config/config.hpp"
 #include "xns/type_traits/types.hpp"
 
-#if !___xns_has_builtin(__builtin_memmove)
+#if !___xns_has_builtin(__builtin_memchr)
 #	include <string.h>
 #endif
 
@@ -28,27 +28,17 @@
 namespace xns {
 
 
-	// -- M E M M O V E -------------------------------------------------------
+	// -- M E M C H R -----------------------------------------------------------
 
-	/* memmove */
-	constexpr auto memmove(void* ___dst, const void* ___src, const xns::size_t ___sz) noexcept -> void* {
-		___xns_if_consteval {
-			if (___dst < ___src) {
-				for (xns::size_t i = 0; i < ___sz; ++i)
-					static_cast<unsigned char*>(___dst)[i] = static_cast<const unsigned char*>(___src)[i];
-			} else {
-				for (xns::size_t i = ___sz; i > 0; --i)
-					static_cast<unsigned char*>(___dst)[i - 1] = static_cast<const unsigned char*>(___src)[i - 1];
-			} return ___dst;
-		} else {
-			#if ___xns_has_builtin(__builtin_memmove)
-				return __builtin_memmove(___dst, ___src, ___sz);
-			#else
-				return ::memmove(___dst, ___src, ___sz);
-			#endif
-		}
+	/* memchr */
+	template <typename ___type>
+	constexpr auto memchr(const ___type* ___pt, const ___type& ___vl, const xns::size_t ___sz) noexcept -> const ___type* {
+		for (xns::size_t i = 0; i < ___sz; ++i)
+			if (___pt[i] == ___vl)
+				return ___pt + i;
+		return nullptr;
 	}
 
 } // namespace xns
 
-#endif // XNS_MEMMOVE_HEADER
+#endif // XNS_MEMCHR_HEADER

@@ -12,14 +12,14 @@
 
 #pragma once
 
-#ifndef XNS_MEMMOVE_HEADER
-#define XNS_MEMMOVE_HEADER
+#ifndef XNS_WCSLEN_HEADER
+#define XNS_WCSLEN_HEADER
 
 #include "xns/config/config.hpp"
 #include "xns/type_traits/types.hpp"
 
-#if !___xns_has_builtin(__builtin_memmove)
-#	include <string.h>
+#if !___xns_has_builtin(__builtin_wcslen)
+#	include <wchar.h>
 #endif
 
 
@@ -28,27 +28,23 @@
 namespace xns {
 
 
-	// -- M E M M O V E -------------------------------------------------------
+	// -- W C S L E N -----------------------------------------------------------
 
-	/* memmove */
-	constexpr auto memmove(void* ___dst, const void* ___src, const xns::size_t ___sz) noexcept -> void* {
+	/* wcslen */
+	constexpr auto wcslen(const wchar_t* ___s) noexcept -> xns::size_t {
 		___xns_if_consteval {
-			if (___dst < ___src) {
-				for (xns::size_t i = 0; i < ___sz; ++i)
-					static_cast<unsigned char*>(___dst)[i] = static_cast<const unsigned char*>(___src)[i];
-			} else {
-				for (xns::size_t i = ___sz; i > 0; --i)
-					static_cast<unsigned char*>(___dst)[i - 1] = static_cast<const unsigned char*>(___src)[i - 1];
-			} return ___dst;
+			xns::size_t ___sz = 0;
+			while (___s[___sz] != L'\0') ++___sz;
+			return ___sz;
 		} else {
-			#if ___xns_has_builtin(__builtin_memmove)
-				return __builtin_memmove(___dst, ___src, ___sz);
+			#if ___xns_has_builtin(__builtin_wcslen)
+				return __builtin_wcslen(___s);
 			#else
-				return ::memmove(___dst, ___src, ___sz);
+				return ::wcslen(___s);
 			#endif
 		}
 	}
 
 } // namespace xns
 
-#endif // XNS_MEMMOVE_HEADER
+#endif // XNS_WCSLEN_HEADER

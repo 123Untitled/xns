@@ -9,6 +9,8 @@
 #include "xns/color/color.hpp"
 #include "xns/math/math.hpp"
 
+#include <vector>
+
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
@@ -34,7 +36,7 @@ namespace xns {
 		public:
 
 			/* print memory fragmentation */
-			static auto display(const xns::vector<void*>&) -> void;
+			static auto display(const std::vector<void*>&) -> void;
 
 
 		private:
@@ -53,7 +55,7 @@ namespace xns {
 			// -- private lifecycle -------------------------------------------
 
 			/* addrs constructor */
-			fragmentation(const xns::vector<void*>&);
+			fragmentation(const std::vector<void*>&);
 
 			/* non-assignable class */
 			unassignable(fragmentation);
@@ -66,7 +68,7 @@ namespace xns {
 			// -- private members ---------------------------------------------
 
 			/* addrs */
-			const xns::vector<void*>& _addrs;
+			const std::vector<void*>& _addrs;
 
 			/* terminal width */
 			const size_type _width;

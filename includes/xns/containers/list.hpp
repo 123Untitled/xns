@@ -15,6 +15,7 @@
 #ifndef XNS_LIST_HEADER
 #define XNS_LIST_HEADER
 
+#include "xns/config/macros.hpp"
 #include "xns/type_traits/types.hpp"
 
 #include "xns/type_traits/type_operations/move.hpp"
@@ -22,8 +23,9 @@
 
 #include "xns/type_traits/relationships_and_property_queries/is_nothrow_invocable.hpp"
 
-#include "xns/config/macros.hpp"
 #include "xns/memory/allocator.hpp"
+#include "xns/memory/allocator_traits.hpp"
+#include "xns/memory/lifecycle.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -38,16 +40,23 @@ namespace xns {
 	class list final {
 
 
+		// -- assertions ------------------------------------------------------
+
+		/* check if type is nothrow destructible */
+		static_assert(xns::is_nothrow_destructible<___type>,
+					  "list: value type must be nothrow destructible");
+
+
 		private:
 
-			// -- private forward declarations --------------------------------
+			// -- forward declarations ----------------------------------------
 
 			/* node */
-			class node;
+			struct ___node;
 
 			/* iterator */
 			template <bool>
-			class list_iterator;
+			class ___iterator;
 
 
 		public:
@@ -55,67 +64,78 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self           = xns::list<___type, ___alloc>;
+			using self            = xns::list<___type, ___alloc>;
 
 			/* value type */
-			using value_type     = ___type;
-
-			/* size type */
-			using size_type      = xns::size_t;
-
-			/* reference type */
-			using mut_ref        = value_type&;
-
-			/* const reference type */
-			using const_ref      = const value_type&;
-
-			/* move reference type */
-			using move_ref       = xns::remove_const<value_type>&&;
-
-			/* pointer type */
-			using mut_ptr        = value_type*;
-
-			/* const pointer type */
-			using const_ptr      = const value_type*;
-
-			/* iterator type */
-			using iterator       = list_iterator<false>;
-
-			/* const iterator type */
-			using const_iterator = list_iterator<true>;
+			using value_type      = ___type;
 
 			/* allocator type */
-			using allocator_type = ___alloc;
+			using allocator_type  = ___alloc;
+
+			/* size type */
+			using size_type       = xns::size_t;
+
+			/* difference type */
+			using difference_type = xns::ptrdiff_t;
+
+			/* reference type */
+			using reference       = value_type&;
+
+			/* const reference type */
+			using const_reference = const value_type&;
+
+			/* move reference type */
+			using move_reference  = xns::remove_const<value_type>&&;
+
+			/* pointer type */
+			using pointer         = xns::allocator_traits<allocator_type>::pointer;
+
+			/* const pointer type */
+			using const_pointer   = xns::allocator_traits<allocator_type>::const_pointer;
+
+			/* iterator type */
+			using iterator        = ___iterator<false>;
+
+			/* const iterator type */
+			using const_iterator  = ___iterator<true>;
+
+			/* reverse iterator type */
+			// using reverse_iterator =
+
+			/* const reverse iterator type */
+			// using const_reverse_iterator =
 
 
 		private:
 
 			// -- private types -----------------------------------------------
 
-			/* node type */
-			using node_type = node;
-
 			/* node pointer type */
-			using node_ptr  = node_type*;
+			using ___node_ptr     = ___node*;
 
 			/* allocator type */
-			using ___allocator = typename ___alloc::template rebind<node_type>;
+			using ___allocator    = typename ___alloc::template rebind<___node>;
+
+			/* allocator traits */
+			using ___alloc_traits = xns::allocator_traits<___allocator>;
+
+			/* lifecycle type */
+			using ___lifecycle    = xns::lifecycle<___node>;
 
 
 			// -- private members ---------------------------------------------
 
 			/* head */
-			node_ptr _head;
+			___node_ptr _head;
 
 			/* tail */
-			node_ptr _tail;
+			___node_ptr _tail;
 
 			/* size */
 			size_type _size;
 
 			/* allocator */
-			//[[no_unique_address]]
-			//___allocator _alloc;
+			[[no_unique_address]] ___allocator _alloc;
 
 
 		public:
@@ -124,18 +144,18 @@ namespace xns {
 
 			/* default constructor */
 			list(void) noexcept
-			: _head{nullptr}, _tail{nullptr}, _size{0U} {
+			: _head{nullptr}, _tail{nullptr}, _size{0}, _alloc{} {
 			}
 
 			/* copy constructor */
 			list(const self& other) noexcept(xns::is_nothrow_copy_constructible<value_type>
-										  && noexcept(___allocator::allocate()))
-			: _head{nullptr}, _tail{nullptr}, _size{other._size} {
+										  && noexcept(___allocator{}.allocate()))
+			: _head{nullptr}, _tail{nullptr}, _size{other._size}, _alloc{other._alloc} {
 
 				// declare node pointer
-				node_ptr    ptr  = other._head;
-				node_ptr    prev = nullptr;
-				node_type** addr = &_head;
+				___node_ptr    ptr  = other._head;
+				___node_ptr    prev = nullptr;
+				___node** addr = &_head;
 
 
 				// todo: need to increment size for each node if throw !
@@ -145,9 +165,9 @@ namespace xns {
 				while (ptr != nullptr) {
 
 					// nothrow allocate
-					if constexpr (noexcept(___allocator::allocate())) {
+					if constexpr (noexcept(___allocator{}.allocate())) {
 						// allocate
-						*addr = ___allocator::allocate();
+						*addr = ___alloc_traits::allocate(_alloc);
 						if (not *addr) {
 							_tail = prev;
 							return;
@@ -155,7 +175,7 @@ namespace xns {
 					}
 					else {
 						// try to allocate
-						try { *addr = ___allocator::allocate(); }
+						try { *addr = ___alloc_traits::allocate(_alloc); }
 						catch (...) {
 							_tail = prev;
 							throw; }
@@ -164,14 +184,17 @@ namespace xns {
 					// nothrow copy constructible
 					if constexpr (xns::is_nothrow_copy_constructible<value_type>) {
 						// copy construct
-						___allocator::construct(*addr, ptr->_value);
+						___lifecycle::construct(*addr, ptr->_value);
 					}
+
 					// throw copy constructible
 					else {
 						// try to construct
-						try { ___allocator::construct(*addr, ptr->_value); }
+						try {
+							___lifecycle::construct(*addr, ptr->_value);
+						}
 						catch (...) {
-							___allocator::deallocate(*addr);
+							___alloc_traits::deallocate(_alloc, *addr);
 							// init pointer
 							*addr = nullptr;
 							// set tail
@@ -191,14 +214,14 @@ namespace xns {
 
 
 			/* move constructor */
-			list(self&& other) noexcept
-			: _head{other._head}, _tail{other._tail}, _size{other._size} {
+			list(self&& other) noexcept(xns::is_nothrow_move_constructible<___allocator>)
+			: _head{other._head}, _tail{other._tail}, _size{other._size}, _alloc{xns::move(other._alloc)} {
 				other._init();
 			}
 
 			/* destructor */
 			~list(void) noexcept {
-				this->_free();
+				_free();
 			}
 
 
@@ -212,12 +235,14 @@ namespace xns {
 					return *this;
 
 				// deallocate list
-				this->_free();
+				_free();
+
+				// implement copy with keep node allocation
 
 				_init();
 
 				// get other head
-				node_ptr ptr = other._head;
+				___node_ptr ptr = other._head;
 				// loop over other list
 				while (ptr) {
 					// push node copy
@@ -239,7 +264,7 @@ namespace xns {
 					return *this;
 
 				// deallocate list
-				this->_free();
+				_free();
 
 				// move other members
 				_copy(other);
@@ -254,32 +279,32 @@ namespace xns {
 			// -- public accessors --------------------------------------------
 
 			/* size */
-			inline auto size(void) const noexcept -> size_type {
+			auto size(void) const noexcept -> size_type {
 				return _size;
 			}
 
 			/* empty */
-			inline auto empty(void) const noexcept -> bool {
-				return _size == 0;
+			auto empty(void) const noexcept -> bool {
+				return _size == 0U;
 			}
 
 			/* front */
-			inline auto front(void) noexcept -> mut_ref {
+			auto front(void) noexcept -> reference {
 				return _head->_value;
 			}
 
 			/* const front */
-			inline auto front(void) const -> const_ref {
+			auto front(void) const noexcept -> const_reference {
 				return _head->_value;
 			}
 
 			/* back */
-			inline auto back(void) noexcept -> mut_ref {
+			auto back(void) noexcept -> reference {
 				return _tail->_value;
 			}
 
 			/* const back */
-			inline auto back(void) const noexcept -> const_ref {
+			auto back(void) const noexcept -> const_reference {
 				return _tail->_value;
 			}
 
@@ -287,96 +312,91 @@ namespace xns {
 			// -- public iterator accessors -----------------------------------
 
 			/* begin */
-			inline auto begin(void) noexcept -> iterator {
+			auto begin(void) noexcept -> iterator {
 				return iterator{_head};
 			}
 
-			/* begin */
-			inline auto begin(void) const noexcept -> const_iterator {
+			/* end */
+			auto end(void) noexcept -> iterator {
+				return iterator{nullptr};
+			}
+
+			/* const begin */
+			auto begin(void) const noexcept -> const_iterator {
 				return const_iterator{_head};
 			}
 
-			/* end */
-			inline auto end(void) const noexcept -> xns::null {
-				return nullptr;
+			/* const end */
+			auto end(void) const noexcept -> const_iterator {
+				return const_iterator{nullptr};
 			}
 
 
 			// -- public modifiers --------------------------------------------
 
 			/* push front */
-			inline auto push_front(const_ref value) -> void {
-				// allocate new node
-				node_ptr ptr = new_node(value);
-				// link node to front
-				front_link(ptr);
-				// increment list size
+			auto push_front(const_reference ___vl) noexcept(
+					noexcept(_new_node(___vl))
+				) -> void {
+				_front_link(_new_node(___vl));
 				++_size;
 			}
 
 			/* push front */
-			inline auto push_front(move_ref value) noexcept -> void {
-				// allocate new node
-				node_ptr ptr = new_node(xns::move(value));
-				// link node to front
-				front_link(ptr);
-				// increment list size
+			auto push_front(move_reference ___vl) noexcept(
+					noexcept(_new_node(xns::move(___vl)))
+				) -> void {
+				_front_link(_new_node(xns::move(___vl)));
 				++_size;
 			}
 
 			/* emplace front */
-			template <typename... A>
-			inline auto emplace_front(A&&... args) -> void {
-				// allocate new node
-				node_ptr ptr = new_node(xns::forward<A>(args)...);
-				// link node to front
-				front_link(ptr);
-				// increment list size
-				++_size;
-			}
-
-
-			/* push back */
-			inline auto push_back(const_ref value) -> void {
-				// allocate new node
-				node_ptr ptr = new_node(value);
-				// link node to back
-				back_link(ptr);
-				// increment list size
+			template <typename... ___params>
+			auto emplace_front(___params&&... ___args) noexcept(
+					noexcept(_new_node(xns::forward<___params>(___args)...))
+				) -> void {
+				_front_link(_new_node(xns::forward<___params>(___args)...));
 				++_size;
 			}
 
 			/* push back */
-			inline auto push_back(move_ref value) noexcept -> void {
-				// allocate new node
-				node_ptr ptr = new_node(xns::move(value));
-				// link node to back
-				back_link(ptr);
-				// increment list size
+			auto push_back(const_reference __vl) noexcept(
+					noexcept(_new_node(__vl))
+				) -> void {
+				_back_link(_new_node(__vl));
+				++_size;
+			}
+
+			/* push back */
+			auto push_back(move_reference __vl) noexcept(
+					noexcept(_new_node(xns::move(__vl)))
+				) -> void {
+				_back_link(_new_node(xns::move(__vl)));
 				++_size;
 			}
 
 			/* emplace back */
-			template <typename... A>
-			inline auto emplace_back(A&&... args) -> void {
-				// allocate new node
-				node_ptr ptr = new_node(xns::forward<A>(args)...);
-				// link node to back
-				back_link(ptr);
-				// increment list size
+			template <typename... ___params>
+			auto emplace_back(___params&&... ___args) noexcept(
+					noexcept(_new_node(xns::forward<___params>(___args)...))
+				) -> void {
+				_back_link(_new_node(xns::forward<___params>(___args)...));
 				++_size;
 			}
+
+
+
 
 			/* pop front */
 			auto pop_front(void) noexcept -> void {
 				// check if list is empty
 				if (not _head) { return; }
 				// get head node
-				node_ptr ptr = _head;
+				___node_ptr ptr = _head;
 				// set new head node
 				_head = _head->_next;
 				// delete node
-				store_node(ptr);
+				_free_node(ptr);
 				// check if list is empty
 				not _head ? _tail = nullptr : _head->_prev = nullptr;
 				// decrement size
@@ -388,36 +408,24 @@ namespace xns {
 				// check if list is empty
 				if (not _tail) { return; }
 				// get tail node
-				node_ptr ptr = _tail;
+				___node_ptr ptr = _tail;
 				// set new tail node
 				_tail = _tail->_prev;
 				// delete node
-				store_node(ptr);
+				_free_node(ptr);
 				// check if list is empty
 				not _tail ? _head = nullptr : _tail->_next = nullptr;
 				// decrement size
 				--_size;
 			}
 
-			/* insert */
-			auto insert(const_iterator pos, const_ref value) -> iterator {
-				// not implemented
-				return end();
-			}
-
-			/* insert */
-			auto insert(const_iterator pos, move_ref value) noexcept -> iterator {
-				// not implemented
-				return end();
-			}
-
 
 			/* reverse */
 			auto reverse(void) noexcept -> void {
 				// initialize pointers
-				node_ptr ptr  = _head;
-				node_ptr prev = nullptr;
-				node_ptr next = nullptr;
+				___node_ptr ptr  = _head;
+				___node_ptr prev = nullptr;
+				___node_ptr next = nullptr;
 
 				// loop over list
 				while (ptr != nullptr) {
@@ -445,17 +453,17 @@ namespace xns {
 			/* swap */
 			auto swap(self& other) noexcept -> void {
 
-				const node_ptr tmp = _head;
-							 _head = other._head;
-					   other._head = tmp;
+				{ const ___node_ptr tmp = _head;
+					_head = other._head;
+					other._head = tmp;
 
-							   tmp = _tail;
-							 _tail = other._tail;
-					   other._tail = tmp;
+					tmp = _tail;
+					_tail = other._tail;
+					other._tail = tmp; }
 
 				const size_type size = _size;
-							   _size = other._size;
-						 other._size = size;
+				_size = other._size;
+				other._size = size;
 			}
 
 
@@ -467,22 +475,46 @@ namespace xns {
 			// -- private methods ---------------------------------------------
 
 			/* new node */
-			template <typename... A>
-			inline auto new_node(A&&... args) -> node_ptr {
-				auto ptr = ___allocator::allocate();
-				___allocator::construct(ptr, xns::forward<A>(args)...);
-				return ptr;
+			template <typename... ___params>
+			auto _new_node(___params&&... args) noexcept(false &&
+															xns::is_nothrow_constructible<value_type, ___params...>
+				) -> ___node_ptr {
+
+				auto ___ptr = ___alloc_traits::allocate(_alloc);
+
+
+				if constexpr (xns::is_nothrow_constructible<value_type, ___params...>) {
+					___lifecycle::construct(___ptr, xns::forward<___params>(args)...);
+					return ___ptr;
+				}
+
+				else {
+					try {
+						___lifecycle::construct(___ptr, xns::forward<___params>(args)...);
+						return ___ptr;
+					}
+					catch (...) {
+						___alloc_traits::deallocate(_alloc, ___ptr);
+						throw;
+					}
+				}
 			}
 
-			/* delete node */
-			inline void store_node(node_ptr ptr) noexcept {
-				___allocator::destroy(ptr);
-				___allocator::deallocate(ptr);
+
+
+			/* free node */
+			auto _free_node(___node_ptr ___ptr) noexcept -> void {
+
+				// not trivially destructible
+				if constexpr (not xns::is_trivially_destructible<value_type>)
+					___lifecycle::destroy(___ptr);
+
+				___alloc_traits::deallocate(_alloc, ___ptr);
 			}
 
 
 			/* link node to front */
-			auto front_link(node_ptr ptr) noexcept -> void {
+			auto _front_link(___node_ptr ptr) noexcept -> void {
 				// check if list is empty
 				not _head ? _tail = ptr
 					// list is not empty
@@ -492,7 +524,7 @@ namespace xns {
 			}
 
 			/* link node to back */
-			auto back_link(node_ptr ptr) noexcept -> void {
+			auto _back_link(___node_ptr ptr) noexcept -> void {
 				// check if list is empty
 				not _tail ? _head = ptr
 					// list is not empty
@@ -503,29 +535,29 @@ namespace xns {
 
 			/* init */
 			auto _init(void) noexcept -> void {
-				_head = _tail = nullptr;
-				_size = 0;
+				_head = nullptr;
+				_tail = nullptr;
+				_size = 0U;
 			}
 
 			/* copy */
-			auto _copy(const self& __ot) noexcept -> void {
-				_head = __ot._head;
-				_tail = __ot._tail;
-				_size = __ot._size;
+			auto _copy(const self& ___ot) noexcept -> void {
+				_head = ___ot._head;
+				_tail = ___ot._tail;
+				_size = ___ot._size;
 			}
 
 			/* free */
 			auto _free(void) noexcept -> void {
-				// get head node
-				node_ptr ptr = nullptr;
+
 				// loop over list
 				while (_head) {
 					 // unlink node
-					  ptr = _head;
+					auto ___ptr = _head;
 					_head = _head->_next;
-					// delete node
-					store_node(ptr);
-				}
+
+					// free node
+					_free_node(___ptr); }
 			}
 
 
@@ -538,46 +570,45 @@ namespace xns {
 	// -- N O D E -------------------------------------------------------------
 
 	template <typename __type, typename __alloc>
-	class list<__type, __alloc>::node final {
+	struct list<__type, __alloc>::___node final {
 
 
-		public:
 
 			// -- public lifecycle --------------------------------------------
 
 			/* deleted default constructor */
-			node(void) = delete;
+			___node(void) = delete;
 
-			/* not assignable */
-			XNS_NOT_ASSIGNABLE(node);
+			/* not assignable class */
+			___xns_not_assignable(___node);
 
-			/* value copy constructor (with previous node) */
-			node(const_ref value, node_ptr prev = nullptr) noexcept(xns::is_nothrow_copy_constructible<__type>)
-			: _next{nullptr}, _prev{prev}, _value{value} {
-			}
-
-			/* value move constructor */
-			inline node(move_ref value) noexcept(xns::is_nothrow_move_constructible<__type>)
-			: _next{nullptr}, _prev{nullptr}, _value{xns::move(value)} {
-			}
+			/* value copy constructor */
+			//___node(___node_ptr ___nx, ___node_ptr ___pv, const_reference value) noexcept(xns::is_nothrow_copy_constructible<__type>)
+			//: _next{___nx}, _prev{___pv}, _value{value} {
+			//}
+			//
+			///* value move constructor */
+			//___node(___node_ptr ___nx, ___node_ptr ___pv, move_reference value) noexcept(xns::is_nothrow_move_constructible<__type>)
+			//: _next{___nx}, _prev{___pv}, _value{xns::move(value)} {
+			//}
 
 			/* value forward constructor */
-			template <typename... __params> requires (xns::is_constructible<__type, __params...>)
-			inline node(__params&&... args) noexcept(xns::is_nothrow_constructible<__type, __params...>)
+			template <typename... __params> //requires (xns::is_constructible<__type, __params...>)
+			___node(__params&&... args) noexcept(xns::is_nothrow_constructible<__type, __params...>)
 			: _next{nullptr}, _prev{nullptr}, _value{xns::forward<__params>(args)...} {
 			}
 
 			/* destructor */
-			~node(void) noexcept = default;
+			~___node(void) noexcept = default;
 
 
 			// -- public members ----------------------------------------------
 
 			/* next node */
-			node_ptr _next;
+			___node_ptr _next;
 
 			/* previous node */
-			node_ptr _prev;
+			___node_ptr _prev;
 
 			/* value */
 			value_type _value;
@@ -588,38 +619,24 @@ namespace xns {
 	// -- non-member functions ------------------------------------------------
 
 	/* swap */
-	template <typename T>
-	auto swap(xns::list<T>& lhs, xns::list<T>& rhs) noexcept -> void {
+	template <typename ___type>
+	auto swap(xns::list<___type>& lhs, xns::list<___type>& rhs) noexcept -> void {
 		lhs.swap(rhs);
 	}
 
 
-	// -- non-member functions ------------------------------------------------
-
-	/* make list */
-	//template <class... A>
-	//auto make_list(A&&... args) -> xns::list<xns::common_type<A...>> {
-	//
-	//	xns::list<xns::common_type<A...>> list;
-	//	// emplace back
-	//	((list.push_back(xns::forward<A>(args))), ...);
-	//
-	//	return list;
-	//}
-
-
 	// -- I T E R A T O R -----------------------------------------------------
 
-	template <typename __type, typename __alloc>
+	template <typename ___type, typename ___alloc>
 	template <bool ___const>
-	class list<__type, __alloc>::list_iterator final {
+	class list<___type, ___alloc>::___iterator final {
 
 
 		// -- friends ---------------------------------------------------------
 
 		/* other iterator as friend */
 		template <bool>
-		friend class list_iterator;
+		friend class ___iterator;
 
 
 		public:
@@ -627,47 +644,47 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self     = xns::list<__type, __alloc>::list_iterator<___const>;
+			using self     = xns::list<___type, ___alloc>::___iterator<___const>;
 
 			/* reference type */
-			using cond_ref = typename xns::conditional<___const, const_ref, mut_ref>;
+			using cond_ref = typename xns::conditional<___const, const_reference, reference>;
 
 			/* pointer type */
-			using cond_ptr = typename xns::conditional<___const, const_ptr, mut_ptr>;
+			using cond_ptr = typename xns::conditional<___const, const_pointer, pointer>;
 
 
 			// -- public constructors -----------------------------------------
 
 			/* default constructor */
-			list_iterator(void) noexcept
+			___iterator(void) noexcept
 			: _node{nullptr} {
 			}
 
 			/* node constructor */
-			list_iterator(node_ptr __node) noexcept
+			___iterator(___node_ptr __node) noexcept
 			: _node{__node} {
 			}
 
 			/* copy constructor */
-			list_iterator(const self&) noexcept = default;
+			___iterator(const self&) noexcept = default;
 
 			/* move constructor */
-			list_iterator(self&&) noexcept = default;
+			___iterator(self&&) noexcept = default;
 
 			/* copy constructor */
-			list_iterator(const list_iterator<not ___const>& other) noexcept
+			___iterator(const ___iterator<not ___const>& other) noexcept
 			: _node{other._node} {
 				static_assert(___const == true, "iterator: cannot convert const_iterator to iterator");
 			}
 
 			/* move constructor */
-			list_iterator(list_iterator<not ___const>&& other) noexcept
+			___iterator(___iterator<not ___const>&& other) noexcept
 			: _node{other._node} {
 				static_assert(___const == true, "iterator: cannot convert const_iterator to iterator");
 			}
 
 			/* destructor */
-			~list_iterator(void) noexcept = default;
+			~___iterator(void) noexcept = default;
 
 
 			// -- public assignment operators ---------------------------------
@@ -679,14 +696,14 @@ namespace xns {
 			auto operator=(self&&) noexcept -> self& = default;
 
 			/* copy assignment operator */
-			auto operator=(const list_iterator<not ___const>& other) noexcept -> self& {
+			auto operator=(const ___iterator<not ___const>& other) noexcept -> self& {
 				static_assert(___const == true, "iterator: cannot convert const iterator to non-const iterator");
 				_node = other._node;
 				return *this;
 			}
 
 			/* move assignment operator */
-			auto operator=(list_iterator<not ___const>&& other) noexcept -> self& {
+			auto operator=(___iterator<not ___const>&& other) noexcept -> self& {
 				static_assert(___const == true, "iterator: cannot convert const iterator to non-const iterator");
 				_node = other._node;
 				return *this;
@@ -739,13 +756,13 @@ namespace xns {
 
 			/* equality operator */
 			template <bool D>
-			inline auto operator==(const list_iterator<D>& other) const noexcept -> bool {
+			inline auto operator==(const ___iterator<D>& other) const noexcept -> bool {
 				return _node == other._node;
 			}
 
 			/* inequality operator */
 			template <bool D>
-			inline auto operator!=(const list_iterator<D>& other) const noexcept -> bool {
+			inline auto operator!=(const ___iterator<D>& other) const noexcept -> bool {
 				return _node != other._node;
 			}
 
@@ -781,7 +798,7 @@ namespace xns {
 			// -- private members ---------------------------------------------
 
 			/* node pointer */
-			node_ptr _node;
+			___node_ptr _node;
 
 	}; // list_iterator
 

@@ -131,9 +131,9 @@ namespace xns {
 			void detach(inverse& observ) noexcept {
 				std::cout << "in detach of: " << this << std::endl;
 				// remove observer
-				_observers.filter(&observ);
+				//_observers.filter(&observ); temporary comment for avoid new vector errors
 				// also remove self from observer
-				observ._observers.filter(this);
+				//observ._observers.filter(this); temporary comment for avoid new vector errors
 			}
 
 			/* notify observers */

@@ -10,23 +10,24 @@ auto exponential_contrast(xns::f64 value, xns::f64 min, xns::f64 max) -> xns::f6
 }
 
 
-auto xns::fragmentation::display(const xns::vector<void*>& addrs) -> void {
+auto xns::fragmentation::display(const std::vector<void*>& addrs) -> void {
 	xns::fragmentation{addrs};
 }
 
 
-xns::fragmentation::fragmentation(const xns::vector<void*>& addrs)
+xns::fragmentation::fragmentation(const std::vector<void*>& addrs)
 :	_addrs{addrs},
 	_width{xns::terminal::width()},
 	_min_avg{xns::limits<size_type>::max()},
 	_max_avg{0} {
 
+
 	// avg vector
-	xns::vector<size_type> avgs;
+	std::vector<size_type> avgs;
 	avgs.reserve(_width);
 
 	auto it = divisor_iterator<size_type>{addrs.size(), _width};
-	xns::vector<void*>::size_type i = 0;
+	std::vector<void*>::size_type i = 0;
 
 	// loop over divisors
 	for (; it; ++it) {
@@ -51,6 +52,7 @@ xns::fragmentation::fragmentation(const xns::vector<void*>& addrs)
 		avgs.push_back(avg);
 	}
 
+
 	// loop over averages
 	for (auto& avg : avgs) {
 
@@ -71,13 +73,18 @@ xns::fragmentation::fragmentation(const xns::vector<void*>& addrs)
 
 	// -- compute differences ---------------------------------------------------
 
-	xns::vector<size_type> diffs;
+	std::vector<size_type> diffs;
+
+	std::cout << "size: " << avgs.size() << std::endl;
+	diffs.reserve(avgs.size());
+	return;
 
 	size_type min_diff = xns::limits<size_type>::max();
 	size_type max_diff = 0;
 
 
 	for (i = 0; i < avgs.size(); ++i) {
+
 
 		if (i == avgs.size() - 1) {
 			auto diff = xns::diff(avgs[i], avgs[i - 1]);

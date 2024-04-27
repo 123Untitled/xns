@@ -170,7 +170,7 @@ void xns::terminal::terminal_resize_handler(int signum) {
 	if (instance.query_terminal_size() != 0)
 		return;
 	// call resize event subscribers
-	xns::event::shared().call_event(xns::evntype::TERMINAL_RESIZE);
+	//xns::event::shared().call_event(xns::evntype::TERMINAL_RESIZE);
 }
 
 

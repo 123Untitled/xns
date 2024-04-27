@@ -17,6 +17,8 @@
 
 // local headers
 #include "xns/memory/allocator.hpp"
+#include "xns/memory/allocator_traits.hpp"
+#include "xns/memory/lifecycle.hpp"
 #include "xns/type_traits/relationships_and_property_queries/is_derived_from.hpp"
 #include "xns/utility/swap.hpp"
 
@@ -28,7 +30,7 @@ namespace xns {
 
 	// -- S H A R E D  P O I N T E R ------------------------------------------
 
-	template <typename T>
+	template <typename ___type>
 	class shared_ptr final {
 
 
@@ -52,10 +54,10 @@ namespace xns {
 			// -- public types ------------------------------------------------
 
 			/* self type */
-			using self        = xns::shared_ptr<T>;
+			using self        = xns::shared_ptr<___type>;
 
 			/* value type */
-			using value_type  = T;
+			using value_type  = ___type;
 
 			/* mutable reference type */
 			using mut_ref     = value_type&;
@@ -79,6 +81,25 @@ namespace xns {
 			using size_type   = typename allocator::size_type;
 
 
+		private:
+
+			// -- private types -----------------------------------------------
+
+			/* allocator traits type */
+			using ___alloc_traits = xns::allocator_traits<allocator>;
+
+			/* count allocator type */
+			using ___count_alloc = typename ___alloc_traits::template rebind_alloc<size_type>;
+
+			/* count allocator traits type */
+			using ___count_alloc_traits = xns::allocator_traits<___count_alloc>;
+
+			/* lifecycle type */
+			using ___lifecycle = xns::lifecycle<value_type>;
+
+
+
+		public:
 
 			// -- public lifecycle --------------------------------------------
 
@@ -323,13 +344,19 @@ namespace xns {
 				// check there are still references
 				if (--(*_count) > 0)
 					return;
+
 				// destroy object
-				allocator::destroy(_data);
+				___lifecycle::destroy(_data);
+
+				allocator alloc{};
+
 				// deallocate object
-				allocator::deallocate(_data);
+				___alloc_traits::deallocate(alloc, _data);
+
+				___count_alloc count_alloc{};
+
 				// deallocate counter
-				xns::allocator<size_type>::deallocate(_count);
-				std::cout << "deallocated" << std::endl;
+				___count_alloc_traits::deallocate(count_alloc, _count);
 			}
 
 			/* init */
@@ -362,23 +389,36 @@ namespace xns {
 	// -- friend functions ----------------------------------------------------
 
 	/* make shared pointer */
-	template <typename T, typename... A>
-	auto make_shared(A&&... args) -> xns::shared_ptr<T> {
+	template <typename ___type, typename... ___params>
+	auto make_shared(___params&&... ___args) -> xns::shared_ptr<___type> {
+
+		using ___shared = xns::shared_ptr<___type>;
+		using ___alloc  = typename ___shared::allocator;
+
 		// instantiate shared pointer
-		xns::shared_ptr<T> ptr;
+		___shared ptr;
+
+		___alloc alloc{};
+
 		// allocate memory
-		ptr._data = shared_ptr<T>::allocator::allocate();
+		ptr._data = ___shared::___alloc_traits::allocate(alloc);
 
 		// here need to try catch
 
-			// allocate counter
-			ptr._count = xns::allocator<typename shared_ptr<T>::size_type>::allocate();
+		using ___calloc = ___shared::___count_alloc;
+		using ___calloc_traits = xns::allocator_traits<___calloc>;
 
-			// construct object by forwarding arguments
-			xns::shared_ptr<T>::allocator::construct(ptr._data, xns::forward<A>(args)...);
+		___calloc count_alloc{};
+
+		// allocate counter
+		ptr._count = ___calloc_traits::allocate(count_alloc);
+
+		// construct object by forwarding arguments
+		___shared::___lifecycle::construct(ptr._data, xns::forward<___params>(___args)...);
 
 		// initialize counter
 		*ptr._count = 1;
+
 		// return shared pointer
 		return ptr;
 	}

@@ -1,4 +1,6 @@
 #include "xns/system/environment.hpp"
+#include "xns/string/split.hpp"
+
 
 // environ
 extern constinit char** environ;
@@ -79,7 +81,11 @@ auto xns::env::paths(void) -> xns::vector<xns::string> {
 
 	if (weak == nullptr) { return{}; }
 
-	return weak->split(xns::string{":"});
+	return xns::split(*weak, xns::string{":"});
+
+
+
+	//return weak->split(xns::string{":"});
 }
 
 

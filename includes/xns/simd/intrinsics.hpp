@@ -12,15 +12,15 @@
 
 #pragma once
 
-#ifndef XNS_MEMMOVE_HEADER
-#define XNS_MEMMOVE_HEADER
+#ifndef XNS_INTRINSICS_HEADER
+#define XNS_INTRINSICS_HEADER
 
-#include "xns/config/config.hpp"
-#include "xns/type_traits/types.hpp"
+// check architecture and include appropriate header
+//#if defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86)
+//#	include <x86intrin.h>
 
-#if !___xns_has_builtin(__builtin_memmove)
-#	include <string.h>
-#endif
+#if defined(__aarch64__)
+#include <arm_neon.h>
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
@@ -28,27 +28,22 @@
 namespace xns {
 
 
-	// -- M E M M O V E -------------------------------------------------------
+	// -- I N T R I N S I C S ---------------------------------------------------
 
-	/* memmove */
-	constexpr auto memmove(void* ___dst, const void* ___src, const xns::size_t ___sz) noexcept -> void* {
-		___xns_if_consteval {
-			if (___dst < ___src) {
-				for (xns::size_t i = 0; i < ___sz; ++i)
-					static_cast<unsigned char*>(___dst)[i] = static_cast<const unsigned char*>(___src)[i];
-			} else {
-				for (xns::size_t i = ___sz; i > 0; --i)
-					static_cast<unsigned char*>(___dst)[i - 1] = static_cast<const unsigned char*>(___src)[i - 1];
-			} return ___dst;
-		} else {
-			#if ___xns_has_builtin(__builtin_memmove)
-				return __builtin_memmove(___dst, ___src, ___sz);
-			#else
-				return ::memmove(___dst, ___src, ___sz);
-			#endif
-		}
-	}
+	/* intrinsic */
+	template <typename ___type>
+	class intrinsic final {
+
+
+		public:
+
+		private:
+
+	};
+
 
 } // namespace xns
 
-#endif // XNS_MEMMOVE_HEADER
+#endif // ARM NEON
+
+#endif // XNS_INTRINSICS_HEADER
