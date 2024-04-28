@@ -312,14 +312,19 @@ namespace xns {
 
 				const auto ___sz = ___ot.size();
 
-				_data = _end  = _allocate(___sz);
+				if (___sz == 0)
+					return;
+
+				_data = _allocate(___sz);
 				_cap  = _data + ___sz;
 
 				if constexpr (___trivial_copy) {
 					xns::memcpy(_data, ___ot._data, ___sz);
+					_end = _cap;
 				}
 
 				else if constexpr (not ___throw_copy) {
+					_end = _data;
 					for (auto ___it = ___ot._data; ___it < ___ot._end; ++___it) {
 						___lifecycle::construct(_end, *___it);
 						++_end; }
@@ -328,6 +333,7 @@ namespace xns {
 				else {
 					// create destroy guard
 					___destroy ___d{*this};
+					_end = _data;
 					for (auto ___it = ___ot._data; ___it < ___ot._end; ++___it) {
 						___lifecycle::construct(_end, *___it);
 						++_end; }
