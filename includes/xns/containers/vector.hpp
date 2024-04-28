@@ -731,38 +731,39 @@ namespace xns {
 
 
 			/* resize */
-			auto resize(const size_type ___sz) -> void {
-				//static_assert(xns::always_false<value_type>, "resize not implemented");
+			auto resize(const size_type ___sz) noexcept(false) -> void {
+
+				const auto ___size = size();
 
 				// superior size
-				if (___sz > size()) {
+				if (___sz < ___size) {
 
-					// check capacity
-					if (___sz > capacity()) {
-
-						if constexpr (___noexcept_allocate) {
-							if (!_reserve(_try_expand(___sz)))
-								return; }
-						else _reserve(_try_expand(___sz));
-					}
-
-				}
-
-				// inferior size
-				else {
 
 					// destroy only non-trivially destructible types
 					if constexpr (___requires_destruct) {
-						;
+						pointer ___ptr = _end;
+						_end = _data + ___sz;
+						while (___ptr > _end)
+							___lifecycle::destroy(--___ptr);
 					}
-
-						// destroy excess elements (if not equal size)
-						//for (size_type i = ___sz; i < _size; ++i)
-						//	___lifecycle::destroy(_data + i);
+					else _end = _data + ___sz;
 				}
 
-				// update size
-				//_size = ___sz;
+				// inferior size
+				else if (___sz > ___size) {
+
+					// check capacity
+					if (___sz > capacity())
+						_reserve(___sz);
+
+					pointer ___end = _data + ___sz;
+
+					// construct new elements
+					while (_end < ___end) {
+						___lifecycle::construct(_end);
+						++_end; }
+				}
+
 			}
 
 
