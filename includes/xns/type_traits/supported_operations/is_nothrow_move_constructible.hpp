@@ -27,14 +27,14 @@ namespace xns {
 	// -- I S  N O T H R O W  M O V E  C O N S T R U C T I B L E ----------------
 
 	/* is nothrow move constructible */
-	template <typename T>
+	template <typename ___type>
 	concept is_nothrow_move_constructible
-		= xns::is_nothrow_constructible<T, xns::add_rvalue_reference<T>>;
+		= xns::is_nothrow_constructible<___type, xns::add_rvalue_reference<___type>>;
 
 	/* are nothrow move constructible */
-	template <typename... T>
+	template <typename... ___types>
 	concept are_nothrow_move_constructible
-		= (xns::is_nothrow_move_constructible<T> && ...);
+		= (xns::is_nothrow_move_constructible<___types> && ...);
 
 } // namespace xns
 
