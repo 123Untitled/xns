@@ -38,10 +38,10 @@ namespace xns {
 				// -- private static methods ----------------------------------
 
 				/* test for derived */
-				static consteval auto test(___base*) noexcept -> xns::true_type;
+				static /* consteval */ constexpr  auto test(___base*) noexcept -> xns::true_type;
 
 				/* test for not derived */
-				static consteval auto test(...) noexcept -> xns::false_type;
+				static /* consteval */ constexpr auto test(...) noexcept -> xns::false_type;
 
 
 			public:

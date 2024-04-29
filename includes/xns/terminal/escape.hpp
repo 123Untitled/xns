@@ -83,7 +83,7 @@ namespace xns {
 			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			consteval move_up(void) noexcept
+			constexpr move_up(void) noexcept
 			: _esc{'\x1b', '[', '0', 'A'} {
 			}
 
@@ -117,14 +117,14 @@ namespace xns {
 			}
 
 			/* size */
-			constexpr auto size(void) const noexcept -> array::size_type {
+			constexpr auto size(void) const noexcept -> typename array::size_type {
 				return _esc.size();
 			}
 
 
 		private:
 
-			static consteval auto _init(void) -> xns::array<char, xns::limits<___type>::digits() + 3> {
+			static constexpr auto _init(void) -> xns::array<char, xns::limits<___type>::digits() + 3> {
 				// move up escape sequence: \x1b[0A
 				constexpr auto ___lm = xns::limits<___type>::digits();
 				xns::array<char, ___lm + 3> ___esc {'\x1b', '['};
@@ -200,6 +200,10 @@ namespace xns {
 
 		public:
 
+			// -- private types -----------------------------------------------
+
+
+
 			// -- public lifecycle --------------------------------------------
 
 			/* non-instantiable class */
@@ -209,89 +213,85 @@ namespace xns {
 			// -- public static methods ---------------------------------------
 
 			/* move home */
-			static auto move_home(void) noexcept -> const char(&)[] {
-				static constexpr char ___esc[] = "\x1b[H";
-				return ___esc;
+			static consteval auto move_home(void) noexcept -> xns::string_view {
+				return {"\x1b[H"};
 			}
 
 			/* erase screen */
-			static auto erase_screen(void) noexcept ->  const char(&)[] {
-				static constexpr char ___esc[] = "\x1b[2J";
-				return ___esc;
+			static consteval auto erase_screen(void) noexcept -> xns::string_view {
+				return {"\x1b[2J"};
 			}
 
 			/* erase line */
-			static auto erase_line(void) noexcept -> const char(&)[] {
-				static constexpr char ___esc[] = "\x1b[2K";
-				return ___esc;
+			static consteval auto erase_line(void) noexcept -> xns::string_view {
+				return {"\x1b[2K"};
 			}
 
 			/* erase to end of line */
-			static auto erase_to_end(void) noexcept -> const char(&)[] {
-				static constexpr char ___esc[] = "\x1b[0K";
-				return ___esc;
+			static consteval auto erase_to_end(void) noexcept -> xns::string_view {
+				return {"\x1b[0K"};
 			}
 
 			/* erase from start of line */
 			static consteval auto erase_from_start(void) noexcept -> xns::string_view {
-				return "\x1b[1K";
+				return {"\x1b[1K"};
 			}
 
 			/* enter screen */
 			static consteval auto enter_screen(void) noexcept -> xns::string_view {
-				return "\x1b[?1049h";
+				return {"\x1b[?1049h"};
 			}
 
 			/* exit screen */
 			static consteval auto exit_screen(void) noexcept -> xns::string_view {
-				return "\x1b[?1049l";
+				return {"\x1b[?1049l"};
 			}
 
 			/* save screen */
 			static consteval auto save_screen(void) noexcept -> xns::string_view {
-				return "\x1b[?47h";
+				return {"\x1b[?47h"};
 			}
 
 			/* restore screen */
 			static consteval auto restore_screen(void) noexcept -> xns::string_view {
-				return "\x1b[?47l";
+				return {"\x1b[?47l"};
 			}
 
 			/* reset style */
 			static consteval auto reset_style(void) noexcept -> xns::string_view {
-				return "\x1b[0m";
+				return {"\x1b[0m"};
 			}
 
 
 			/* show cursor */
 			static consteval auto show_cursor(void) noexcept -> xns::string_view {
-				return "\x1b[?25h";
+				return {"\x1b[?25h"};
 			}
 
 			/* hide cursor */
 			static consteval auto hide_cursor(void) noexcept -> xns::string_view {
-				return "\x1b[?25l";
+				return {"\x1b[?25l"};
 			}
 
 			/* request position */
 			static constexpr auto request_position(void) noexcept -> xns::string_view {
-				return "\x1b[6n";
+				return {"\x1b[6n"};
 			}
 
 
 			/* cursor beam */
 			static consteval auto cursor_beam(void) noexcept -> xns::string_view {
-				return "\x1b[5 q";
+				return {"\x1b[5 q"};
 			}
 
 			/* cursor underline */
 			static consteval auto cursor_underline(void) noexcept -> xns::string_view {
-				return "\x1b[3 q";
+				return {"\x1b[3 q"};
 			}
 
 			/* cursor block */
 			static consteval auto cursor_block(void) noexcept -> xns::string_view {
-				return "\x1b[1 q";
+				return {"\x1b[1 q"};
 			}
 
 

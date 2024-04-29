@@ -60,11 +60,11 @@ namespace xns {
 
 					/* test */
 					template <typename ___>
-					static consteval auto ___test(typename ___helper<decltype(xns::declval<___&>().~___())>::type) -> xns::true_type;
+					static /* consteval */ constexpr auto ___test(typename ___helper<decltype(xns::declval<___&>().~___())>::type) -> xns::true_type;
 
 					/* test */
 					template <typename>
-					static consteval auto ___test(...) -> xns::false_type;
+					static /* consteval */ constexpr auto ___test(...) -> xns::false_type;
 
 					/* value */
 					static constexpr bool value = decltype(___test<___tp>(0))::value;

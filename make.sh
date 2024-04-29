@@ -216,7 +216,7 @@ CXXFLAGS+=('-Wconversion' '-Wsign-conversion' '-Wfloat-conversion' '-Wnarrowing'
 CXXFLAGS+=('-Wshadow')
 
 # exception
-CXXFLAGS+=('-fexceptions' '-Wexceptions')
+#CXXFLAGS+=('-fexceptions' '-Wexceptions')
 
 # runtime type information
 CXXFLAGS+=('-fno-rtti')

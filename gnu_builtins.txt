@@ -1,0 +1,31 @@
+
+
+
+/*
+---- g++ builtin type traits ---
+
+__has_nothrow_assign (type)
+__has_nothrow_copy (type)
+__has_nothrow_constructor (type)
+
+__has_trivial_assign (type)
+__has_trivial_copy (type)
+__has_trivial_constructor (type)
+__has_trivial_destructor (type)
+__has_virtual_destructor (type)
+__is_abstract (type)
+__is_aggregate (type)
+__is_base_of (base_type, derived_type)
+__is_class (type)
+__is_empty (type)
+__is_enum (type)
+__is_final (type)
+__is_literal_type (type)
+__is_pod (type)
+__is_polymorphic (type)
+__is_standard_layout (type)
+__is_trivial (type)
+__is_union (type)
+__underlying_type (type)
+__integer_pack (length)
+*/
