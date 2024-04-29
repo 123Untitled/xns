@@ -32,8 +32,8 @@ namespace xns {
 							&& xns::is_nothrow_move_assignable<___type>;
 
 	/* are nothrow moveable */
-	template <typename... ___type>
-	concept are_nothrow_moveable = (xns::is_nothrow_moveable<___type> && ...);
+	template <typename... ___types>
+	concept are_nothrow_moveable = (xns::is_nothrow_moveable<___types> && ...);
 
 } // namespace xns
 
