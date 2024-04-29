@@ -103,18 +103,18 @@ namespace xns {
 
 			// -- debug -------------------------------------------------------
 
-#ifdef XNS_TEST_VECTOR
-
-			/* debug */
-			template <unsigned ___sz>
-			static constexpr auto _(const char (&___msg)[___sz]) -> void {
-				::write(STDOUT_FILENO, "\x1b[31mvector: \x1b[0m", 17);
-				::write(STDOUT_FILENO, ___msg, ___sz);
-				::write(STDOUT_FILENO, "\n", 1);
-			}
-#else
+//#ifdef XNS_TEST_VECTOR
+//
+//			/* debug */
+//			template <unsigned ___sz>
+//			static constexpr auto _(const char (&___msg)[___sz]) -> void {
+//				::write(STDOUT_FILENO, "\x1b[31mvector: \x1b[0m", 17);
+//				::write(STDOUT_FILENO, ___msg, ___sz);
+//				::write(STDOUT_FILENO, "\n", 1);
+//			}
+//#else
 #	define _(msg)
-#endif
+//#endif
 
 
 		public:
