@@ -130,7 +130,7 @@ namespace xns {
 				using char_type = typename decltype(__literal)::char_t;
 
 				/* size type */
-				using size_type = decltype(__literal)::size_type;
+				using size_type = typename decltype(__literal)::size_type;
 
 
 				// -- private implementation --------------------------------------

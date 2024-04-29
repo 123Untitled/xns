@@ -59,10 +59,10 @@ namespace xns {
 			using const_reference = const value_type&;
 
 			/* pointer type */
-			using pointer = xns::allocator_traits<allocator_type>::pointer;
+			using pointer = typename xns::allocator_traits<allocator_type>::pointer;
 
 			/* const pointer type */
-			using const_pointer = xns::allocator_traits<allocator_type>::const_pointer;
+			using const_pointer = typename xns::allocator_traits<allocator_type>::const_pointer;
 
 			/* iterator type */
 			//using iterator = ...

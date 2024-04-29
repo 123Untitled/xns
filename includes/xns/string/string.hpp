@@ -1333,16 +1333,16 @@ namespace xns {
 			using string_type     = xns::basic_string<value_type>;
 
 			/* size type */
-			using size_type       = string_type::size_type;
+			using size_type       = typename string_type::size_type;
 
 			/* comparison type */
 			using signed_type     = xns::s64;
 
 			/* const reference type */
-			using const_reference       = const value_type&;
+			using const_reference = const value_type&;
 
 			/* const pointer type */
-			using const_pointer       = const value_type*;
+			using const_pointer   = const value_type*;
 
 
 			// -- public constructors -----------------------------------------

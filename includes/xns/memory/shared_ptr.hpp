@@ -405,7 +405,7 @@ namespace xns {
 
 		// here need to try catch
 
-		using ___calloc = ___shared::___count_alloc;
+		using ___calloc = typename ___shared::___count_alloc;
 		using ___calloc_traits = xns::allocator_traits<___calloc>;
 
 		___calloc count_alloc{};

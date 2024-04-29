@@ -122,7 +122,8 @@ namespace xns {
 			// -- private types -----------------------------------------------
 
 			/* node allocator type */
-			using ___allocator = xns::allocator_traits<___alloc>::template rebind_alloc<node_type>;
+			//using ___allocator = typename ___alloc::template rebind<node_type>;
+			using ___allocator = typename xns::allocator_traits<___alloc>::template rebind_alloc<node_type>;
 
 			/* allocator traits type */
 			using ___alloc_traits = xns::allocator_traits<___allocator>;
@@ -1984,7 +1985,10 @@ namespace xns {
 
 				xns::size_t levels = 0;
 
-				std::queue<std::tuple<node_ptr, node_info*>> queue;
+				using pair_type = std::pair<node_ptr, node_info*>;
+				using queue_type = std::queue<pair_type>;
+
+				queue_type queue;
 
 				_nodes.emplace_back();
 
@@ -1993,12 +1997,12 @@ namespace xns {
 
 				while (not queue.empty()) {
 
-					auto tuple = queue.front();
+					pair_type& tuple = queue.front();
 					//auto tuple = queue.next();
 					queue.pop();
 					//queue.dequeue();
 
-					auto node = std::get<node_ptr>(tuple);
+					node_ptr node = std::get<node_ptr>(tuple);
 					auto info = std::get<node_info*>(tuple);
 
 					if constexpr (xns::is_same<___type, std::string>) {
