@@ -17,7 +17,7 @@
 
 #include "xns/config/config.hpp"
 
-#if not XNS_HAS_BUILTIN(__is_nothrow_assignable)
+#if not ___xns_has_builtin(__is_nothrow_assignable)
 #	error "compiler does not support __is_nothrow_assignable"
 #endif
 
