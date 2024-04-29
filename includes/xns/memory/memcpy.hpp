@@ -37,7 +37,8 @@ namespace xns {
 		static_assert(xns::is_trivially_copyable<___type>,
 			"memcpy requires trivially copyable type");
 
-		if consteval {
+		___xns_if_consteval {
+		//if consteval {
 
 			for (decltype(sizeof(0)) i = 0U; i < ___sz; ++i)
 				___dst[i] = ___src[i];
