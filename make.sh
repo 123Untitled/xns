@@ -158,8 +158,8 @@ CLONE=''
 
 # compiler
 #CXX=('/opt/homebrew/Cellar/llvm/'*'/bin/clang++'(N))
-CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
-#CXX='clang++'
+#CXX='/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13'
+CXX='clang++'
 #CXX='g++'
 
 # archiver
@@ -172,7 +172,7 @@ ARFLAGS='-rcs'
 LINKER=$CXX
 
 # standard
-STD='-std=c++23'
+STD='-std=c++2a'
 
 # debug
 DEBUG='-g'
