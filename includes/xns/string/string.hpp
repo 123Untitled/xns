@@ -1283,31 +1283,31 @@ namespace xns {
 
 	/* empty string */
 	template <typename ___char> requires(xns::is_same<___char, char>)
-	consteval auto empty_string(void) noexcept -> const char* {
+	constexpr auto empty_string(void) noexcept -> const char* {
 		return "";
 	}
 
 	/* empty string */
 	template <typename ___char> requires(xns::is_same<___char, char8_t>)
-	consteval auto empty_string(void) noexcept -> const char8_t* {
+	constexpr auto empty_string(void) noexcept -> const char8_t* {
 		return u8"";
 	}
 
 	/* empty string */
 	template <typename ___char> requires(xns::is_same<___char, char16_t>)
-	consteval auto empty_string(void) noexcept -> const char16_t* {
+	constexpr auto empty_string(void) noexcept -> const char16_t* {
 		return u"";
 	}
 
 	/* empty string */
 	template <typename ___char> requires(xns::is_same<___char, char32_t>)
-	consteval auto empty_string(void) noexcept -> const char32_t* {
+	constexpr auto empty_string(void) noexcept -> const char32_t* {
 		return U"";
 	}
 
 	/* empty string */
 	template <typename ___char> requires(xns::is_same<___char, wchar_t>)
-	consteval auto empty_string(void) noexcept -> const wchar_t* {
+	constexpr auto empty_string(void) noexcept -> const wchar_t* {
 		return L"";
 	}
 
