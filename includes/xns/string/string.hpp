@@ -167,28 +167,28 @@ namespace xns {
 			using traits_type     = xns::char_traits<___char>;
 
 			/* value type */
-			using value_type      = traits_type::char_type;
+			using value_type      = typename traits_type::char_type;
 
 			/* allocator type */
 			using allocator_type  = xns::allocator<value_type>; // ___alloc
 
 			/* size type */
-			using size_type       = xns::allocator_traits<allocator_type>::size_type;
+			using size_type       = typename xns::allocator_traits<allocator_type>::size_type;
 
 			/* difference type */
-			using difference_type = xns::allocator_traits<allocator_type>::difference_type;
+			using difference_type = typename xns::allocator_traits<allocator_type>::difference_type;
 
 			/* reference type */
-			using reference       = traits_type::reference;
+			using reference       = typename traits_type::reference;
 
 			/* const reference type */
-			using const_reference = traits_type::const_reference;
+			using const_reference = typename traits_type::const_reference;
 
 			/* pointer type */
-			using pointer         = xns::allocator_traits<allocator_type>::pointer;
+			using pointer         = typename xns::allocator_traits<allocator_type>::pointer;
 
 			/* const pointer type */
-			using const_pointer   = xns::allocator_traits<allocator_type>::const_pointer;
+			using const_pointer   = typename xns::allocator_traits<allocator_type>::const_pointer;
 
 			/* iterator type */
 			using iterator        = xns::basic_string_iterator<value_type, false>;

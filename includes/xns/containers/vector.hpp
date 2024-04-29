@@ -140,10 +140,10 @@ namespace xns {
 			using const_reference        = const value_type&;
 
 			/* pointer type */
-			using pointer                = ___alloc_traits::pointer;
+			using pointer                = typename ___alloc_traits::pointer;
 
 			/* const pointer type */
-			using const_pointer          = ___alloc_traits::const_pointer;
+			using const_pointer          = typename ___alloc_traits::const_pointer;
 
 			/* iterator type */
 			using iterator               = ___iterator<false, false>;
