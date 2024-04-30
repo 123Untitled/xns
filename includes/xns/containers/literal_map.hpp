@@ -23,12 +23,10 @@
 #include "xns/type_traits/supported_operations/is_nothrow_copy_assignable.hpp"
 #include "xns/type_traits/supported_operations/is_nothrow_move_assignable.hpp"
 
-//#include "xns/is_char.hpp"
 #include "xns/type_traits/other/is_all_unique.hpp"
 #include "xns/type_traits/sequences/char_sequence.hpp"
 #include "xns/type_traits/other/string_literal.hpp"
 #include "xns/type_traits/type_operations/forward.hpp"
-#include "xns/type_traits/type_operations/move.hpp"
 
 
 
@@ -39,7 +37,7 @@ namespace xns {
 
 	// -- L I T E R A L  M A P ------------------------------------------------
 
-	template <typename T, xns::basic_string_literal... L>
+	template <typename ___type, xns::basic_string_literal... ___literals>
 	class literal_map final {
 
 
@@ -48,35 +46,38 @@ namespace xns {
 			// -- forward declarations ----------------------------------------
 
 			template <typename>
-			struct __element;
+			struct ___wrapper;
 
 
 			// -- private types -----------------------------------------------
 
-			/* key helper */
-			template <xns::basic_string_literal __literal>
-			using __key = xns::make_character_sequence<__literal>;
+			/* self type */
+			using ___self = xns::literal_map<___type, ___literals...>;
 
-			/* element by key */
-			template <xns::basic_string_literal __literal>
-			using element_by_key = __element<__key<__literal>>;
+			/* key type */
+			template <xns::basic_string_literal ___literal>
+			using ___key = xns::make_character_sequence<___literal>;
+
+			/* wrapper from type */
+			template <xns::basic_string_literal ___literal>
+			using ___wrapper_from = ___wrapper<___key<___literal>>;
 
 
 			// -- private constants -------------------------------------------
 
 			/* __have_key */
-			template <xns::basic_string_literal __literal>
-			static constexpr bool __have_key = xns::is_one_of<__key<__literal>, __key<L>...>;
+			template <xns::basic_string_literal ___literal>
+			static constexpr bool ___have_key = xns::is_one_of<___key<___literal>, ___key<___literals>...>;
 
 
 		// -- assertions ------------------------------------------------------
 
 		/* check all string literals are unique */
-		static_assert(xns::is_all_unique<__key<L>...>,
+		static_assert(xns::is_all_unique<___key<___literals>...>,
 					 "literal_map: all string literals must be unique");
 
 		/* check for map size */
-		static_assert(sizeof...(L) > 0,
+		static_assert(sizeof...(___literals) > 0,
 					"Map must have at least one element.");
 
 
@@ -84,20 +85,14 @@ namespace xns {
 
 			// -- public types ------------------------------------------------
 
-			/* self type */
-			using self = xns::literal_map<T, L...>;
-
 			/* value type */
-			using value_type = T;
+			using value_type = ___type;
 
-			/* mutable reference type */
-			using mut_ref = value_type&;
-
-			/* move reference type */
-			using move_ref = value_type&&;
+			/* reference type */
+			using reference = value_type&;
 
 			/* const reference type */
-			using const_ref = const value_type&;
+			using const_reference = const value_type&;
 
 			/* size type */
 			using size_type = xns::size_t;
@@ -108,124 +103,124 @@ namespace xns {
 			// -- private structs ---------------------------------------------
 
 			/* __element */
-			template <typename __sequence>
-			struct __element {
+			template <typename ___sequence>
+			struct ___wrapper {
 
 
-				// -- types ---------------------------------------------------
-
-				/* self type */
-				using __self = __element<__sequence>;
-
-
-				// -- lifecycle -----------------------------------------------
-
-				/* explicit default constructor */
-				constexpr __element(void) noexcept(xns::is_nothrow_default_constructible<value_type>)
-				requires (not xns::is_trivially_default_constructible<value_type>)
-				: _data{} {
-				}
-
-				/* implicit default constructor */
-				constexpr __element(void) noexcept(xns::is_nothrow_default_constructible<value_type>)
-				requires (xns::is_trivially_default_constructible<value_type>) = default;
-
-				/* copy constructor */
-				constexpr __element(const __self&)
-				noexcept(xns::is_nothrow_move_constructible<value_type>) = default;
-
-				/* move constructor */
-				constexpr __element(__self&&)
-				noexcept(xns::is_nothrow_move_constructible<value_type>) = default;
-
-				/* variadic constructor */
-				template <typename... __params>
-				constexpr __element(__params&&... params)
-				: _data{xns::forward<__params>(params)...} {
-				}
-
-				/* destructor */
-				__attribute__((noinline))
-				~__element(void) noexcept = default;
-
-
-				// -- assignment operators ------------------------------------
-
-				/* copy assignment operator */
-				constexpr auto operator=(const __self&)
-				noexcept(xns::is_nothrow_copy_assignable<value_type>) -> __self& = default;
-
-				/* move assignment operator */
-				constexpr auto operator=(__self&&)
-				noexcept(xns::is_nothrow_move_assignable<value_type>) -> __self& = default;
+				//// -- types ---------------------------------------------------
+				//
+				///* self type */
+				//using ___self = ___wrapper<___sequence>;
+				//
+				//
+				//// -- lifecycle -----------------------------------------------
+				//
+				///* explicit default constructor */
+				//constexpr __element(void) noexcept(xns::is_nothrow_default_constructible<value_type>)
+				//requires (not xns::is_trivially_default_constructible<value_type>)
+				//: _data{} {
+				//}
+				//
+				///* implicit default constructor */
+				//constexpr __element(void) noexcept(xns::is_nothrow_default_constructible<value_type>)
+				//requires (xns::is_trivially_default_constructible<value_type>) = default;
+				//
+				///* copy constructor */
+				//constexpr __element(const __self&)
+				//noexcept(xns::is_nothrow_move_constructible<value_type>) = default;
+				//
+				///* move constructor */
+				//constexpr __element(__self&&)
+				//noexcept(xns::is_nothrow_move_constructible<value_type>) = default;
+				//
+				///* variadic constructor */
+				//template <typename... __params>
+				//constexpr __element(__params&&... params)
+				//: _data{xns::forward<__params>(params)...} {
+				//}
+				//
+				///* destructor */
+				//__attribute__((noinline))
+				//~__element(void) noexcept = default;
+				//
+				//
+				//// -- assignment operators ------------------------------------
+				//
+				///* copy assignment operator */
+				//constexpr auto operator=(const __self&)
+				//noexcept(xns::is_nothrow_copy_assignable<value_type>) -> __self& = default;
+				//
+				///* move assignment operator */
+				//constexpr auto operator=(__self&&)
+				//noexcept(xns::is_nothrow_move_assignable<value_type>) -> __self& = default;
 
 
 				// -- members -------------------------------------------------
 
 				/* value */
-				value_type _data;
+				value_type value;
 
 			}; // struct __element
 
 
 			/* __impl */
-			struct __impl final : public __element<__key<L>>... {
+			struct ___impl final : public ___wrapper<___key<___literals>>... {
+
 
 				// -- types ---------------------------------------------------
 
 				/* self type */
-				using __self = __impl;
+				using ___self = ___self::___impl;
 
 
 				// -- lifecycle -----------------------------------------------
 
 				/* default constructor */
-				constexpr __impl(void) noexcept(xns::are_nothrow_default_constructible<__element<__key<L>>...>)
-				requires (not xns::are_trivially_default_constructible<__element<__key<L>>...>)
-				: __element<__key<L>>{}... {
+				constexpr ___impl(void) noexcept(xns::is_nothrow_default_constructible<value_type>)
+				requires (not xns::is_trivially_default_constructible<value_type>)
+				: ___wrapper<___key<___literals>>{}... {
 				}
 
 				/* default constructor */
-				constexpr __impl(void) noexcept(xns::are_nothrow_default_constructible<__element<__key<L>>...>)
-				requires (xns::are_trivially_default_constructible<__element<__key<L>>...>) = default;
-
+				constexpr ___impl(void) noexcept(xns::is_nothrow_default_constructible<value_type>)
+				requires (xns::is_trivially_default_constructible<value_type>) = default;
 
 				/* variadic constructor */
-				template <typename... __params> requires (sizeof...(__params) > 1)
-				constexpr __impl(__params&&... args)
-				: __element<__key<L>>{xns::forward<__params>(args)}... {
+				template <typename... ___params> requires (sizeof...(___params) > 1)
+				constexpr ___impl(___params&&... ___args)
+				noexcept(xns::is_nothrow_constructible<value_type, ___params...>)
+				: ___wrapper<___key<___literals>>{xns::forward<___params>(___args)}... {
 				}
 
 				/* copy constructor */
-				constexpr __impl(const __self&)
-				noexcept(xns::are_nothrow_copy_constructible<__element<__key<L>>...>) = default;
+				constexpr ___impl(const ___self&)
+				noexcept(xns::is_nothrow_copy_constructible<value_type>) = default;
 
 				/* move constructor */
-				constexpr __impl(__self&&)
-				noexcept(xns::are_nothrow_move_constructible<__element<__key<L>>...>) = default;
+				constexpr ___impl(___self&&)
+				noexcept(xns::is_nothrow_move_constructible<value_type>) = default;
 
 				/* destructor */
-				__attribute__((noinline))
-				~__impl(void) noexcept = default;
+				constexpr ~___impl(void) noexcept = default;
 
 
 				// -- assignment operators ------------------------------------
 
 				/* copy assignment operator */
-				auto operator=(const __self&)
-				noexcept(xns::are_nothrow_copy_assignable<__element<__key<L>>...>) -> __self& = default;
+				auto operator=(const ___self&)
+				noexcept(xns::is_nothrow_copy_assignable<value_type>) -> ___self& = default;
 
 				/* move assignment operator */
-				auto operator=(__self&&)
-				noexcept(xns::are_nothrow_move_assignable<__element<__key<L>>...>) -> __self& = default;
+				auto operator=(___self&&)
+				noexcept(xns::is_nothrow_move_assignable<value_type>) -> ___self& = default;
 
-			}; // struct __impl
+			}; // struct ___impl
 
 
 			// -- private members ---------------------------------------------
 
 			/* implementation */
-			__impl _impl;
+			___impl _impl;
 
 
 		public:
@@ -233,155 +228,177 @@ namespace xns {
 			// -- public lifecycle --------------------------------------------
 
 			/* default constructor */
-			constexpr literal_map(void) noexcept(xns::is_nothrow_default_constructible<__impl>)
-			requires (not xns::is_trivially_default_constructible<__impl>)
+			constexpr literal_map(void) noexcept(xns::is_nothrow_default_constructible<___impl>)
+			requires (not xns::is_trivially_default_constructible<___impl>)
 			: _impl{} {
 			}
 
 			/* default constructor */
-			constexpr literal_map(void) noexcept(xns::is_nothrow_default_constructible<__impl>)
-			requires (xns::is_trivially_default_constructible<__impl>) = default;
+			constexpr literal_map(void) noexcept(xns::is_nothrow_default_constructible<___impl>)
+			requires (xns::is_trivially_default_constructible<___impl>) = default;
 
 			/* variadic constructor */
-			template <typename... __params>
-			constexpr literal_map(__params&&... __args) requires (sizeof...(__args) > 1)
-			: _impl{xns::forward<__params>(__args)...} {
+			template <typename... ___params>
+			constexpr literal_map(___params&&... ___args) requires (sizeof...(___args) > 1U)
+			: _impl{xns::forward<___params>(___args)...} {
 
-				static_assert(sizeof...(L) == sizeof...(__args),
+				static_assert(sizeof...(___literals) == sizeof...(___args),
 							"literal_map: must have exactly one value for each key.");
 			}
 
 			/* copy constructor */
-			constexpr literal_map(const self&)
-			noexcept(xns::is_nothrow_copy_constructible<__impl>) = default;
+			constexpr literal_map(const ___self&)
+			noexcept(xns::is_nothrow_copy_constructible<___impl>) = default;
 
 			/* move constructor */
-			inline constexpr literal_map(self&&)
-			noexcept(xns::is_nothrow_move_constructible<__impl>) = default;
+			constexpr literal_map(___self&&)
+			noexcept(xns::is_nothrow_move_constructible<___impl>) = default;
 
 			/* destructor */
-			~literal_map(void) noexcept = default;
+			constexpr ~literal_map(void) noexcept = default;
 
 
 			// -- public assignment operators ---------------------------------
 
 			/* copy assignment operator */
-			constexpr auto operator=(const self&)
-			noexcept(xns::is_nothrow_copy_assignable<__impl>) -> self& = default;
+			constexpr auto operator=(const ___self&)
+			noexcept(xns::is_nothrow_copy_assignable<___impl>) -> ___self& = default;
 
 			/* move assignment operator */
-			constexpr auto operator=(self&&)
-			noexcept(xns::is_nothrow_move_assignable<__impl>) -> self& = default;
+			constexpr auto operator=(___self&&)
+			noexcept(xns::is_nothrow_move_assignable<___impl>) -> ___self& = default;
 
 
 			// -- public accessors --------------------------------------------
 
 			/* size */
-			inline consteval auto size(void) const noexcept -> size_type {
-				return sizeof...(L);
+			constexpr auto size(void) const noexcept -> size_type {
+				return sizeof...(___literals);
 			}
 
 			/* contains */
-			constexpr auto contains(const_ref __vl) const -> bool {
-				return ((__vl == static_cast<element_by_key<L>&>(_impl)._data) || ...);
+			constexpr auto contains(const_reference ___vl) const noexcept /* () */ -> bool {
+				return ((___vl == static_cast<___wrapper_from<___literals>&>(_impl).value) || ...);
 			}
 
 
 			// -- public loopers ----------------------------------------------
 
 			/* for each element */
-			template <typename __invokable, typename... __params>
-			constexpr auto for_each(__invokable&& __func, __params&&... __args) -> void {
-				(__func(static_cast<element_by_key<L>&>(_impl)._data, xns::forward<__params>(__args)...), ...);
+			template <typename ___invokable, typename... ___params>
+			constexpr auto for_each(___invokable&& ___func, ___params&&... ___args) -> void {
+				(___func(static_cast<___wrapper_from<___literals>&>(_impl).value, xns::forward<___params>(___args)...), ...);
 			}
 
 			/* for each const element */
-			template <typename __invokable, typename... __params>
-			constexpr auto for_each(__invokable&& __func, __params&&... __args) const -> void {
-				(__func(static_cast<const element_by_key<L>&>(_impl)._data, xns::forward<__params>(__args)...), ...);
+			template <typename ___invokable, typename... ___params>
+			constexpr auto for_each(___invokable&& ___func, ___params&&... ___args) const -> void {
+				(___func(static_cast<const ___wrapper_from<___literals>&>(_impl).value, xns::forward<___params>(___args)...), ...);
 			}
 
 
 		// -- friends ---------------------------------------------------------
 
 		/* get as friend */
-		template <xns::basic_string_literal ___key, typename ___type,
+		template <xns::basic_string_literal, typename ___tp,
 				  xns::basic_string_literal... ___keys>
-		friend constexpr auto get(xns::literal_map<___type, ___keys...>&)
-		noexcept -> ___type&;
+		friend constexpr auto get(xns::literal_map<___tp, ___keys...>&) noexcept -> ___tp&;
 
 		/* get as friend */
-		template <xns::basic_string_literal ___key, typename ___type,
+		template <xns::basic_string_literal, typename ___tp,
 				  xns::basic_string_literal... ___keys>
-		friend constexpr auto get(xns::literal_map<___type, ___keys...>&&)
-		noexcept -> ___type&&;
+		friend constexpr auto get(xns::literal_map<___tp, ___keys...>&&) noexcept -> ___tp&&;
 
 		/* get as friend */
-		template <xns::basic_string_literal ___key, typename ___type,
+		template <xns::basic_string_literal, typename ___tp,
 				  xns::basic_string_literal... ___keys>
-		friend constexpr auto get(const xns::literal_map<___type, ___keys...>&)
-		noexcept -> const ___type&;
+		friend constexpr auto get(const xns::literal_map<___tp, ___keys...>&) noexcept -> const ___tp&;
 
 		/* get as friend */
-		template <xns::basic_string_literal ___key, typename ___type,
+		template <xns::basic_string_literal, typename ___tp,
 				  xns::basic_string_literal... ___keys>
-		friend constexpr auto get(const xns::literal_map<___type, ___keys...>&&)
-		noexcept -> const ___type&&;
+		friend constexpr auto get(const xns::literal_map<___tp, ___keys...>&&) noexcept -> const ___tp&&;
 
-	};
+	}; // class literal_map
 
 
 	/* get */
-	template <xns::basic_string_literal __key, typename __type, xns::basic_string_literal... __keys>
-	constexpr auto get(xns::literal_map<__type, __keys...>& __ltmp) noexcept -> __type& {
+	template <xns::basic_string_literal ___literal, typename ___type, xns::basic_string_literal... ___literals>
+	constexpr auto get(xns::literal_map<___type, ___literals...>& ___map) noexcept -> ___type& {
+
 		// literal map type
-		using __map = xns::literal_map<__type, __keys...>;
+		using ___map_type = xns::literal_map<___type, ___literals...>;
+
 		// assertions
-		static_assert(__map::template __have_key<__key>, "literal_map: key not found");
-		// element type
-		using __element = typename __map::template element_by_key<__key>;
+		static_assert(___map_type::template ___have_key<___literal>, "literal_map: key not found");
+
+		// wrapper type
+		using ___wrapper_type = typename ___map_type::template ___wrapper_from<___literal>;
+
 		// return lvalue reference
-		return static_cast<__type&>(static_cast<__element&>(__ltmp._impl)._data);
+		return static_cast<___type&>(static_cast<___wrapper_type&>(___map._impl).value);
 	}
 
 	/* get */
-	template <xns::basic_string_literal __key, typename __type, xns::basic_string_literal... __keys>
-	constexpr auto get(xns::literal_map<__type, __keys...>&& __ltmp) noexcept -> __type&& {
+	template <xns::basic_string_literal ___literal, typename ___type, xns::basic_string_literal... ___literals>
+	constexpr auto get(xns::literal_map<___type, ___literals...>&& ___map) noexcept -> ___type&& {
+
 		// literal map type
-		using __map = xns::literal_map<__type, __keys...>;
+		using ___map_type = xns::literal_map<___type, ___literals...>;
+
 		// assertions
-		static_assert(__map::template __have_key<__key>, "literal_map: key not found");
-		// element type
-		using __element = typename __map::template element_by_key<__key>;
+		static_assert(___map_type::template ___have_key<___literal>, "literal_map: key not found");
+
+		// wrapper type
+		using ___wrapper_type = typename ___map_type::template ___wrapper_from<___literal>;
+
 		// return rvalue reference
-		return static_cast<__type&&>(static_cast<__element&&>(__ltmp._impl)._data);
+		return static_cast<___type&&>(static_cast<___wrapper_type&&>(___map._impl).value);
 	}
 
 	/* get */
-	template <xns::basic_string_literal __key, typename __type, xns::basic_string_literal... __keys>
-	constexpr auto get(const xns::literal_map<__type, __keys...>& __ltmp) noexcept -> const __type& {
+	template <xns::basic_string_literal ___literal, typename ___type, xns::basic_string_literal... ___literals>
+	constexpr auto get(const xns::literal_map<___type, ___literals...>& ___map) noexcept -> const ___type& {
+
 		// literal map type
-		using __map = xns::literal_map<__type, __keys...>;
+		using ___map_type = xns::literal_map<___type, ___literals...>;
+
 		// assertions
-		static_assert(__map::template __have_key<__key>, "literal_map: key not found");
-		// element type
-		using __element = typename __map::template element_by_key<__key>;
+		static_assert(___map_type::template ___have_key<___literal>, "literal_map: key not found");
+
+		// wrapper type
+		using ___wrapper_type = typename ___map_type::template ___wrapper_from<___literal>;
+
 		// return const lvalue reference
-		return static_cast<const __type&>(static_cast<const __element&>(__ltmp._impl)._data);
+		return static_cast<const ___type&>(static_cast<const ___wrapper_type&>(___map._impl).value);
 	}
 
 	/* get */
-	template <xns::basic_string_literal __key, typename __type, xns::basic_string_literal... __keys>
-	constexpr auto get(const xns::literal_map<__type, __keys...>&& __ltmp) noexcept -> const __type&& {
+	template <xns::basic_string_literal ___literal, typename ___type, xns::basic_string_literal... ___literals>
+	constexpr auto get(const xns::literal_map<___type, ___literals...>&& ___map) noexcept -> const ___type&& {
+
 		// literal map type
-		using __map = xns::literal_map<__type, __keys...>;
+		using ___map_type = xns::literal_map<___type, ___literals...>;
+
 		// assertions
-		static_assert(__map::template __have_key<__key>, "literal_map: key not found");
-		// element type
-		using __element = typename __map::template element_by_key<__key>;
+		static_assert(___map_type::template ___have_key<___literal>, "literal_map: key not found");
+
+		// wrapper type
+		using ___wrapper_type = typename ___map_type::template ___wrapper_from<___literal>;
+
 		// return const rvalue reference
-		return static_cast<const __type&&>(static_cast<const __element&&>(__ltmp._impl)._data);
+		return static_cast<const ___type&&>(static_cast<const ___wrapper_type&&>(___map._impl).value);
 	}
+
+
+
+	/* for each */
+	template <typename ___invokable, typename ___type, xns::basic_string_literal... ___literals, typename... ___params>
+	constexpr auto for_each(xns::literal_map<___type, ___literals...>& ___map, ___invokable&& ___func, ___params&&... ___args) -> void {
+		___map.for_each(xns::forward<___invokable>(___func), xns::forward<___params>(___args)...);
+	}
+
+
 
 } // namespace xns
 

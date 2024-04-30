@@ -26,50 +26,50 @@ namespace xns {
 
 	// -- E X T E N T ---------------------------------------------------------
 
-	namespace __impl {
+	namespace ___impl {
 
 
 		/* extent for non-array types */
-		template <typename __type, unsigned __dim = 0>
-		struct extent final {
-			XNS_NOT_INSTANTIABLE(extent);
+		template <typename ___type, xns::size_t ___dim = 0U>
+		struct ___extent final {
+			___xns_not_instantiable(___extent);
 			static constexpr xns::size_t value = 0;
 		};
 
 		/* extent for unbounded array types (first dimension) */
-		template <typename __type>
-		struct extent<__type[], 0U> final {
-			XNS_NOT_INSTANTIABLE(extent);
-			static constexpr xns::size_t value = 0;
+		template <typename ___type>
+		struct ___extent<___type[], 0U> final {
+			___xns_not_instantiable(___extent);
+			static constexpr xns::size_t value = 0U;
 		};
 
 		/* extent for unbounded array types (subsequent dimensions) */
-		template <typename __type, unsigned __dim>
-		struct extent<__type[], __dim> final {
-			XNS_NOT_INSTANTIABLE(extent);
-			static constexpr xns::size_t value = extent<__type, __dim - 1>::value;
+		template <typename ___type, xns::size_t ___dim>
+		struct ___extent<___type[], ___dim> final {
+			___xns_not_instantiable(___extent);
+			static constexpr xns::size_t value = ___impl::___extent<___type, ___dim - 1U>::value;
 		};
 
 		/* extent for bounded array types (first dimension) */
-		template <typename __type, xns::size_t __size>
-		struct extent<__type[__size], 0U> final {
-			XNS_NOT_INSTANTIABLE(extent);
-			static constexpr xns::size_t value = __size;
+		template <typename ___type, xns::size_t ___size>
+		struct ___extent<___type[___size], 0U> final {
+			___xns_not_instantiable(___extent);
+			static constexpr xns::size_t value = ___size;
 		};
 
 		/* extent for bounded array types (subsequent dimensions) */
-		template <typename __type, xns::size_t __size, unsigned __dim>
-		struct extent<__type[__size], __dim> final {
-			XNS_NOT_INSTANTIABLE(extent);
-			static constexpr xns::size_t value = extent<__type, __dim - 1>::value;
+		template <typename ___type, xns::size_t ___size, xns::size_t ___dim>
+		struct ___extent<___type[___size], ___dim> final {
+			___xns_not_instantiable(___extent);
+			static constexpr xns::size_t value = ___impl::___extent<___type, ___dim - 1U>::value;
 		};
 
-	} // namespace __impl
+	} // namespace ___impl
 
 
 	/* extent */
-	template <typename __type, unsigned __dim = 0>
-	constexpr xns::size_t extent = __impl::extent<__type, __dim>::value;
+	template <typename ___type, xns::size_t ___dim = 0U>
+	constexpr xns::size_t extent = ___impl::___extent<___type, ___dim>::value;
 
 } // namespace xns
 
