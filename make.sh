@@ -198,7 +198,7 @@ CXXFLAGS=()
 CXXFLAGS+=('-Wall' '-Wextra')
 
 # warning impact
-CXXFLAGS+=('-Werror')
+CXXFLAGS+=('-Werror' '-Wfatal-errors')
 
 # standard respect
 CXXFLAGS+=('-Wpedantic' '-Weffc++')
