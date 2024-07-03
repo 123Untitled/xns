@@ -2,10 +2,10 @@
 #define XNS_AST_HEADER
 
 // local headers
-#include "xns/vector.hpp"
-#include "xns/string.hpp"
-#include "xns/memory.hpp"
-#include "xns/unique_ptr.hpp"
+#include "xns/containers/vector.hpp"
+#include "xns/string/string.hpp"
+#include "xns/memory/memory.hpp"
+#include "xns/memory/unique_ptr.hpp"
 
 
 

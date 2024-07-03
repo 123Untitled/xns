@@ -2,8 +2,8 @@
 #define XNS_SHARED_DESCRIPTOR_HEADER
 
 // local headers
-#include "xns/types.hpp"
-#include "xns/allocator.hpp"
+#include "xns/type_traits/types.hpp"
+#include "xns/memory/allocator.hpp"
 
 #include <unistd.h>
 #include <fcntl.h>

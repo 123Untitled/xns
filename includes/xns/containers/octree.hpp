@@ -2,8 +2,8 @@
 #define XNS_OCTREE_HEADER
 
 // local headers
-#include "xns/macros.hpp"
-#include "xns/types.hpp"
+#include "xns/config/macros.hpp"
+#include "xns/type_traits/types.hpp"
 
 
 // -- X N S  N A M E S P A C E ------------------------------------------------
