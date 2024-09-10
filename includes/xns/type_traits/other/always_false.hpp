@@ -23,8 +23,7 @@ namespace xns {
 
 	// -- A L W A Y S  F A L S E ----------------------------------------------
 
-
-	namespace __impl {
+	namespace ___impl {
 
 
 		template <typename>
@@ -34,8 +33,8 @@ namespace xns {
 
 	} // namespace __impl
 
-	template <typename __type>
-	concept always_false = xns::__impl::always_false<__type>::value;
+	template <typename ___type>
+	concept always_false = xns::___impl::always_false<___type>::value;
 
 } // namespace xns
 
