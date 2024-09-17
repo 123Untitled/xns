@@ -895,23 +895,6 @@ function handle_argument {
 			;;
 
 		'test')
-
-			# check clone type
-			if [[ $CLONE == 'public' ]]; then
-				message 'error' \
-					'tests are not available in public repository'
-				exit 1
-			fi
-
-			# submodule : tests
-			# initialize submodules
-			if ! git submodule update --init --quiet; then
-				message 'error' 'failed to initialize submodules'
-				exit 1
-			fi
-
-			message '\ninfo' 'submodule tests initialized'
-
 			make_silent_clean
 			echo 'MODE=test'    > $SETUP
 
@@ -970,6 +953,20 @@ function setup_mode {
 			;;
 
 		'test')
+
+			# check clone type
+			if [[ $CLONE == 'public' ]]; then
+				message 'error' \
+					'tests are not available in public repository'
+				exit 1
+			fi
+
+			# initialize submodules
+			if ! git submodule update --init; then
+				message 'error' 'failed to initialize submodules'
+				exit 1
+			fi
+
 			if [[ -z $TEST ]]; then
 				require_test_file
 			fi
