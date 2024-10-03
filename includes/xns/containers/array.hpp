@@ -10,8 +10,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-#pragma once
-
 #ifndef XNS_ARRAY_HEADER
 #define XNS_ARRAY_HEADER
 
@@ -37,52 +35,60 @@ namespace xns {
 
 	// -- A R R A Y -----------------------------------------------------------
 
-	template <typename ___type, decltype(sizeof(0)) ___size>
+	template <typename ___type, xns::size_t ___size>
 	class array final {
+
+
+		private:
+
+			// -- private types -----------------------------------------------
+
+			/* self type */
+			using ___self = xns::array<___type, ___size>;
+
+			/* array type */
+			using ___array = ___type[___size];
 
 
 		public:
 
 			// -- public types ------------------------------------------------
 
-			/* self type */
-			using self       = xns::array<___type, ___size>;
-
 			/* value type */
-			using value_type = ___type;
+			using value_type      = ___type;
 
-			/* mutable reference type */
-			using mut_ref    = value_type&;
+			/* reference type */
+			using reference       = value_type&;
 
-			/* constant reference type */
-			using const_ref  = const value_type&;
+			/* const reference type */
+			using const_reference = const value_type&;
 
-			/* mutable pointer type */
-			using mut_ptr    = value_type*;
+			/* pointer type */
+			using pointer         = value_type*;
 
-			/* constant pointer type */
-			using const_ptr  = const value_type*;
+			/* const pointer type */
+			using const_pointer   = const value_type*;
 
 			/* size type */
-			using size_type  = decltype(sizeof(0));
+			using size_type       = decltype(___size);
 
 
 			// -- public members ----------------------------------------------
 
 			/* data */
-			value_type _data[___size];
+			___array _data;
 
 
 			// -- public subscript operators ----------------------------------
 
 			/* subscript operator */
-			constexpr auto operator[](const size_type index) noexcept -> mut_ref {
-				return _data[index];
+			constexpr auto operator[](const size_type i) noexcept -> reference {
+				return _data[i];
 			}
 
 			/* const subscript operator */
-			constexpr auto operator[](const size_type index) const noexcept -> const_ref {
-				return _data[index];
+			constexpr auto operator[](const size_type i) const noexcept -> const_reference {
+				return _data[i];
 			}
 
 
@@ -94,15 +100,24 @@ namespace xns {
 			}
 
 			/* data */
-			constexpr auto data(void) noexcept -> mut_ptr {
+			constexpr auto data(void) noexcept -> pointer {
 				return _data;
 			}
 
 			/* const data */
-			constexpr auto data(void) const noexcept -> const_ptr {
+			constexpr auto data(void) const noexcept -> const_pointer {
 				return _data;
 			}
 
+			/* c array */
+			constexpr auto c_array(void) noexcept -> ___array& {
+				return _data;
+			}
+
+			/* const c array */
+			constexpr auto c_array(void) const noexcept -> const ___array& {
+				return _data;
+			}
 
 	}; // class array
 
