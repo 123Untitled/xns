@@ -36,6 +36,9 @@
 
 #include "xns/type_traits/type_operations/declval.hpp"
 
+#include "xns/diagnostics/exceptions.hpp"
+
+
 // -- X N S  N A M E S P A C E ------------------------------------------------
 
 namespace xns {
@@ -46,12 +49,124 @@ namespace xns {
 	};
 
 
-	// -- T E R M  C L A S S --------------------------------------------------
+
+	// -- T E R M I N A L -----------------------------------------------------
 
 	class terminal final {
 
 
 		public:
+
+			// -- public classes ----------------------------------------------
+
+
+			class attribute final {
+
+
+				private:
+
+					// -- private types ---------------------------------------
+
+					/* self type */
+					using ___self = xns::terminal::attribute;
+
+					/* tcflag type */
+					using ___flag = ::tcflag_t;
+
+					/* cc type */
+					using ___cc   = ::cc_t;
+
+					/* termios type */
+					using ___termios = struct ::termios;
+
+
+					// -- private members ---------------------------------------------
+
+					/* attribute */
+					___termios _attrs;
+
+
+				public:
+
+					// -- public lifecycle --------------------------------------------
+
+					/* default constructor */
+					attribute(void) noexcept
+					/* : _attrs{} no init */ {
+					}
+
+					/* copy constructor */
+					attribute(const ___self&) noexcept = default;
+
+					/* move constructor */
+					attribute(___self&&) noexcept = default;
+
+					/* destructor */
+					~attribute(void) noexcept = default;
+
+
+					// -- public assignment operators ---------------------------------
+
+					/* copy assignment operator */
+					auto operator=(const ___self&) noexcept -> ___self& = default;
+
+					/* move assignment operator */
+					auto operator=(___self&&) noexcept -> ___self& = default;
+
+
+					// -- public modifiers --------------------------------------------
+
+					/* raw */
+					auto raw(void) noexcept -> void {
+
+						// disable input flags
+						_attrs.c_iflag &= ~static_cast<___flag>(
+								BRKINT |  IGNBRK | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON | IGNCR);
+
+						// disable output flags
+						_attrs.c_oflag &= ~static_cast<___flag>(
+								OPOST);
+
+						// disable control flags
+						_attrs.c_lflag &= ~static_cast<___flag>(
+								ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+
+						// disable local flags
+						_attrs.c_cflag &= ~static_cast<___flag>(
+								CSIZE | PARENB);
+					}
+
+
+					/* read timeout */
+					auto read_timeout(const ___cc& ___time) noexcept -> void {
+						_attrs.c_cc[VMIN] = ___time;
+					}
+
+					/* min read */
+					auto min_read(const ___cc& ___min) noexcept -> void {
+						_attrs.c_cc[VTIME] = ___min;
+					}
+
+
+					/* set */
+					auto set(const int ___ac) const -> void {
+
+						// set terminal attributes
+						if (::tcsetattr(STDIN_FILENO, ___ac, &_attrs) == -1)
+							throw xns::exception("failed to set terminal attributes", errno);
+					}
+
+					/* get */
+					auto get(void) -> void {
+
+						// get terminal attributes
+						if (::tcgetattr(STDIN_FILENO, &_attrs) == -1)
+							throw xns::exception("failed to get terminal attributes", errno);
+					}
+
+			}; // class attribute
+
+
 
 			// -- public types ------------------------------------------------
 
@@ -59,16 +174,40 @@ namespace xns {
 			using self = xns::terminal;
 
 			/* terminal size type */
-			using term_size = decltype(xns::declval<struct winsize>().ws_row);
+			using term_size = decltype(xns::declval<struct ::winsize>().ws_row);
 
 
-			// -- C O N S T R U C T O R S -------------------------------------
+		private:
+
+			// -- private types -----------------------------------------------
+
+			/* self type */
+			using ___self = xns::terminal;
+
+
+			// -- private members ---------------------------------------------
+
+			/* original terminal settings */
+			const ___self::attribute _origin;
+
+			/* raw terminal settings */
+			___self::attribute _raw;
+
+			/* terminal width */
+			term_size _width;
+
+			/* terminal height */
+			term_size _height;
+
+
+		public:
+
+			// -- public lifecycle --------------------------------------------
+
 
 			/* non-assignable class */
 			unassignable(terminal);
 
-			/* destructor */
-			~terminal(void) noexcept;
 
 
 			// -- M E T H O D S -----------------------------------------------
@@ -120,86 +259,29 @@ namespace xns {
 			static void get_process_info(void);
 
 
-			template <tcflag_t ___flags>
-			static auto oflags(struct termios& attrs) -> void {
-				attrs.c_oflag |= ___flags;
-			}
-
-			template <tcflag_t ___flags>
-			static auto iflags(struct termios& attrs) -> void {
-				attrs.c_iflag |= ___flags;
-			}
-
-			template <tcflag_t ___flags>
-			static auto lflags(struct termios& attrs) -> void {
-				attrs.c_lflag |= ___flags;
-			}
-
-			template <tcflag_t ___flags>
-			static auto cflags(struct termios& attrs) -> void {
-				attrs.c_cflag |= ___flags;
-			}
-
-
-			void test() {
-				struct termios attrs;
-				oflags<ONLCR>(attrs);
-				iflags<ICRNL>(attrs);
-			}
-
-
 		private:
 
 			// -- private lifecycle -------------------------------------------
 
-			/* private default constructor */
+			/* default constructor */
 			terminal(void);
 
+			/* destructor */
+			~terminal(void) noexcept;
 
-			// -- M E T H O D S -----------------------------------------------
 
-			/* get terminal settings */
-			const struct termios setup_terminal(void);
-
-			/* setup raw terminal */
-			void setup_raw(void);
+			// -- private methods ---------------------------------------------
 
 			/* query terminal size */
-			int query_terminal_size(void);
+			auto _query_terminal_size(void) noexcept -> void;
 
 
+			// -- private static methods --------------------------------------
 
-			/* signal handler */
-			static void terminal_resize_handler(int signum);
+			/* resize handler */
+			static void _resize_handler(const int) noexcept;
 
-
-
-			// -- private members --------------------------------------------
-
-			/* raw terminal flag */
-			bool _is_raw;
-
-			/* original terminal flag */
-			bool _is_origin;
-
-			// setup flag
-			bool _is_setup;
-
-			// original terminal settings
-			const struct termios _origin;
-
-			// raw terminal settings
-			struct termios _raw;
-
-			/* terminal width */
-			term_size _width;
-
-			/* terminal height */
-			term_size _height;
-
-
-
-	};
+	}; // class terminal
 
 } // namespace xns
 

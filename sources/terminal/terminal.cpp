@@ -28,81 +28,35 @@
 // the values of the c_cflag, c_ispeed, and c_ospeed fields are ignored.
 
 
+static auto get_attr(void) -> xns::terminal::attribute {
+	xns::terminal::attribute attr;
+	attr.get();
+	return attr;
+}
 
 // -- C O N S T R U C T O R S -------------------------------------------------
 
 /* private default constructor */
 xns::terminal::terminal(void)
-:	_is_raw{false}, _is_origin{false}, _is_setup{false},
-	_origin{setup_terminal()}, _raw{},
- 	_width{0}, _height{0} {
+: _origin{get_attr()}, _raw{_origin},
+  _width{0u}, _height{0u} {
 
-	// check if original terminal settings are available
-	if (_is_origin) {
-		// copy original terminal settings
-		_raw = _origin;
-		// setup raw terminal settings
-		setup_raw();
-		// set setup flag
-		_is_setup = true;
-	}
+	// setup raw terminal settings
+	_raw.raw();
 
 	// query terminal size
-	query_terminal_size();
+	___self::_query_terminal_size();
 
 	// set resize signal handler
-	std::signal(SIGWINCH, &terminal::terminal_resize_handler);
+	std::signal(SIGWINCH, &terminal::_resize_handler);
 }
 
 /* destructor */
 xns::terminal::~terminal(void) noexcept {
 	// restore terminal settings if raw
-	if (_is_raw == false)
-		return;
-	restore();
+	_origin.set(TCSANOW); // here need to noexcept !
 }
 
-
-// -- M E T H O D S -----------------------------------------------------------
-
-
-/* get terminal settings */
-auto xns::terminal::setup_terminal(void) -> const struct termios {
-
-	// termios structure
-	struct termios origin;
-
-	// get current terminal settings
-	if (::tcgetattr(STDIN_FILENO, &origin) != 0)
-		return origin;
-
-	// if no error, set bool flag
-	_is_origin = true;
-	// return by value original terminal setup
-	return origin;
-}
-
-/* setup raw terminal */
-auto xns::terminal::setup_raw(void) -> void {
-
-	// get flag type
-	using iflag = decltype(_raw.c_iflag);
-	using lflag = decltype(_raw.c_lflag);
-
-
-	// setup new terminal structure
-	_raw.c_iflag &= ~static_cast<iflag>(  IXON   // disable Ctrl-S and Ctrl-Q
-										| ICRNL  // disable Ctrl-M
-	);
-
-	_raw.c_lflag &= ~static_cast<lflag>(  ECHO   // disable echo
-										| ICANON // non-canonical mode
-										| ISIG   // disable Ctrl-C and Ctrl-Z
-										| IEXTEN // disable Ctrl-V and Ctrl-O
-	);
-
-	_raw.c_cc[VTIME] = 0;
-}
 
 
 /* flush stdin buffer */
@@ -114,63 +68,45 @@ void xns::terminal::flush(void) {
 auto xns::terminal::raw(const VFlag vmin) -> void {
 
 	// get instance
-	auto& instance = self::shared();
-
-	// check if terminal is setup
-	if (instance._is_setup == false) { return; }
+	auto& ___ins = self::shared();
 
 	// VMIN = Minimum number of characters to read
-	instance._raw.c_cc[VMIN] = static_cast<xns::ubyte>(vmin);
+	___ins._raw.min_read(static_cast<xns::ubyte>(vmin));
 
-	// set non-canonical mode
-	if (::tcsetattr(STDIN_FILENO, TCSANOW, &instance._raw) != 0)
-		return;
-
-	instance._is_raw = true;
+	// set raw terminal settings
+	___ins._raw.set(TCSANOW);
 }
 
+/* restore */
 auto xns::terminal::restore(void) -> void {
-	// get instance
-	auto& instance = self::shared();
-	// check if terminal is setup
-	if (instance._is_setup == false) { return; }
-	// reset orignal terminal settings
-	if (::tcsetattr(STDIN_FILENO, TCSAFLUSH, &instance._origin) != 0)
-		return;
-	instance._is_raw = false;
+	// restore terminal settings
+	___self::shared()._origin.set(TCSANOW);
 }
-
 
 
 /* query terminal size */
-int xns::terminal::query_terminal_size(void) {
+auto xns::terminal::_query_terminal_size(void) noexcept -> void {
 
 	// winsize structure
-	struct winsize win;
+	struct ::winsize win;
 
 	// query terminal dimensions
 	int err = ::ioctl(STDOUT_FILENO, TIOCGWINSZ, &win);
 
 	// check error
-	if (err != -1) {
-		// assign result to reference parameters
-		_width = win.ws_col;
-		_height = win.ws_row;
-	}
-	// error return
-	return err;
+	if (err == -1)
+		return;
 
+	// assign result
+	_width = win.ws_col;
+	_height = win.ws_row;
 }
 
-void xns::terminal::terminal_resize_handler(int signum) {
-	// get instance
-	auto& instance = self::shared();
-	static_cast<void>(signum);
+/* terminal resize handler */
+auto xns::terminal::_resize_handler(const int) noexcept -> void {
+
 	// query terminal size
-	if (instance.query_terminal_size() != 0)
-		return;
-	// call resize event subscribers
-	//xns::event::shared().call_event(xns::evntype::TERMINAL_RESIZE);
+	___self::shared()._query_terminal_size();
 }
 
 
