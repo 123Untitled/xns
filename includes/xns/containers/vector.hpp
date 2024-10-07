@@ -353,6 +353,7 @@ namespace xns {
 			}
 
 			/* container constructor */
+			/*
 			template <xns::is_container ___container>
 			constexpr vector(const ___container& ___c) noexcept(false)
 			// initializer
@@ -389,6 +390,7 @@ namespace xns {
 					___d.complete();
 				}
 			}
+			*/
 
 
 			/* iterator constructor */
